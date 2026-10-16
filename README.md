@@ -49,7 +49,7 @@ Zuna Roast/
 | `.github/workflows/release.yml` | Builds the `.dmg` on GitHub's Macs and publishes a Release when a `v*` tag is pushed. |
 | `.github/workflows/check.yml` | On every change, checks that the screen code parses and the Mac app compiles. |
 
-**To ship a new version:** change `"version"` in `package.json` (for example `1.0.1`), commit, then push a tag with the same number (`git tag v1.0.1 && git push --tags`). GitHub builds it, and every installed app offers the update the next time it opens.
+**To ship a new version:** change `"version"` in `package.json` (for example `1.0.1`) and commit. Then either go to **Actions → Release Mac app → Run workflow**, or push a tag with the same number (`git tag v1.0.1 && git push --tags`). GitHub builds it in about 6 minutes, and every installed app offers the update the next time it opens.
 
 **Update signing:** updates are signed with a private key stored as the repository secret `TAURI_SIGNING_PRIVATE_KEY`, and the matching public key is in `src-tauri/tauri.conf.json`. Keep a backup of the private key. Without it, installed copies can't be updated automatically, and you'd have to install new versions by hand.
 
