@@ -1,8 +1,8 @@
 {
   "name": "zuna-roast",
   "private": true,
-  "version": "1.0.0",
-  "description": "Zuna Roast — roasting software for the Probat P12 III",
+  "version": "1.0.1",
+  "description": "Zuna Roast \u2014 roasting software for the Probat P12 III",
   "scripts": {
     "tauri": "tauri",
     "check": "node tools/check.mjs"
