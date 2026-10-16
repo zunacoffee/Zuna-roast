@@ -680,10 +680,12 @@ function onData(data){const vals={};
   for(const [k,cc] of Object.entries(cfg.channels)){let v=cc.node?num(getPath(data,cc.node)):null;if(v==null){vals[k]=null;continue}v*=Number(cc.scale)||1;if(TEMP_KEYS.includes(k)&&cc.mode==='F')v=(v-32)*5/9;vals[k]=v}
   const now=link.clock();S.latest=vals;S.lastDataAt=performance.now();
   S.mon.push({t:now,bt:vals.bt});while(S.mon.length&&S.mon[0].t<now-120)S.mon.shift();S.liveRor=slope(S.mon,'bt',now,cfg.rorWindow);
-  if(S.recording){const r=S.roast,t=now-r.t0,s={t:+t.toFixed(2)};for(const k of Object.keys(cfg.channels))s[k]=vals[k]==null?null:+vals[k].toFixed(2);
+  if(S.recording){const r=S.roast,lastS=r.samples.at(-1);if(lastS&&now-r.t0<=lastS.t){r.t0=now-(lastS.t+(Number(cfg.interval)||1));log('sys','Roast clock kept continuous after the data source restarted')}
+    const t=now-r.t0,s={t:+t.toFixed(2)};for(const k of Object.keys(cfg.channels))s[k]=vals[k]==null?null:+vals[k].toFixed(2);
     r.samples.push(s);const ror=slope(r.samples,'bt',t,cfg.rorWindow);s.ror=ror==null?null:+ror.toFixed(2);detectTP(s);checkAutoCool(s);S.dirty=true;checkReminders()}
   renderLive();scheduleDraw()}
 function checkAutoCool(s){const r=S.roast;if(!cfg.autoCoolOn||r.autoCooled||r.events.CHARGE==null||r.events.TP==null||!ok(s.bt)||s.bt<cfg.autoCoolC)return;
+  const tpS=sampleAt(r.samples,r.events.TP);if(s.t-r.events.CHARGE<120||!tpS||!ok(tpS.bt)||s.bt<tpS.bt+25||!(ok(s.ror)&&s.ror>0))return;
   r.autoCooled=true;const at=`${fT(s.bt)}°${cfg.unit}`;
   if(!C.on||!link.connected()){toast(`Auto cooling skipped at ${at} — Control is off`);log('ctl','Auto cooling skipped (Control off)');return}
   sendSwitch('coolingFanState',true,true);r.tnotes.push({t:s.t,text:`Cooling on (auto at ${at})`});toast(`Cooling on — bean temp ${at}`);log('ctl','Auto cooling ON at '+at);
@@ -1575,7 +1577,7 @@ async function init(){
   $('#snav').onclick=e=>{const b=e.target.closest('button');if(b){curPane=b.dataset.p;renderSettings()}};
   $('#btnConnect').onclick=()=>{if(!link.manual&&!link.sim)link.disconnect();else link.connect(false)};
   $('#btnSim').onclick=()=>{if(!link.manual&&link.sim)link.disconnect();else link.connect(true)};
-  $('#simSpeed').onchange=()=>{if(!link.manual&&link.sim){if(S.recording)toast('Simulator restarted');link.connect(true)}};
+  let simSpeedNow=$('#simSpeed').value;$('#simSpeed').onchange=()=>{if(!link.manual&&link.sim){if(S.recording){$('#simSpeed').value=simSpeedNow;toast('Stop the roast before changing the simulator speed');return}link.connect(true)}simSpeedNow=$('#simSpeed').value};
   $('#btnControl').onclick=()=>setControl(!C.on);$('#btnCtlOn').onclick=()=>setControl(true);
   $('#chartTitle').onclick=()=>openDrawer();
   $('#roBT').onclick=()=>{if(S.alarm.active){S.alarm.muted=true;checkBtAlarm()}};
