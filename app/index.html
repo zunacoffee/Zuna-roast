@@ -328,7 +328,7 @@ tr.tdone td{color:var(--text2)}
   <section class="panel">
     <div class="pt">Other values</div>
     <div class="ro" id="roEx"><div class="l"><span>Exhaust</span><span class="u">°F</span></div><div class="v sm" id="vEx">—</div></div>
-    <div class="ro" id="roPa"><div class="l"><span>Air pressure</span><span>Pa</span></div><div class="v sm" id="vPa">—</div></div>
+    <div class="ro" id="roPa"><div class="l"><span>Air pressure</span><span class="up">Pa</span></div><div class="v sm" id="vPa">—</div></div>
     <div id="todayMini"></div>
     <div class="pt" id="notesHead" style="margin-top:6px"><span>Notes</span></div>
     <div class="notes" id="notes"></div>
@@ -521,6 +521,7 @@ const DEF={
   presets:{burner:[20,40,60,80],fan:[30,45,65]},btAlarmOn:true,btAlarmC:(460-32)*5/9,autoCoolOn:false,autoCoolC:(400-32)*5/9,autoStirDelay:5,autoOffOn:true,dropSetOn:false,dropBurner:40,dropAir:60,showNextBar:true,coolOffMin:4,stirOffMin:6,ctlStep:1,burnerMax:100,sendEvents:true,confirmMachine:true,coolOnDrop:false,sound:true,
   events:[{k:'UNDO',label:'Undo',show:true,key:'0'},{k:'CHARGE',label:'Charge',show:true,key:'1'},{k:'DRY',label:'Dry end',show:true,key:'2'},{k:'FCs',label:'FC start',show:true,key:'3'},{k:'FCe',label:'FC end',show:true,key:'4'},{k:'SCs',label:'SC start',show:false,key:'5'},{k:'SCe',label:'SC end',show:false,key:''},{k:'COOL',label:'Cool end',show:false,key:'7'},{k:'DROP',label:'Drop',show:true,key:'6'}],evOrderV:2,keyV:2,
   startKey:'Escape',swKeys:{coolingFanState:'c',stirrerState:'s'},
+  pUnit:'Pa',
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0},
   theme:{name:'White',colors:{...WHITE}},customThemes:[]
 };
@@ -548,6 +549,8 @@ const toDR=r=>ok(r)?(isF()?r*1.8:r):null;            // °C/min → display
 const fT=c=>ok(c)?toD(c).toFixed(1):'—';
 const fR=r=>ok(r)?toDR(r).toFixed(1):'—';
 const f0=v=>ok(v)?String(Math.round(v)):'—';
+const isMbar=()=>cfg.pUnit==='mbar',pU=()=>isMbar()?'mbar':'Pa';            // pressure is stored in Pa
+const fP=v=>ok(v)?(isMbar()?(v/100).toFixed(2):String(Math.round(v))):'—';
 let COL={};
 function applyTheme(){const c=cfg.theme.colors,r=document.documentElement.style;
   const map={bg:'--bg',panel:'--panel',text:'--text',text2:'--text2',border:'--border',accent:'--accent',chartBg:'--chartBg',grid:'--grid',axis:'--axis',bt:'--c-bt',ror:'--c-ror',exhaust:'--c-exhaust',bkg:'--c-bkg',burner:'--c-burner',air:'--c-air',drum:'--c-drum',pressure:'--c-pressure',phase:'--c-phase',tTime:'--t-time',tBT:'--t-bt',tRoR:'--t-ror',tSpB:'--t-spb',tSpA:'--t-spa',tSpD:'--t-spd'};
@@ -847,8 +850,8 @@ function csvText(r){const u=isF()?'F':'C',c=r.events.CHARGE??0,evAt={};for(const
   const m=r.meta,sp=spreadOf(m),cost=costOf(r);
   const pre=[...(cfg.bizName?[`# ${cfg.bizName}`]:[]),`# Roast #${r.num||''} | ${m.name||''} | ${m.coffee||''} | lot ${m.lot||''} | green ${m.green||''} lb | roasted ${m.roasted||''} lb | whole ${m.colorWhole||''} | ground ${m.colorGround||''} | spread ${ok(sp)?sp:''}${r.isProfile?' | PROFILE':''}`,
     `# Charged ${r.chargedAt?new Date(r.chargedAt).toLocaleString():''} | batch cost ${cost&&ok(cost.batch)?cost.batch.toFixed(2):''} | cup ${r.cup??''} | ${r.machine}`,`# Notes: ${String(m.notes||'').replace(/\s+/g,' ')}`];
-  const head=['time_s','time_from_charge',`bt_${u}`,`ror_${u}_per_min`,`exhaust_${u}`,`et_${u}`,`inlet_${u}`,'burner_pct','air_pct','drum_pct','air_pressure_pa','event'];
-  const rows=r.samples.map(s=>[s.t.toFixed(1),mmss(s.t-c),fT(s.bt),fR(s.ror),fT(s.exhaust),fT(s.et),fT(s.inlet),f0(s.burner),f0(s.fan),f0(s.drum),f0(s.pressure),evAt[s.t]||''].map(v=>v==='—'?'':v).join(','));
+  const head=['time_s','time_from_charge',`bt_${u}`,`ror_${u}_per_min`,`exhaust_${u}`,`et_${u}`,`inlet_${u}`,'burner_pct','air_pct','drum_pct',`air_pressure_${pU().toLowerCase()}`,'event'];
+  const rows=r.samples.map(s=>[s.t.toFixed(1),mmss(s.t-c),fT(s.bt),fR(s.ror),fT(s.exhaust),fT(s.et),fT(s.inlet),f0(s.burner),f0(s.fan),f0(s.drum),fP(s.pressure),evAt[s.t]||''].map(v=>v==='—'?'':v).join(','));
   return pre.concat([head.join(',')],rows).join('\n')}
 function invCSV(){const head=['coffee','origin','process','lot','supplier','arrived','price_per_lb','start_lb','adjust_lb','used_lb','left_lb','value_on_hand','notes'];
   const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;return [head.join(',')].concat(INV.map(l=>{const adj=(l.adj||[]).reduce((a,x)=>a+(num(x.lb)||0),0),left=invLeft(l),p=num(l.price);
@@ -965,7 +968,7 @@ function renderHeader(){
 const rorStart=ev=>ev.CHARGE==null?null:cfg.rorFrom==='tp'?(ev.TP??ev.CHARGE+45):ev.CHARGE;
 function curTime(){const r=S.roast;if(S.recording)return link.clock()-r.t0;return r.samples.length?r.samples.at(-1).t:null}
 function renderLive(){const v=S.latest,r=S.roast,last=S.recording?r.samples.at(-1):null;
-  $('#vBT').textContent=fT(v.bt);const rorHide=cfg.rorFrom==='tp'&&S.recording&&r.events.CHARGE!=null&&(r.events.TP==null||r.events.DROP!=null);$('#vRoR').textContent=rorHide?'—':fR(last?last.ror:S.liveRor);$('#vEx').textContent=fT(v.exhaust);$('#vPa').textContent=f0(v.pressure);
+  $('#vBT').textContent=fT(v.bt);const rorHide=cfg.rorFrom==='tp'&&S.recording&&r.events.CHARGE!=null&&(r.events.TP==null||r.events.DROP!=null);$('#vRoR').textContent=rorHide?'—':fR(last?last.ror:S.liveRor);$('#vEx').textContent=fT(v.exhaust);$('#vPa').textContent=fP(v.pressure);
   let dbt='',dror='';if(S.bg&&S.recording&&last&&r.events.CHARGE!=null){const rc=S.bg.events.CHARGE??0,x=last.t-r.events.CHARGE;
     const rb=interp(S.bg.samples,'bt',x+rc),rr=interp(S.bg.samples,'ror',x+rc);
     const f=(d,dig)=>ok(d)?`Δ BKG <b class="${Math.abs(d)<.05?'':d>0?'pos':'neg'}">${d>0?'+':''}${d.toFixed(dig)}</b>`:'';
@@ -1065,13 +1068,13 @@ function drawMain(){const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H
 function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)return;const w=W-PAD.l-PAD.r,X=x=>PAD.l+(x-v.lo)/(v.hi-v.lo)*w;
   ctx.fillStyle=COL.chartBg;ctx.fillRect(0,0,W,H);
   const rows=[{k:'burner',label:'Burner',col:COL.burner,max:100,unit:'%'},{k:'fan',label:'Air',col:COL.air,max:100,unit:'%'}];
-  if(cfg.scales.showPressure){let pm=Number(cfg.scales.pMax)||0;if(!pm){let mx=0;for(const s of [...S.roast.samples,...(S.bg?S.bg.samples:[])])if(ok(s.pressure))mx=Math.max(mx,s.pressure);pm=Math.max(50,Math.ceil(mx*1.15/50)*50)}rows.push({k:'pressure',label:'Pressure',col:COL.pressure,max:pm,unit:' Pa',noLabels:true})}
+  if(cfg.scales.showPressure){let pm=Number(cfg.scales.pMax)||0;if(!pm){let mx=0;for(const s of [...S.roast.samples,...(S.bg?S.bg.samples:[])])if(ok(s.pressure))mx=Math.max(mx,s.pressure);pm=Math.max(50,Math.ceil(mx*1.15/50)*50)}rows.push({k:'pressure',label:'Pressure',col:COL.pressure,max:pm,maxLabel:isMbar()?String(+(pm/100).toFixed(2)):pm,unit:' '+pU(),noLabels:true})}
   const rh=(H-14)/rows.length,font=getComputedStyle(document.body).fontFamily;
   ctx.strokeStyle=COL.grid;ctx.lineWidth=1;const step=v.hi-v.lo>1500?120:60;for(let x=Math.ceil(v.lo/step)*step;x<=v.hi;x+=step){const px=Math.round(X(x))+.5;ctx.beginPath();ctx.moveTo(px,4);ctx.lineTo(px,H-10);ctx.stroke()}
   rows.forEach((R,i)=>{const top=6+i*rh,h=rh-12,Yv=val=>top+h-(clamp(val,0,R.max)/R.max)*h;
     ctx.strokeStyle=COL.grid;for(const f of [0,.5,1]){const y=Math.round(top+h-f*h)+.5;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke()}
     ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(R.label,PAD.l-8,top+h/2);
-    ctx.textAlign='left';ctx.fillText(R.max+R.unit.trim(),PAD.l+w+6,top+3);ctx.fillText('0',PAD.l+w+6,top+h);
+    ctx.textAlign='left';ctx.fillText((R.maxLabel??R.max)+R.unit.trim(),PAD.l+w+6,top+3);ctx.fillText('0',PAD.l+w+6,top+h);
     const series=(r,dash,alpha,lw,lab,end)=>{if(!r)return;const o=r.events.CHARGE??0;ctx.save();ctx.beginPath();ctx.rect(PAD.l,0,w,H);ctx.clip();ctx.globalAlpha=alpha;ctx.strokeStyle=R.col;ctx.lineWidth=lw;ctx.setLineDash(dash);ctx.beginPath();let pen=false;
       for(const s of r.samples){if(end!=null&&s.t>end)break;const vv=s[R.k];if(!ok(vv)){pen=false;continue}const x=X(s.t-o),y=Yv(vv);pen?ctx.lineTo(x,y):ctx.moveTo(x,y);pen=true}ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
       if(lab&&!R.noLabels){ctx.font=`600 ${11*TS()}px ${font}`;for(const a of adjustments(r).filter(a=>a.key===R.k)){const x=X(a.t-o),y=Yv(a.to),tx=Math.round(a.to)+'%',tw=ctx.measureText(tx).width+8,oy=lab.below?4:-16;
@@ -1084,7 +1087,7 @@ function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)re
   ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText(S.bg?'— — background   ━ this roast':'',PAD.l+w,H)}
 function onHover(e){const v=S.view;if(!v)return;const b=e.currentTarget.getBoundingClientRect(),px=e.clientX-b.left,w=b.width-PAD.l-PAD.r;if(px<PAD.l||px>PAD.l+w)return clearHover();
   S.hover=v.lo+(px-PAD.l)/w*(v.hi-v.lo);const s=sampleAt(S.roast.samples,S.hover+v.off),ro=$('#readout');let h=`<b>${mmss(S.hover)}</b>`;
-  if(s&&Math.abs(s.t-v.off-S.hover)<4)h+=`<br>BT ${fT(s.bt)} · RoR ${fR(s.ror)}<br>Exhaust ${fT(s.exhaust)} · ${f0(s.pressure)} Pa<br>Burner ${f0(s.burner)}% · Air ${f0(s.fan)}% · Drum ${f0(s.drum)}%`;
+  if(s&&Math.abs(s.t-v.off-S.hover)<4)h+=`<br>BT ${fT(s.bt)} · RoR ${fR(s.ror)}<br>Exhaust ${fT(s.exhaust)} · ${fP(s.pressure)} ${pU()}<br>Burner ${f0(s.burner)}% · Air ${f0(s.fan)}% · Drum ${f0(s.drum)}%`;
   if(S.bg){const r0=S.bg.events.CHARGE??0,rb=interp(S.bg.samples,'bt',S.hover+r0);if(ok(rb))h+=`<br><span class="muted">Background BT ${fT(rb)}</span>`}
   ro.innerHTML=h;ro.hidden=false;const wrap=e.currentTarget.parentElement.getBoundingClientRect();let lx=e.clientX-wrap.left+14;if(lx>wrap.width-220)lx=e.clientX-wrap.left-220;ro.style.left=lx+'px';ro.style.top=(e.clientY-wrap.top+10)+'px';scheduleDraw()}
 function clearHover(){S.hover=null;$('#readout').hidden=true;scheduleDraw()}
@@ -1467,9 +1470,9 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="row"><button id="thSave">Save as my look…</button><span class="sp"></span><button id="thReset">Reset to White</button></div>`},
   scale:()=>{const s=cfg.scales;return `<h2>Chart scales</h2><div class="sub">The numbers along the sides and bottom of the roast chart.</div>
     <label class="chk"><input type="checkbox" data-sc="auto" ${s.auto?'checked':''}> Fit the temperature scale to the roast automatically</label>
-    <div class="sgrid">${[['tMin',`Temperature min (°${cfg.unit})`],['tMax',`Temperature max (°${cfg.unit})`],['tStep','Temperature label step'],['rMin',`Rate of rise min (°${cfg.unit}/min)`],['rMax','Rate of rise max'],['rStep','Rate of rise label step'],['minutes','Minutes shown before the roast fills it'],['pMax','Air pressure strip max (Pa, 0 = auto)']].map(([k,l])=>`<label class="field">${l}<input data-scv="${k}" value="${esc(s[k])}" inputmode="decimal"></label>`).join('')}</div>
+    <div class="sgrid">${[['tMin',`Temperature min (°${cfg.unit})`],['tMax',`Temperature max (°${cfg.unit})`],['tStep','Temperature label step'],['rMin',`Rate of rise min (°${cfg.unit}/min)`],['rMax','Rate of rise max'],['rStep','Rate of rise label step'],['minutes','Minutes shown before the roast fills it'],['pMax',`Air pressure strip max (${pU()}, 0 = auto)`]].map(([k,l])=>`<label class="field">${l}<input data-scv="${k}" value="${esc(k==='pMax'&&isMbar()?+(s[k]/100).toFixed(2):s[k])}" inputmode="decimal"></label>`).join('')}</div>
     <label class="chk"><input type="checkbox" data-sc="showPressure" ${s.showPressure?'checked':''}> Show air pressure in the strip under the chart</label>
-    <div class="sgrid"><label class="field">Temperature unit<select id="sUnit"><option value="F" ${isF()?'selected':''}>°F</option><option value="C" ${!isF()?'selected':''}>°C</option></select></label><label class="field">Rate of rise smoothing (s)<input data-cfg="rorWindow" value="${esc(cfg.rorWindow)}"></label><label class="field">Show rate of rise<select id="sRorFrom"><option value="charge" ${cfg.rorFrom!=='tp'?'selected':''}>Right away, from Charge</option><option value="tp" ${cfg.rorFrom==='tp'?'selected':''}>After the turning point</option></select></label></div>
+    <div class="sgrid"><label class="field">Temperature unit<select id="sUnit"><option value="F" ${isF()?'selected':''}>°F</option><option value="C" ${!isF()?'selected':''}>°C</option></select></label><label class="field">Air pressure unit<select id="sPUnit"><option value="Pa" ${!isMbar()?'selected':''}>Pa (pascals)</option><option value="mbar" ${isMbar()?'selected':''}>mbar (millibars)</option></select></label><label class="field">Rate of rise smoothing (s)<input data-cfg="rorWindow" value="${esc(cfg.rorWindow)}"></label><label class="field">Show rate of rise<select id="sRorFrom"><option value="charge" ${cfg.rorFrom!=='tp'?'selected':''}>Right away, from Charge</option><option value="tp" ${cfg.rorFrom==='tp'?'selected':''}>After the turning point</option></select></label></div>
     <div class="row"><button id="scReset">Reset scales</button></div>`},
   store:()=>`<h2>Saving &amp; storage</h2><div class="sub">Every roast is saved as files in a folder on this Mac.</div>
     ${!FS.supported?'<div class="warn">This browser can’t save straight to a folder. Open the app in Google Chrome to save into a roasts folder. Until then, roasts are kept inside the browser — use Export all for backups.</div>':
@@ -1532,7 +1535,7 @@ function wireSettings(){const el=$('#scont');
   const ts=$('#thSave');if(ts)ts.onclick=async()=>{const n=await askText('Save this look','Name','My roasting room');if(!n||!n.trim())return;cfg.customThemes=cfg.customThemes.filter(t=>t.name!==n.trim());cfg.customThemes.push({name:n.trim(),colors:{...cfg.theme.colors}});cfg.theme.name=n.trim();saveCfg();renderSettings()};
   const tr=$('#thReset');if(tr)tr.onclick=()=>{cfg.theme={name:'White',colors:{...WHITE}};saveCfg();applyTheme();renderSettings();renderAll()};
   $$('[data-sc]',el).forEach(i=>i.onchange=()=>{cfg.scales[i.dataset.sc]=i.checked;saveCfg();scheduleDraw()});
-  $$('[data-scv]',el).forEach(i=>i.onchange=()=>{const v=num(i.value);if(v==null){i.value=cfg.scales[i.dataset.scv];return}cfg.scales[i.dataset.scv]=v;const s=cfg.scales;if(s.tMax<=s.tMin)s.tMax=s.tMin+50;if(s.rMax<=s.rMin)s.rMax=s.rMin+10;if(s.tStep<=0)s.tStep=25;if(s.rStep<=0)s.rStep=5;saveCfg();scheduleDraw()});
+  $$('[data-scv]',el).forEach(i=>i.onchange=()=>{const v=num(i.value);if(v==null){i.value=cfg.scales[i.dataset.scv];return}cfg.scales[i.dataset.scv]=i.dataset.scv==='pMax'&&isMbar()?v*100:v;const s=cfg.scales;if(s.tMax<=s.tMin)s.tMax=s.tMin+50;if(s.rMax<=s.rMin)s.rMax=s.rMin+10;if(s.tStep<=0)s.tStep=25;if(s.rStep<=0)s.rStep=5;saveCfg();scheduleDraw()});
   const su=$('#sUnit');if(su)su.onchange=()=>{const to=su.value;if(to===cfg.unit)return;const s=cfg.scales,cv=to==='C'?(v=>Math.round((v-32)*5/9)):(v=>Math.round(v*9/5+32)),cr=to==='C'?(v=>Math.round(v/1.8)):(v=>Math.round(v*1.8));
     s.tMin=cv(s.tMin);s.tMax=cv(s.tMax);s.tStep=to==='C'?25:50;s.rMin=cr(s.rMin);s.rMax=cr(s.rMax);s.rStep=to==='C'?5:10;cfg.unit=to;saveCfg();renderAll();renderSettings()};
   for(const [id,k] of [['#sCoolOff','coolOffMin'],['#sStirOff','stirOffMin']]){const i=$(id);if(i)i.onchange=()=>{const v=num(i.value);if(v==null||v<0.1||v>60){toast('Enter minutes from 0.1 to 60');i.value=cfg[k];return}cfg[k]=v;saveCfg();renderCtl()}}
@@ -1545,6 +1548,7 @@ function wireSettings(){const el=$('#scont');
   $$('[data-wt]',el).forEach(i=>i.onchange=()=>{cfg[i.dataset.wt]=Number(i.value);saveCfg();applyTheme()});
   $$('[data-font]',el).forEach(i=>i.onchange=()=>{cfg[i.dataset.font]=i.value;saveCfg();applyTheme();renderSettings();scheduleDraw()});
   $$('[data-fontc]',el).forEach(i=>i.onchange=()=>{cfg[i.dataset.fontc]=i.value.trim();saveCfg();applyTheme();scheduleDraw()});
+  const pu=$('#sPUnit');if(pu)pu.onchange=()=>{cfg.pUnit=pu.value;saveCfg();renderAll();renderSettings();toast('Air pressure now shown in '+pU())};
   const rf=$('#sRorFrom');if(rf)rf.onchange=()=>{cfg.rorFrom=rf.value;saveCfg();renderAll()};
   const scr=$('#scReset');if(scr)scr.onclick=()=>{cfg.scales={...DEF.scales};if(!isF()){Object.assign(cfg.scales,{tMin:65,tMax:235,tStep:25,rMin:0,rMax:22,rStep:5})}saveCfg();scheduleDraw();renderSettings()};
   const b1=$('#stChoose')||$('#stChange');if(b1)b1.onclick=chooseFolder;const b2=$('#stRe');if(b2)b2.onclick=reconnectFolder;
@@ -1557,7 +1561,7 @@ function wireSettings(){const el=$('#scont');
    ================================================================ */
 function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
   if(n==='roast'){renderAll();renderTodayMini()}else if(n==='today')renderToday();else if(n==='profiles')renderProfiles();else if(n==='roasts')renderRoasts();else if(n==='green'){gMode='view';setGView(gViewMode)}else if(n==='cupping'){cupMode='view';renderCupping()}else if(n==='settings')renderSettings()}
-function renderUnits(){$$('.u').forEach(e=>e.textContent='°'+cfg.unit);$$('.ur').forEach(e=>e.textContent='°'+cfg.unit+'/min')}
+function renderUnits(){$$('.up').forEach(e=>e.textContent=pU());$$('.u').forEach(e=>e.textContent='°'+cfg.unit);$$('.ur').forEach(e=>e.textContent='°'+cfg.unit+'/min')}
 function renderAll(){renderUnits();renderHeader();renderLive();renderFkeys();renderNotes();renderBgSelect();if($('#drawer').classList.contains('open'))renderDrawer();tick();scheduleDraw()}
 function handleKey(e){if(e.metaKey||e.ctrlKey||e.altKey)return;if($('#modalRoot').firstChild)return;const tg=e.target.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tg))return;if(curScreen!=='roast')return;
   const k=e.key.length===1?e.key.toLowerCase():e.key;
