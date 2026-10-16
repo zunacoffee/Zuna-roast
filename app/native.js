@@ -107,6 +107,8 @@
       s.readyState = 1; try { s.onopen && s.onopen({ type: 'open' }); } catch (e) {}
     } else if (kind === 'message') {
       try { s.onmessage && s.onmessage({ type: 'message', data }); } catch (e) { console.error(e); }
+    } else if (kind === 'info') {
+      if (window.log) try { log('sys', 'Roaster link: ' + data); } catch (e) {}
     } else if (kind === 'error') {
       if (window.log) try { log('err', 'Roaster link: ' + data); } catch (e) {}
       s._error(data);
