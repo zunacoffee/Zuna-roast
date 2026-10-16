@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Zuna Roast",
+  "version": "../package.json",
+  "identifier": "com.zunacoffee.roast",
+  "build": {
+    "frontendDist": "../app"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Zuna Roast",
+        "width": 1600,
+        "height": 1000,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "maximized": true,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "app",
+      "dmg"
+    ],
+    "category": "Productivity",
+    "copyright": "Zuna Coffee",
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.png"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "13.0"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDNjVCRkYzNDNBNTQ1M0MKUldROFJhVkQ4NzlsZkpaZE1tN2RYZ0g5a2JjaWZ5V2ZxQjBaT2VhRTdHWTNJcjI1dGxRSnVLSFIK",
+      "endpoints": [
+        "https://github.com/zunacoffee/Zuna-roast/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}

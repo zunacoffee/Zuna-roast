@@ -1,0 +1,11 @@
+# Build output
+node_modules/
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Never commit roast data or keys
+*.key
+Zuna Roast/
+Roasts/
+*.alog
+.DS_Store

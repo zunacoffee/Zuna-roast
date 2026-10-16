@@ -465,6 +465,7 @@ tr.tdone td{color:var(--text2)}
 <div id="toast"></div>
 <div id="modalRoot"></div>
 
+<script src="native.js"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -539,7 +540,7 @@ function loadCfg(){const s=store.get(LS.cfg,{})||{},c=JSON.parse(JSON.stringify(
   if(s.evOrderV!==2&&Array.isArray(s.events)){const u=c.events.find(e=>e.k==='UNDO'),d=c.events.find(e=>e.k==='DROP');c.events=[u,...c.events.filter(e=>e!==u&&e!==d),d].filter(Boolean);c.evOrderV=2}
   return c}
 let cfg=loadCfg();
-const saveCfg=()=>store.set(LS.cfg,cfg);
+const saveCfg=()=>{cfg.savedAt=new Date().toISOString();const ok=store.set(LS.cfg,cfg);persistSettingsSoon();return ok};
 const isF=()=>cfg.unit==='F';
 const toD=c=>ok(c)?(isF()?c*9/5+32:c):null;          // °C → display
 const fromD=d=>isF()?(d-32)*5/9:d;                   // display → °C
@@ -708,7 +709,7 @@ async function startRoast(fromMachine){
 async function stopRoast(force){
   if(!S.recording)return;
   if(!force&&S.roast.events.DROP==null&&!await ask('Stop recording?','Drop has not been marked yet.','Stop recording',true))return;
-  S.recording=false;store.del(LS.draft);log('sys','Recording stopped');renderAll();openDrawer();toast('Enter roasted weight, colors and comments, then Save')}
+  S.recording=false;clearDraft();log('sys','Recording stopped');renderAll();openDrawer();toast('Enter roasted weight, colors and comments, then Save')}
 function markEvent(k,src='manual'){
   if(k==='UNDO')return undoEvent();
   if(!S.recording){if(k==='CHARGE'&&src==='manual'){startRoast(false).then(okk=>{if(okk)markEvent('CHARGE','manual')});}else if(src==='manual')toast('Press START first');return}
@@ -760,7 +761,7 @@ const roastBase=r=>(`R${String(r.num||0).padStart(4,'0')}_${stamp(r.chargedAt||r
 const idb={db:null,open(){return new Promise(res=>{try{const q=indexedDB.open('zunaRoast2',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>{this.db=q.result;res(true)};q.onerror=()=>res(false)}catch(e){res(false)}})},
   get(k){return new Promise(res=>{if(!this.db)return res(undefined);try{const q=this.db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(undefined)}catch(e){res(undefined)}})},
   set(k,v){return new Promise(res=>{if(!this.db)return res(false);try{const tx=this.db.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.oncomplete=()=>res(true);tx.onerror=()=>res(false)}catch(e){res(false)}})}};
-const FS={supported:typeof window.showDirectoryPicker==='function',dir:null,state:'none'};
+const FS={supported:typeof window.showDirectoryPicker==='function'||!!window.ZR_NATIVE,dir:null,state:'none'};
 async function dirAt(parts,create=true){let d=FS.dir;for(const p of parts)d=await d.getDirectoryHandle(p,{create});return d}
 async function writeAt(parts,name,text){const d=await dirAt(parts);const fh=await d.getFileHandle(name,{create:true});const w=await fh.createWritable();await w.write(text);await w.close()}
 async function removeAt(parts,name){try{const d=await dirAt(parts,false);await d.removeEntry(name)}catch(e){}}
@@ -791,13 +792,21 @@ async function saveRoast(auto,asProfile){
     for(const x of HIST)if(x.id!==r.id&&x.isProfile&&normName(x.meta.name)===normName(r.meta.name)){x.isProfile=false;await commitRoast(x,true)}
     r.isProfile=true;if(S.bg&&S.bg.reminders&&S.bg.reminders.length&&normName(S.bg.meta.name)===normName(r.meta.name)&&!r.reminders.length)r.reminders=JSON.parse(JSON.stringify(S.bg.reminders))}
   const wasNew=!HIST.some(x=>x.id===r.id);
-  const copy=JSON.parse(JSON.stringify(r));await commitRoast(copy,true);S.roast=copy;S.dirty=false;S.viewingId=copy.id;store.del(LS.draft);
+  const copy=JSON.parse(JSON.stringify(r));await commitRoast(copy,true);S.roast=copy;S.dirty=false;S.viewingId=copy.id;clearDraft();
   const doneIt=wasNew?planMarkDone(copy):null,nx=doneIt?planNext():null;
   toast(`Roast #${copy.num} saved${asProfile?' as the profile':''}${FS.state==='granted'?' to your roasts folder':''}${nx?` — next batch loaded: ${nx.name||nx.coffee} · ${nx.green} lb`:doneIt?' — that was the last batch today':''}`);
   if(nx){closeDrawer();loadBatch(nx.id,true)}else if(doneIt){S.planCur=null}
   resolveBg();renderAll();renderTodayMini();return true}
 
 /* ---------- folder ---------- */
+/* ---------- settings, today's plan and the roast in progress also live in the folder ---------- */
+let setT;function persistSettingsSoon(){clearTimeout(setT);setT=setTimeout(persistSettings,800)}
+async function persistSettings(){if(FS.state!=='granted')return;try{await writeAt(['Settings'],'settings.json',JSON.stringify({savedAt:cfg.savedAt||'',settings:cfg},null,1));
+  await writeAt(['Settings'],'today-plan.json',JSON.stringify(PLAN,null,1))}catch(e){log('err','Settings write failed: '+e.message)}}
+function saveDraft(){const d={roast:S.roast,at:new Date().toISOString()};store.set(LS.draft,d);if(FS.state==='granted')writeAt(['Settings'],'roast-in-progress.json',JSON.stringify(d)).catch(()=>{})}
+function clearDraft(){store.del(LS.draft);if(FS.state==='granted')removeAt(['Settings'],'roast-in-progress.json')}
+async function readFolderJSON(parts,name){try{return JSON.parse(await (await (await (await dirAt(parts,false)).getFileHandle(name)).getFile()).text())}catch(e){return null}}
+function applySettings(o){const keepTheme=cfg.theme;localStorage.setItem(LS.cfg,JSON.stringify(o));cfg=loadCfg();if(!o.theme)cfg.theme=keepTheme;applyTheme();buildCtl();renderCtl();renderFkeys()}
 async function syncFolder(){
   if(FS.state!=='granted')return;const found=[];let invFile=null,cupFile=null;
   async function walk(d,depth){for await(const [name,h] of d.entries()){if(h.kind==='directory'&&depth<3)await walk(h,depth+1);else if(h.kind==='file'&&name.endsWith('.json')){try{const r=JSON.parse(await (await h.getFile()).text());if(r&&r.id&&Array.isArray(r.samples))found.push(r)}catch(e){}}}}
@@ -810,15 +819,22 @@ async function syncFolder(){
   const inFolder=new Set(found.map(r=>r.id));for(const r of HIST)if(!inFolder.has(r.id))await writeRoastFiles(r);
   if(invFile&&Array.isArray(invFile.items)&&String(invFile.savedAt||'')>String(INVsavedAt||'')){INV=invFile.items;INVsavedAt=invFile.savedAt}else if(INV.length)await persistInv();
   if(cupFile&&Array.isArray(cupFile.sessions)&&String(cupFile.savedAt||'')>String(CUPsavedAt||'')){CUP=cupFile.sessions;CUPsavedAt=cupFile.savedAt}else if(CUP.length)await persistCup();
+  const sf=await readFolderJSON(['Settings'],'settings.json');
+  if(sf&&sf.settings&&String(sf.savedAt||'')>String(cfg.savedAt||'')){applySettings(sf.settings);log('sys','Settings loaded from the folder')}
+  const pf=await readFolderJSON(['Settings'],'today-plan.json');
+  if(pf&&Array.isArray(pf.items)&&String(pf.savedAt||'')>String(PLAN.savedAt||'')){PLAN=pf;store.set('zr2.plan',PLAN)}
+  await persistSettings();
   sortHist();await persistHist();if(idb.db){await idb.set('inv',{savedAt:INVsavedAt,items:INV});await idb.set('cup',{savedAt:CUPsavedAt,sessions:CUP})}
   log('sys',`Folder synced: ${found.length} roast files, ${added} new`);resolveBg();renderAll()}
-async function chooseFolder(){try{const h=await window.showDirectoryPicker({id:'zuna-roasts',mode:'readwrite',startIn:'documents'});FS.dir=h;FS.state='granted';await idb.set('dir',h);await syncFolder();toast(`Saving to the “${h.name}” folder`)}catch(e){if(e.name!=='AbortError')toast('Could not use that folder: '+e.message)}renderStorageStatus()}
+async function chooseFolder(){if(window.ZR_NATIVE){try{const h=await ZR_NATIVE.chooseFolder();if(h){FS.dir=h;FS.state='granted';await syncFolder();toast(`Saving to ${ZR_NATIVE.folder}`)}}catch(e){toast('Could not use that folder: '+e)}renderStorageStatus();return}
+  try{const h=await window.showDirectoryPicker({id:'zuna-roasts',mode:'readwrite',startIn:'documents'});FS.dir=h;FS.state='granted';await idb.set('dir',h);await syncFolder();toast(`Saving to the “${h.name}” folder`)}catch(e){if(e.name!=='AbortError')toast('Could not use that folder: '+e.message)}renderStorageStatus()}
 async function reconnectFolder(){if(!FS.dir)return chooseFolder();try{FS.state=(await FS.dir.requestPermission({mode:'readwrite'}))==='granted'?'granted':'prompt'}catch(e){FS.state='prompt'}if(FS.state==='granted'){await syncFolder();toast('Roasts folder reconnected')}renderStorageStatus()}
 async function initStorage(){await idb.open();
   const h=idb.db?await idb.get('hist'):null;HIST=Array.isArray(h)?h:[];sortHist();
   const iv=idb.db?await idb.get('inv'):null;if(iv&&Array.isArray(iv.items)){INV=iv.items;INVsavedAt=iv.savedAt||''}
   const cp=idb.db?await idb.get('cup'):null;if(cp&&Array.isArray(cp.sessions)){CUP=cp.sessions;CUPsavedAt=cp.savedAt||''}
-  if(FS.supported&&idb.db){const d=await idb.get('dir');if(d){FS.dir=d;try{FS.state=(await d.queryPermission({mode:'readwrite'}))==='granted'?'granted':'prompt'}catch(e){FS.state='prompt'}}}
+  if(window.ZR_NATIVE){try{FS.dir=await ZR_NATIVE.root();FS.state='granted'}catch(e){log('err','Could not open the data folder: '+e);toast('Could not open the data folder: '+e)}}
+  else if(FS.supported&&idb.db){const d=await idb.get('dir');if(d){FS.dir=d;try{FS.state=(await d.queryPermission({mode:'readwrite'}))==='granted'?'granted':'prompt'}catch(e){FS.state='prompt'}}}
   if(FS.state==='granted')await syncFolder();renderStorageStatus()}
 function renderStorageStatus(){const b=$('#banners');let html='';
   if(FS.supported&&FS.state==='prompt')html=`<div class="banner info">📁 Your roasts folder needs permission again.<button class="pri" id="bnReconnect">Reconnect folder</button></div>`;
@@ -840,7 +856,8 @@ function invCSV(){const head=['coffee','origin','process','lot','supplier','arri
 function cupCSV(){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;const head=['date','session','cuppers','roast','profile','fragrance','flavor','aftertaste','acidity','body','balance','overall','uniformity','clean_cup','sweetness','defects','final','notes','comments'];const rows=[];
   for(const s of CUP)for(const x of s.samples){const r=HIST.find(h=>h.id===x.roastId),sc=x.scores;rows.push([s.date,s.name,s.cuppers,r?'#'+r.num:'',r?r.meta.name:'',...ATTRS.map(a=>sc[a[0]]),...CUPK.map(c=>x.cups[c[0]].filter(Boolean).length*2),x.defects,cupScore(x).toFixed(2),(x.tags||[]).join('; '),x.comments].map(q).join(','))}
   return [head.join(',')].concat(rows).join('\n')}
-function download(name,text,type='text/csv'){const b=new Blob([text],{type}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function download(name,text,type='text/csv'){if(window.ZR_NATIVE){ZR_NATIVE.saveExport(name,text).then(ok=>{if(ok)toast('Saved '+name)}).catch(e=>toast('Could not save: '+e));return}
+  const b=new Blob([text],{type}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 
 /* ================================================================
    Background profile
@@ -1099,7 +1116,7 @@ function renderInvSelect(cur){const sel=$('#fInv');cur=cur??sel.value;const show
 const dayKey=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`};
 let PLAN=store.get('zr2.plan',null)||{date:dayKey(),items:[]};
 function planRoll(){if(PLAN.date!==dayKey()){const left=PLAN.items.filter(x=>x.status!=='done');PLAN={date:dayKey(),items:left,carried:left.length};savePlan()}}
-function savePlan(){store.set('zr2.plan',PLAN)}
+function savePlan(){PLAN.savedAt=new Date().toISOString();store.set('zr2.plan',PLAN);persistSettingsSoon()}
 const planNext=()=>PLAN.items.find(x=>x.status!=='done');
 function batchMeta(it){return {...blankMeta(),name:it.name||'',invId:it.invId||'',coffee:it.coffee||'',lot:it.lot||'',green:it.green||''}}
 function loadBatch(id,quiet){const it=PLAN.items.find(x=>x.id===id);if(!it||it.status==='done')return;if(S.recording){toast('Finish the current roast first');return}
@@ -1456,14 +1473,16 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="row"><button id="scReset">Reset scales</button></div>`},
   store:()=>`<h2>Saving &amp; storage</h2><div class="sub">Every roast is saved as files in a folder on this Mac.</div>
     ${!FS.supported?'<div class="warn">This browser can’t save straight to a folder. Open the app in Google Chrome to save into a roasts folder. Until then, roasts are kept inside the browser — use Export all for backups.</div>':
-      FS.state==='granted'?`<div class="box"><span>📁 Saving to <b>${esc(FS.dir.name)}</b></span><button id="stChange">Change folder</button></div>`:FS.dir?`<div class="warn">📁 <b>${esc(FS.dir.name)}</b> needs permission again. <button class="pri sm" id="stRe">Reconnect folder</button></div>`:`<div class="box"><span>No folder chosen yet — roasts are only inside the browser.</span><button class="pri" id="stChoose">Choose roasts folder</button></div>`}
+      FS.state==='granted'?`<div class="box"><span>📁 Saving to <b>${esc(window.ZR_NATIVE?ZR_NATIVE.folder:FS.dir.name)}</b></span><span class="row">${window.ZR_NATIVE?'<button id="stReveal">Show in Finder</button>':''}<button id="stChange">Change folder</button></span></div>`:FS.dir?`<div class="warn">📁 <b>${esc(FS.dir.name)}</b> needs permission again. <button class="pri sm" id="stRe">Reconnect folder</button></div>`:`<div class="box"><span>No folder chosen yet — roasts are only inside the browser.</span><button class="pri" id="stChoose">Choose roasts folder</button></div>`}
     <div class="note" style="font-family:var(--mono);font-size:calc(12.5px*var(--ts,1))">Your folder/
   Profiles/           one file per profile, named by profile
   Roasts/2026/10 October/R0042_2026-10-12_1445_….json + .csv
   Green coffee/       inventory.json + inventory.csv
-  Cupping/            cupping.json + cupping.csv</div>
+  Cupping/            cupping.json + cupping.csv
+  Settings/           settings.json · today-plan.json · roast-in-progress.json</div>
     <div class="muted" style="font-size:calc(13px*var(--ts,1));line-height:1.5">Tip: put the folder in iCloud Drive so it’s backed up and you can open it from another Mac. ${HIST.length} roasts · ${INV.length} green lots · ${CUP.length} cupping sessions stored.</div>
-    <div class="row"><button id="stExport">Export everything (JSON)</button></div>`,
+    <div class="row"><button id="stExport">Export everything (JSON)</button></div>
+    ${window.ZR_NATIVE?`<div class="box"><span>Zuna Roast for Mac · version <b>${esc(ZR_NATIVE.version||'—')}</b></span><button id="stUpd">Check for updates</button></div>`:''}`,
   log:()=>`<h2>Connection log</h2><div class="row"><label class="chk"><input type="checkbox" id="logV" ${logVerbose?'checked':''}> Show data traffic</label><button class="sm" id="logClear">Clear</button><span class="sp"></span><span class="muted">${esc(link.url())}</span></div><div class="log" id="logBox"></div>`};
   el.innerHTML=P[curPane]();wireSettings()}
 function evc(i,w,v){const def=w==='bg'?cfg.theme.colors.panel:cfg.theme.colors.text;return `<div class="evc"><input type="color" data-evc="${i}:${w}" value="${v||def}"><input type="text" data-evh="${i}:${w}" value="${esc(v||'')}" placeholder="default" maxlength="7">${v?`<button class="sm" data-evr="${i}:${w}" title="Back to default">↺</button>`:''}</div>`}
@@ -1529,7 +1548,8 @@ function wireSettings(){const el=$('#scont');
   const rf=$('#sRorFrom');if(rf)rf.onchange=()=>{cfg.rorFrom=rf.value;saveCfg();renderAll()};
   const scr=$('#scReset');if(scr)scr.onclick=()=>{cfg.scales={...DEF.scales};if(!isF()){Object.assign(cfg.scales,{tMin:65,tMax:235,tStep:25,rMin:0,rMax:22,rStep:5})}saveCfg();scheduleDraw();renderSettings()};
   const b1=$('#stChoose')||$('#stChange');if(b1)b1.onclick=chooseFolder;const b2=$('#stRe');if(b2)b2.onclick=reconnectFolder;
-  const ex=$('#stExport');if(ex)ex.onclick=()=>download('zuna_roast_export_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({roasts:HIST,green:INV,cupping:CUP,settings:cfg}),'application/json');
+  const srv=$('#stReveal');if(srv)srv.onclick=()=>ZR_NATIVE.reveal();const sup=$('#stUpd');if(sup)sup.onclick=()=>ZR_NATIVE.checkUpdate(true);
+  const ex=$('#stExport');if(ex)ex.onclick=()=>download('zuna_roast_export_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({app:'Zuna Roast',exported:new Date().toISOString(),roasts:HIST,green:INV,cupping:CUP,settings:cfg,plan:PLAN}),'application/json');
   const lv=$('#logV');if(lv){lv.onchange=()=>{logVerbose=lv.checked;renderLogSoon()};$('#logClear').onclick=()=>{logBuf.length=0;renderLogSoon()};renderLogSoon()}}
 
 /* ================================================================
@@ -1575,7 +1595,15 @@ async function init(){
   $('#rRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selRoast=tr.dataset.id;renderRoasts()}};
   $('#btnExportAll').onclick=()=>download('zuna_roasts_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(HIST),'application/json');
   $('#btnImport').onclick=()=>$('#fileImport').click();
-  $('#fileImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=async()=>{try{let d=JSON.parse(rd.result);if(d&&d.roasts)d=d.roasts;if(!Array.isArray(d))d=[d];let n=0;for(const r of d){if(!r||!Array.isArray(r.samples)||!r.events)continue;if(!r.id||HIST.some(x=>x.id===r.id))r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);r.meta={...blankMeta(),...(r.meta||{})};r.tnotes=r.tnotes||[];r.reminders=r.reminders||[];r.controlLog=r.controlLog||[];if(!r.num){r.num=nextNum();store.set(LS.num,r.num)}await commitRoast(r,true);n++}renderRoasts();toast(`Imported ${n} roast${n===1?'':'s'}`)}catch(err){toast('That file is not a roast export')}};rd.readAsText(f);e.target.value=''};
+  $('#fileImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=async()=>{try{let d=JSON.parse(rd.result);const full=d&&!Array.isArray(d)&&(d.roasts||d.green||d.cupping||d.settings);
+    let roasts=full?(d.roasts||[]):Array.isArray(d)?d:[d],n=0,g=0,c=0,skip=0;
+    for(const r of roasts){if(!r||!Array.isArray(r.samples)||!r.events)continue;const ex=r.id&&HIST.find(x=>x.id===r.id);if(ex&&String(ex.savedAt||'')>=String(r.savedAt||'')){skip++;continue}if(!r.id)r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);r.meta={...blankMeta(),...(r.meta||{})};r.tnotes=r.tnotes||[];r.reminders=r.reminders||[];r.controlLog=r.controlLog||[];if(!r.num){r.num=nextNum();store.set(LS.num,r.num)}await commitRoast(r,true);n++}
+    if(full&&Array.isArray(d.green)){for(const l of d.green){if(l&&l.id&&!INV.some(x=>x.id===l.id)){INV.push(l);g++}}if(g)await persistInv()}
+    if(full&&Array.isArray(d.cupping)){for(const x of d.cupping){if(x&&x.id&&!CUP.some(y=>y.id===x.id)){CUP.push(x);c++}}if(c)await persistCup()}
+    let st=false;if(full&&d.settings&&await ask('Restore settings too?','Replaces the connection, presets, event keys, alarms, scales, colors and logo on this Mac with the ones in the backup.','Restore settings')){applySettings(d.settings);saveCfg();st=true}
+    if(full&&d.plan&&Array.isArray(d.plan.items)&&!PLAN.items.length&&d.plan.date===dayKey()){PLAN=d.plan;savePlan()}
+    store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,...HIST.map(r=>r.num||0)));
+    renderAll();renderRoasts();toast(`Imported ${n} roast${n===1?'':'s'}${full?`, ${g} green lot${g===1?'':'s'}, ${c} cupping session${c===1?'':'s'}${st?' and settings':''}`:''}${skip?` · ${skip} already here`:''}`)}catch(err){console.error(err);toast('That file is not a Zuna Roast export')}};rd.readAsText(f);e.target.value=''};
   $('#gSearch').oninput=renderGreen;$('#gFilter').onclick=e=>{const b=e.target.closest('button');if(!b)return;gFilter=b.dataset.f;$$('#gFilter button').forEach(x=>x.classList.toggle('on',x===b));renderGreen()};
   $('#gRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selGreen=tr.dataset.id;gMode='view';renderGreen()}};
   $('#gView').onclick=e=>{const b=e.target.closest('button');if(b)setGView(b.dataset.v)};$('#gYearSel').onchange=e=>{gYear=Number(e.target.value);renderYear()};$('#btnYearCsv').onclick=()=>download(`green_use_${gYear}.csv`,yearCSV());
@@ -1593,12 +1621,13 @@ async function init(){
   if(S.planCur)loadBatch(S.planCur,true);
   setInterval(tick,250);
   // crash recovery: autosave the roast in progress
-  setInterval(()=>{if(S.recording)store.set(LS.draft,{roast:S.roast,at:new Date().toISOString()})},5000);
-  const draft=store.get(LS.draft,null);
+  setInterval(()=>{if(S.recording)saveDraft()},5000);
+  let draft=store.get(LS.draft,null);
+  if(FS.state==='granted'){const fd=await readFolderJSON(['Settings'],'roast-in-progress.json');if(fd&&fd.roast&&(!draft||String(fd.at)>String(draft.at)))draft=fd}
   if(draft&&draft.roast&&draft.roast.samples&&draft.roast.samples.length){
     $('#banners').insertAdjacentHTML('beforeend',`<div class="banner info" id="bnRecover">Roast #${draft.roast.num} was still recording when the app closed (${new Date(draft.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}).<button class="pri" id="rcYes">Recover it</button><button id="rcNo">Discard</button></div>`);
-    $('#rcYes').onclick=()=>{S.roast=draft.roast;S.dirty=true;S.viewingId=null;fillForm(S.roast.meta);store.del(LS.draft);$('#bnRecover').remove();resolveBg();renderAll();openDrawer();toast('Recovered — add the details and Save')};
-    $('#rcNo').onclick=()=>{store.del(LS.draft);$('#bnRecover').remove()}}
+    $('#rcYes').onclick=()=>{S.roast=draft.roast;S.dirty=true;S.viewingId=null;fillForm(S.roast.meta);clearDraft();$('#bnRecover').remove();resolveBg();renderAll();openDrawer();toast('Recovered — add the details and Save')};
+    $('#rcNo').onclick=()=>{clearDraft();$('#bnRecover').remove()}}
   log('sys','Ready. Roaster address '+link.url())}
 init();
 </script>
