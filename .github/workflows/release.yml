@@ -1,0 +1,48 @@
+# Builds the Mac app on GitHub's Apple Silicon Macs and publishes it as a Release.
+# Runs when a version tag like v1.0.1 is pushed (or by hand from the Actions tab).
+# The app's Update button reads latest.json from the newest Release.
+name: Release Mac app
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+      - run: npm ci
+      - run: npm run check
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ''
+        with:
+          tagName: v__VERSION__
+          releaseName: Zuna Roast __VERSION__
+          releaseBody: |
+            Download the .dmg below, open it and drag Zuna Roast into Applications.
+            Already installed? Open Zuna Roast and click Update when it asks — your roasts and settings are not touched.
+          releaseDraft: false
+          prerelease: false
+          args: --target aarch64-apple-darwin
