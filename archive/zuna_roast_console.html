@@ -1,0 +1,1604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zuna Roast · Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F5;--card:#FFFFFF;--ink:#1F2328;--muted:#6B6F76;--line:#E7E2DB;--grid:#EEE9E2;
+  --navy:#002836;--teal:#0C8493;--light:#BAE9EE;--danger:#C0392B;--ok:#2E8B57;--warn:#C98A00;
+  --c-bt:#6B3A2A;--c-et:#0C8493;--c-ror:#9A7800;--c-burner:#C0392B;--c-air:#7A4FA0;--c-drum:#2E8B57;
+  --c-fan:#1A5FA8;--c-inlet:#E07020;--c-exhaust:#5A7A8A;--c-cooling:#3D4FA8;
+  --ph1:rgba(186,233,238,.35);--ph2:rgba(232,196,140,.22);--ph3:rgba(107,58,42,.10);
+}
+:root[data-theme="dark"]{
+  --bg:#0E1417;--card:#162026;--ink:#E6EBEE;--muted:#8E9BA3;--line:#25323A;--grid:#1F2B33;
+  --c-bt:#D19A7C;--c-et:#3FC1CF;--c-ror:#E2BE3A;--c-burner:#F06A5A;--c-air:#B58AE0;--c-drum:#5FC48A;
+  --c-fan:#5E9BE8;--c-inlet:#F59A4E;--c-exhaust:#9DB6C2;--c-cooling:#8C9BF0;
+  --ph1:rgba(63,193,207,.10);--ph2:rgba(232,196,140,.08);--ph3:rgba(209,154,124,.10);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{font-family:Poppins,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--teal)}
+button:disabled{opacity:.45;cursor:default}
+button.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:100%}
+textarea{resize:vertical;min-height:60px}
+header{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--navy);color:#fff;flex-wrap:wrap}
+header .brand{font-weight:700;letter-spacing:.1em;font-size:15px;line-height:1.1;margin-right:6px}
+header .brand small{display:block;font-weight:400;letter-spacing:.02em;opacity:.7;font-size:11px}
+header button,header select{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:8px;padding:6px 10px;width:auto}
+header select option{color:#000}
+header button.on{background:var(--teal);border-color:var(--teal)}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.1);font-size:12px}
+.pill i{width:9px;height:9px;border-radius:50%;background:#888;display:inline-block}
+.pill[data-s="connected"] i{background:#3DDC84}
+.pill[data-s="sim"] i{background:var(--light)}
+.pill[data-s="connecting"] i,.pill[data-s="reconnecting"] i{background:#F5C542;animation:blink 1s infinite}
+.pill[data-s="nodata"] i{background:#F06A5A}
+@keyframes blink{50%{opacity:.25}}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) clamp(380px,26vw,560px);gap:14px;padding:14px;align-items:start}
+@media (max-width:1150px){.layout{grid-template-columns:1fr}}
+main{display:flex;flex-direction:column;gap:12px;min-width:0}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.card h3{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lcds{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.lcd{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--c,var(--line));border-radius:10px;padding:7px 10px}
+.lcd .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);display:flex;justify-content:space-between}
+.lcd .v{font-size:23px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.25}
+.lcd.big{grid-column:span 2}
+.lcd.big .v{font-size:34px}
+.lcds.stale .lcd .v{opacity:.35}
+.chartcard{padding:10px 10px 6px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;padding:0 6px 6px;color:var(--muted)}
+.legend label{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.legend input{width:auto;margin:0}
+.sw{width:16px;height:3px;border-radius:2px;display:inline-block}
+.sw.dash{background:repeating-linear-gradient(90deg,var(--muted) 0 4px,transparent 4px 7px)!important}
+.chart{position:relative;height:max(380px,calc(100vh - 470px))}
+.chart.aux{height:140px;margin-top:4px}
+canvas{width:100%;height:100%;display:block}
+.readout{font-size:12px;color:var(--muted);padding:4px 8px;min-height:22px;font-variant-numeric:tabular-nums}
+.controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.controls .ev{min-width:96px}
+.controls .ev.set{background:var(--navy);border-color:var(--navy);color:#fff}
+:root[data-theme="dark"] .controls .ev.set{background:var(--teal);border-color:var(--teal)}
+.controls .ev.next{border-color:var(--teal);box-shadow:0 0 0 2px rgba(12,132,147,.18)}
+.controls kbd{font-size:10px;opacity:.55;margin-left:4px}
+.sep{width:1px;align-self:stretch;background:var(--line);margin:0 4px}
+.phases{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--line);font-size:12px}
+.phases div{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;overflow:hidden;white-space:nowrap;transition:flex-grow .4s}
+.phases .p1{background:var(--ph1)} .phases .p2{background:var(--ph2)} .phases .p3{background:var(--ph3)}
+.phases b{font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.field.full{grid-column:1/-1}
+.stat{font-size:12.5px;display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line)}
+.stat:last-child{border-bottom:0}
+.stat b{font-variant-numeric:tabular-nums;font-weight:600}
+table.evt{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+table.evt td{padding:3px 2px;border-bottom:1px dashed var(--line)}
+table.evt td:not(:first-child){text-align:right}
+.hist{display:flex;flex-direction:column;gap:6px;max-height:330px;overflow:auto}
+.hitem{border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:12px}
+.hitem.active{border-color:var(--teal)}
+.roastid{font-size:11.5px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;line-height:1.3}
+.roastid b{color:var(--ink);font-size:15px;display:block}
+.tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.tabs button{flex:1;border:0;background:transparent;padding:7px 6px;border-radius:7px;font-weight:500;color:var(--muted)}
+.tabs button.on{background:var(--navy);color:#fff}
+:root[data-theme="dark"] .tabs button.on{background:var(--teal)}
+.tabs button .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin-left:5px;vertical-align:2px}
+details.more summary,details.full summary{cursor:pointer;color:var(--teal);font-size:12px}
+.readout:empty{display:none}
+/* ---- roasting layout: big numbers + controls on the right, nearest the roaster ---- */
+.big{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.big .l{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;display:flex;justify-content:space-between}
+.big .v{font-weight:700;font-variant-numeric:tabular-nums;line-height:1.02;letter-spacing:-.02em}
+.bigtime .v{font-size:clamp(44px,4vw,84px);color:var(--ink)}
+.bigrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.bigv .v{font-size:clamp(46px,4.4vw,96px);color:var(--c)}
+.big.stale .v{opacity:.35}
+.livecard .delta{font-size:clamp(24px,1.8vw,36px)}
+.livecard .nextadj{font-size:clamp(14px,1vw,17px);padding:10px 12px}
+.livecard .nextadj button{font-size:clamp(14px,1vw,17px);padding:6px 16px}
+.ctloff{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);flex-wrap:wrap}
+aside .ctlcard{margin-top:12px;padding-top:12px;border-top:2px solid var(--danger)}
+aside .ctlgrid{grid-template-columns:1fr;gap:16px}
+aside .ctl .ctl-v{font-size:clamp(28px,2vw,40px)}
+aside .ctl .ctl-h span{font-size:13px}
+aside .ctl .ctl-row{gap:6px}
+aside .ctl .ctl-row button{font-size:clamp(15px,1vw,18px);padding:10px 0;min-width:clamp(46px,3vw,60px);font-weight:600}
+aside .ctl input[type=range]{height:28px}
+aside .ctlfoot{flex-direction:column;align-items:stretch;gap:8px}
+aside #swRow{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+aside #swRow .swg{justify-content:space-between;font-size:13px}
+aside #swRow .swg button{padding:7px 12px;font-size:14px}
+aside #btnStandby{grid-column:1/-1}
+aside #btnCtlOff{padding:10px;font-size:15px}
+body.rec .legend{display:none}
+.controls .ev,#btnStart,#btnUndo{font-size:clamp(14px,1vw,17px);padding:clamp(8px,.7vw,12px) clamp(12px,1vw,18px)}
+#btnStart{min-width:120px;font-weight:700;letter-spacing:.04em}
+.lcds .lcd .v{font-size:20px}
+header button#btnControl.on{background:var(--danger);border-color:var(--danger)}
+.ctlcard{border-color:var(--danger);border-width:1.5px}
+.ctlgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.ctlgrid{grid-template-columns:1fr}}
+.ctl .ctl-h{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.ctl .ctl-h span{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.ctl .ctl-v{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.ctl .ctl-t{font-size:12px;color:var(--danger);font-weight:600}
+.ctl .ctl-row{display:flex;align-items:center;gap:4px}
+.ctl .ctl-row button{padding:5px 8px;min-width:38px}
+.ctl input[type=range]{flex:1;padding:0;accent-color:var(--c,var(--teal))}
+.ctlfoot{margin-top:12px;font-size:12px;padding-top:10px;border-top:1px dashed var(--line);flex-wrap:wrap}
+.ctlfoot details summary{cursor:pointer;color:var(--teal);font-size:12px}
+#swRow .swg{display:flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-weight:500}
+#swRow .swg.on{border-color:var(--ok)}
+#swRow .swg button{padding:5px 12px;font-size:13px}
+.nextadj button{margin-left:8px;padding:3px 10px;font-size:12px}
+.nav{display:flex;gap:2px;background:rgba(255,255,255,.06);border-radius:10px;padding:3px;margin-left:8px}
+header .nav button{border:0;background:transparent;padding:6px 14px;border-radius:7px;color:rgba(255,255,255,.75);font-weight:500}
+header .nav button.on{background:#fff;color:var(--navy)}
+.page{padding:18px 18px 40px;max-width:1400px;margin:0 auto}
+.pagehead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.pagehead h2{margin:0;font-size:22px;font-weight:600}
+.page .hist{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px;max-height:none;overflow:visible}
+.page .hitem{background:var(--card);padding:11px 13px}
+.hitem .k{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px;font-size:11.5px}
+.hitem .k b{display:block;font-size:13px;font-variant-numeric:tabular-nums}
+.greengrid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:950px){.greengrid{grid-template-columns:1fr}}
+.folder{font-size:12px;border:1px dashed var(--line);border-radius:9px;padding:8px 10px;margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.folder.ok{border-style:solid;border-color:var(--teal)}
+.folder.warn{border-color:var(--warn)}
+.folder button{padding:3px 9px;font-size:12px}
+table.inv{width:100%;border-collapse:collapse;font-size:12.5px}
+table.inv th{text-align:left;color:var(--muted);font-weight:500;padding:5px 6px;border-bottom:1px solid var(--line)}
+table.inv td{padding:6px;border-bottom:1px dashed var(--line);vertical-align:top}
+table.inv td.n{text-align:right;font-variant-numeric:tabular-nums}
+table.inv button{padding:3px 8px;font-size:11.5px}
+.low{color:var(--danger);font-weight:600}
+.refnotes{white-space:pre-wrap;background:var(--bg);border-radius:7px;padding:8px 10px;font-size:12.5px;margin-top:4px}
+.hitem .num{color:var(--teal);font-weight:700;margin-right:6px}
+.hitem.prof{border-left:4px solid var(--teal)}
+.badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;background:var(--teal);color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.hitem .t{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hitem .m{color:var(--muted)}
+.hitem .a{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.hitem .a button{padding:3px 8px;font-size:11.5px}
+.adj td:last-child{text-align:left!important;padding-left:8px}
+.nextadj{background:var(--bg);border-left:3px solid var(--teal);border-radius:6px;padding:7px 9px;margin:8px 0;font-size:12.5px}
+.delta{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.delta.pos{color:var(--danger)} .delta.neg{color:var(--c-fan)}
+.muted{color:var(--muted);font-size:12px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.log{font-family:ui-monospace,Menlo,monospace;font-size:11px;max-height:220px;overflow:auto;background:var(--bg);border-radius:7px;padding:6px;white-space:pre-wrap;word-break:break-all}
+.log .err{color:var(--danger)} .log .ctl{color:var(--danger);font-weight:600} .log .push{color:var(--teal)} .log .evt{color:var(--warn)} .log .sys{color:var(--ok)} .log .in,.log .out{opacity:.65}
+details>summary{cursor:pointer;list-style:none}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);padding:0;width:min(860px,94vw);max-height:90vh}
+dialog::backdrop{background:rgba(0,20,28,.45)}
+.dlg-h{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);font-weight:600}
+.dlg-b{padding:14px 18px;overflow:auto;max-height:calc(90vh - 130px)}
+.dlg-f{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--line)}
+.sec{margin-bottom:16px}
+.sec h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--teal)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.sgrid .chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:13px}
+.sgrid .chk input{width:auto}
+table.ch{width:100%;border-collapse:collapse;font-size:12.5px}
+table.ch th{text-align:left;font-weight:500;color:var(--muted);padding:4px}
+table.ch td{padding:3px 4px}
+table.ch input[type=checkbox]{width:auto}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:9px 16px;border-radius:9px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90vw}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* =================== CONSOLE DESIGN =================== */
+:root{--bg:#F3F1ED;--card:#FFFFFF}
+:root[data-theme="dark"]{--bg:#071217;--card:#0E1C23;--line:#1E2F38;--grid:#16252D;--ink:#E9EEF0;--muted:#7F939C}
+body{overflow:hidden}
+header{padding:8px 14px}
+.console{display:grid;grid-template-columns:clamp(250px,15vw,330px) minmax(0,1fr) clamp(260px,16vw,350px);gap:12px;padding:12px;height:calc(100vh - 54px)}
+.console[hidden]{display:none!important}
+.page{height:calc(100vh - 54px);overflow:auto}
+.rail{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.railhead{display:flex;justify-content:space-between;align-items:center;font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--muted)}
+.pillbtn{border-radius:999px;padding:5px 16px;font-weight:700;font-size:13px}
+body.ctl-on .pillbtn{background:var(--danger);border-color:var(--danger);color:#fff}
+.ctloff{font-size:12.5px;color:var(--muted);line-height:1.45}
+body.ctl-on .ctloff{display:none}
+/* faders */
+.ctlcard{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+.ctlgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:1;min-height:300px}
+.ctl{display:flex;flex-direction:column;align-items:center;background:var(--bg);border-radius:12px;padding:10px 4px;min-height:0}
+.ctl .ctl-h{flex-direction:column;align-items:center;gap:2px;margin:0 0 6px}
+.ctl .ctl-h span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ctl .ctl-v{font-size:clamp(24px,1.7vw,34px);color:var(--c);font-weight:700}
+.ctl .ctl-t{font-size:11px;min-height:14px;color:var(--danger);text-align:center}
+.ctl .ctl-row{flex-direction:column-reverse;align-items:center;gap:5px;flex:1;width:100%;min-height:0}
+.ctl .ctl-row button{width:84%;padding:8px 0;font-size:15px;font-weight:700;min-width:0}
+.ctl input[type=range]{writing-mode:vertical-lr;direction:rtl;flex:1;width:40px;min-height:80px;accent-color:var(--c);padding:0;margin:4px 0}
+.ctl input[type=range]:disabled{opacity:.55}
+.ctlfoot{display:flex;flex-direction:column;gap:8px}
+#swRow{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#swRow .swg{display:grid;grid-template-columns:1fr;gap:4px;border:1px solid var(--line);border-radius:10px;padding:6px;font-size:12px;font-weight:600;text-align:center}
+#swRow .swg button{padding:6px 0;font-size:13px}
+#swRow .swg span{display:flex;gap:4px}
+#btnStandby{grid-column:1/-1;padding:8px}
+#ctlNote{font-size:11.5px;text-align:center}
+#btnCtlOff{padding:10px;font-weight:600}
+body:not(.ctl-on) #btnCtlOff{display:none}
+/* stage */
+.stage{display:flex;flex-direction:column;gap:10px;min-width:0;min-height:0}
+.hud{display:grid;grid-template-columns:1fr 1.15fr 1fr auto;gap:10px;align-items:stretch}
+.hv{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 16px 8px}
+.hv .l{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.hv .v{font-size:clamp(48px,4.6vw,104px);font-weight:700;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--c,var(--ink));margin-top:4px}
+.hud.stale .v{opacity:.35}
+.lcds{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:clamp(200px,12vw,260px)}
+.mini{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;justify-content:center}
+.mini span{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.mini b{font-size:22px;font-variant-numeric:tabular-nums}
+.lcds.stale b{opacity:.35}
+.chartwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 8px 4px;flex:1;display:flex;flex-direction:column;min-height:0}
+.chartwrap .chart{flex:1;height:auto;min-height:200px}
+.chartwrap .chart.aux{flex:0 0 clamp(90px,11vh,140px)}
+.phases{height:30px;border-radius:10px}
+/* right rail */
+#btnStart{font-size:clamp(22px,1.6vw,30px);font-weight:800;letter-spacing:.08em;padding:clamp(14px,1.4vh,22px);border-radius:14px}
+.livecard #liveRef{display:flex;flex-direction:column;gap:8px}
+.deltas{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.deltas>div{background:var(--bg);border-radius:10px;padding:8px 10px}
+.deltas span{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.deltas .delta{font-size:clamp(22px,1.6vw,32px)}
+.livecard .nextadj{margin:0;border-left:0;border-radius:12px;background:var(--bg);font-size:14px;padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.livecard .nextadj button{margin-left:auto;font-size:16px;padding:8px 18px;font-weight:700}
+.evstack{display:flex;flex-direction:column;gap:6px;flex:1;min-height:0}
+#evButtons{display:flex;flex-direction:column;gap:6px;flex:1}
+#evButtons .ev{flex:1;min-height:40px;max-height:74px;font-size:clamp(15px,1.05vw,19px);font-weight:600;border-radius:12px;display:flex;justify-content:space-between;align-items:center;padding:0 16px}
+#evButtons .ev kbd{font-size:12px;opacity:.5;font-family:inherit}
+#evButtons .ev.set{background:transparent;color:var(--muted);border-style:dashed}
+#evButtons .ev.set::after{content:'✓';color:var(--ok);font-weight:800;margin-left:auto;padding-left:8px}
+#evButtons .ev.set kbd{display:none}
+#evButtons .ev.next{background:var(--teal);border-color:var(--teal);color:#fff;flex:1.6;max-height:110px;font-size:clamp(18px,1.35vw,24px);box-shadow:0 6px 18px rgba(12,132,147,.3)}
+#evButtons .ev.next kbd{opacity:.8}
+#evButtons .ev[data-k=SCs],#evButtons .ev[data-k=SCe]{flex:.6;min-height:32px;font-size:13px}
+#btnUndo{font-size:13px;padding:8px}
+.drawerbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.drawerbtns button{padding:10px 6px;font-size:13px}
+/* drawer */
+.drawer{position:fixed;top:54px;left:0;bottom:0;width:min(520px,92vw);background:var(--card);border-right:1px solid var(--line);box-shadow:20px 0 50px rgba(0,0,0,.3);transform:translateX(-105%);transition:transform .25s ease;z-index:30;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer[hidden]{display:none!important}
+.drawerhead{display:flex;gap:8px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.dtabs{display:flex;gap:4px;flex:1}
+.dtabs button{flex:1;border:0;background:var(--bg);padding:8px;border-radius:8px;font-weight:600;color:var(--muted)}
+.dtabs button.on{background:var(--navy);color:#fff}
+:root[data-theme="dark"] .dtabs button.on{background:var(--teal)}
+.drawer>.card{border:0;border-radius:0;overflow:auto;flex:1}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">ZUNA ROAST<small>Probat P12 III · WebSocket</small></div>
+  <span class="pill" id="pill" data-s="offline"><i></i><span id="pillText">Offline</span></span>
+  <button id="btnConnect">Connect</button>
+  <button id="btnSim" title="Run a simulated P12 roast for testing">Simulator</button>
+  <select id="simSpeed" title="Simulator speed"><option value="1">1×</option><option value="4">4×</option><option value="10">10×</option></select>
+  <nav class="nav" id="nav"><button data-screen="roasting" class="on">Roasting</button><button data-screen="roasts">Roasts</button><button data-screen="green">Green coffee</button></nav>
+  <div class="spacer"></div>
+  <button id="btnUnit" title="Toggle °C / °F">°C</button>
+  <button id="btnTheme" title="Light / dark">Dark</button>
+  <button id="btnControl" title="Send burner, air and drum settings to the roaster">Control</button>
+  <button id="btnSettings">Settings</button>
+</header>
+
+<div class="console" data-screen="roasting">
+
+  <!-- LEFT: control faders -->
+  <section class="rail rail-l">
+    <div class="railhead"><span>Control</span><button id="btnCtlOn2" class="pillbtn">Off</button></div>
+    <div id="ctlOff" class="ctloff">Watching only — faders follow the roaster. Turn Control on to send settings.</div>
+    <div class="ctlcard" id="ctlCard">
+      <div class="ctlgrid" id="ctlGrid"></div>
+      <div class="ctlfoot">
+        <div id="swRow"></div>
+        <span class="muted" id="ctlNote"></span>
+        <button id="btnCtlOff" class="danger">Release control</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CENTER: numbers + chart -->
+  <main class="stage">
+    <div class="hud" id="bigBox">
+      <div class="hv time"><div class="l"><span id="timerLabel">Roast time</span><span id="recState"></span></div><div class="v" id="timer">0:00</div></div>
+      <div class="hv" style="--c:var(--c-bt)"><div class="l">BT <span class="u">°C</span></div><div class="v" id="lcd-bt">—</div></div>
+      <div class="hv" style="--c:var(--c-ror)"><div class="l">ΔBT <span class="ur">°C/min</span></div><div class="v" id="lcd-ror">—</div></div>
+      <div class="lcds" id="lcds">
+        <div class="mini" style="--c:var(--c-exhaust)"><span>Exhaust</span><b id="lcd-exhaust">—</b></div>
+        <div class="mini" style="--c:var(--c-air)"><span>Pressure</span><b id="lcd-air">—</b></div>
+        <div class="mini" style="--c:var(--c-burner)"><span>Burner</span><b id="lcd-burner">—</b></div>
+        <div class="mini" style="--c:var(--c-drum)"><span>Drum</span><b id="lcd-drum">—</b></div>
+      </div>
+    </div>
+    <div class="chartwrap">
+      <div class="legend" id="legend"></div>
+      <div class="chart"><canvas id="chartMain"></canvas></div>
+      <div class="chart aux"><canvas id="chartAux"></canvas></div>
+      <div class="readout" id="readout"></div>
+    </div>
+    <div class="phases" id="phases">
+      <div class="p1" style="flex-grow:1">Drying <b id="ph1">—</b></div>
+      <div class="p2" style="flex-grow:1">Maillard <b id="ph2">—</b></div>
+      <div class="p3" style="flex-grow:1">Development <b id="ph3">—</b></div>
+    </div>
+  </main>
+
+  <!-- RIGHT: start, next move, events -->
+  <section class="rail rail-r">
+    <button id="btnStart" class="primary">START</button>
+    <div class="livecard" data-pane="live">
+      <div id="liveRef">
+        <div class="deltas"><div><span>BT vs bg</span><div class="delta" id="refDBT">—</div></div><div><span>ΔBT vs bg</span><div class="delta" id="refDROR">—</div></div></div>
+        <div id="nextAdj"></div>
+      </div>
+    </div>
+    <div class="evstack" id="controls">
+      <div id="evButtons"></div>
+      <button id="btnUndo" title="Remove the last marked event">Undo last event</button>
+    </div>
+    <div class="drawerbtns" id="tabs"><button data-tab="roast">Roast details</button><button data-tab="bg">Background</button></div>
+  </section>
+</div>
+
+<!-- DRAWER: roast form + background -->
+<div class="drawer" id="drawer" data-screen="roasting">
+  <div class="drawerhead"><div class="dtabs" id="dtabs"><button data-tab="roast">Roast</button><button data-tab="bg">Background</button></div><button id="drawerX">✕</button></div>
+  <div class="card" data-pane="roast">
+    <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:10px"><span id="roastId" class="roastid"></span><button id="btnNew">New</button></div>
+    <div class="row" style="margin-bottom:12px"><button id="btnSave" class="primary" style="flex:1">Save</button><button id="btnSaveProfile" style="flex:1" title="Save and make this the profile for its name">Save as profile</button></div>
+    <div class="grid2" id="metaForm">
+      <label class="field full">Profile name<input data-m="name" list="profileNames" placeholder="e.g. Brazil Cerrado – Espresso" autocomplete="off"><datalist id="profileNames"></datalist></label>
+      <div class="field full" id="profileHint" style="margin-top:-2px"></div>
+      <label class="field full">Green coffee<select data-m="invId" id="invSelect"></select></label>
+      <div class="field full" id="invHint" style="margin-top:-2px"></div>
+      <label class="field">Green weight (lb)<input data-m="green" inputmode="decimal"></label>
+      <label class="field">Roasted weight (lb)<input data-m="roasted" inputmode="decimal"></label>
+      <label class="field">Whole bean color<input data-m="colorWhole" inputmode="decimal" placeholder="Agtron"></label>
+      <label class="field">Ground color<input data-m="colorGround" inputmode="decimal" placeholder="Agtron"></label>
+      <label class="field full">Comments<textarea data-m="notes" placeholder="Aroma, appearance, cupping…"></textarea></label>
+      <details class="field full more"><summary>Coffee &amp; lot names</summary>
+        <div class="grid2" style="margin-top:6px"><label class="field">Coffee<input data-m="coffee" placeholder="Origin / farm"></label><label class="field">Lot<input data-m="lot"></label></div>
+      </details>
+    </div>
+    <div class="stat" style="margin-top:8px"><span>Weight loss</span><b id="wloss">—</b></div>
+  </div>
+  <div class="card" data-pane="bg" hidden>
+    <select id="refSelect"></select>
+    <div id="refBody" class="muted" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<section class="page" data-screen="roasts" hidden>
+  <div class="pagehead"><h2>Roasts</h2>
+    <div class="row"><select id="histFilter" style="width:auto"><option value="all">All roasts</option><option value="profiles">Profiles only</option></select>
+    <input id="histSearch" placeholder="Search name, coffee, lot, #…" style="width:220px">
+    <button id="btnImport" title="Import roasts from a JSON export">Import</button><button id="btnExportAll" title="Export every saved roast as JSON">Export all</button></div></div>
+  <div class="folder" id="folderBox"></div>
+  <div class="hist" id="hist"></div>
+  <input type="file" id="fileImport" accept=".json,application/json" hidden>
+</section>
+
+<section class="page" data-screen="green" hidden>
+  <div class="pagehead"><h2>Green coffee</h2><div class="row"><label class="row muted"><input type="checkbox" id="invShowEmpty" style="width:auto"> show used-up lots</label><button id="invCSV">Export CSV</button></div></div>
+  <div class="greengrid">
+    <div class="card" id="invFormBox">
+      <h3 id="invFormTitle">Add green coffee</h3>
+      <div class="grid2" id="invForm">
+        <label class="field full">Coffee name<input data-i="name" placeholder="e.g. Brazil Cerrado Natural"></label>
+        <label class="field">Origin<input data-i="origin" placeholder="Country / region"></label>
+        <label class="field">Lot<input data-i="lot"></label>
+        <label class="field">Supplier<input data-i="supplier"></label>
+        <label class="field">Arrived<input data-i="arrived" type="date"></label>
+        <label class="field full">Starting weight (lb)<input data-i="startLb" inputmode="decimal"></label>
+        <label class="field full">Notes<input data-i="notes" placeholder="Process, variety, moisture, cost…"></label>
+      </div>
+      <div class="row" style="margin-top:10px"><button id="invSave" class="primary">Add to inventory</button><button id="invCancelEdit" hidden>Cancel edit</button></div>
+    </div>
+    <div class="card"><h3>In stock</h3><div id="invList" style="overflow-x:auto"></div></div>
+  </div>
+</section>
+
+<dialog id="dlg">
+  <div class="dlg-h">Settings <button id="dlgX" style="padding:3px 9px">✕</button></div>
+  <div class="dlg-b" id="dlgBody"></div>
+  <div style="padding:0 18px 12px">    <details id="logBox" >
+      <summary class="muted">Connection log ▸</summary>
+      <div class="row" style="margin:8px 0"><label class="row muted"><input type="checkbox" id="logVerbose" style="width:auto"> show data traffic</label><button id="btnLogClear" style="padding:3px 8px">Clear</button></div>
+      <div class="log" id="log"></div>
+    </details></div>
+  <div class="dlg-f"><button id="dlgReset">Reset to defaults</button><span class="spacer"></span><button id="dlgCancel">Cancel</button><button id="dlgSave" class="primary">Save</button></div>
+</dialog>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   Zuna Roast · Probat P12 III
+   Monitor-only roast logger. Talks to the P12 III over WebSocket
+   using the same message/node mapping Artisan uses for Probat.
+   ============================================================ */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const LS={cfg:'zunaRoast.p12.cfg.v1',hist:'zunaRoast.p12.history.v1',num:'zunaRoast.p12.lastNum',theme:'zunaRoast.theme',meta:'zunaRoast.p12.metaDraft',ref:'zunaRoast.p12.ref'};
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+
+/* ---------- Channels (Inputs 1–9 from the Artisan WebSocket tab) ---------- */
+const CHANNELS=[
+  {key:'bt',     label:'BT',       node:'beanTemp',       mode:'C', scale:1,    kind:'temp', curve:true},
+  {key:'et',     label:'ET',       node:'ambientTemp',    mode:'C', scale:1,    kind:'temp', curve:false},
+  {key:'burner', label:'Burner',   node:'burner',         mode:'',  scale:1,    kind:'pct',  curve:true},
+  {key:'air',    label:'Air',      node:'airPressure',    mode:'',  scale:1000, kind:'pa',   curve:true},
+  {key:'drum',   label:'Drum',     node:'drum',           mode:'',  scale:1,    kind:'pct',  curve:true},
+  {key:'fan',    label:'Exh. fan', node:'exhaustFan',     mode:'',  scale:1,    kind:'pct',  curve:true},
+  {key:'inlet',  label:'Inlet',    node:'intakeAirTemp',  mode:'C', scale:1,    kind:'temp', curve:false},
+  {key:'exhaust',label:'Exhaust',  node:'exhaustAirTemp', mode:'C', scale:1,    kind:'temp', curve:true},
+  {key:'cooling',label:'Cooling',  node:'coolingAirTemp', mode:'C', scale:1,    kind:'temp', curve:false},
+];
+const EVENTS=[
+  {key:'CHARGE',label:'Charge', short:'CHG', hot:'c'},
+  {key:'TP',    label:'TP',     short:'TP',  auto:true},
+  {key:'DRY',   label:'Dry end',short:'DRY', hot:'d'},
+  {key:'FCs',   label:'FC start',short:'FCs',hot:'f'},
+  {key:'FCe',   label:'FC end', short:'FCe', hot:'e'},
+  {key:'SCs',   label:'SC start',short:'SCs',hot:'s'},
+  {key:'SCe',   label:'SC end', short:'SCe', hot:'w'},
+  {key:'DROP',  label:'Drop',   short:'DROP',hot:'x'},
+  {key:'COOL',  label:'Cool end',short:'COOL',hot:'o'},
+];
+
+const DEFAULT_CFG={
+  host:'192.168.1.63',port:80,path:'WebSocket',roasterId:0,
+  connectTimeout:4,reconnect:2,requestTimeout:0.5,interval:1,
+  nodes:{id:'id',machine:'roasterID',command:'command',data:'data',message:'pushMessage'},
+  dataRequest:'getCurrentRoastingStep',
+  msgCharge:'startRoasting',msgDrop:'endRoasting',
+  eventMsg:'addEvent',eventNode:'event',
+  evDRY:'colorChangeEvent',evFCs:'firstCrackBeginningEvent',evFCe:'firstCrackEndEvent',
+  evSCs:'secondCrackBeginningEvent',evSCe:'secondCrackEndEvent',
+  startOnCharge:true,offOnDrop:false,
+  ctlBurnerMax:100,ctlStep:10,ctlSendEvents:true,
+  channels:Object.fromEntries(CHANNELS.map(c=>[c.key,{node:c.node,mode:c.mode,scale:c.scale,curve:c.curve}])),
+  unit:'C',rorWindow:30,projection:90,showProjection:true,tMin:0,tMax:260,rorMax:30
+};
+function loadCfg(){
+  const s=store.get(LS.cfg,{})||{};
+  const c=JSON.parse(JSON.stringify(DEFAULT_CFG));
+  for(const k of Object.keys(s)) if(k!=='nodes'&&k!=='channels') c[k]=s[k];
+  Object.assign(c.nodes,s.nodes||{});
+  for(const ch of CHANNELS) Object.assign(c.channels[ch.key],(s.channels||{})[ch.key]||{});
+  if(!s.lean){for(const k of ['et','inlet','cooling'])c.channels[k].curve=false;c.lean=true}
+  return c;
+}
+let cfg=loadCfg();
+
+/* ---------- helpers ---------- */
+const getPath=(o,p)=>!p?o:String(p).split('.').reduce((a,k)=>a==null?undefined:a[k],o);
+const isF=()=>cfg.unit==='F';
+const toDispT=c=>c==null?null:(isF()?c*9/5+32:c);
+const fromDispT=d=>isF()?(d-32)*5/9:d;
+const toDispR=r=>r==null?null:(isF()?r*1.8:r);
+const ok=v=>v!=null&&isFinite(v);
+const fmtT=c=>ok(c)?toDispT(c).toFixed(1):'—';
+const fmtR=r=>ok(r)?toDispR(r).toFixed(1):'—';
+const fmt0=v=>ok(v)?Math.round(v).toString():'—';
+const mmss=s=>{if(!ok(s))return '—';const n=s<0;s=Math.abs(Math.round(s));return (n?'-':'')+Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const n=parseFloat(String(v??'').replace(',','.'));return isFinite(n)?n:null};
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3200)}
+
+/* least-squares slope of key over the last `win` seconds, in units per minute */
+function slope(arr,key,tEnd,win){
+  let n=0,sx=0,sy=0,sxx=0,sxy=0;
+  for(let i=arr.length-1;i>=0;i--){
+    const p=arr[i];if(p.t<tEnd-win)break;const y=p[key];if(!ok(y))continue;
+    const x=p.t-tEnd;n++;sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;
+  }
+  if(n<3)return null;const d=n*sxx-sx*sx;if(!d)return null;
+  return (n*sxy-sx*sy)/d*60;
+}
+function sampleAt(arr,t){
+  if(!arr.length)return null;let lo=0,hi=arr.length-1;
+  while(hi-lo>1){const m=(lo+hi)>>1;if(arr[m].t<t)lo=m;else hi=m}
+  return Math.abs(arr[lo].t-t)<=Math.abs(arr[hi].t-t)?arr[lo]:arr[hi];
+}
+function interp(arr,key,t){
+  if(!arr.length)return null;let lo=0,hi=arr.length-1;
+  if(t<arr[0].t||t>arr[hi].t)return null;
+  while(hi-lo>1){const m=(lo+hi)>>1;if(arr[m].t<t)lo=m;else hi=m}
+  const a=arr[lo],b=arr[hi];if(!ok(a[key])||!ok(b[key]))return ok(a[key])?a[key]:(ok(b[key])?b[key]:null);
+  if(b.t===a.t)return a[key];return a[key]+(b[key]-a[key])*(t-a.t)/(b.t-a.t);
+}
+
+/* ---------- log ---------- */
+const logBuf=[];let logRenderPending=false;
+function log(kind,text){
+  logBuf.push({t:new Date().toLocaleTimeString(),kind,text:String(text).slice(0,500)});
+  if(logBuf.length>500)logBuf.splice(0,logBuf.length-500);
+  if($('#logBox').open&&!logRenderPending){logRenderPending=true;setTimeout(renderLog,250)}
+}
+function renderLog(){
+  logRenderPending=false;const v=$('#logVerbose').checked;const el=$('#log');
+  el.innerHTML=logBuf.filter(l=>v||(l.kind!=='in'&&l.kind!=='out')).slice(-200)
+    .map(l=>`<div class="${l.kind}">${l.t} ${l.kind.toUpperCase().padEnd(4)} ${esc(l.text)}</div>`).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+/* ============================================================
+   Simulator — behaves like the P12 III WebSocket endpoint.
+   Charges 15 s after connecting, pushes DRY/FC/DROP messages.
+   ============================================================ */
+class SimSocket{
+  constructor(speed){
+    this.speed=speed;this.readyState=0;this.t0=performance.now();this.fired={};
+    setTimeout(()=>{if(this.readyState!==0)return;this.readyState=1;this.onopen&&this.onopen()},250);
+    this.pushTimer=setInterval(()=>this.checkPushes(),100);
+  }
+  simNow(){return (performance.now()-this.t0)/1000*this.speed}
+  r(){return this.simNow()-15}
+  send(s){
+    if(this.readyState!==1)return;let m;try{m=JSON.parse(s)}catch(e){return}
+    const n=cfg.nodes;
+    if(m[n.command]==='setControlParams'&&m.params){this.ctl=Object.assign(this.ctl||{},m.params);setTimeout(()=>this.emit({[n.id]:m[n.id],[n.machine]:m[n.machine],[n.data||'data']:{result:'ok'}}),15);return}
+    if(m[n.command]==='getControlParams'){const c=this.ctl||{};setTimeout(()=>this.emit({[n.id]:m[n.id],[n.data||'data']:{standby:!!c.standby,burner:c.burner,exhaustFan:c.exhaustFan,drum:c.drum}}),15);return}
+    if(m[n.command]!==cfg.dataRequest)return;
+    const resp={};resp[n.id]=m[n.id];resp[n.machine]=m[n.machine];
+    const vals=this.values();
+    if(n.data){const parts=n.data.split('.');let o=resp;parts.forEach((p,i)=>{o[p]=i===parts.length-1?vals:(o[p]||{});o=o[p]})}else Object.assign(resp,vals);
+    setTimeout(()=>this.emit(resp),8);
+  }
+  emit(o){if(this.readyState===1&&this.onmessage)this.onmessage({data:JSON.stringify(o)})}
+  close(){if(this.readyState===3)return;this.readyState=3;clearInterval(this.pushTimer);setTimeout(()=>this.onclose&&this.onclose({}),0)}
+  checkPushes(){
+    const r=this.r(),n=cfg.nodes;
+    const ev=name=>{const o={[n.message]:cfg.eventMsg};const d={[cfg.eventNode]:name};if(n.data)o[n.data]=d;else Object.assign(o,d);return o};
+    const fire=(k,at,build)=>{if(r>=at&&!this.fired[k]){this.fired[k]=1;this.emit(build())}};
+    fire('charge',0,()=>({[n.message]:cfg.msgCharge}));
+    fire('dry',268,()=>ev(cfg.evDRY));
+    fire('fcs',510,()=>ev(cfg.evFCs));
+    fire('fce',598,()=>ev(cfg.evFCe));
+    fire('drop',640,()=>({[n.message]:cfg.msgDrop}));
+  }
+  values(){
+    const r=this.r(),nz=a=>(Math.random()-.5)*2*a;
+    const tb=x=>228-203*Math.exp(-x/280);
+    let bt,et,inlet,exhaust,cooling=24,burner,fan,drum=65;
+    if(r<0){bt=210;et=232;inlet=330;exhaust=178;burner=55;fan=60}
+    else if(r<=640){
+      const b=tb(r);bt=b+(210-b)*Math.exp(-r/35);
+      et=245-55*Math.exp(-r/150)-30*Math.exp(-r/12);
+      burner=r<300?85:r<510?68:45;fan=r<510?60:75;
+      inlet=burner*3.6+40;exhaust=150+58*(1-Math.exp(-r/220));
+    }else{
+      const d=r-640,b=tb(640);bt=32+(b-32)*Math.exp(-d/70);
+      et=238;burner=40;fan=75;inlet=190;exhaust=172;cooling=26+70*Math.exp(-d/160)*(1-Math.exp(-d/8));
+    }
+    const o=this.ctl||{};if(o.burner!=null)burner=o.burner;if(o.exhaustFan!=null)fan=o.exhaustFan;if(o.drum!=null)drum=o.drum;if(o.burnerState===false)burner=0;
+    const out={};const c=cfg.channels;
+    const put=(k,v,a)=>{const node=c[k].node;if(!node)return;let x=v+nz(a);x/=Number(c[k].scale)||1;if(CHANNELS.find(q=>q.key===k).kind==='temp'&&c[k].mode==='F')x=x*9/5+32;out[node]=+x.toFixed(3)};
+    put('bt',bt,.15);put('et',et,.4);put('inlet',inlet,1.2);put('exhaust',exhaust,.5);put('cooling',cooling,.3);
+    put('burner',burner,0);put('fan',fan,0);put('drum',drum,0);put('air',fan*1.8,1.5);
+    return out;
+  }
+}
+
+/* ============================================================
+   WebSocket link — Artisan-compatible Probat request/response
+   ============================================================ */
+class Link{
+  constructor(){this.ws=null;this.state='offline';this.reqId=0;this.pending=new Map();this.poll=null;this.manual=true;this.sim=false;this.simRef=null;this.missed=0;this.rt=null}
+  url(){const p=String(cfg.path||'').replace(/^\/+/,'');return `ws://${cfg.host}:${cfg.port}/${p}`}
+  clock(){return this.simRef?this.simRef.simNow():performance.now()/1000}
+  connected(){return !!this.ws&&this.ws.readyState===1}
+  setState(s){const was=this.state;this.state=s;renderStatus();if(C.on&&(was==='connected'||was==='sim')&&s!=='connected'&&s!=='sim'){toast('Connection lost — control the roaster at its panel');log('err','Connection lost while Control was on');renderCtl()}}
+  connect(sim){
+    this.disconnect(true);this.manual=false;this.sim=!!sim;
+    if(this.sim){this.simRef=null}else{this.simRef=null}
+    this.setState('connecting');
+    let ws;
+    try{ws=this.sim?new SimSocket(S.simSpeed):new WebSocket(this.url())}
+    catch(e){log('err','Could not open socket: '+e.message);this.scheduleReconnect();return}
+    if(this.sim)this.simRef=ws;
+    this.ws=ws;log('sys','Connecting to '+(this.sim?'simulator':this.url()));
+    const ct=setTimeout(()=>{if(ws.readyState!==1){log('err','Connect timeout');try{ws.close()}catch(e){}}},cfg.connectTimeout*1000);
+    ws.onopen=()=>{clearTimeout(ct);if(this.ws!==ws)return;this.missed=0;this.setState(this.sim?'sim':'connected');log('sys','Connected');this.startPolling()};
+    ws.onmessage=e=>{if(this.ws===ws)this.onMessage(e.data)};
+    ws.onerror=()=>{log('err','Socket error')};
+    ws.onclose=()=>{clearTimeout(ct);if(this.ws!==ws)return;this.stopPolling();this.ws=null;log('sys','Socket closed');
+      if(this.manual)this.setState('offline');else this.scheduleReconnect()};
+  }
+  scheduleReconnect(){if(this.manual)return;this.setState('reconnecting');clearTimeout(this.rt);
+    this.rt=setTimeout(()=>{if(!this.manual)this.connect(this.sim)},cfg.reconnect*1000)}
+  disconnect(silent){
+    this.manual=true;clearTimeout(this.rt);this.stopPolling();
+    if(this.ws){const w=this.ws;this.ws=null;try{w.close()}catch(e){}}
+    if(!silent)this.setState('offline');
+  }
+  startPolling(){
+    this.stopPolling();
+    const ms=Math.max(40,cfg.interval*1000/(this.sim?S.simSpeed:1));
+    this.poll=setInterval(()=>this.request(),ms);this.request();
+  }
+  stopPolling(){clearInterval(this.poll);this.poll=null;for(const t of this.pending.values())clearTimeout(t);this.pending.clear()}
+  request(){
+    if(!this.connected())return;const n=cfg.nodes;
+    const id=this.reqId=(this.reqId%65535)+1;
+    const msg={};msg[n.command]=cfg.dataRequest;msg[n.id]=id;msg[n.machine]=Number(cfg.roasterId)||0;
+    const s=JSON.stringify(msg);
+    try{this.ws.send(s)}catch(e){log('err','Send failed');return}
+    log('out',s);
+    this.pending.set(id,setTimeout(()=>{this.pending.delete(id);this.missed++;if(this.missed===3)log('err','No response to the last 3 data requests');renderStatus()},cfg.requestTimeout*1000));
+  }
+  sendCommand(obj){
+    if(!this.connected())return null;const n=cfg.nodes;
+    const id=this.reqId=(this.reqId%65535)+1;obj[n.id]=id;obj[n.machine]=Number(cfg.roasterId)||0;
+    const s=JSON.stringify(obj);try{this.ws.send(s)}catch(e){log('err','Send failed');return null}
+    log('out',s);return id;
+  }
+  ask(obj,ms=2000){return new Promise(res=>{const id=this.sendCommand(obj);if(id==null)return res(null);
+    this.asks=this.asks||new Map();const t=setTimeout(()=>{this.asks.delete(id);res(null)},ms);this.asks.set(id,m=>{clearTimeout(t);res(m)})})}
+  onMessage(raw){
+    let m;try{m=JSON.parse(raw)}catch(e){log('err','Non-JSON message: '+String(raw).slice(0,200));return}
+    const n=cfg.nodes;const push=m[n.message];
+    const id=Number(m[n.id]);
+    if(this.asks&&this.asks.has(id)){log('in',raw);const f=this.asks.get(id);this.asks.delete(id);f(m);return}
+    if(this.pending.has(id)){
+      log('in',raw);clearTimeout(this.pending.get(id));this.pending.delete(id);
+      const wasMissing=this.missed>=3;this.missed=0;if(wasMissing)renderStatus();
+      const data=n.data?getPath(m,n.data):m;
+      if(data&&typeof data==='object')onData(data);
+    }else if(push!=null&&push!==''){onPush(String(push),m)}
+    else log('in',raw);
+  }
+}
+const link=new Link();
+
+/* ============================================================
+   State
+   ============================================================ */
+function blankMeta(){return {wUnit:'lb',name:'',invId:'',coffee:'',lot:'',green:'',roasted:'',colorWhole:'',colorGround:'',notes:''}}
+const toLb=v=>{const n=num(v);return n==null?(v||''):String(+(n*2.20462).toFixed(2))};
+function normMeta(m){m=m||{};const o=Object.assign(blankMeta(),m);if(!o.colorWhole&&o.color)o.colorWhole=o.color;
+  if(m.wUnit!=='lb'&&(m.green||m.roasted)){o.green=toLb(m.green);o.roasted=toLb(m.roasted)}o.wUnit='lb';return o}
+function normInv(l){if(l.startLb==null&&l.startKg!=null){l.startLb=+(num(l.startKg)*2.20462).toFixed(2);delete l.startKg}
+  for(const x of l.adj||[])if(x.lb==null&&x.kg!=null){x.lb=+(num(x.kg)*2.20462).toFixed(2);delete x.kg}return l}
+function newRoast(){return {id:null,created:null,machine:'Probat P12 III',source:null,t0:null,samples:[],events:{},meta:blankMeta()}}
+const S={recording:false,roast:newRoast(),ref:null,latest:{},mon:[],liveRor:null,tpMin:null,dirty:false,
+  viewingId:null,hover:null,refMode:'__match',refWhy:'',refAdj:[],simSpeed:1,evStack:[],lastDataAt:0};
+
+/* ---------- incoming data ---------- */
+function onData(data){
+  const vals={};
+  for(const ch of CHANNELS){
+    const cc=cfg.channels[ch.key];let v=cc.node?num(getPath(data,cc.node)):null;
+    if(v==null){vals[ch.key]=null;continue}
+    v*=Number(cc.scale)||1;
+    if(ch.kind==='temp'&&cc.mode==='F')v=(v-32)*5/9;
+    vals[ch.key]=v;
+  }
+  const now=link.clock();
+  S.latest=vals;S.lastDataAt=performance.now();
+  S.mon.push({t:now,bt:vals.bt});while(S.mon.length&&S.mon[0].t<now-120)S.mon.shift();
+  S.liveRor=slope(S.mon,'bt',now,cfg.rorWindow);
+  if(S.recording){
+    const r=S.roast,t=now-r.t0,s={t:+t.toFixed(2)};
+    for(const ch of CHANNELS)s[ch.key]=vals[ch.key]==null?null:+vals[ch.key].toFixed(2);
+    r.samples.push(s);
+    const ror=slope(r.samples,'bt',t,cfg.rorWindow);s.ror=ror==null?null:+ror.toFixed(2);
+    detectTP(s);S.dirty=true;
+  }
+  renderLCDs();scheduleDraw();
+}
+function detectTP(s){
+  const ev=S.roast.events;if(ev.CHARGE==null||ev.TP!=null||!ok(s.bt)||s.t-ev.CHARGE<5)return;
+  if(!S.tpMin||s.bt<S.tpMin.bt)S.tpMin={t:s.t,bt:s.bt};
+  else if(s.bt-S.tpMin.bt>=1.5&&s.t-S.tpMin.t>=8){ev.TP=S.tpMin.t;log('evt',`TP auto-detected at ${mmss(ev.TP-ev.CHARGE)}, BT ${fmtT(S.tpMin.bt)}`);renderEvents()}
+}
+function onPush(p,m){
+  log('push',JSON.stringify(m));
+  if(p===cfg.msgCharge){
+    if(!S.recording){if(cfg.startOnCharge){if(!startRoast('machine'))return}else{toast('CHARGE received from roaster — press START to record');return}}
+    markEvent('CHARGE','machine');
+  }else if(p===cfg.msgDrop){if(S.recording)markEvent('DROP','machine')}
+  else if(p===cfg.eventMsg){
+    const d=cfg.nodes.data?getPath(m,cfg.nodes.data):m;
+    const e=(d&&d[cfg.eventNode]!=null)?d[cfg.eventNode]:m[cfg.eventNode];
+    const map={[cfg.evDRY]:'DRY',[cfg.evFCs]:'FCs',[cfg.evFCe]:'FCe',[cfg.evSCs]:'SCs',[cfg.evSCe]:'SCe'};
+    const k=map[e];if(k&&S.recording)markEvent(k,'machine');else if(!k)log('sys','Unmapped event: '+e);
+  }
+}
+
+/* ---------- roast control ---------- */
+function startRoast(src){
+  if(S.recording)return true;
+  if(S.viewingId==null&&S.dirty&&S.roast.samples.length){
+    if(src==='machine')saveRoast(true);
+    else if(!confirm('The current roast has not been saved. Discard it and start a new one?'))return false;
+  }
+  if(!link.connected()){toast('Not connected — connect to the roaster or start the simulator first');return false}
+  const meta=readMeta();meta.roasted='';meta.colorWhole='';meta.colorGround='';meta.notes='';
+  S.roast=newRoast();S.roast.meta=meta;S.roast.t0=link.clock();S.roast.created=new Date().toISOString();S.roast.num=nextNum();
+  S.roast.source=link.sim?'simulator':link.url();
+  S.recording=true;S.dirty=true;S.tpMin=null;S.evStack=[];S.viewingId=null;
+  fillMeta(meta);log('sys','Recording started');renderAll();showTab('live');return true;
+}
+function stopRoast(){
+  if(!S.recording)return;S.recording=false;log('sys','Recording stopped');
+  toast('Recording stopped — add roasted weight, colors and comments, then Save');renderAll();showTab('roast');
+}
+function markEvent(key,src='manual'){
+  if(!S.recording){
+    if(key==='CHARGE'&&src==='manual'){if(!startRoast('manual'))return}
+    else{if(src==='manual')toast('Press START (or CHARGE) to begin recording');return}
+  }
+  const r=S.roast;if(src==='machine'&&r.events[key]!=null)return;
+  const t=+(link.clock()-r.t0).toFixed(2);
+  r.events[key]=t;if(key==='CHARGE'){delete r.events.TP;S.tpMin=null;r.chargedAt=new Date().toISOString();renderRoastId()}
+  S.evStack=S.evStack.filter(k=>k!==key);S.evStack.push(key);S.dirty=true;
+  log('evt',`${key} at ${mmss(t-(r.events.CHARGE??0))}, BT ${fmtT(S.latest.bt)} (${src})`);
+  renderEvents();scheduleDraw();
+  if(src==='manual')sendEventToRoaster(key);
+  if(key==='DROP'&&cfg.offOnDrop)setTimeout(stopRoast,0);
+}
+function undoEvent(){
+  const k=S.evStack.pop();if(!k){toast('No event to undo');return}
+  delete S.roast.events[k];if(k==='CHARGE'){delete S.roast.events.TP;S.tpMin=null}
+  log('evt','Removed '+k);renderEvents();scheduleDraw();
+}
+
+/* ---------- meta form ---------- */
+function readMetaRaw(){const m=blankMeta();$$('#metaForm [data-m]').forEach(el=>m[el.dataset.m]=el.value);return m}
+function readMeta(){const m=readMetaRaw();if(m.invId==='__manage')m.invId='';return m}
+function fillMeta(m){m=normMeta(m);renderInvSelect(m.invId);$$('#metaForm [data-m]').forEach(el=>el.value=m[el.dataset.m]||'');renderLoss();renderInvHint()}
+function renderLoss(){
+  const m=readMeta(),g=num(m.green),r=num(m.roasted);
+  $('#wloss').textContent=g&&r?((g-r)/g*100).toFixed(1)+' %':'—';
+}
+
+/* ---------- history ---------- */
+/* ---------- storage: history in IndexedDB, files in a folder on disk ---------- */
+let HIST=[];
+const loadHist=()=>HIST;
+const idb={db:null,
+  open(){return new Promise(res=>{try{const r=indexedDB.open('zunaRoastP12',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>{this.db=r.result;res(true)};r.onerror=()=>res(false)}catch(e){res(false)}})},
+  get(k){return new Promise(res=>{if(!this.db)return res(undefined);try{const q=this.db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(undefined)}catch(e){res(undefined)}})},
+  set(k,v){return new Promise(res=>{if(!this.db)return res(false);try{const tx=this.db.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.oncomplete=()=>res(true);tx.onerror=()=>res(false)}catch(e){res(false)}})}};
+function sortHist(){HIST.sort((a,b)=>(b.num||0)-(a.num||0)||String(b.created).localeCompare(String(a.created)))}
+async function persistHist(){
+  const ok1=idb.db?await idb.set('hist',HIST):store.set(LS.hist,HIST);
+  if(!ok1)toast('Could not save the roast list in the browser — your folder copy is still safe');
+}
+function setHist(h){HIST=h;sortHist();persistHist();return true}
+/* ---------- green coffee inventory ---------- */
+let INV=[],INVsavedAt='';
+const invUsed=id=>HIST.filter(r=>r.meta&&r.meta.invId===id).reduce((a,r)=>a+(num(r.meta.green)||0),0);
+const invLeft=l=>(num(l.startLb)||0)+(l.adj||[]).reduce((a,x)=>a+(num(x.lb)||0),0)-invUsed(l.id);
+const invById=id=>INV.find(l=>l.id===id);
+const invLabel=l=>`${l.name||'Unnamed'}${l.lot?' · lot '+l.lot:''}`;
+function invCSV(){
+  const head=['coffee','origin','lot','supplier','arrived','start_lb','adjust_lb','used_lb','left_lb','roasts','notes'];
+  return [head.join(',')].concat(INV.map(l=>{const adj=(l.adj||[]).reduce((a,x)=>a+(num(x.lb)||0),0);
+    return [l.name,l.origin,l.lot,l.supplier,l.arrived,num(l.startLb)||0,adj.toFixed(2),invUsed(l.id).toFixed(2),invLeft(l).toFixed(2),HIST.filter(r=>r.meta.invId===l.id).map(r=>'#'+r.num).join(' '),l.notes]
+      .map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')})).join('\n');
+}
+async function persistInv(){
+  INVsavedAt=new Date().toISOString();
+  const payload={savedAt:INVsavedAt,items:INV};
+  if(idb.db)await idb.set('inv',payload);else store.set('zunaRoast.p12.inv',payload);
+  if(FS.state==='granted'){try{await fsWrite('inventory.json',JSON.stringify(payload,null,1));await fsWrite('inventory.csv',invCSV())}catch(e){log('err','Inventory write failed: '+e.message)}}
+}
+async function writeInvCSV(){if(FS.state==='granted')try{await fsWrite('inventory.csv',invCSV())}catch(e){}}
+function renderInvSelect(cur){
+  const sel=$('#invSelect');if(!sel)return;cur=cur??sel.value;
+  const show=INV.filter(l=>invLeft(l)>0.001||l.id===cur);
+  sel.innerHTML='<option value="">— not from inventory —</option>'+show.map(l=>`<option value="${l.id}">${esc(invLabel(l))} — ${invLeft(l).toFixed(1)} lb left</option>`).join('')+
+    `<option value="__manage">Manage inventory…</option>`;
+  sel.value=show.some(l=>l.id===cur)?cur:'';
+}
+function renderInvHint(){
+  const el=$('#invHint');if(!el)return;const m=readMeta(),l=invById(m.invId);
+  if(!l){el.innerHTML=INV.length?'':'<span class="muted">Add your green coffee under “Green inventory” to pick it here.</span>';return}
+  const g=num(m.green)||0,saved=S.roast.id&&HIST.find(r=>r.id===S.roast.id&&r.meta.invId===l.id);
+  const left=invLeft(l)+(saved?num(saved.meta.green)||0:0),after=left-g;
+  el.innerHTML=`<span class="${after<0?'low':'muted'}">${left.toFixed(1)} lb in stock${g?` → ${after.toFixed(1)} lb after this roast`:''}${after<0?' — not enough green!':''}</span>`;
+}
+function onInvPick(){
+  const sel=$('#invSelect');
+  if(sel.value==='__manage'){sel.value=readMetaRaw().invId||'';openInv();return}
+  const l=invById(sel.value);
+  if(l){$('[data-m=coffee]').value=l.name||'';$('[data-m=lot]').value=l.lot||''}
+  $('#metaForm').dispatchEvent(new Event('input'));renderInvHint();
+}
+let invEditId=null;
+function openInv(){invEditId=null;fillInvForm({});showScreen('green')}
+function fillInvForm(l){
+  $$('#invForm [data-i]').forEach(el=>el.value=l[el.dataset.i]??'');
+  $('#invFormTitle').textContent=invEditId?'Edit green coffee':'Add green coffee';$('#invFormBox').style.borderColor=invEditId?'var(--teal)':'';
+  $('#invSave').textContent=invEditId?'Save changes':'Add to inventory';$('#invCancelEdit').hidden=!invEditId;
+}
+function saveInvForm(){
+  const o={};$$('#invForm [data-i]').forEach(el=>o[el.dataset.i]=el.value.trim());
+  if(!o.name){toast('Give the coffee a name');return}
+  if(num(o.startLb)==null){toast('Enter the starting weight in lb');return}
+  o.startLb=num(o.startLb);
+  if(invEditId){Object.assign(invById(invEditId),o)}else INV.unshift({id:'g'+Date.now().toString(36),adj:[],created:new Date().toISOString(),...o});
+  toast(invEditId?'Green coffee updated':`${o.name} added — ${o.startLb} lb`);
+  invEditId=null;fillInvForm({});persistInv();renderInvList();renderInvSelect();renderInvHint();
+}
+function adjustInv(id){
+  const l=invById(id);if(!l)return;
+  const v=prompt(`Adjust stock for ${invLabel(l)}\n\nEnter lb to add (e.g. 132 for a new bag) or remove (e.g. -2 for a sample or spill):`);
+  const lb=num(v);if(lb==null||!lb)return;
+  const note=prompt('Note for this adjustment (optional):')||'';
+  (l.adj=l.adj||[]).push({date:new Date().toISOString(),lb,note});
+  persistInv();renderInvList();renderInvSelect();renderInvHint();toast(`${lb>0?'Added':'Removed'} ${Math.abs(lb)} lb`);
+}
+function deleteInv(id){
+  const l=invById(id);if(!l)return;const used=HIST.filter(r=>r.meta.invId===id).length;
+  if(!confirm(`Remove ${invLabel(l)} from inventory?${used?`\n\n${used} saved roast(s) used this coffee. They keep their coffee and lot names.`:''}`))return;
+  INV=INV.filter(x=>x.id!==id);persistInv();renderInvList();renderInvSelect();renderInvHint();
+}
+function renderInvList(){
+  const showEmpty=$('#invShowEmpty').checked,list=INV.filter(l=>showEmpty||invLeft(l)>0.001);
+  $('#invList').innerHTML=list.length?`<table class="inv"><tr><th>Coffee</th><th>Origin</th><th>Lot</th><th>Supplier</th><th>Arrived</th><th class="n">Start</th><th class="n">Used</th><th class="n">Left (lb)</th><th>Roasts</th><th></th></tr>`+
+    list.map(l=>{const left=invLeft(l),rs=HIST.filter(r=>r.meta.invId===l.id),adj=(l.adj||[]).reduce((a,x)=>a+(num(x.lb)||0),0);
+      return `<tr><td><b>${esc(l.name)}</b>${l.notes?`<div class="muted">${esc(l.notes)}</div>`:''}</td><td>${esc(l.origin)}</td><td>${esc(l.lot)}</td><td>${esc(l.supplier)}</td><td>${esc(l.arrived)}</td>
+      <td class="n">${(num(l.startLb)||0).toFixed(1)}${adj?`<div class="muted">${adj>0?'+':''}${adj.toFixed(1)} adj</div>`:''}</td><td class="n">${invUsed(l.id).toFixed(1)}</td>
+      <td class="n ${left<10?'low':''}">${left.toFixed(1)}</td><td class="muted">${rs.length?rs.slice(0,8).map(r=>'#'+r.num).join(' ')+(rs.length>8?' …':''):'—'}</td>
+      <td><div class="row" style="flex-wrap:nowrap"><button data-iv="edit" data-id="${l.id}">Edit</button><button data-iv="adj" data-id="${l.id}">Adjust</button><button data-iv="del" data-id="${l.id}">Remove</button></div></td></tr>`}).join('')+'</table>'
+    :`<div class="muted">${INV.length?'Every lot is used up. Tick “show used-up lots” to see them.':'No green coffee yet. Add your first lot above.'}</div>`;
+}
+
+/* roast numbers — never reused, even after a delete */
+function nextNum(){return Math.max(Number(store.get(LS.num,0))||0,...HIST.map(r=>r.num||0))+1}
+function ensureNums(){
+  const missing=HIST.filter(r=>!r.num).sort((a,b)=>String(a.created).localeCompare(String(b.created)));
+  for(const r of missing){r.num=nextNum();store.set(LS.num,r.num)}
+  return missing;
+}
+const pad4=n=>String(n||0).padStart(4,'0');
+const fmtStamp=iso=>{if(!iso)return '—';const d=new Date(iso);return d.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})};
+const fileStamp=iso=>{const d=new Date(iso||Date.now()),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`};
+const roastFileName=r=>(`R${pad4(r.num)}_${fileStamp(r.created)}_${(r.meta.name||'roast').trim()}`).replace(/[^\w.-]+/g,'_').replace(/_+/g,'_').slice(0,120);
+const FS={supported:typeof window.showDirectoryPicker==='function',dir:null,state:'none'};
+async function fsWrite(name,text){const fh=await FS.dir.getFileHandle(name,{create:true});const w=await fh.createWritable();await w.write(text);await w.close()}
+async function writeRoastFile(r){
+  if(FS.state!=='granted'||!r.samples||!r.samples.length)return false;
+  const base=roastFileName(r);
+  try{
+    if(r.file&&r.file!==base){for(const x of ['.json','.csv'])try{await FS.dir.removeEntry(r.file+x)}catch(e){}}
+    r.file=base;await fsWrite(base+'.json',JSON.stringify(r));await fsWrite(base+'.csv',csvText(r));return true;
+  }catch(e){log('err','Folder write failed: '+e.message);if(e.name==='NotAllowedError'){FS.state='prompt';renderFolder()}return false}
+}
+async function deleteRoastFile(r){if(FS.state!=='granted'||!r.file)return;for(const x of ['.json','.csv'])try{await FS.dir.removeEntry(r.file+x)}catch(e){}}
+async function syncFolder(){
+  if(FS.state!=='granted')return;
+  const found=[];let invFile=null;
+  try{for await(const [name,h] of FS.dir.entries()){
+    if(h.kind!=='file'||!name.toLowerCase().endsWith('.json'))continue;
+    if(name==='inventory.json'){try{const d=JSON.parse(await (await h.getFile()).text());if(d&&Array.isArray(d.items))invFile=d}catch(e){}continue}
+    try{const r=JSON.parse(await (await h.getFile()).text());
+      if(r&&!Array.isArray(r)&&Array.isArray(r.samples)&&r.events&&r.id){r.file=name.replace(/\.json$/i,'');r.meta=normMeta(r.meta);found.push(r)}}catch(e){}
+  }}catch(e){log('err','Could not read the roasts folder: '+e.message);return}
+  const byId=new Map(HIST.map(r=>[r.id,r]));let added=0,written=0;
+  for(const r of found){const ex=byId.get(r.id);
+    if(!ex){HIST.push(r);added++}
+    else if(String(r.savedAt||'')>String(ex.savedAt||''))Object.assign(ex,r);
+    else ex.file=r.file}
+  const renum=ensureNums();
+  const inFolder=new Set(found.map(r=>r.id));
+  for(const r of HIST)if(!inFolder.has(r.id)||renum.includes(r))if(await writeRoastFile(r))written++;
+  sortHist();await persistHist();
+  if(invFile&&String(invFile.savedAt||'')>String(INVsavedAt||'')){INV=invFile.items.map(normInv);INVsavedAt=invFile.savedAt;if(idb.db)await idb.set('inv',invFile)}
+  else if(INV.length)await persistInv();
+  renderInvSelect();renderInvHint();
+  log('sys',`Folder synced: ${found.length} roast file(s) found, ${added} added to history, ${written} written to folder`);
+  resolveRef();renderHistory();renderFolder();renderRoastId();
+}
+async function chooseFolder(){
+  try{
+    const h=await window.showDirectoryPicker({id:'zuna-roasts',mode:'readwrite',startIn:'documents'});
+    FS.dir=h;FS.state='granted';await idb.set('dir',h);renderFolder();await syncFolder();
+    toast(`Roasts will be saved to the “${h.name}” folder`);
+  }catch(e){if(e.name!=='AbortError')toast('Could not use that folder: '+e.message)}
+}
+async function reconnectFolder(){
+  if(!FS.dir)return chooseFolder();
+  try{const p=await FS.dir.requestPermission({mode:'readwrite'});FS.state=p==='granted'?'granted':'prompt'}catch(e){FS.state='prompt'}
+  renderFolder();if(FS.state==='granted'){await syncFolder();toast('Roasts folder reconnected')}
+}
+async function initStorage(){
+  await idb.open();
+  let h=idb.db?await idb.get('hist'):undefined;
+  const legacy=store.get(LS.hist,null);
+  if(!Array.isArray(h))h=[];
+  if(Array.isArray(legacy)&&legacy.length){const ids=new Set(h.map(r=>r.id));for(const r of legacy)if(!ids.has(r.id))h.push(r);}
+  HIST=h;for(const r of HIST)r.meta=normMeta(r.meta);ensureNums();sortHist();
+  const iv=idb.db?await idb.get('inv'):store.get('zunaRoast.p12.inv',null);if(iv&&Array.isArray(iv.items)){INV=iv.items.map(normInv);INVsavedAt=iv.savedAt||''}
+  renderInvSelect(S.roast.meta.invId);renderInvHint();
+  if(idb.db&&await idb.set('hist',HIST))store.del(LS.hist);
+  if(FS.supported&&idb.db){const d=await idb.get('dir');if(d){FS.dir=d;
+    try{FS.state=(await d.queryPermission({mode:'readwrite'}))==='granted'?'granted':'prompt'}catch(e){FS.state='prompt'}}}
+  renderFolder();if(FS.state==='granted')await syncFolder();
+}
+function renderFolder(){
+  const el=$('#folderBox');if(!el)return;
+  if(!FS.supported){el.className='folder warn';el.innerHTML='<span>This browser can’t save straight to a folder, so each save downloads a copy to your Downloads folder. Open the app in <b>Google Chrome</b> to save into a roasts folder.</span>';return}
+  if(FS.state==='granted'){el.className='folder ok';el.innerHTML=`<span>📁 Saving to <b>${esc(FS.dir.name)}</b></span><button id="btnFolder">Change</button>`}
+  else if(FS.dir){el.className='folder warn';el.innerHTML=`<span>📁 <b>${esc(FS.dir.name)}</b> needs permission again</span><button id="btnFolder" class="primary">Reconnect folder</button>`}
+  else{el.className='folder warn';el.innerHTML='<span>Roasts are only in the browser. Pick a folder on your Mac to save every roast as a file.</span><button id="btnFolder" class="primary">Choose roasts folder</button>'}
+  $('#btnFolder').onclick=FS.state==='prompt'&&FS.dir?reconnectFolder:chooseFolder;
+}
+function renderRoastId(){
+  const el=$('#roastId');if(!el)return;const r=S.roast;
+  const n=r.num||(S.recording||r.samples.length?null:nextNum());
+  el.innerHTML=`<b>Roast #${r.num||n||nextNum()}</b>${r.created?fmtStamp(r.created):'next roast'}`;
+}
+function summarize(r){
+  const ev=r.events,c=ev.CHARGE??0,at=k=>ev[k]==null?null:sampleAt(r.samples,ev[k]);
+  const g=num(r.meta.green),w=num(r.meta.roasted);
+  return {charge:at('CHARGE')?.bt??null,tp:ev.TP!=null?ev.TP-c:null,tpBT:at('TP')?.bt??null,
+    dry:ev.DRY!=null?ev.DRY-c:null,fcs:ev.FCs!=null?ev.FCs-c:null,fcsBT:at('FCs')?.bt??null,
+    drop:ev.DROP!=null?ev.DROP-c:null,dropBT:at('DROP')?.bt??null,
+    dev:ev.FCs!=null&&ev.DROP!=null?ev.DROP-ev.FCs:null,loss:g&&w?(g-w)/g*100:null};
+}
+function saveRoast(auto,asProfile){
+  const r=S.roast;if(!r.samples.length){toast('Nothing recorded yet');return false}
+  if(!auto)r.meta=readMeta();
+  if(!r.id)r.id='r'+Date.now().toString(36);
+  if(!r.num){r.num=nextNum()}
+  if(!r.created)r.created=new Date().toISOString();
+  store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,r.num));
+  r.savedAt=new Date().toISOString();r.summary=summarize(r);
+  const touched=[];
+  if(asProfile){
+    for(const x of HIST)if(x.id!==r.id&&x.isProfile&&normName(x.meta.name)===normName(r.meta.name)){x.isProfile=false;x.savedAt=r.savedAt;touched.push(x)}
+    r.isProfile=true;
+  }
+  const i=HIST.findIndex(h=>h.id===r.id);
+  const copy=JSON.parse(JSON.stringify(r));if(i>=0)HIST[i]=copy;else HIST.push(copy);
+  sortHist();persistHist();
+  if(!S.recording)S.dirty=false;S.viewingId=S.recording?null:r.id;
+  const label=`Roast #${r.num}`;
+  if(FS.state==='granted'){
+    (async()=>{const okW=await writeRoastFile(copy);for(const x of touched)await writeRoastFile(x);r.file=copy.file;persistHist();
+      if(!auto)toast(okW?`${label} saved to “${FS.dir.name}”${asProfile?' as the profile':''}`:`${label} saved in the browser, but writing to the folder failed — see the connection log`)})();
+  }else{
+    if(!auto){download(roastFileName(copy)+'.json',JSON.stringify(copy),'application/json');
+      toast(`${label} saved${asProfile?' as the profile':''} — a copy was downloaded${FS.supported?'. Choose a roasts folder to save straight to disk':''}`)}
+  }
+  if(auto)toast(`Previous unsaved roast auto-saved as #${r.num}`);
+  resolveRef();renderHistory();renderRoastId();renderControls();renderInvSelect();renderInvHint();writeInvCSV();return true;
+}
+function openRoast(id){
+  if(S.recording){toast('Stop recording before opening another roast');return}
+  if(S.dirty&&S.roast.samples.length&&!confirm('The current roast has not been saved. Open another anyway?'))return;
+  const h=loadHist().find(x=>x.id===id);if(!h)return;
+  S.roast=JSON.parse(JSON.stringify(h));S.viewingId=id;S.dirty=false;S.evStack=[];fillMeta(S.roast.meta);renderAll();if(S.refMode==='__match')resolveRef();
+}
+function deleteRoast(id){
+  const h=loadHist(),r=h.find(x=>x.id===id);if(!r)return;
+  if(!confirm(`Delete roast #${r.num} "${r.meta.name||'Untitled roast'}"?${FS.state==='granted'&&r.file?' Its files in the roasts folder will be deleted too.':''}`))return;
+  deleteRoastFile(r);setHist(h.filter(x=>x.id!==id));renderInvSelect();renderInvHint();writeInvCSV();
+  if(S.refMode===id)S.refMode='__last';
+  if(S.viewingId===id){S.viewingId=null;S.dirty=true}
+  resolveRef();renderHistory();
+}
+function newRoastClick(){
+  if(S.recording){toast('Stop recording first');return}
+  if(S.dirty&&S.roast.samples.length&&!confirm('Discard the current unsaved roast?'))return;
+  const keep=readMeta();S.roast=newRoast();S.roast.meta={...blankMeta(),name:keep.name,invId:keep.invId,coffee:keep.coffee,lot:keep.lot,green:keep.green};
+  S.viewingId=null;S.dirty=false;S.evStack=[];fillMeta(S.roast.meta);renderAll();if(S.refMode==='__match')resolveRef();
+}
+/* ============================================================
+   Control — same commands Artisan sends to the P Series III
+   ============================================================ */
+const CTL=[{key:'burner',label:'Burner',param:'burner'},{key:'fan',label:'Air',param:'exhaustFan'},{key:'drum',label:'Drum',param:'drum'}];
+const SWITCHES=[{param:'coolingFanState',label:'Cooling fan'},{param:'stirrerState',label:'Stir arm'},{param:'drivesState',label:'Drives'},{param:'burnerState',label:'Burner'}];
+const C={on:false,target:{},drag:{},deb:{},wake:null};
+const ctlMax=k=>k==='burner'?Math.max(0,Math.min(100,Number(cfg.ctlBurnerMax)||100)):100;
+function ctlBase(k){const t=C.target[k];return t&&performance.now()-t.at<6000?t.v:(ok(S.latest[k])?S.latest[k]:0)}
+function sendControl(k,v){
+  const c=CTL.find(x=>x.key===k);v=Math.round(Math.max(0,Math.min(ctlMax(k),v)));
+  if(!C.on){toast('Turn Control on first');return}
+  if(!link.connected()){toast('Not connected — control is locked');renderCtl();return}
+  if(link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[c.param]:v}})==null)return;
+  C.target[k]={v,at:performance.now()};
+  if(S.recording){(S.roast.controlLog=S.roast.controlLog||[]).push({t:+(link.clock()-S.roast.t0).toFixed(2),key:k,value:v});S.dirty=true}
+  log('ctl',`${c.label} → ${v}%`);renderCtl();
+}
+function nudge(k,d){
+  if(!C.on||!link.connected())return;
+  const v=Math.round(Math.max(0,Math.min(ctlMax(k),ctlBase(k)+d)));
+  C.target[k]={v,at:performance.now(),pending:true};renderCtl();
+  clearTimeout(C.deb[k]);C.deb[k]=setTimeout(()=>sendControl(k,v),350);
+}
+async function sendSwitch(param,val,label){
+  if(!C.on||!link.connected()){toast('Not connected — control is locked');return}
+  if(!confirm(`Turn ${label} ${val?'ON':'OFF'} on the roaster?`))return;
+  link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[param]:val}});log('ctl',`${label} ${val?'ON':'OFF'}`);toast(`${label} ${val?'ON':'OFF'} sent`);
+}
+async function toggleStandby(){
+  if(!C.on||!link.connected()){toast('Not connected — control is locked');return}
+  const m=await link.ask({[cfg.nodes.command]:'getControlParams'});
+  const d=m&&(cfg.nodes.data?getPath(m,cfg.nodes.data):m);
+  if(!d||typeof d.standby!=='boolean'){toast('The roaster did not report its standby state');return}
+  if(!confirm(`${d.standby?'Leave':'Put the roaster into'} standby?`))return;
+  link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{standby:!d.standby}});log('ctl','Standby '+(!d.standby?'ON':'OFF'));
+}
+function sendEventToRoaster(key){
+  const type={DRY:cfg.evDRY,FCs:cfg.evFCs,FCe:cfg.evFCe,SCs:cfg.evSCs,SCe:cfg.evSCe}[key];
+  if(!type||!C.on||!cfg.ctlSendEvents||!link.connected())return;
+  link.sendCommand({[cfg.nodes.command]:cfg.eventMsg,params:{type}});
+}
+async function wakeLock(on){
+  try{if(on&&'wakeLock' in navigator&&!C.wake){C.wake=await navigator.wakeLock.request('screen');C.wake.addEventListener('release',()=>{C.wake=null})}
+    else if(!on&&C.wake){await C.wake.release();C.wake=null}}catch(e){}
+}
+function setControl(on){
+  if(on&&!C.on&&!store.get('zunaRoast.p12.ctlOk',false)){
+    if(!confirm('Control sends burner, air and drum settings to the roaster.\n\n• Stay at the roaster — its own panel and safety systems always come first.\n• Keep this window in front and the Mac awake while roasting.\n\nTurn Control on?'))return;
+    store.set('zunaRoast.p12.ctlOk',true);
+  }
+  C.on=on;C.target={};document.body.classList.toggle('ctl-on',on);$('#btnCtlOn2').textContent=on?'On':'Off';$('#btnControl').classList.toggle('on',on);$('#btnControl').textContent=on?'Control ON':'Control';
+  wakeLock(on);log('ctl',on?'Control ON':'Control released');renderCtl();scheduleDraw();
+}
+function buildCtl(){
+  const big=Number(cfg.ctlStep)||10;
+  $('#ctlGrid').innerHTML=CTL.map(c=>`<div class="ctl" data-k="${c.key}" style="--c:var(--c-${c.key})"><div class="ctl-h"><span>${c.label}</span><b class="ctl-v">—</b><span class="ctl-t"></span></div>
+    <div class="ctl-row"><button data-d="-${big}">−${big}</button><button data-d="-1">−1</button><input type="range" min="0" max="100" step="1"><button data-d="1">+1</button><button data-d="${big}">+${big}</button></div></div>`).join('');
+  $('#swRow').innerHTML=SWITCHES.map(w=>`<div class="swg">${w.label}<span><button data-sw="${w.param}" data-v="1" data-l="${w.label}" style="flex:1">On</button><button data-sw="${w.param}" data-v="0" data-l="${w.label}" style="flex:1">Off</button></span></div>`).join('')+'<button id="btnStandby">Standby</button>';
+  $$('#ctlGrid .ctl').forEach(el=>{const k=el.dataset.k,rg=$('input',el);
+    el.addEventListener('click',e=>{const b=e.target.closest('button[data-d]');if(b)nudge(k,Number(b.dataset.d))});
+    rg.addEventListener('input',()=>{C.drag[k]=true;rg.value=Math.min(ctlMax(k),rg.value);$('.ctl-t',el).textContent='→ '+rg.value+'%'});
+    rg.addEventListener('change',()=>{C.drag[k]=false;sendControl(k,Number(rg.value))});
+  });
+}
+function renderCtl(){
+  if(!$('#ctlGrid .ctl'))return;const live=link.connected()&&C.on;
+  $$('#ctlGrid .ctl').forEach(el=>{const k=el.dataset.k,cur=S.latest[k],t=C.target[k],rg=$('input',el);
+    $('.ctl-v',el).textContent=ok(cur)?Math.round(cur)+'%':'—';
+    let tt='';if(t){const age=performance.now()-t.at;if(t.pending)tt='→ '+t.v+'%';else if(ok(cur)&&Math.abs(cur-t.v)<1)C.target[k]=null;else if(age<6000)tt='→ '+t.v+'% sending…';else tt='roaster still at '+(ok(cur)?Math.round(cur):'—')+'%'}
+    if(!C.drag[k]){$('.ctl-t',el).textContent=tt;rg.value=t?t.v:(ok(cur)?cur:0)}
+    $$('button,input',el).forEach(x=>x.disabled=!live);
+  });
+  $$('#swRow button').forEach(x=>x.disabled=!live);
+  $('#ctlNote').textContent=!C.on?'':live?'Keep this window in front while controlling.':'Not connected — control is locked. Use the roaster panel.';
+  $('#ctlNote').style.color=live||!C.on?'':'var(--danger)';
+}
+
+/* ---------- adjustments: burner / drum / fan changes ---------- */
+const ADJ_KEYS=[['burner','Burner'],['drum','Drum'],['fan','Air']];
+function adjustments(r){
+  const out=[],ev=r.events,c=ev.CHARGE,d=ev.DROP;
+  for(const [k,label] of ADJ_KEYS){
+    let lvl=null,cur=null;
+    for(const s of r.samples){const v=s[k];if(!ok(v))continue;
+      if(lvl==null){lvl=v;continue}
+      if(Math.abs(v-lvl)>=1){
+        if(cur&&s.t-cur.tl<4){cur.to=v;cur.tl=s.t}
+        else{cur={t:s.t,tl:s.t,key:k,label,from:lvl,to:v};out.push(cur)}
+        lvl=v}}
+  }
+  return out.filter(a=>(c==null||a.t>=c-30)&&(d==null||a.t<=d+5)&&Math.round(a.to)!==Math.round(a.from)).sort((a,b)=>a.t-b.t);
+}
+const adjTxt=a=>`${a.label} ${Math.round(a.from)}→${Math.round(a.to)}%`;
+const normName=n=>String(n||'').trim().toLowerCase().replace(/\s+/g,' ');
+function matchProfile(name,h){
+  const n=normName(name);if(!n)return {r:null,why:'none'};
+  const same=h.filter(x=>normName(x.meta.name)===n&&!(S.recording&&x.id===S.roast.id));
+  const p=same.find(x=>x.isProfile);if(p)return {r:p,why:'profile'};
+  return same.length?{r:same[0],why:'latest'}:{r:null,why:'nomatch'};
+}
+function resolveRef(){
+  const mode=S.refMode,h=loadHist();let r=null;S.refWhy='';
+  if(mode==='__match'){const m=matchProfile(readMeta().name,h);r=m.r;S.refWhy=m.why}
+  else if(mode==='__last')r=h.find(x=>!(S.recording&&x.id===S.roast.id))||null;
+  else if(mode)r=h.find(x=>x.id===mode)||null;
+  S.ref=r?JSON.parse(JSON.stringify(r)):null;S.refAdj=S.ref?adjustments(S.ref):[];
+  renderRefSelect();renderRef();renderLegend();renderProfileHint();scheduleDraw();
+}
+function renderProfileHint(){
+  const el=$('#profileHint');if(!el)return;const h=loadHist(),name=readMeta().name;
+  $('#profileNames').innerHTML=[...new Set(h.filter(x=>x.isProfile&&x.meta.name).map(x=>x.meta.name.trim()))].map(n=>`<option value="${esc(n)}">`).join('');
+  if(!normName(name)){el.innerHTML='';return}
+  const m=matchProfile(name,h);
+  el.innerHTML=m.why==='profile'?`<span style="color:var(--teal)">★ Profile found — roast #${m.r.num||''}, ${new Date(m.r.created).toLocaleDateString()}</span>`
+    :m.why==='latest'?'<span class="muted">No profile marked for this name yet — the latest roast with this name will be the background</span>'
+    :'<span class="muted">New name — no saved roasts with this name yet</span>';
+}
+function markProfile(id,on){
+  const h=loadHist(),r=h.find(x=>x.id===id);if(!r)return;
+  if(on){
+    if(!normName(r.meta.name)){toast('Give the roast a profile name first');return}
+    for(const x of h)if(x.id!==id&&x.isProfile&&normName(x.meta.name)===normName(r.meta.name))x.isProfile=false;
+    r.isProfile=true;
+  }else r.isProfile=false;
+  const now=new Date().toISOString();
+  for(const x of h)if(x.id===id||(on&&normName(x.meta.name)===normName(r.meta.name)))x.savedAt=now;
+  persistHist();
+  if(FS.state==='granted')(async()=>{for(const x of h)if(normName(x.meta.name)===normName(r.meta.name))await writeRoastFile(x);persistHist()})();
+  if(S.roast.id===id)S.roast.isProfile=r.isProfile;
+  toast(on?`“${r.meta.name}” is now the profile for that name`:'Profile mark removed');
+  resolveRef();renderHistory();
+}
+function saveAsProfile(){
+  if(S.recording){toast('Stop recording before saving it as a profile');return}
+  if(!normName(readMeta().name)){toast('Enter a profile name first');$('[data-m=name]').focus();return}
+  saveRoast(false,true);
+}
+function setRef(id){
+  S.refMode=id||'';store.set(LS.ref,S.refMode);resolveRef();
+}
+
+/* ---------- export / import ---------- */
+function download(name,text,type){
+  const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+}
+const fileBase=r=>roastFileName(r);
+function csvText(r){
+  const u=isF()?'F':'C',c=r.events.CHARGE??0;
+  const evAt={};for(const [k,t] of Object.entries(r.events)){const s=sampleAt(r.samples,t);if(s)evAt[s.t]=(evAt[s.t]?evAt[s.t]+'|':'')+k}
+  const head=['time_s','time_from_charge',`bt_${u}`,`et_${u}`,`ror_${u}_per_min`,`inlet_${u}`,`exhaust_${u}`,`cooling_${u}`,'burner_pct','air_pa','drum_pct','exhaust_fan_pct','event'];
+  const rows=r.samples.map(s=>[s.t.toFixed(1),mmss(s.t-c),fmtT(s.bt),fmtT(s.et),fmtR(s.ror),fmtT(s.inlet),fmtT(s.exhaust),fmtT(s.cooling),
+    ok(s.burner)?s.burner.toFixed(1):'',ok(s.air)?s.air.toFixed(0):'',ok(s.drum)?s.drum.toFixed(1):'',ok(s.fan)?s.fan.toFixed(1):'',evAt[s.t]||''].map(v=>v==='—'?'':v).join(','));
+  const m=r.meta;const pre=[`# Roast #${r.num||''} | ${m.name||'Roast'} | ${m.coffee||''} | lot ${m.lot||''} | green ${m.green||''} lb | roasted ${m.roasted||''} lb | whole color ${m.colorWhole||''} | ground color ${m.colorGround||''}${r.isProfile?' | PROFILE':''}`,
+    `# Notes: ${String(m.notes||'').replace(/\s+/g,' ')}`,
+    `# Started ${r.created?new Date(r.created).toLocaleString():''} | Charged ${r.chargedAt?new Date(r.chargedAt).toLocaleString():''} | ${r.machine}`];
+  return pre.concat([head.join(',')],rows).join('\n');
+}
+function exportCSV(r){download(roastFileName(r)+'.csv',csvText(r),'text/csv')}
+function exportJSON(list,name){download(name,JSON.stringify(list,null,1),'application/json')}
+function importFile(f){
+  const rd=new FileReader();rd.onload=()=>{
+    try{
+      let d=JSON.parse(rd.result);if(!Array.isArray(d))d=[d];
+      const h=loadHist();let n=0;
+      for(const r of d){if(!r||!Array.isArray(r.samples)||!r.events)continue;
+        if(!r.id||h.some(x=>x.id===r.id))r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+        r.meta=normMeta(r.meta);r.summary=summarize(r);if(!r.num){r.num=nextNum();store.set(LS.num,r.num)}h.push(r);n++;writeRoastFile(r)}
+      setHist(h);
+      resolveRef();renderHistory();toast(`Imported ${n} roast${n===1?'':'s'}`);
+    }catch(e){toast('That file is not a Zuna Roast JSON export')}
+  };rd.readAsText(f);
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+let COL={};
+function readColors(){
+  const cs=getComputedStyle(document.documentElement),g=n=>cs.getPropertyValue(n).trim();
+  COL={grid:g('--grid'),muted:g('--muted'),ink:g('--ink'),card:g('--card'),line:g('--line'),ph1:g('--ph1'),ph2:g('--ph2'),ph3:g('--ph3'),ror:g('--c-ror')};
+  for(const ch of CHANNELS)COL[ch.key]=g('--c-'+ch.key);
+}
+function renderStatus(){
+  let s=link.state;if((s==='connected'||s==='sim')&&link.missed>=3)s='nodata';
+  const txt={offline:'Offline',connecting:'Connecting…',reconnecting:'Reconnecting…',connected:'Connected · '+cfg.host,sim:'Simulator · '+S.simSpeed+'×',nodata:'No data from roaster'}[s];
+  $('#pill').dataset.s=s;$('#pillText').textContent=txt;
+  const live=!link.manual;
+  $('#btnConnect').textContent=live&&!link.sim?'Disconnect':'Connect';
+  $('#btnConnect').classList.toggle('on',live&&!link.sim);
+  $('#btnSim').classList.toggle('on',live&&link.sim);
+  $('#btnSim').textContent=live&&link.sim?'Stop sim':'Simulator';
+}
+function renderLCDs(){
+  renderCtl();
+  const v=S.latest;
+  const put=(id,t)=>{const e=$(id);if(e)e.textContent=t};
+  put('#lcd-bt',fmtT(v.bt));put('#lcd-exhaust',fmtT(v.exhaust));
+  const last=S.recording?S.roast.samples.at(-1):null;
+  put('#lcd-ror',fmtR(last?last.ror:S.liveRor));
+  put('#lcd-burner',fmt0(v.burner));put('#lcd-air',fmt0(v.air));put('#lcd-drum',fmt0(v.drum));
+}
+function renderUnits(){
+  $$('.u').forEach(e=>e.textContent=isF()?'°F':'°C');$$('.ur').forEach(e=>e.textContent=isF()?'°F/min':'°C/min');
+  $('#btnUnit').textContent=isF()?'°F':'°C';
+}
+function curTime(){const r=S.roast;if(S.recording)return link.clock()-r.t0;return r.samples.length?r.samples.at(-1).t:null}
+function tick(){
+  const r=S.roast,t=curTime(),c=r.events.CHARGE;
+  if(t==null){$('#timer').textContent='0:00';$('#timerLabel').textContent='Roast time'}
+  else if(c!=null){$('#timer').textContent=mmss((r.events.DROP??t)-c);$('#timerLabel').textContent=r.events.DROP!=null?'Drop time':'Roast time'}
+  else{$('#timer').textContent=mmss(t);$('#timerLabel').textContent='Since START'}
+  $('#recState').textContent=(r.num?'#'+r.num+' ':'')+(S.recording?'● REC':(S.viewingId?'saved':(r.samples.length?'stopped':'')));
+  $('#recState').style.color=S.recording?'var(--danger)':'';
+  const stale=link.connected()&&performance.now()-S.lastDataAt>3000;
+  $('#lcds').classList.toggle('stale',stale||!link.connected());$('#bigBox').classList.toggle('stale',stale||!link.connected());
+  renderPhases();renderRefLive();
+}
+function renderPhases(){
+  const ev=S.roast.events,c=ev.CHARGE,t=curTime();
+  const end=ev.DROP??t;
+  let d1=null,d2=null,d3=null;
+  if(c!=null&&end!=null){
+    d1=(ev.DRY??(ev.FCs==null?end:null));d1=d1==null?null:d1-c;
+    d2=ev.DRY!=null?(ev.FCs??end)-ev.DRY:null;
+    d3=ev.FCs!=null?end-ev.FCs:null;
+  }
+  $('#ph1').textContent=mmss(d1);$('#ph2').textContent=mmss(d2);$('#ph3').textContent=mmss(d3);
+  const ps=$$('#phases > div');[d1,d2,d3].forEach((d,i)=>ps[i].style.flexGrow=String(Math.max(d||0,40)));
+}
+function renderEvents(){
+  const r=S.roast,ev=r.events,c=ev.CHARGE??0;
+  if($('#evTable'))$('#evTable').innerHTML='<tr><td class="muted">Event</td><td class="muted">Time</td><td class="muted">BT</td><td class="muted">ΔBT</td></tr>'+
+    EVENTS.filter(e=>ev[e.key]!=null).map(e=>{const s=sampleAt(r.samples,ev[e.key]);
+      return `<tr><td>${e.label}</td><td>${mmss(ev[e.key]-c)}</td><td>${s?fmtT(s.bt):'—'}</td><td>${s?fmtR(s.ror):'—'}</td></tr>`}).join('')+
+    (ev.FCs!=null&&ev.DROP!=null?`<tr><td>Development</td><td>${mmss(ev.DROP-ev.FCs)}</td><td>${(()=>{const a=sampleAt(r.samples,ev.FCs),b=sampleAt(r.samples,ev.DROP);return a&&b&&ok(a.bt)&&ok(b.bt)?'+'+(toDispT(b.bt)-toDispT(a.bt)).toFixed(1):'—'})()}</td><td></td></tr>`:'');
+  const order=['CHARGE','DRY','FCs','FCe','DROP','COOL'];const next=order.find(k=>ev[k]==null);
+  $$('#evButtons .ev').forEach(b=>{b.classList.toggle('set',ev[b.dataset.k]!=null);b.classList.toggle('next',S.recording&&b.dataset.k===next);b.disabled=!!S.viewingId});
+  $('#btnUndo').disabled=!S.recording||!S.evStack.length;
+}
+function renderControls(){
+  document.body.classList.toggle('rec',S.recording);
+  const b=$('#btnStart');b.textContent=S.recording?'STOP':'START';b.className=S.recording?'danger':'primary';
+  $('#btnSave').textContent=S.viewingId?'Update':'Save';
+}
+function renderHistory(){
+  const all=loadHist(),q=normName($('#histSearch')?$('#histSearch').value:'');
+  let h=$('#histFilter')&&$('#histFilter').value==='profiles'?all.filter(r=>r.isProfile):all;
+  if(q)h=h.filter(r=>normName([r.num,'#'+r.num,r.meta.name,r.meta.coffee,r.meta.lot,r.meta.notes].join(' ')).includes(q));
+  $('#hist').innerHTML=h.length?h.map(r=>{const s=r.summary||summarize(r);const d=r.created?new Date(r.created):null;
+    return `<div class="hitem${r.id===S.viewingId?' active':''}${r.isProfile?' prof':''}"><div class="t"><span class="num">#${r.num||'—'}</span>${esc(r.meta.name||'Untitled roast')}${r.isProfile?'<span class="badge">Profile</span>':''}</div>
+    <div class="m">${fmtStamp(r.chargedAt||r.created)}${r.meta.coffee?' · '+esc(r.meta.coffee):''}${r.meta.colorWhole||r.meta.colorGround?` · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}`:''}</div>
+    <div class="k"><span class="muted">FC<b>${mmss(s.fcs)}</b></span><span class="muted">Drop<b>${mmss(s.drop)}</b></span><span class="muted">Dev<b>${mmss(s.dev)}</b></span><span class="muted">Drop BT<b>${fmtT(s.dropBT)}°</b></span>
+      <span class="muted">Green<b>${r.meta.green?esc(r.meta.green)+' lb':'—'}</b></span><span class="muted">Roasted<b>${r.meta.roasted?esc(r.meta.roasted)+' lb':'—'}</b></span><span class="muted">Loss<b>${s.loss!=null?s.loss.toFixed(1)+'%':'—'}</b></span><span class="muted">${r.source==='simulator'?'Simulator':'&nbsp;'}<b>&nbsp;</b></span></div>
+    <div class="a"><button data-a="open" data-id="${r.id}">Open</button><button data-a="prof" data-id="${r.id}">${r.isProfile?'Unmark':'Make profile'}</button><button data-a="ref" data-id="${r.id}">Background</button><button data-a="csv" data-id="${r.id}">CSV</button><button data-a="json" data-id="${r.id}">JSON</button><button data-a="del" data-id="${r.id}">Delete</button></div></div>`}).join('')
+    :`<div class="muted">${q?'No roasts match that search.':all.length?'No profiles yet. Use “Make profile” on a roast you want to repeat.':'No saved roasts yet. Record a roast and press Save.'}</div>`;
+}
+function renderRefSelect(){
+  const h=loadHist(),sel=$('#refSelect');
+  const opt=r=>`<option value="${r.id}">${r.isProfile?'★ ':''}#${r.num||''} ${esc(r.meta.name||'Untitled')} — ${r.created?new Date(r.created).toLocaleDateString():''}</option>`;
+  const prof=h.filter(r=>r.isProfile);
+  sel.innerHTML='<option value="">None</option><option value="__match">Matching profile (automatic)</option><option value="__last">Last roast (automatic)</option>'+
+    (prof.length?`<optgroup label="Profiles">${prof.map(opt).join('')}</optgroup>`:'')+(h.length?`<optgroup label="All roasts">${h.map(opt).join('')}</optgroup>`:'');
+  sel.value=S.refMode||'';
+}
+function refComments(r){const m=normMeta(r.meta);
+  return `<div class="refnotes">${m.notes?esc(m.notes):'<span class="muted">No comments saved with this roast.</span>'}</div>`+
+    (m.colorWhole||m.colorGround?`<div class="muted" style="margin-top:6px">Color: whole ${esc(m.colorWhole||'—')} · ground ${esc(m.colorGround||'—')}</div>`:'')}
+function refDetails(r,s){
+  const m=normMeta(r.meta),l=invById(m.invId);
+  const row=(k,v)=>v!=null&&v!==''?`<div class="stat"><span>${k}</span><b>${v}</b></div>`:'';
+  return row('Coffee',esc(m.coffee))+row('Lot',esc(m.lot))+(l?row('Inventory',esc(invLabel(l))):'')+
+    row('Green in',m.green?esc(m.green)+' lb':'')+row('Roasted out',m.roasted?esc(m.roasted)+' lb':'')+row('Weight loss',s.loss!=null?s.loss.toFixed(1)+' %':'')+
+    row('Whole bean color',esc(m.colorWhole))+row('Ground color',esc(m.colorGround))+
+    (!S.recording&&!S.viewingId?`<div class="row" style="margin:8px 0 6px"><button id="btnCopySetup" title="Fill coffee, lot, inventory and green weight from this roast">Use this setup for my next roast</button></div>`:'')+
+    `<div class="muted" style="margin:10px 0 2px">Roast curve</div>`;
+}
+function copySetup(){
+  if(!S.ref)return;const m=normMeta(S.ref.meta),cur=readMeta();
+  cur.name=cur.name||m.name;cur.coffee=m.coffee;cur.lot=m.lot;cur.green=m.green;cur.invId=invById(m.invId)?m.invId:'';
+  fillMeta(cur);store.set(LS.meta,readMeta());toast('Setup copied from roast #'+S.ref.num);
+}
+function renderRef(){
+  const el=$('#refBody');if(!S.ref){el.className='muted';el.innerHTML=S.refMode==='__match'?(normName(readMeta().name)?'No saved roasts with this profile name yet. Save one with “Save as profile” and it will show here next time.':'Type a profile name in the Roast panel and its saved profile will load here.'):S.refMode==='__last'?'Your last saved roast will appear here as the background.':'Pick a saved roast to show behind the live roast.';return}
+  const s=S.ref.summary||summarize(S.ref);el.className='';
+  el.innerHTML=`<div class="muted" style="margin-bottom:6px">${S.ref.isProfile?'<span class="badge" style="margin-left:0">Profile</span> ':''}#${S.ref.num||''} ${esc(S.ref.meta.name||'Untitled')} · ${fmtStamp(S.ref.chargedAt||S.ref.created)}${S.refWhy==='latest'?' · latest roast with this name':''}</div>
+  ${refComments(S.ref)}
+  <details class="full" style="margin-top:10px"><summary>Full roast details</summary>
+  ${refDetails(S.ref,s)}
+  <div class="stat"><span>Charge</span><b>${fmtT(s.charge)}°</b></div>
+  <div class="stat"><span>Turning point</span><b>${mmss(s.tp)} · ${fmtT(s.tpBT)}°</b></div>
+  <div class="stat"><span>Dry end</span><b>${mmss(s.dry)}</b></div>
+  <div class="stat"><span>FC start</span><b>${mmss(s.fcs)} · ${fmtT(s.fcsBT)}°</b></div>
+  <div class="stat"><span>Drop</span><b>${mmss(s.drop)} · ${fmtT(s.dropBT)}°</b></div>
+  <div class="stat"><span>Development</span><b>${mmss(s.dev)}</b></div>
+  <div class="muted" style="margin:10px 0 4px">Adjustments in ${esc(S.ref.meta.name||'this roast')}</div>
+  ${S.refAdj.length?`<table class="evt adj">${S.refAdj.map(a=>{const rc=S.ref.events.CHARGE??0,b=interp(S.ref.samples,'bt',a.t);
+    return `<tr><td>${mmss(a.t-rc)}</td><td>${fmtT(b)}°</td><td style="color:var(--c-${a.key})">${adjTxt(a)}</td></tr>`}).join('')}</table>`:'<div class="muted">No burner, drum or fan changes recorded.</div>'}
+  </details>`;
+  renderRefLive();
+}
+function renderRefLive(){
+  const a=$('#refDBT'),b=$('#refDROR');if(!a)return;
+  $('#liveRef').hidden=!S.ref;if(!S.ref)return;
+  const r=S.roast,c=r.events.CHARGE,last=r.samples.at(-1),na=$('#nextAdj');
+  if(c==null||!last||!S.recording){a.textContent='—';b.textContent='—';a.className=b.className='delta';if(na)na.innerHTML='';return}
+  if(na){const rc0=S.ref.events.CHARGE??0,x0=last.t-c,nx=S.refAdj.find(q=>q.t-rc0>x0);
+    na.innerHTML=nx?`<div class="nextadj">Next: <b style="color:var(--c-${nx.key})">${adjTxt(nx)}</b> at ${mmss(nx.t-rc0)} · in <b>${mmss(nx.t-rc0-x0)}</b>${C.on&&link.connected()?`<button class="primary" data-sendadj="${nx.key}:${Math.round(nx.to)}">Send</button>`:''}</div>`:''}
+  const rc=S.ref.events.CHARGE??0,x=last.t-c;
+  const rb=interp(S.ref.samples,'bt',x+rc),rr=interp(S.ref.samples,'ror',x+rc);
+  const set=(el,d,f)=>{if(!ok(d)){el.textContent='—';el.className='delta';return}el.textContent=(d>0?'+':'')+f(d);el.className='delta '+(Math.abs(d)<0.05?'':d>0?'pos':'neg')};
+  set(a,ok(rb)&&ok(last.bt)?toDispT(last.bt)-toDispT(rb):null,d=>d.toFixed(1)+'°');
+  set(b,ok(rr)&&ok(last.ror)?toDispR(last.ror)-toDispR(rr):null,d=>d.toFixed(1));
+}
+function renderLegend(){
+  const items=[['bt','BT',true],['ror','ΔBT',true],['exhaust','Exhaust'],['burner','Burner'],['drum','Drum'],['fan','Air'],['air','Pressure']].concat(['et','inlet','cooling'].filter(k=>cfg.channels[k].curve).map(k=>[k,CHANNELS.find(c=>c.key===k).label]));
+  $('#legend').innerHTML=items.map(([k,l,fixed])=>{const col=k==='ror'?'var(--c-ror)':`var(--c-${k})`;
+    return fixed?`<label><span class="sw" style="background:${col}"></span>${l}</label>`
+      :`<label><input type="checkbox" data-k="${k}" ${cfg.channels[k].curve?'checked':''}><span class="sw" style="background:${col}"></span>${l}</label>`}).join('')+
+    (S.ref?`<label><span class="sw dash"></span>Background</label>`:'');
+}
+function showScreen(n){
+  $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.screen===n));
+  $$('body > [data-screen]').forEach(el=>el.hidden=el.dataset.screen!==n);if(n!=='roasting')$('#drawer').classList.remove('open');
+  if(n==='roasting')scheduleDraw();if(n==='roasts')renderHistory();if(n==='green')renderInvList();
+  window.scrollTo(0,0);
+}
+function showTab(t){
+  const d=$('#drawer');
+  if(t==='live'){d.classList.remove('open');return}
+  $$('#dtabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  $$('#drawer [data-pane]').forEach(p=>p.hidden=p.dataset.pane!==t);
+  d.classList.add('open');if(t==='bg')renderRef();
+}
+function renderAll(){renderRoastId();renderStatus();renderUnits();renderLCDs();renderControls();renderEvents();renderHistory();renderRef();renderLegend();tick();scheduleDraw()}
+
+/* ---------- charts ---------- */
+let drawPending=false;
+function scheduleDraw(){if(drawPending)return;drawPending=true;requestAnimationFrame(()=>{drawPending=false;drawMain();drawAux()})}
+function prep(cv){
+  const b=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=Math.max(1,Math.round(b.width*dpr)),h=Math.max(1,Math.round(b.height*dpr));
+  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,b.width,b.height);
+  ctx.font='11px Poppins, system-ui, sans-serif';return {ctx,W:b.width,H:b.height};
+}
+const PAD={l:48,r:50,t:12,b:24};
+function xRange(){
+  const r=S.roast,off=r.events.CHARGE??0;let lo=-30,hi=12*60;
+  if(r.samples.length){lo=Math.min(lo,r.samples[0].t-off);hi=Math.max(hi,r.samples.at(-1).t-off+90)}
+  if(S.ref&&S.ref.samples.length){const ro=S.ref.events.CHARGE??0,end=(S.ref.events.DROP??S.ref.samples.at(-1).t)-ro;hi=Math.max(hi,end+60)}
+  return {off,lo:Math.max(lo,-120),hi};
+}
+function niceStep(raw){const p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
+function line(ctx,arr,key,off,X,Y,color,lw,fromT,dash){
+  ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.setLineDash(dash||[]);ctx.beginPath();let pen=false;
+  for(const p of arr){const v=p[key];if(!ok(v)||(fromT!=null&&p.t<fromT)){pen=false;continue}
+    const x=X(p.t-off),y=Y(v);if(pen)ctx.lineTo(x,y);else{ctx.moveTo(x,y);pen=true}}
+  ctx.stroke();ctx.setLineDash([]);
+}
+function timeGrid(ctx,X,lo,hi,top,bot,labels){
+  const step=hi-lo>1500?120:60;ctx.strokeStyle=COL.grid;ctx.lineWidth=1;ctx.fillStyle=COL.muted;ctx.textAlign='center';ctx.textBaseline='top';
+  for(let x=Math.ceil(lo/step)*step;x<=hi;x+=step){const px=Math.round(X(x))+.5;ctx.beginPath();ctx.moveTo(px,top);ctx.lineTo(px,bot);ctx.stroke();if(labels)ctx.fillText(String(x/60),px,bot+5)}
+}
+function drawMain(){
+  const cv=$('#chartMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H-PAD.t-PAD.b;if(w<40||h<40)return;
+  const {off,lo,hi}=xRange();S.view={off,lo,hi};
+  const X=x=>PAD.l+(x-lo)/(hi-lo)*w,Y=c=>PAD.t+(1-(c-cfg.tMin)/(cfg.tMax-cfg.tMin))*h,YR=v=>PAD.t+(1-v/cfg.rorMax)*h;
+  const r=S.roast,ev=r.events,smp=r.samples,cur=curTime();
+  // phase bands
+  const bands=[['CHARGE','DRY','ph1'],['DRY','FCs','ph2'],['FCs','DROP','ph3']];
+  bands.forEach(([a,b,c],i)=>{if(ev[a]==null)return;let e=ev[b];
+    if(e==null){const later=bands.slice(i+1).some(([aa])=>ev[aa]!=null);if(later||cur==null)return;e=cur}
+    const xa=Math.max(X(ev[a]-off),PAD.l),xb=Math.min(X(e-off),PAD.l+w);if(xb>xa){ctx.fillStyle=COL[c];ctx.fillRect(xa,PAD.t,xb-xa,h)}});
+  // grid + axes
+  timeGrid(ctx,X,lo,hi,PAD.t,PAD.t+h,true);
+  const dmin=toDispT(cfg.tMin),dmax=toDispT(cfg.tMax),st=isF()?50:25;
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  for(let d=Math.ceil(dmin/st)*st;d<=dmax+.01;d+=st){const y=Math.round(Y(fromDispT(d)))+.5;ctx.strokeStyle=COL.grid;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke();ctx.fillStyle=COL.muted;ctx.fillText(String(Math.round(d)),PAD.l-6,y)}
+  const rmax=toDispR(cfg.rorMax),rs=niceStep(rmax/6);ctx.textAlign='left';ctx.fillStyle=COL.ror;
+  for(let v=0;v<=rmax+.01;v+=rs)ctx.fillText(String(+v.toFixed(1)),PAD.l+w+6,YR(v/(isF()?1.8:1)));
+  ctx.fillStyle=COL.muted;ctx.textBaseline='top';ctx.textAlign='left';ctx.fillText(isF()?'°F':'°C',4,PAD.t-2);
+  ctx.textAlign='right';ctx.fillText('ΔBT/min',W-2,PAD.t+h+5);ctx.textAlign='left';ctx.fillText('min',PAD.l-30,PAD.t+h+5);
+  // curves
+  ctx.save();ctx.beginPath();ctx.rect(PAD.l,PAD.t,w,h);ctx.clip();
+  if(S.ref){const ro=S.ref.events.CHARGE??0,rs2=S.ref.samples;ctx.globalAlpha=.55;
+    if(cfg.channels.et.curve)line(ctx,rs2,'et',ro,X,Y,COL.et,1.4,null,[5,4]);
+    line(ctx,rs2,'bt',ro,X,Y,COL.bt,1.8,null,[6,4]);
+    line(ctx,S.ref.events.DROP!=null?rs2.filter(p=>p.t<=S.ref.events.DROP):rs2,'ror',ro,X,YR,COL.ror,1.3,(S.ref.events.TP??ro+45),[5,4]);
+    ctx.globalAlpha=1;
+    for(const e of EVENTS){const t=S.ref.events[e.key];if(t==null||e.key==='TP')continue;const s=sampleAt(rs2,t);if(!s||!ok(s.bt))continue;
+      const x=X(t-ro),y=Y(s.bt);ctx.fillStyle=COL.muted;ctx.globalAlpha=.6;ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+4,y);ctx.lineTo(x,y+4);ctx.lineTo(x-4,y);ctx.fill();ctx.globalAlpha=1}
+  }
+  for(const k of ['cooling','exhaust','inlet'])if(cfg.channels[k].curve)line(ctx,smp,k,off,X,Y,COL[k],1.2);
+  if(cfg.channels.et.curve)line(ctx,smp,'et',off,X,Y,COL.et,1.8);
+  line(ctx,smp,'bt',off,X,Y,COL.bt,2.6);
+  if(ev.CHARGE!=null)line(ctx,ev.DROP!=null?smp.filter(p=>p.t<=ev.DROP):smp,'ror',off,X,YR,COL.ror,1.7,ev.TP??(ev.CHARGE+45));
+  // projection
+  const last=smp.at(-1);
+  if(cfg.showProjection&&S.recording&&last&&ok(last.ror)&&ok(last.bt)&&ev.TP!=null&&ev.DROP==null){
+    const x0=last.t-off,x1=x0+cfg.projection;ctx.strokeStyle=COL.bt;ctx.globalAlpha=.5;ctx.lineWidth=1.5;ctx.setLineDash([2,4]);
+    ctx.beginPath();ctx.moveTo(X(x0),Y(last.bt));ctx.lineTo(X(x1),Y(last.bt+last.ror*cfg.projection/60));ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  }
+  ctx.restore();
+  // event annotations
+  let k=0;
+  for(const e of EVENTS){const t=ev[e.key];if(t==null)continue;const s=sampleAt(smp,t);const x=X(t-off);if(x<PAD.l||x>PAD.l+w)continue;
+    const y=s&&ok(s.bt)?Y(s.bt):PAD.t+h/2;
+    ctx.fillStyle=COL.bt;ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fill();
+    const label=`${e.short} ${mmss(t-off)}${s&&ok(s.bt)?' · '+fmtT(s.bt):''}`;
+    ctx.font='600 10.5px Poppins, system-ui, sans-serif';const tw=ctx.measureText(label).width+10;
+    const ly=Math.max(PAD.t+2,y-26-(k%2)*18),lx=Math.min(Math.max(x-tw/2,PAD.l+2),PAD.l+w-tw-2);
+    ctx.strokeStyle=COL.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x,ly+16);ctx.stroke();
+    ctx.fillStyle=COL.card;ctx.strokeStyle=COL.bt;ctx.beginPath();ctx.roundRect?ctx.roundRect(lx,ly,tw,16,4):ctx.rect(lx,ly,tw,16);ctx.fill();ctx.stroke();
+    ctx.fillStyle=COL.ink;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(label,lx+5,ly+8.5);k++}
+  // adjustment flags — background (hollow, above its BT) and live (solid, below BT)
+  ctx.font='600 10px Poppins, system-ui, sans-serif';ctx.textBaseline='middle';
+  const flag=(a,arr,o,live,i)=>{if(Math.abs(a.t-o)<12)return;const x=X(a.t-o);if(x<PAD.l||x>PAD.l+w)return;const b=interp(arr,'bt',a.t);if(!ok(b))return;
+    const y=Y(b),col=COL[a.key],txt=`${a.label[0]} ${Math.round(a.to)}%`,tw=ctx.measureText(txt).width+8;
+    const ly=live?Math.min(PAD.t+h-14,y+16+(i%3)*14):Math.max(PAD.t+2,y-20-(i%3)*14);
+    ctx.globalAlpha=live?1:.75;ctx.strokeStyle=col;ctx.lineWidth=1;ctx.setLineDash(live?[]:[2,2]);
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,live?ly-6:ly+6);ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);if(live){ctx.fillStyle=col;ctx.fill()}else{ctx.fillStyle=COL.card;ctx.fill();ctx.stroke()}
+    const lx=Math.min(Math.max(x-tw/2,PAD.l+1),PAD.l+w-tw-1);
+    ctx.fillStyle=live?col:COL.card;ctx.fillRect(lx,ly-6,tw,12);if(!live){ctx.strokeRect(lx+.5,ly-5.5,tw-1,11)}
+    ctx.fillStyle=live?'#fff':col;ctx.textAlign='left';ctx.fillText(txt,lx+4,ly+.5);ctx.globalAlpha=1};
+  if(S.ref)S.refAdj.forEach((a,i)=>flag(a,S.ref.samples,S.ref.events.CHARGE??0,false,i));
+  adjustments(r).forEach((a,i)=>flag(a,smp,off,true,i));
+  ctx.font='11px Poppins, system-ui, sans-serif';
+  drawHover(ctx,X,PAD.t,PAD.t+h);
+}
+function drawAux(){
+  const cv=$('#chartAux'),{ctx,W,H}=prep(cv),P={l:PAD.l,r:PAD.r,t:6,b:16},w=W-P.l-P.r,h=H-P.t-P.b;if(w<40||h<20)return;
+  const {off,lo,hi}=S.view||xRange(),X=x=>P.l+(x-lo)/(hi-lo)*w,Y=v=>P.t+(1-v/100)*h;
+  const smp=S.roast.samples;let amax=200;for(const s of smp)if(ok(s.air)&&s.air*1.15>amax)amax=s.air*1.15;amax=niceStep(amax/4)*4;
+  const YA=v=>P.t+(1-v/amax)*h;
+  timeGrid(ctx,X,lo,hi,P.t,P.t+h,false);
+  ctx.textBaseline='middle';
+  for(const v of [0,50,100]){const y=Math.round(Y(v))+.5;ctx.strokeStyle=COL.grid;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+w,y);ctx.stroke();ctx.fillStyle=COL.muted;ctx.textAlign='right';ctx.fillText(v+'%',P.l-6,y)}
+  if(cfg.channels.air.curve){ctx.fillStyle=COL.air;ctx.textAlign='left';ctx.fillText(Math.round(amax)+' Pa',P.l+w+6,P.t+4);ctx.fillText('0',P.l+w+6,P.t+h)}
+  ctx.save();ctx.beginPath();ctx.rect(P.l,P.t,w,h);ctx.clip();
+  if(S.ref){ctx.globalAlpha=.5;for(const k of ['drum','fan','burner'])if(cfg.channels[k].curve)line(ctx,S.ref.samples,k,S.ref.events.CHARGE??0,X,Y,COL[k],1.3,null,[5,4]);ctx.globalAlpha=1}
+  for(const k of ['drum','fan','burner'])if(cfg.channels[k].curve)line(ctx,smp,k,off,X,Y,COL[k],1.7);
+  if(cfg.channels.air.curve)line(ctx,smp,'air',off,X,YA,COL.air,1.4);
+  ctx.restore();
+  drawHover(ctx,X,P.t,P.t+h);
+}
+function drawHover(ctx,X,top,bot){
+  if(S.hover==null)return;const x=X(S.hover);ctx.strokeStyle=COL.muted;ctx.globalAlpha=.6;ctx.setLineDash([3,3]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bot);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+}
+function onHover(e){
+  const cv=e.currentTarget,b=cv.getBoundingClientRect(),v=S.view;if(!v)return;
+  const w=b.width-PAD.l-PAD.r,px=e.clientX-b.left;if(px<PAD.l||px>PAD.l+w){clearHover();return}
+  S.hover=v.lo+(px-PAD.l)/w*(v.hi-v.lo);
+  const s=sampleAt(S.roast.samples,S.hover+v.off);
+  let txt=`${mmss(S.hover)}`;
+  if(s&&Math.abs(s.t-v.off-S.hover)<5){txt+=` · BT ${fmtT(s.bt)} · ΔBT ${fmtR(s.ror)} · Exhaust ${fmtT(s.exhaust)} · Burner ${fmt0(s.burner)}% · Drum ${fmt0(s.drum)}% · Air ${fmt0(s.fan)}% · Pressure ${fmt0(s.air)} Pa`}
+  if(S.ref){const ro=S.ref.events.CHARGE??0,rb=interp(S.ref.samples,'bt',S.hover+ro);if(ok(rb))txt+=` · Background BT ${fmtT(rb)}`}
+  $('#readout').textContent=txt;scheduleDraw();
+}
+function clearHover(){S.hover=null;$('#readout').textContent='';scheduleDraw()}
+
+/* ============================================================
+   Settings dialog
+   ============================================================ */
+const SETTINGS=[
+  {sec:'Machine',items:[['host','Host'],['port','Port','number'],['path','Path'],['roasterId','Machine ID','number']]},
+  {sec:'Timing',items:[['connectTimeout','Connect timeout (s)','number'],['reconnect','Reconnect delay (s)','number'],['requestTimeout','Request timeout (s)','number'],['interval','Sampling interval (s)','number']]},
+  {sec:'Nodes',items:[['nodes.id','Message ID'],['nodes.machine','Machine ID'],['nodes.command','Command'],['nodes.data','Data'],['nodes.message','Message']]},
+  {sec:'Commands, messages & flags',items:[['dataRequest','Data request'],['msgCharge','CHARGE message'],['msgDrop','DROP message'],['startOnCharge','START on CHARGE','check'],['offOnDrop','OFF on DROP','check']]},
+  {sec:'Events',items:[['eventMsg','Event message'],['eventNode','Event node'],['evDRY','DRY'],['evFCs','FCs'],['evFCe','FCe'],['evSCs','SCs'],['evSCe','SCe']]},
+  {sec:'Control',items:[['ctlBurnerMax','Highest burner % the app may send','number'],['ctlStep','Big step (%)','number'],['ctlSendEvents','Send event buttons to the roaster','check']]},
+  {sec:'Display',items:[['unit','Temperature unit','select',['C','F']],['rorWindow','ΔBT window (s)','number'],['showProjection','Show BT projection','check'],['projection','Projection length (s)','number'],['tMin','Temp axis min (°C)','number'],['tMax','Temp axis max (°C)','number'],['rorMax','ΔBT axis max (°C/min)','number']]},
+];
+let draft=null;
+const getP=(o,p)=>p.split('.').reduce((a,k)=>a[k],o);
+const setP=(o,p,v)=>{const ks=p.split('.'),l=ks.pop();ks.reduce((a,k)=>a[k],o)[l]=v};
+function openSettings(){
+  draft=JSON.parse(JSON.stringify(cfg));buildSettings();$('#dlg').showModal();
+}
+function buildSettings(){
+  let h='';
+  for(const s of SETTINGS){
+    h+=`<div class="sec"><h4>${s.sec}</h4><div class="sgrid">`;
+    for(const [k,l,t,opt] of s.items){const v=getP(draft,k);
+      if(t==='check')h+=`<label class="field chk"><input type="checkbox" data-s="${k}" ${v?'checked':''}>${l}</label>`;
+      else if(t==='select')h+=`<label class="field">${l}<select data-s="${k}">${opt.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select></label>`;
+      else h+=`<label class="field">${l}<input data-s="${k}" data-t="${t||'text'}" value="${esc(v)}"></label>`}
+    h+='</div></div>';
+  }
+  h+=`<div class="sec"><h4>Inputs</h4><table class="ch"><tr><th>Channel</th><th>Node</th><th>Mode</th><th>Scale ×</th><th>Curve</th></tr>`+
+    CHANNELS.map(c=>{const d=draft.channels[c.key];return `<tr><td>${c.label}</td><td><input data-c="${c.key}" data-f="node" value="${esc(d.node)}"></td>
+    <td>${c.kind==='temp'?`<select data-c="${c.key}" data-f="mode"><option ${d.mode==='C'?'selected':''}>C</option><option ${d.mode==='F'?'selected':''}>F</option></select>`:'<span class="muted">raw</span>'}</td>
+    <td><input data-c="${c.key}" data-f="scale" value="${esc(d.scale)}" style="width:80px"></td>
+    <td>${c.key==='bt'?'<span class="muted">always</span>':`<input type="checkbox" data-c="${c.key}" data-f="curve" ${d.curve?'checked':''}>`}</td></tr>`}).join('')+
+    `</table><p class="muted">Mode C/F is the unit the roaster sends. Air pressure is multiplied by 1000 (kPa → Pa) to match your Artisan setup.</p></div>`;
+  $('#dlgBody').innerHTML=h;
+}
+function saveSettings(){
+  $$('#dlgBody [data-s]').forEach(el=>{const k=el.dataset.s;let v=el.type==='checkbox'?el.checked:el.value;
+    if(el.dataset.t==='number'){const n=num(v);v=n==null?getP(cfg,k):n}else if(typeof v==='string')v=v.trim();setP(draft,k,v)});
+  $$('#dlgBody [data-c]').forEach(el=>{const d=draft.channels[el.dataset.c],f=el.dataset.f;
+    if(f==='curve')d.curve=el.checked;else if(f==='scale')d.scale=num(el.value)??1;else d[f]=el.value.trim()});
+  draft.interval=Math.max(.25,draft.interval);draft.requestTimeout=Math.max(.1,draft.requestTimeout);
+  draft.rorWindow=Math.max(5,draft.rorWindow);if(draft.tMax<=draft.tMin)draft.tMax=draft.tMin+50;if(draft.rorMax<=0)draft.rorMax=30;
+  const reconn=['host','port','path','interval'].some(k=>draft[k]!==cfg[k]);
+  cfg=draft;store.set(LS.cfg,cfg);$('#dlg').close();
+  if(reconn&&!link.manual&&!link.sim){log('sys','Settings changed — reconnecting');link.connect(false)}
+  else if(!link.manual&&link.connected())link.startPolling();
+  if(C.on)buildCtl();renderAll();toast('Settings saved');
+}
+
+/* ============================================================
+   Wiring
+   ============================================================ */
+function init(){
+  const th=store.get(LS.theme,null)||'dark';if(th){document.documentElement.dataset.theme=th;$('#btnTheme').textContent=th==='dark'?'Light':'Dark'}
+  readColors();
+  buildCtl();
+  $('#evButtons').innerHTML=EVENTS.filter(e=>!e.auto).map(e=>`<button class="ev" data-k="${e.key}">${e.label}<kbd>${e.hot.toUpperCase()}</kbd></button>`).join('');
+  $('#evButtons').addEventListener('click',e=>{const b=e.target.closest('.ev');if(b)markEvent(b.dataset.k,'manual')});
+  $('#btnStart').onclick=()=>S.recording?stopRoast():startRoast('manual');
+  $('#btnUndo').onclick=undoEvent;
+  $('#btnConnect').onclick=()=>{if(!link.manual&&!link.sim)link.disconnect();else link.connect(false)};
+  $('#btnSim').onclick=()=>{if(!link.manual&&link.sim)link.disconnect();else link.connect(true)};
+  $('#simSpeed').onchange=e=>{S.simSpeed=Number(e.target.value);if(!link.manual&&link.sim){if(S.recording)toast('Restarting simulator at '+S.simSpeed+'× — stop and START again');link.connect(true)}};
+  $('#btnUnit').onclick=()=>{cfg.unit=isF()?'C':'F';store.set(LS.cfg,cfg);renderAll()};
+  $('#btnTheme').onclick=()=>{const d=document.documentElement,n=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=n;store.set(LS.theme,n);$('#btnTheme').textContent=n==='dark'?'Light':'Dark';readColors();scheduleDraw()};
+  $('#btnSettings').onclick=openSettings;
+  $('#dlgX').onclick=$('#dlgCancel').onclick=()=>$('#dlg').close();
+  $('#dlgSave').onclick=saveSettings;
+  $('#dlgReset').onclick=()=>{if(confirm('Reset all settings to the P12 defaults?')){draft=JSON.parse(JSON.stringify(DEFAULT_CFG));buildSettings()}};
+  $('#btnSave').onclick=()=>saveRoast(false);
+  $('#btnNew').onclick=newRoastClick;
+  $('#btnSaveProfile').onclick=saveAsProfile;
+  $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showScreen(b.dataset.screen)});
+  $('#histSearch').addEventListener('input',renderHistory);
+  $('#dtabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showTab(b.dataset.tab)});
+  $('#drawerX').onclick=()=>showTab('live');
+  $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showTab(b.dataset.tab)});
+  $('#invSelect').onchange=onInvPick;
+  $('[data-m=green]').addEventListener('input',renderInvHint);
+  $('#invSave').onclick=saveInvForm;$('#invCancelEdit').onclick=()=>{invEditId=null;fillInvForm({})};
+  $('#invShowEmpty').onchange=renderInvList;
+  $('#invCSV').onclick=()=>download('green_inventory_'+new Date().toISOString().slice(0,10)+'.csv',invCSV(),'text/csv');
+  $('#invList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.id;
+    if(b.dataset.iv==='edit'){invEditId=id;fillInvForm(invById(id));window.scrollTo({top:0,behavior:'smooth'})}
+    else if(b.dataset.iv==='adj')adjustInv(id);else if(b.dataset.iv==='del')deleteInv(id)});
+  $('#refBody').addEventListener('click',e=>{if(e.target.id==='btnCopySetup')copySetup();const b=e.target.closest('[data-sendadj]');if(b){const [k,v]=b.dataset.sendadj.split(':');sendControl(k,Number(v))}});
+  $('#btnControl').onclick=()=>setControl(!C.on);$('#btnCtlOn2').onclick=()=>setControl(!C.on);$('#btnCtlOff').onclick=()=>setControl(false);
+  $('#swRow').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='btnStandby')toggleStandby();else if(b.dataset.sw)sendSwitch(b.dataset.sw,b.dataset.v==='1',b.dataset.l)});
+  document.addEventListener('visibilitychange',()=>{if(C.on&&document.visibilityState==='visible')wakeLock(true)});
+  $('#histFilter').onchange=renderHistory;
+  let nameT;$('[data-m=name]').addEventListener('input',()=>{clearTimeout(nameT);nameT=setTimeout(()=>{if(S.refMode==='__match')resolveRef();else renderProfileHint()},300)});
+  $('#metaForm').addEventListener('input',()=>{renderLoss();if(!S.viewingId)store.set(LS.meta,readMeta());else S.dirty=true});
+  $('#refSelect').onchange=e=>setRef(e.target.value||null);
+  $('#hist').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.id,h=loadHist().find(x=>x.id===id);
+    if(b.dataset.a==='open'){openRoast(id);showScreen('roasting');showTab('roast')}else if(b.dataset.a==='prof'&&h)markProfile(id,!h.isProfile);else if(b.dataset.a==='ref'){setRef(id);showScreen('roasting');showTab('bg')}else if(b.dataset.a==='del')deleteRoast(id);
+    else if(b.dataset.a==='csv'&&h)exportCSV(h);else if(b.dataset.a==='json'&&h)exportJSON(h,fileBase(h)+'.json')});
+  $('#btnExportAll').onclick=()=>{const h=loadHist();if(!h.length)return toast('No saved roasts');exportJSON(h,'zuna_roasts_'+new Date().toISOString().slice(0,10)+'.json')};
+  $('#btnImport').onclick=()=>$('#fileImport').click();
+  $('#fileImport').onchange=e=>{const f=e.target.files[0];if(f)importFile(f);e.target.value=''};
+  $('#logBox').addEventListener('toggle',renderLog);$('#logVerbose').onchange=renderLog;$('#btnLogClear').onclick=()=>{logBuf.length=0;renderLog()};
+  $('#legend').addEventListener('change',e=>{const k=e.target.dataset.k;if(k){cfg.channels[k].curve=e.target.checked;store.set(LS.cfg,cfg);scheduleDraw()}});
+  for(const id of ['#chartMain','#chartAux']){const c=$(id);c.addEventListener('mousemove',onHover);c.addEventListener('mouseleave',clearHover)}
+  new ResizeObserver(scheduleDraw).observe($('#chartMain'));
+  document.addEventListener('keydown',e=>{
+    if(e.metaKey||e.ctrlKey||e.altKey||$('#dlg').open)return;const tg=e.target.tagName;if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT')return;
+    const ev=EVENTS.find(x=>x.hot===e.key.toLowerCase());if(ev){e.preventDefault();markEvent(ev.key,'manual')}
+  });
+  window.addEventListener('beforeunload',e=>{if(S.recording||(S.dirty&&S.roast.samples.length)){e.preventDefault();e.returnValue=''}});
+  if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{readColors();scheduleDraw()});
+  const md=store.get(LS.meta,null);if(md){S.roast.meta=normMeta(md);fillMeta(S.roast.meta)}
+  const rm=store.get(LS.ref,null);S.refMode=(rm==null||rm==='__last')?'__match':rm;
+  renderAll();
+  initStorage().then(()=>{resolveRef();renderHistory();renderRoastId()});
+  setInterval(tick,250);
+  if(document.fonts)document.fonts.ready.then(scheduleDraw);
+  log('sys','Ready. Target '+link.url());
+}
+init();
+</script>
+</body>
+</html>
