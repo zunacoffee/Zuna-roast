@@ -455,7 +455,7 @@ tr.tdone td{color:var(--text2)}
       <div class="grid2" style="margin-top:8px"><label class="field">Coffee<input id="fCoffee"></label><label class="field">Lot<input id="fLot"></label></div></details>
     <div id="dNotesList"></div>
   </div>
-  <div class="df"><button class="pri" id="btnSave" style="flex:1">Save roast</button><button id="btnSaveProf" style="flex:1">Save as profile ★</button><button id="btnCsv">CSV</button></div>
+  <div class="df"><button class="pri" id="btnSave" style="flex:1">Save roast</button><button id="btnSaveProf" style="flex:1">Save as profile ★</button><button id="btnCsv">CSV</button><button class="pri" id="btnNewRoast" hidden>New roast ▶</button></div>
 </aside>
 
 <div id="banners"></div>
@@ -519,7 +519,7 @@ const DEF={
   events:[{k:'UNDO',label:'Undo',show:true,key:'0'},{k:'CHARGE',label:'Charge',show:true,key:'1'},{k:'DRY',label:'Dry end',show:true,key:'2'},{k:'FCs',label:'FC start',show:true,key:'3'},{k:'FCe',label:'FC end',show:true,key:'4'},{k:'SCs',label:'SC start',show:false,key:'5'},{k:'SCe',label:'SC end',show:false,key:''},{k:'COOL',label:'Cool end',show:false,key:'7'},{k:'DROP',label:'Drop',show:true,key:'6'}],evOrderV:2,keyV:2,
   startKey:'Escape',swKeys:{coolingFanState:'c',stirrerState:'s'},
   pUnit:'Pa',
-  scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0},
+  scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[]
 };
 const FONTS=[['system','System (SF Pro)','-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif'],['rounded','SF Rounded','ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,sans-serif'],['helvetica','Helvetica Neue','"Helvetica Neue",Helvetica,Arial,sans-serif'],['avenir','Avenir Next','"Avenir Next",Avenir,"Helvetica Neue",sans-serif'],['din','DIN Alternate','"DIN Alternate","DIN Condensed","Helvetica Neue",sans-serif'],['futura','Futura','Futura,"Trebuchet MS",sans-serif'],['gill','Gill Sans','"Gill Sans","Gill Sans MT",sans-serif'],['optima','Optima','Optima,"Helvetica Neue",sans-serif'],['verdana','Verdana','Verdana,Geneva,sans-serif'],['georgia','Georgia (serif)','Georgia,"Times New Roman",serif'],['mono','SF Mono (monospace)','ui-monospace,"SF Mono",Menlo,monospace'],['custom','Other font…','']];
@@ -746,6 +746,10 @@ function renderFormCalc(){const m=readMeta(),g=num(m.green),w=num(m.roasted);
   $('#profNames').innerHTML=[...new Set(HIST.filter(r=>r.isProfile&&r.meta.name).map(r=>r.meta.name))].map(n=>`<option value="${esc(n)}">`).join('')}
 function onFormInput(e){if(S.viewingId||S.recording||S.roast.samples.length)S.dirty=true;
   if(e&&e.target===$('#fInv')){const l=INV.find(x=>x.id===$('#fInv').value);if(l){$('#fCoffee').value=l.name;$('#fLot').value=l.lot||''}}
+  if(e&&e.target===$('#fName')&&!S.recording&&!S.viewingId&&!S.roast.samples.length){const pr=profileByName($('#fName').value);
+    if(pr){const l=INV.find(x=>x.id===pr.meta.invId&&invLeft(x)>0.001)||INV.find(x=>invLeft(x)>0.001&&normName(x.name)===normName(pr.meta.coffee));
+      renderInvSelect(l?l.id:'');$('#fInv').value=l?l.id:'';$('#fCoffee').value=l?l.name:(pr.meta.coffee||'');$('#fLot').value=l?(l.lot||''):'';if(pr.meta.green)$('#fGreen').value=pr.meta.green;
+      if(S.bgMode!=='auto'&&S.bgMode!=='none')setBgMode('auto')}}
   if(e&&e.target===$('#fName')&&S.bgMode==='auto')resolveBg();
   if(!S.recording&&!S.roast.samples.length)store.set('zr2.setup',readMeta());
   S.roast.meta=readMeta();renderFormCalc();renderHeader()}
@@ -1043,7 +1047,13 @@ function drawMain(){const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H
   ctx.textAlign='left';ctx.fillStyle=COL.ror;for(let v=R.min;v<=R.max+.01;v+=R.step)ctx.fillText(String(v),PAD.l+w+8,PAD.t+(1-(v-R.min)/(R.max-R.min))*h);
   ctx.fillStyle=COL.axis;ctx.textBaseline='top';ctx.fillText('°'+cfg.unit,4,2);ctx.textAlign='right';ctx.fillText('°'+cfg.unit+'/min',W-2,PAD.t+h+6);
   const line=(arr,key,o,Yf,col,lw,dash,from,to)=>{ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.beginPath();let pen=false;for(const p of arr){const v=p[key];if(!ok(v)||(from!=null&&p.t<from)||(to!=null&&p.t>to)){pen=false;continue}const x=X(p.t-o),y=Yf(v);pen?ctx.lineTo(x,y):ctx.moveTo(x,y);pen=true}ctx.stroke();ctx.setLineDash([])};
+  const area=(arr,key,o,Yf,col,from,to,a)=>{const g=ctx.createLinearGradient(0,PAD.t,0,PAD.t+h);g.addColorStop(0,rgba(col,a));g.addColorStop(1,rgba(col,0));ctx.fillStyle=g;ctx.beginPath();let seg=null;const close=()=>{if(seg){ctx.lineTo(seg.x,PAD.t+h);ctx.lineTo(seg.x0,PAD.t+h);ctx.closePath();seg=null}};
+    for(const p of arr){const v=p[key];if(!ok(v)||(from!=null&&p.t<from)||(to!=null&&p.t>to)){close();continue}const x=X(p.t-o),y=Yf(v);if(!seg){seg={x0:x,x};ctx.moveTo(x,y)}else{ctx.lineTo(x,y);seg.x=x}}close();ctx.fill()};
   ctx.save();ctx.beginPath();ctx.rect(PAD.l,PAD.t,w,h);ctx.clip();
+  {const F=cfg.scales;if(S.bg&&F.fillBkg){const b=S.bg,ro=b.events.CHARGE??0;area(b.samples,'bt',ro,Y,COL.bkg,ro-60,null,.16);area(b.samples,'ror',ro,YR,COL.ror,rorStart(b.events)??ro,b.events.DROP,.06)}
+    if(F.fillEx)area(smp,'exhaust',off,Y,COL.exhaust,null,null,.22);
+    if(F.fillRor&&ev.CHARGE!=null)area(smp,'ror',off,YR,COL.ror,rorStart(ev),ev.DROP,.14);
+    if(F.fillBt)area(smp,'bt',off,Y,COL.bt,null,null,.12)}
   if(S.bg){const b=S.bg,ro=b.events.CHARGE??0;line(b.samples,'bt',ro,Y,COL.bkg,1.6,[6,5],ro-60);line(b.samples,'ror',ro,YR,rgba(COL.ror,.4),1.3,[6,5],rorStart(b.events)??ro,b.events.DROP);
     for(const k of ['FCs','DROP']){const t=b.events[k];if(t==null)continue;const s=sampleAt(b.samples,t);if(s&&ok(s.bt)){ctx.strokeStyle=COL.bkg;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(t-ro),Y(s.bt),4,0,7);ctx.stroke()}}}
   line(smp,'exhaust',off,Y,COL.exhaust,1.3);
@@ -1074,7 +1084,10 @@ function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)re
     ctx.strokeStyle=COL.grid;for(const f of [0,.5,1]){const y=Math.round(top+h-f*h)+.5;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke()}
     ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(R.label,PAD.l-8,top+h/2);
     ctx.textAlign='left';ctx.fillText((R.maxLabel??R.max)+R.unit.trim(),PAD.l+w+6,top+3);ctx.fillText('0',PAD.l+w+6,top+h);
-    const series=(r,dash,alpha,lw,lab,end)=>{if(!r)return;const o=r.events.CHARGE??0;ctx.save();ctx.beginPath();ctx.rect(PAD.l,0,w,H);ctx.clip();ctx.globalAlpha=alpha;ctx.strokeStyle=R.col;ctx.lineWidth=lw;ctx.setLineDash(dash);ctx.beginPath();let pen=false;
+    const fk={burner:'fillBurner',fan:'fillAir',pressure:'fillPressure'}[R.k];
+    const series=(r,dash,alpha,lw,lab,end)=>{if(!r)return;const o=r.events.CHARGE??0;ctx.save();ctx.beginPath();ctx.rect(PAD.l,0,w,H);ctx.clip();
+      if(cfg.scales[fk]&&(r===S.roast||cfg.scales.fillBkg)){ctx.fillStyle=rgba(R.col,r===S.roast?.16:.07);ctx.beginPath();let x0=null,xl=null;const cl=()=>{if(x0!=null){ctx.lineTo(xl,top+h);ctx.lineTo(x0,top+h);ctx.closePath();x0=null}};
+        for(const s of r.samples){if(end!=null&&s.t>end)break;const vv=s[R.k];if(!ok(vv)){cl();continue}const x=X(s.t-o),y=Yv(vv);if(x0==null){x0=x;ctx.moveTo(x,y)}else ctx.lineTo(x,y);xl=x}cl();ctx.fill()}ctx.globalAlpha=alpha;ctx.strokeStyle=R.col;ctx.lineWidth=lw;ctx.setLineDash(dash);ctx.beginPath();let pen=false;
       for(const s of r.samples){if(end!=null&&s.t>end)break;const vv=s[R.k];if(!ok(vv)){pen=false;continue}const x=X(s.t-o),y=Yv(vv);pen?ctx.lineTo(x,y):ctx.moveTo(x,y);pen=true}ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
       if(lab&&!R.noLabels){ctx.font=`600 ${11*TS()}px ${font}`;for(const a of adjustments(r).filter(a=>a.key===R.k)){const x=X(a.t-o),y=Yv(a.to),tx=Math.round(a.to)+'%',tw=ctx.measureText(tx).width+8,oy=lab.below?4:-16;
         ctx.fillStyle=lab.bg==='col'?R.col:COL.chartBg;ctx.fillRect(x+3,y+oy,tw,13);ctx.fillStyle=lab.fg==='col'?R.col:lab.fg;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(tx,x+7,y+oy+6.5)}}
@@ -1106,9 +1119,14 @@ function closeDrawer(){$('#drawer').classList.remove('open')}
 function renderDrawer(){const r=S.roast;$('#dTitle').textContent=`Roast #${r.num||nextNum()}`;
   $('#dSub').textContent=r.chargedAt?`${fmtLong(r.chargedAt)} · ${ageOf(r.chargedAt)==='today'?'today':ageOf(r.chargedAt)+' old'}${r.events.DROP!=null&&r.events.CHARGE!=null?' · '+mmss(r.events.DROP-r.events.CHARGE)+' roast':''}`:(S.recording?'Recording…':'Set up the next roast, then press Start');
   const st=$('#dState');st.textContent=S.recording?'Recording':S.viewingId?(r.isProfile?'Profile ★':'Saved'):r.samples.length?'Not saved':'Next roast';
-  $('#btnSave').textContent=S.viewingId?'Update roast':'Save roast';$('#btnSave').disabled=$('#btnSaveProf').disabled=S.recording||!r.samples.length;$('#btnCsv').disabled=!r.samples.length;
+  $('#btnSave').textContent=S.viewingId?'Update roast':'Save roast';$('#btnNewRoast').hidden=!(S.viewingId&&!S.recording);$('#btnSave').disabled=$('#btnSaveProf').disabled=S.recording||!r.samples.length;$('#btnCsv').disabled=!r.samples.length;
   $('#dNotesList').innerHTML=(r.tnotes||[]).length?`<div class="h3" style="margin:4px 0 6px">Notes during the roast</div>`+r.tnotes.map(n=>`<div class="tnote"><span>${mmss(n.t-(r.events.CHARGE??0))}</span>${esc(n.text)}</div>`).join(''):'';
   renderFormCalc()}
+function newRoastFromCurrent(){if(S.recording)return;const m=readMeta(),inStock=INV.find(l=>l.id===m.invId&&invLeft(l)>0.001);
+  const meta={...blankMeta(),name:m.name,invId:inStock?m.invId:'',coffee:inStock?m.coffee:(m.invId?'':m.coffee),lot:inStock?m.lot:(m.invId?'':m.lot),green:m.green};
+  S.roast=newRoast();S.roast.meta=meta;S.viewingId=null;S.dirty=false;S.evStack=[];S.firedRem={};fillForm(meta);
+  if(S.bgMode!=='auto'&&S.bgMode!=='none')setBgMode('auto');else resolveBg();renderAll();renderDrawer();
+  toast(`Ready for roast #${nextNum()} — check the setup, then charge`+(m.invId&&!inStock?' (last coffee is out of stock — pick one)':''))}
 function renderInvSelect(cur){const sel=$('#fInv');cur=cur??sel.value;const show=INV.filter(l=>invLeft(l)>0.001||l.id===cur);
   sel.innerHTML='<option value="">— not from inventory —</option>'+show.map(l=>`<option value="${l.id}">${esc(l.name)}${l.lot?' · lot '+esc(l.lot):''} — ${invLeft(l).toFixed(1)} lb</option>`).join('');sel.value=show.some(l=>l.id===cur)?cur:''}
 
@@ -1491,6 +1509,9 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <label class="chk"><input type="checkbox" data-sc="auto" ${s.auto?'checked':''}> Fit the temperature scale to the roast automatically</label>
     <div class="sgrid">${[['tMin',`Temperature min (°${cfg.unit})`],['tMax',`Temperature max (°${cfg.unit})`],['tStep','Temperature label step'],['rMin',`Rate of rise min (°${cfg.unit}/min)`],['rMax','Rate of rise max'],['rStep','Rate of rise label step'],['minutes','Minutes shown before the roast fills it'],['pMax',`Air pressure strip max (${pU()}, 0 = auto)`]].map(([k,l])=>`<label class="field">${l}<input data-scv="${k}" value="${esc(k==='pMax'&&isMbar()?+(s[k]/100).toFixed(2):s[k])}" inputmode="decimal"></label>`).join('')}</div>
     <label class="chk"><input type="checkbox" data-sc="showPressure" ${s.showPressure?'checked':''}> Show air pressure in the strip under the chart</label>
+    <div class="h3" style="margin-top:6px">Shade under lines</div>
+    <div class="sgrid" style="grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 14px">${[['fillBt','Bean temp'],['fillRor','Rate of rise'],['fillEx','Exhaust'],['fillBkg','Background curves'],['fillBurner','Burner'],['fillAir','Air'],['fillPressure','Air pressure']].map(([k,l])=>`<label class="chk"><input type="checkbox" data-sc="${k}" ${s[k]?'checked':''}> ${l}</label>`).join('')}</div>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">A soft fill in each line’s own color. Turn on only the ones you find helpful — too many at once gets busy.</div>
     <div class="sgrid"><label class="field">Temperature unit<select id="sUnit"><option value="F" ${isF()?'selected':''}>°F</option><option value="C" ${!isF()?'selected':''}>°C</option></select></label><label class="field">Air pressure unit<select id="sPUnit"><option value="Pa" ${!isMbar()?'selected':''}>Pa (pascals)</option><option value="mbar" ${isMbar()?'selected':''}>mbar (millibars)</option></select></label><label class="field">Rate of rise smoothing (s)<input data-cfg="rorWindow" value="${esc(cfg.rorWindow)}"></label><label class="field">Show rate of rise<select id="sRorFrom"><option value="charge" ${cfg.rorFrom!=='tp'?'selected':''}>Right away, from Charge</option><option value="tp" ${cfg.rorFrom==='tp'?'selected':''}>After the turning point</option></select></label></div>
     <div class="row"><button id="scReset">Reset scales</button></div>`},
   store:()=>`<h2>Saving &amp; storage</h2><div class="sub">Every roast is saved as files in a folder on this Mac.</div>
@@ -1607,7 +1628,7 @@ async function init(){
   $('#sps').onclick=spClick;$('#spsL').onclick=spClick;
   for(const id of ['#sw','#swL'])$(id).onclick=e=>{const b=e.target.closest('button');if(b)sendSwitch(b.dataset.sw,!(S.sw[b.dataset.sw]===true))};
   for(const s of Object.values(FORM))$(s).addEventListener('input',onFormInput);
-  $('#btnSave').onclick=()=>saveRoast(false,false);$('#btnSaveProf').onclick=()=>saveRoast(false,true);$('#btnCsv').onclick=()=>download(roastBase(S.roast)+'.csv',csvText(S.roast));
+  $('#btnSave').onclick=()=>saveRoast(false,false);$('#btnNewRoast').onclick=()=>newRoastFromCurrent();$('#btnSaveProf').onclick=()=>saveRoast(false,true);$('#btnCsv').onclick=()=>download(roastBase(S.roast)+'.csv',csvText(S.roast));
   for(const id of ['#cvMain','#cvStrip']){$(id).addEventListener('mousemove',onHover);$(id).addEventListener('mouseleave',clearHover)}
   new ResizeObserver(scheduleDraw).observe($('#cvMain'));
   document.addEventListener('keydown',handleKey);
