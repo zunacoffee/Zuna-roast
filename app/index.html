@@ -814,7 +814,7 @@ async function readFolderJSON(parts,name){try{return JSON.parse(await (await (aw
 function applySettings(o){const keepTheme=cfg.theme;localStorage.setItem(LS.cfg,JSON.stringify(o));cfg=loadCfg();if(!o.theme)cfg.theme=keepTheme;applyTheme();buildCtl();renderCtl();renderFkeys()}
 async function syncFolder(){
   if(FS.state!=='granted')return;const found=[];let invFile=null,cupFile=null;
-  async function walk(d,depth){for await(const [name,h] of d.entries()){if(h.kind==='directory'&&depth<3)await walk(h,depth+1);else if(h.kind==='file'&&name.endsWith('.json')){try{const r=JSON.parse(await (await h.getFile()).text());if(r&&r.id&&Array.isArray(r.samples))found.push(r)}catch(e){}}}}
+  async function walk(d,depth){for await(const [name,h] of d.entries()){if(h.kind==='directory'&&depth<3)await walk(h,depth+1);else if(h.kind==='file'&&name.endsWith('.json')){try{const r=JSON.parse(await (await h.getFile()).text());if(r&&r.id&&Array.isArray(r.samples)){if((cfg.deletedRoasts||[]).includes(r.id)){for(const x of [name,name.replace(/\.json$/,'.csv')])try{await d.removeEntry(x)}catch(e){}}else found.push(r)}}catch(e){}}}}
   try{try{await walk(await dirAt(['Roasts'],false),0)}catch(e){}
     try{invFile=JSON.parse(await (await (await (await dirAt(['Green coffee'],false)).getFileHandle('inventory.json')).getFile()).text())}catch(e){}
     try{cupFile=JSON.parse(await (await (await (await dirAt(['Cupping'],false)).getFileHandle('cupping.json')).getFile()).text())}catch(e){}
@@ -1240,11 +1240,27 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   <div class="kv"><span>Adjustments</span><b>${adj.map(a=>`${a.label} ${Math.round(a.from)}→${Math.round(a.to)} at ${mmss(a.t-rc)}`).join(' · ')||'—'}</b></div>
   <div class="kv"><span>Cupping score</span><b class="tnum">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div></div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}${(r.tnotes||[]).length?'\n\n'+r.tnotes.map(n=>mmss(n.t-rc)+'  '+esc(n.text)).join('\n'):''}</div></div>
-  <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="${r.archived?'':'dangerTxt'}" id="rArch">${r.archived?'Unarchive':'Archive'}</button></div>`;
+  <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="${r.archived?'':'dangerTxt'}" id="rArch">${r.archived?'Unarchive':'Archive'}</button>${r.archived?'<button class="dangerTxt" id="rDel">Delete permanently</button>':''}</div>`;
   requestAnimationFrame(()=>miniCurve($('#rBig'),r,{axis:true}));
   $('#rRoast').onclick=()=>roastThis(r.id);$('#rOpen').onclick=()=>openRoast(r.id);$('#rCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
   $('#rProf').onclick=async()=>{if(!r.isProfile){if(!normName(r.meta.name)){toast('This roast has no profile name — open it and add one first');return}for(const x of HIST)if(x.id!==r.id&&x.isProfile&&normName(x.meta.name)===normName(r.meta.name)){x.isProfile=false;await commitRoast(x,true)}r.isProfile=true}else r.isProfile=false;await commitRoast(r,true);resolveBg();renderRoasts();toast(r.isProfile?`#${r.num} is now the profile for “${r.meta.name}”`:'Profile mark removed')};
-  $('#rArch').onclick=async()=>{r.archived=!r.archived;if(r.archived&&r.isProfile)r.isProfile=false;await commitRoast(r,true);resolveBg();renderRoasts();toast(r.archived?`Roast #${r.num} archived — find it under Archived`:`Roast #${r.num} restored`)}}
+  $('#rArch').onclick=async()=>{r.archived=!r.archived;if(r.archived&&r.isProfile)r.isProfile=false;await commitRoast(r,true);resolveBg();renderRoasts();toast(r.archived?`Roast #${r.num} archived — find it under Archived`:`Roast #${r.num} restored`)};
+  const del=$('#rDel');if(del)del.onclick=()=>deleteRoastForever(r.id)}
+/* Permanent delete — only offered for archived roasts. Green inventory is left unchanged:
+   the green this roast used is booked as an inventory adjustment, so stock stays the same. */
+async function deleteRoastForever(id){const r=HIST.find(x=>x.id===id);if(!r)return;
+  if(S.recording&&S.roast.id===id){toast('Stop recording first');return}
+  if(!await ask(`Delete roast #${r.num} permanently?`,`Its files are removed from your roasts folder and it can't be brought back. Green inventory stays the same. Roast number ${r.num} won't be reused.`,'Delete permanently',true))return;
+  const g=num(r.meta.green),lot=INV.find(l=>l.id===r.meta.invId);
+  if(lot&&g){(lot.adj=lot.adj||[]).push({date:new Date().toISOString(),lb:-g,note:`Roast #${r.num} deleted — green kept as used`});await persistInv()}
+  store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,r.num||0));
+  cfg.deletedRoasts=[...new Set([...(cfg.deletedRoasts||[]),r.id])];saveCfg();
+  if(FS.state==='granted'){if(r.file){const parts=r.file.split('/'),nm=parts.pop();for(const x of ['.json','.csv'])await removeAt(parts,nm+x)}
+    if(r.pfile)for(const x of ['.json','.csv'])await removeAt(['Profiles'],r.pfile+x)}
+  HIST=HIST.filter(x=>x.id!==id);await persistHist();
+  if(S.bgMode===id)setBgMode('auto');
+  if(S.roast.id===id&&!S.recording){S.roast=newRoast();S.viewingId=null;S.dirty=false;S.evStack=[];fillForm(S.roast.meta)}
+  log('sys',`Roast #${r.num} deleted permanently`);resolveBg();renderRoasts();renderInvSelect();toast(`Roast #${r.num} deleted`)}
 
 /* ================================================================
    Green coffee
