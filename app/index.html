@@ -9,7 +9,7 @@
 :root{
   --bg:#F4F5F7;--panel:#FFFFFF;--text:#15181B;--text2:#8A929B;--border:#E3E6EA;--accent:#1463FF;
   --chartBg:#FFFFFF;--grid:#F0F2F4;--axis:#9AA1A9;
-  --c-bt:#15181B;--c-ror:#1463FF;--c-exhaust:#C3C9CF;--c-bkg:#B9C0C7;--c-burner:#E5484D;--c-air:#4C8DF6;--c-drum:#1FA463;--c-pressure:#8E6CEF;--c-phase:#15181B;--t-time:#15181B;--t-bt:#15181B;--t-ror:#1463FF;--t-spb:#15181B;--t-spa:#15181B;--t-spd:#15181B;
+  --c-bt:#15181B;--c-ror:#1463FF;--c-exhaust:#C3C9CF;--c-bkg:#B9C0C7;--c-burner:#E5484D;--c-air:#4C8DF6;--c-drum:#1FA463;--c-pressure:#8E6CEF;--c-phase:#15181B;--c-ctl:#1463FF;--t-time:#15181B;--t-bt:#15181B;--t-ror:#1463FF;--t-spb:#15181B;--t-spa:#15181B;--t-spd:#15181B;
   --good:#1FA463;--warn:#E59A00;--danger:#E5484D;
   --line2:color-mix(in srgb,var(--border) 55%,var(--panel));
   --soft:color-mix(in srgb,var(--text) 4%,var(--panel));
@@ -75,7 +75,7 @@ nav button.on{background:var(--panel);color:var(--text);box-shadow:0 1px 2px rgb
 @media (max-width:1900px){#clock{display:none}.hinfo>.muted{display:none}}
 @media (max-width:1700px){#hRoast{display:none}}
 @media (max-width:1450px){nav button{padding:6px 9px}.brand small{display:none}}
-header .on-red{background:var(--danger);border-color:var(--danger);color:#fff}
+header .on-ctl{background:var(--c-ctl);border-color:var(--c-ctl);color:#fff}
 header .on-acc{background:var(--accent);border-color:var(--accent);color:#fff}
 
 /* ---------- screens ---------- */
@@ -181,13 +181,12 @@ canvas{display:block;width:100%;height:100%}
 .fkeys{grid-column:1/-1;display:flex;gap:10px}
 .fk{flex:1;padding:10px 6px 9px;border-radius:10px;font-weight:600;font-size:calc(16px*var(--ts,1));text-align:center;line-height:1.2}
 .fk small{display:block;font-size:calc(11px*var(--ts,1));color:var(--text2);font-weight:500}
-.fk.done{color:var(--text2);background:var(--soft)}
-.fk.nx{background:var(--accent);border-color:var(--accent);color:#fff}.fk.nx small{color:rgba(255,255,255,.75)}
+.fk.done{color:var(--text2)}
+.fk.nx{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 
-.fk[data-k=DROP]{flex:1.3}
-.fk.custom small{color:inherit;opacity:.7}.fk.custom.done{opacity:.45}.fk.custom.nx{box-shadow:0 0 0 3px var(--accent);border-color:var(--accent)}
+.fk.custom small{color:inherit;opacity:.7}.fk.custom.done{opacity:.45}.fk.custom.nx{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
 .evc{display:flex;gap:4px;align-items:center}.evc input[type=color]{width:30px;height:28px;padding:2px;border-radius:6px;flex:none}.evc input[type=text]{width:86px;font-family:var(--mono);font-size:calc(12.5px*var(--ts,1));padding:5px 6px}
-.fk.stop{flex:1.3;border-color:var(--danger);color:var(--danger)}
+.fk.stop{color:var(--danger)}
 /* banners */
 .banner{position:fixed;left:50%;top:66px;transform:translateX(-50%);z-index:60;border-radius:10px;padding:10px 16px;font-size:calc(14px*var(--ts,1));display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.18);max-width:92vw}
 .banner.red{background:var(--danger);color:#fff}
@@ -317,8 +316,6 @@ tr.tdone td{color:var(--text2)}
   <div class="hinfo"><span id="hRoast">Roast #—</span><span class="muted">Background</span><select id="bgSel" title="Background profile"></select></div>
   <button id="btnDetails">Roast details</button>
   <button id="btnConnect">Connect</button>
-  <button id="btnSim" title="Run a simulated P12 for testing">Simulator</button>
-  <select id="simSpeed" style="width:auto;padding:5px 6px" title="Simulator speed"><option value="1">1×</option><option value="4">4×</option><option value="10" selected>10×</option></select>
   <button id="btnControl" title="Send burner, air and drum settings to the roaster">Control</button>
   <span id="clock" class="muted"></span>
 </header>
@@ -389,7 +386,7 @@ tr.tdone td{color:var(--text2)}
 <div class="screen" id="scr-roasts" hidden>
   <div class="page">
     <div class="ph"><h1>Roasts</h1><input type="search" id="rSearch" placeholder="Search name, coffee, lot, #…">
-      <div class="seg" id="rFilter"><button data-f="all" class="on">All</button><button data-f="prof">Profiles ★</button><button data-f="week">This week</button><button data-f="arch">Archived</button></div>
+      <div class="seg" id="rFilter"><button data-f="all" class="on">All</button><button data-f="prof">Profiles ★</button><button data-f="week">This week</button></div>
       <div class="sp"></div><button id="btnImport">Import</button><button id="btnExportAll">Export all</button><input type="file" id="fileImport" accept=".json" hidden></div>
     <div class="split">
       <div class="card scroll"><table><thead><tr><th>#</th><th>Date</th><th>Age</th><th>Profile</th><th>Coffee</th><th class="n">Green</th><th class="n">Roasted</th><th class="n">Loss</th><th class="n">Color W / G</th><th class="n">Spread</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">$/lb</th><th class="n">Cup</th></tr></thead><tbody id="rRows"></tbody></table><div id="rEmpty"></div></div>
@@ -504,9 +501,9 @@ function askText(title,label,val=''){return new Promise(res=>{
 /* ================================================================
    Settings
    ================================================================ */
-const WHITE={bg:'#F4F5F7',panel:'#FFFFFF',text:'#15181B',text2:'#8A929B',border:'#E3E6EA',accent:'#1463FF',chartBg:'#FFFFFF',grid:'#F0F2F4',axis:'#9AA1A9',bt:'#15181B',ror:'#1463FF',exhaust:'#C3C9CF',bkg:'#B9C0C7',burner:'#E5484D',air:'#4C8DF6',drum:'#1FA463',pressure:'#8E6CEF',phase:'#15181B',tTime:'#15181B',tBT:'#15181B',tRoR:'#1463FF',tSpB:'#15181B',tSpA:'#15181B',tSpD:'#15181B'};
-const DARK ={bg:'#141618',panel:'#1C1F22',text:'#F1F3F4',text2:'#8B939A',border:'#2E3338',accent:'#2F9BFF',chartBg:'#101214',grid:'#1F2327',axis:'#7A8188',bt:'#FFFFFF',ror:'#22D3EE',exhaust:'#4A5157',bkg:'#5E666D',burner:'#FF6B5E',air:'#5AA9FF',drum:'#4BE08A',pressure:'#B39BFF',phase:'#FFFFFF',tTime:'#F1F3F4',tBT:'#F1F3F4',tRoR:'#22D3EE',tSpB:'#F1F3F4',tSpA:'#F1F3F4',tSpD:'#F1F3F4'};
-const COLOR_ROWS={screen:[['bg','Background'],['panel','Panels'],['text','Text'],['text2','Secondary text'],['border','Borders'],['accent','Accent']],
+const WHITE={bg:'#F4F5F7',panel:'#FFFFFF',text:'#15181B',text2:'#8A929B',border:'#E3E6EA',accent:'#1463FF',chartBg:'#FFFFFF',grid:'#F0F2F4',axis:'#9AA1A9',bt:'#15181B',ror:'#1463FF',exhaust:'#C3C9CF',bkg:'#B9C0C7',burner:'#E5484D',air:'#4C8DF6',drum:'#1FA463',pressure:'#8E6CEF',phase:'#15181B',tTime:'#15181B',tBT:'#15181B',tRoR:'#1463FF',tSpB:'#15181B',tSpA:'#15181B',tSpD:'#15181B',ctlOn:'#1463FF'};
+const DARK ={bg:'#141618',panel:'#1C1F22',text:'#F1F3F4',text2:'#8B939A',border:'#2E3338',accent:'#2F9BFF',chartBg:'#101214',grid:'#1F2327',axis:'#7A8188',bt:'#FFFFFF',ror:'#22D3EE',exhaust:'#4A5157',bkg:'#5E666D',burner:'#FF6B5E',air:'#5AA9FF',drum:'#4BE08A',pressure:'#B39BFF',phase:'#FFFFFF',tTime:'#F1F3F4',tBT:'#F1F3F4',tRoR:'#22D3EE',tSpB:'#F1F3F4',tSpA:'#F1F3F4',tSpD:'#F1F3F4',ctlOn:'#2F9BFF'};
+const COLOR_ROWS={screen:[['bg','Background'],['panel','Panels'],['text','Text'],['text2','Secondary text'],['border','Borders'],['accent','Accent'],['ctlOn','Control ON button']],
   big:[['tTime','Roast time'],['tBT','Bean temp'],['tRoR','Rate of rise'],['tSpB','Burner setpoint'],['tSpA','Air setpoint'],['tSpD','Drum setpoint']],
   chart:[['chartBg','Chart background'],['grid','Grid lines'],['axis','Axis numbers'],['phase','Phase shading'],['bt','Bean temp'],['ror','Rate of rise'],['exhaust','Exhaust'],['bkg','Background profile'],['burner','Burner'],['air','Air'],['drum','Drum'],['pressure','Air pressure']]};
 const EVENTS_ALL=[{k:'CHARGE',label:'Charge'},{k:'DRY',label:'Dry end'},{k:'FCs',label:'FC start'},{k:'FCe',label:'FC end'},{k:'SCs',label:'SC start'},{k:'SCe',label:'SC end'},{k:'DROP',label:'Drop'},{k:'COOL',label:'Cool end'},{k:'UNDO',label:'Undo'}];
@@ -515,7 +512,7 @@ const DEF={
   nodes:{id:'id',machine:'roasterID',command:'command',data:'data',message:'pushMessage'},
   dataRequest:'getCurrentRoastingStep',msgCharge:'startRoasting',msgDrop:'endRoasting',eventMsg:'addEvent',eventNode:'event',
   evDRY:'colorChangeEvent',evFCs:'firstCrackBeginningEvent',evFCe:'firstCrackEndEvent',evSCs:'secondCrackBeginningEvent',evSCe:'secondCrackEndEvent',
-  startOnCharge:true,
+  startOnCharge:true,simSpeed:10,nextHighlight:false,
   channels:{bt:{node:'beanTemp',mode:'C',scale:1},et:{node:'ambientTemp',mode:'C',scale:1},burner:{node:'burner',mode:'',scale:1},pressure:{node:'airPressure',mode:'',scale:1000},drum:{node:'drum',mode:'',scale:1},fan:{node:'exhaustFan',mode:'',scale:1},inlet:{node:'intakeAirTemp',mode:'C',scale:1},exhaust:{node:'exhaustAirTemp',mode:'C',scale:1},cooling:{node:'coolingAirTemp',mode:'C',scale:1}},
   bigWeight:400,textScale:100,bigScale:100,smallScale:100,smallWeight:500,fontText:'system',fontNum:'system',fontTextCustom:'',fontNumCustom:'',bizName:'',bizLogo:'',bizLogoDark:'',bizHeader:true,unit:'F',rorWindow:30,rorFrom:'charge',
   presets:{burner:[20,40,60,80],fan:[30,45,65]},btAlarmOn:true,btAlarmC:(460-32)*5/9,autoCoolOn:false,autoCoolC:(400-32)*5/9,autoStirDelay:5,autoOffOn:true,dropSetOn:false,dropBurner:40,dropAir:60,showNextBar:true,coolOffMin:4,stirOffMin:6,ctlStep:1,burnerMax:100,sendEvents:true,confirmMachine:true,coolOnDrop:false,sound:true,
@@ -543,6 +540,7 @@ function loadCfg(){const s=store.get(LS.cfg,{})||{},c=JSON.parse(JSON.stringify(
 let cfg=loadCfg();
 const saveCfg=()=>{cfg.savedAt=new Date().toISOString();const ok=store.set(LS.cfg,cfg);persistSettingsSoon();return ok};
 const isF=()=>cfg.unit==='F';
+const simSpeed=()=>[1,4,10].includes(Number(cfg.simSpeed))?Number(cfg.simSpeed):10;
 const toD=c=>ok(c)?(isF()?c*9/5+32:c):null;          // °C → display
 const fromD=d=>isF()?(d-32)*5/9:d;                   // display → °C
 const toDR=r=>ok(r)?(isF()?r*1.8:r):null;            // °C/min → display
@@ -553,7 +551,7 @@ const isMbar=()=>cfg.pUnit==='mbar',pU=()=>isMbar()?'mbar':'Pa';            // p
 const fP=v=>ok(v)?(isMbar()?(v/100).toFixed(2):String(Math.round(v))):'—';
 let COL={};
 function applyTheme(){const c=cfg.theme.colors,r=document.documentElement.style;
-  const map={bg:'--bg',panel:'--panel',text:'--text',text2:'--text2',border:'--border',accent:'--accent',chartBg:'--chartBg',grid:'--grid',axis:'--axis',bt:'--c-bt',ror:'--c-ror',exhaust:'--c-exhaust',bkg:'--c-bkg',burner:'--c-burner',air:'--c-air',drum:'--c-drum',pressure:'--c-pressure',phase:'--c-phase',tTime:'--t-time',tBT:'--t-bt',tRoR:'--t-ror',tSpB:'--t-spb',tSpA:'--t-spa',tSpD:'--t-spd'};
+  const map={ctlOn:'--c-ctl',bg:'--bg',panel:'--panel',text:'--text',text2:'--text2',border:'--border',accent:'--accent',chartBg:'--chartBg',grid:'--grid',axis:'--axis',bt:'--c-bt',ror:'--c-ror',exhaust:'--c-exhaust',bkg:'--c-bkg',burner:'--c-burner',air:'--c-air',drum:'--c-drum',pressure:'--c-pressure',phase:'--c-phase',tTime:'--t-time',tBT:'--t-bt',tRoR:'--t-ror',tSpB:'--t-spb',tSpA:'--t-spa',tSpD:'--t-spd'};
   for(const [k,v] of Object.entries(map))r.setProperty(v,c[k]);
   const lum=hexLum(c.panel);document.documentElement.style.colorScheme=lum<.35?'dark':'light';
   r.setProperty('--bigW',String(cfg.bigWeight||400));r.setProperty('--smallW',String(cfg.smallWeight||500));r.setProperty('--ts',String(TS()));r.setProperty('--bs',String((Number(cfg.bigScale)||100)/100));r.setProperty('--ss',String((Number(cfg.smallScale)||100)/100));r.setProperty('--font',fontStack(cfg.fontText,cfg.fontTextCustom));r.setProperty('--numFont',fontStack(cfg.fontNum,cfg.fontNumCustom));COL={...c};if($('#brand'))renderBrand();scheduleDraw()}
@@ -616,7 +614,7 @@ class Link{
   connected(){return !!this.ws&&this.ws.readyState===1}
   setState(s){const was=this.state;this.state=s;renderHeader();if(C.on&&(was==='connected'||was==='sim')&&s!=='connected'&&s!=='sim'){log('err','Connection lost while Control was on');renderCtl()}}
   connect(sim){this.disconnect(true);this.manual=false;this.sim=!!sim;this.setState('connecting');let ws;
-    try{ws=this.sim?new SimSocket(Number($('#simSpeed').value)||1):new WebSocket(this.url())}catch(e){log('err','Could not open socket: '+e.message);this.scheduleReconnect();return}
+    try{ws=this.sim?new SimSocket(simSpeed()):new WebSocket(this.url())}catch(e){log('err','Could not open socket: '+e.message);this.scheduleReconnect();return}
     this.simRef=this.sim?ws:null;this.ws=ws;log('sys','Connecting to '+(this.sim?'simulator':this.url()));
     const ct=setTimeout(()=>{if(ws.readyState!==1){log('err','Connect timeout');try{ws.close()}catch(e){}}},cfg.connectTimeout*1000);
     ws.onopen=()=>{clearTimeout(ct);if(this.ws!==ws)return;this.missed=0;this.setState(this.sim?'sim':'connected');log('sys','Connected');this.startPolling()};
@@ -625,9 +623,9 @@ class Link{
     ws.onclose=ev=>{clearTimeout(ct);if(this.ws!==ws)return;this.stopPolling();this.ws=null;log(this.connectedAt?'err':'sys','Socket closed'+(ev&&ev.code?` (code ${ev.code}${ev.reason?', '+ev.reason:''})`:'')+(this.connectedAt?` after ${mmss((Date.now()-this.connectedAt)/1000)} connected`:''));this.connectedAt=0;if(!C.on)wakeLock(false);if(this.manual)this.setState('offline');else this.scheduleReconnect()}}
   scheduleReconnect(){if(this.manual)return;this.setState('reconnecting');clearTimeout(this.rt);this.rt=setTimeout(()=>{if(!this.manual)this.connect(this.sim)},cfg.reconnect*1000)}
   disconnect(silent){this.manual=true;clearTimeout(this.rt);this.stopPolling();if(this.ws){const w=this.ws;this.ws=null;try{w.close()}catch(e){}}this.simRef=null;if(!silent)this.setState('offline')}
-  startPolling(){this.stopPolling();const ms=Math.max(40,cfg.interval*1000/(this.sim?(Number($('#simSpeed').value)||1):1));this.poll=setInterval(()=>this.request(),ms);this.request();
+  startPolling(){this.stopPolling();const ms=Math.max(40,cfg.interval*1000/(this.sim?(simSpeed()):1));this.poll=setInterval(()=>this.request(),ms);this.request();
     this.ctlPoll=setInterval(()=>pollSwitches(),3000);pollSwitches();
-    const ka=Number(cfg.keepAlive)||0;if(ka>0)this.kaPoll=setInterval(()=>{if(this.connected())this.sendCommand({[cfg.nodes.command]:'keepAlive'})},ka*1000/(this.sim?(Number($('#simSpeed').value)||1):1));
+    const ka=Number(cfg.keepAlive)||0;if(ka>0)this.kaPoll=setInterval(()=>{if(this.connected())this.sendCommand({[cfg.nodes.command]:'keepAlive'})},ka*1000/(this.sim?(simSpeed()):1));
     this.connectedAt=Date.now();wakeLock(true)}
   stopPolling(){clearInterval(this.poll);clearInterval(this.ctlPoll);clearInterval(this.kaPoll);this.poll=this.ctlPoll=this.kaPoll=null;for(const t of this.pending.values())clearTimeout(t);this.pending.clear()}
   nextId(){return this.reqId=(this.reqId%65535)+1}
@@ -704,7 +702,7 @@ function onPush(p,m){log('push',JSON.stringify(m));
    ================================================================ */
 async function startRoast(fromMachine){
   if(S.recording)return true;
-  if(!link.connected()){toast('Not connected — press Connect or Simulator first');return false}
+  if(!link.connected()){toast('Not connected — press Connect first (or start the simulator in Settings → Connection)');return false}
   if(S.dirty&&S.roast.samples.length&&!S.viewingId){
     if(fromMachine){await saveRoast(true)}else if(!await ask('Start a new roast?','The last roast has not been saved. Starting a new one discards it.','Discard and start',true))return false}
   const keep=readMeta();const meta={...blankMeta(),name:keep.name,invId:keep.invId,coffee:keep.coffee,lot:keep.lot,green:keep.green};
@@ -787,7 +785,7 @@ async function writeRoastFiles(r){
     return true}catch(e){log('err','Folder write failed: '+e.message);if(e.name==='NotAllowedError'){FS.state='prompt';renderStorageStatus()}return false}}
 async function commitRoast(r,quiet){r.savedAt=new Date().toISOString();r.summary=summarize(r);const i=HIST.findIndex(x=>x.id===r.id);if(i>=0)HIST[i]=r;else HIST.push(r);
   sortHist();await writeRoastFiles(r);await persistHist();if(!quiet)renderAll()}
-function sortHist(){HIST.sort((a,b)=>(b.num||0)-(a.num||0))}
+function sortHist(){for(const r of HIST)if(r.archived)r.archived=false;HIST.sort((a,b)=>(b.num||0)-(a.num||0))}
 async function saveRoast(auto,asProfile){
   const r=S.roast;if(!r.samples.length){toast('Nothing recorded yet');return false}
   if(S.recording&&!auto){toast('Stop recording first');return false}
@@ -964,9 +962,8 @@ function renderHeader(){
     if(cof)parts.push(esc(cof));if(num(mt.green))parts.push(`${esc(mt.green)} lb`);
     $('#chartTitle').innerHTML=`#${r.num||nextNum()} · ${mt.name?esc(mt.name):'<span>No profile name</span>'}`+(parts.length?` <span>— ${parts.join(' · ')}</span>`:` <span class="warn2">— no coffee picked (Roast details)</span>`)}
   $('#hRoast').textContent=`Roast #${r.num||nextNum()}${r.meta.name?' · '+r.meta.name:''}`;
-  const live=!link.manual;$('#btnConnect').textContent=live&&!link.sim?'Disconnect':'Connect';$('#btnConnect').className=live&&!link.sim?'on-acc':'';
-  $('#btnSim').textContent=live&&link.sim?'Stop sim':'Simulator';$('#btnSim').className=live&&link.sim?'on-acc':'';
-  $('#btnControl').textContent=C.on?'Control ON':'Control';$('#btnControl').className=C.on?'on-red':''}
+  const live=!link.manual;$('#btnConnect').textContent=live?(link.sim?'Stop simulator':'Disconnect'):'Connect';$('#btnConnect').className=live?'on-acc':'';if(curScreen==='settings'&&curPane==='conn'&&$('#sSim'))$('#sSim').textContent=live&&link.sim?'Stop simulator':'Start simulator';
+    $('#btnControl').textContent=C.on?'Control ON':'Control';$('#btnControl').className=C.on?'on-ctl':''}
 const rorStart=ev=>ev.CHARGE==null?null:cfg.rorFrom==='tp'?(ev.TP??ev.CHARGE+45):ev.CHARGE;
 function curTime(){const r=S.roast;if(S.recording)return link.clock()-r.t0;return r.samples.length?r.samples.at(-1).t:null}
 function renderLive(){const v=S.latest,r=S.roast,last=S.recording?r.samples.at(-1):null;
@@ -1014,7 +1011,7 @@ function tick(){checkBtAlarm();checkAutoOff();if(S.autoOff)renderCtl();const r=S
   else if(lost&&performance.now()-(S.lostBeepAt||0)>6000){beep(2);S.lostBeepAt=performance.now()}
   else if(!lost&&bn)bn.remove();
   if(S.bg&&S.recording)renderNext()}
-function renderFkeys(){const ev=S.roast.events,nx=S.recording?nextEventKey():null;
+function renderFkeys(){const ev=S.roast.events,nx=S.recording&&cfg.nextHighlight?nextEventKey():null;
   const keys=cfg.events.filter(e=>e.show).map(e=>{const done=e.k!=='UNDO'&&ev[e.k]!=null;return `<button class="fk ${done?'done':''} ${e.k===nx?'nx':''} ${e.bg||e.fg?'custom':''}" style="${fkStyle(e.bg,e.fg)}" data-k="${e.k}" ${e.k==='UNDO'&&(!S.recording||!S.evStack.length)?'disabled':''}><small>${esc(e.key||'')}</small>${esc(e.label)}${done?' ✓':''}</button>`}).join('');
   $('#fkeys').innerHTML=`<button class="fk ${S.recording?'stop':'start'} ${cfg.startBg||cfg.startFg?'custom':''}" style="${fkStyle(cfg.startBg,cfg.startFg)}" id="fkStart"><small>${esc(keyName(cfg.startKey))}</small>${S.recording?'Stop':'Start'}</button>`+keys}
 const fkStyle=(bg,fg)=>(bg?`background:${bg};border-color:${bg};`:'')+(fg?`color:${fg};`:'');
@@ -1066,7 +1063,7 @@ function drawMain(){const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H
   // now line
   if(S.recording&&cur!=null){const x=X(cur-off);ctx.strokeStyle=COL.axis;ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+h);ctx.stroke();ctx.setLineDash([])}
   if(S.hover!=null){const x=X(S.hover);ctx.strokeStyle=COL.axis;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+h);ctx.stroke();ctx.setLineDash([])}
-  if(!smp.length&&!S.bg){ctx.fillStyle=COL.axis;ctx.textAlign='center';ctx.font=`${14*TS()}px ${getComputedStyle(document.body).fontFamily}`;ctx.fillText(link.connected()?'Press Start (or charge the roaster) to begin recording':'Press Connect (or Simulator) to start',PAD.l+w/2,PAD.t+h/2)}}
+  if(!smp.length&&!S.bg){ctx.fillStyle=COL.axis;ctx.textAlign='center';ctx.font=`${14*TS()}px ${getComputedStyle(document.body).fontFamily}`;ctx.fillText(link.connected()?'Press Start (or charge the roaster) to begin recording':'Press Connect to start',PAD.l+w/2,PAD.t+h/2)}}
 function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)return;const w=W-PAD.l-PAD.r,X=x=>PAD.l+(x-v.lo)/(v.hi-v.lo)*w;
   ctx.fillStyle=COL.chartBg;ctx.fillRect(0,0,W,H);
   const rows=[{k:'burner',label:'Burner',col:COL.burner,max:100,unit:'%'},{k:'fan',label:'Air',col:COL.air,max:100,unit:'%'}];
@@ -1220,7 +1217,7 @@ function openRoast(id){const r=HIST.find(x=>x.id===id);if(!r)return;if(S.recordi
    Roasts screen
    ================================================================ */
 let selRoast=null,rFilter='all';
-function roastList(){const q=normName($('#rSearch').value),wk=Date.now()-7*864e5;return HIST.filter(r=>{if(rFilter==='arch')return r.archived;if(r.archived)return false;if(rFilter==='prof'&&!r.isProfile)return false;if(rFilter==='week'&&new Date(r.chargedAt||r.created).getTime()<wk)return false;
+function roastList(){const q=normName($('#rSearch').value),wk=Date.now()-7*864e5;return HIST.filter(r=>{if(rFilter==='prof'&&!r.isProfile)return false;if(rFilter==='week'&&new Date(r.chargedAt||r.created).getTime()<wk)return false;
   return !q||normName(['#'+r.num,r.num,r.meta.name,r.meta.coffee,r.meta.lot,r.meta.notes].join(' ')).includes(q)})}
 function renderRoasts(){const list=roastList();if(!list.find(r=>r.id===selRoast))selRoast=list[0]?.id||null;
   $('#rRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),sp=spreadOf(r.meta),c=costOf(r),dt=r.chargedAt||r.created;
@@ -1240,17 +1237,17 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   <div class="kv"><span>Adjustments</span><b>${adj.map(a=>`${a.label} ${Math.round(a.from)}→${Math.round(a.to)} at ${mmss(a.t-rc)}`).join(' · ')||'—'}</b></div>
   <div class="kv"><span>Cupping score</span><b class="tnum">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div></div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}${(r.tnotes||[]).length?'\n\n'+r.tnotes.map(n=>mmss(n.t-rc)+'  '+esc(n.text)).join('\n'):''}</div></div>
-  <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="${r.archived?'':'dangerTxt'}" id="rArch">${r.archived?'Unarchive':'Archive'}</button>${r.archived?'<button class="dangerTxt" id="rDel">Delete permanently</button>':''}</div>`;
+  <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="dangerTxt" id="rDel">Delete</button></div>`;
   requestAnimationFrame(()=>miniCurve($('#rBig'),r,{axis:true}));
   $('#rRoast').onclick=()=>roastThis(r.id);$('#rOpen').onclick=()=>openRoast(r.id);$('#rCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
   $('#rProf').onclick=async()=>{if(!r.isProfile){if(!normName(r.meta.name)){toast('This roast has no profile name — open it and add one first');return}for(const x of HIST)if(x.id!==r.id&&x.isProfile&&normName(x.meta.name)===normName(r.meta.name)){x.isProfile=false;await commitRoast(x,true)}r.isProfile=true}else r.isProfile=false;await commitRoast(r,true);resolveBg();renderRoasts();toast(r.isProfile?`#${r.num} is now the profile for “${r.meta.name}”`:'Profile mark removed')};
-  $('#rArch').onclick=async()=>{r.archived=!r.archived;if(r.archived&&r.isProfile)r.isProfile=false;await commitRoast(r,true);resolveBg();renderRoasts();toast(r.archived?`Roast #${r.num} archived — find it under Archived`:`Roast #${r.num} restored`)};
   const del=$('#rDel');if(del)del.onclick=()=>deleteRoastForever(r.id)}
-/* Permanent delete — only offered for archived roasts. Green inventory is left unchanged:
+/* Permanent delete, with one confirmation. Green inventory is left unchanged:
    the green this roast used is booked as an inventory adjustment, so stock stays the same. */
 async function deleteRoastForever(id){const r=HIST.find(x=>x.id===id);if(!r)return;
   if(S.recording&&S.roast.id===id){toast('Stop recording first');return}
-  if(!await ask(`Delete roast #${r.num} permanently?`,`Its files are removed from your roasts folder and it can't be brought back. Green inventory stays the same. Roast number ${r.num} won't be reused.`,'Delete permanently',true))return;
+  const what=[r.meta.name||'Untitled',fmtDate(r.chargedAt||r.created,false)].join(' · ');
+  if(!await ask(`Delete roast #${r.num}?`,`${what}. This can't be undone.${r.isProfile?` It's the profile (background) for “${r.meta.name}”.`:''} Green inventory stays the same.`,'Delete',true))return;
   const g=num(r.meta.green),lot=INV.find(l=>l.id===r.meta.invId);
   if(lot&&g){(lot.adj=lot.adj||[]).push({date:new Date().toISOString(),lb:-g,note:`Roast #${r.num} deleted — green kept as used`});await persistInv()}
   store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,r.num||0));
@@ -1420,6 +1417,10 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
   conn:()=>`<h2>Connection</h2><div class="sub">Same settings as your Artisan WebSocket setup for the P12 III.</div>
     <div class="sgrid">${[['host','Host (roaster IP)'],['port','Port'],['path','Path'],['roasterId','Machine ID'],['interval','Sampling interval (s)'],['requestTimeout','Request timeout (s)'],['connectTimeout','Connect timeout (s)'],['reconnect','Reconnect delay (s)'],['keepAlive','Keep-alive every (s, 0 = off)']].map(([k,l])=>`<label class="field">${l}<input data-cfg="${k}" value="${esc(cfg[k])}"></label>`).join('')}</div>
     <label class="chk"><input type="checkbox" data-cfgb="startOnCharge" ${cfg.startOnCharge?'checked':''}> Start recording automatically when the roaster charges</label>
+    <div class="h3" style="margin-top:6px">Simulator</div>
+    <div class="row" style="align-items:flex-end;gap:12px"><button class="${!link.manual&&link.sim?'':'pri'}" id="sSim">${!link.manual&&link.sim?'Stop simulator':'Start simulator'}</button>
+      <label class="field" style="width:130px">Speed<select id="sSimSpeed">${[1,4,10].map(v=>`<option value="${v}" ${simSpeed()===v?'selected':''}>${v}×</option>`).join('')}</select></label></div>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">A pretend P12 for testing and practice. The Link light at the top says “(sim)” while it runs. Use Disconnect or Stop simulator at the top to end it.</div>
     <details><summary class="muted" style="cursor:pointer">Advanced: message nodes and inputs</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
     <div class="sgrid">${Object.entries(cfg.nodes).map(([k,v])=>`<label class="field">Node: ${k}<input data-node="${k}" value="${esc(v)}"></label>`).join('')}${['dataRequest','msgCharge','msgDrop','eventMsg','eventNode','evDRY','evFCs','evFCe','evSCs','evSCe'].map(k=>`<label class="field">${k}<input data-cfg="${k}" value="${esc(cfg[k])}"></label>`).join('')}</div>
     <table class="evtbl"><thead><tr><th>Input</th><th>Node</th><th>Unit sent</th><th>Scale ×</th></tr></thead><tbody>${Object.entries(cfg.channels).map(([k,c])=>`<tr><td>${k}</td><td><input data-ch="${k}" data-f="node" value="${esc(c.node)}"></td><td>${TEMP_KEYS.includes(k)?`<select data-ch="${k}" data-f="mode"><option ${c.mode==='C'?'selected':''}>C</option><option ${c.mode==='F'?'selected':''}>F</option></select>`:'<span class="muted">raw</span>'}</td><td><input data-ch="${k}" data-f="scale" value="${esc(c.scale)}" style="width:90px"></td></tr>`).join('')}</tbody></table></div></details>
@@ -1453,10 +1454,11 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <label class="chk"><input type="checkbox" data-cfgb="coolOnDrop" ${cfg.coolOnDrop?'checked':''}> Turn on Cooling and Stirrer automatically at Drop (Control must be on)</label>
     <label class="chk"><input type="checkbox" data-cfgb="sound" ${cfg.sound?'checked':''}> Sounds for reminders and lost connection</label>`,
   ev:()=>`<h2>Event buttons</h2><div class="sub">Choose which keys show along the bottom of the Roast screen. Hidden events still work from their keyboard key.</div>
+    <label class="chk"><input type="checkbox" data-cfgb="nextHighlight" ${cfg.nextHighlight?'checked':''}> Outline the next event button during a roast</label>
     <table class="evtbl"><thead><tr><th>Show</th><th>Event</th><th>Label on button</th><th>Keyboard key</th><th>Button color</th><th>Text color</th><th></th></tr></thead><tbody>${cfg.events.map((e,i)=>`<tr><td><input type="checkbox" data-evs="${i}" ${e.show?'checked':''}></td><td>${esc(EVENTS_ALL.find(x=>x.k===e.k).label)}</td><td><input data-evl="${i}" value="${esc(e.label)}"></td><td><input data-evk="${i}" value="${esc(keyName(e.key))}" placeholder="press a key" readonly style="cursor:pointer"></td><td>${evc(i,'bg',e.bg)}</td><td>${evc(i,'fg',e.fg)}</td><td><button class="sm" data-up="${i}" ${i===0?'disabled':''}>↑</button> <button class="sm" data-dn="${i}" ${i===cfg.events.length-1?'disabled':''}>↓</button></td></tr>`).join('')}
     <tr><td><input type="checkbox" checked disabled></td><td>Start / Stop</td><td class="muted">always shown</td><td><input data-startkey="1" value="${esc(cfg.startKey)}" readonly style="cursor:pointer"></td><td>${evc('start','bg',cfg.startBg)}</td><td>${evc('start','fg',cfg.startFg)}</td><td></td></tr>
     ${SWITCHES.filter(w=>!w.confirm).map(w=>`<tr><td></td><td>${w.label} on/off</td><td class="muted">switch button</td><td><input data-swkey="${w.p}" value="${esc(keyName(cfg.swKeys[w.p]))}" placeholder="press a key" readonly style="cursor:pointer"></td><td></td><td></td><td></td></tr>`).join('')}</tbody></table>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Leave a color empty to use the normal look. A custom-colored button shows the next event with a blue ring and fades once it’s done.</div>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Leave a color empty to use the normal look.</div>
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Cooling and Stirrer keys work when Control is on, and not while you're typing in a box.</div>
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Click a keyboard box, then press the key you want (Backspace clears it). Number keys work best on a Mac. F-keys need the fn key unless “Use F1, F2, etc. keys as standard function keys” is on in System Settings → Keyboard.</div>
     <div class="row"><button id="evReset">Reset to defaults</button></div>`,
@@ -1519,9 +1521,11 @@ function loadLogo(f,key='bizLogo'){if(f.size>8e6){toast('That image is too large
 function crow(k,l){const v=cfg.theme.colors[k];return `<div class="crow"><span>${l}</span><input type="color" data-col="${k}" value="${v}"><input type="text" data-hex="${k}" value="${v.toUpperCase()}" maxlength="7"></div>`}
 function wireSettings(){const el=$('#scont');
   $$('[data-cfg]',el).forEach(i=>i.onchange=()=>{const k=i.dataset.cfg,n=num(i.value);cfg[k]=typeof DEF[k]==='number'?(n??DEF[k]):i.value.trim();saveCfg();if(['ctlStep','burnerMax'].includes(k)){buildCtl();renderCtl()}scheduleDraw()});
-  $$('[data-cfgb]',el).forEach(i=>i.onchange=()=>{cfg[i.dataset.cfgb]=i.checked;saveCfg();if(i.dataset.cfgb==='showNextBar')renderNext();if(i.dataset.cfgb==='bizHeader')renderBrand()});
+  $$('[data-cfgb]',el).forEach(i=>i.onchange=()=>{cfg[i.dataset.cfgb]=i.checked;saveCfg();if(i.dataset.cfgb==='showNextBar')renderNext();if(i.dataset.cfgb==='bizHeader')renderBrand();if(i.dataset.cfgb==='nextHighlight')renderFkeys()});
   $$('[data-node]',el).forEach(i=>i.onchange=()=>{cfg.nodes[i.dataset.node]=i.value.trim();saveCfg()});
   $$('[data-ch]',el).forEach(i=>i.onchange=()=>{const c=cfg.channels[i.dataset.ch],f=i.dataset.f;c[f]=f==='scale'?(num(i.value)??1):i.value.trim();saveCfg()});
+  const ssb=$('#sSim',el);if(ssb)ssb.onclick=()=>{if(!link.manual&&link.sim)link.disconnect();else link.connect(true);renderSettings()};
+  const sss=$('#sSimSpeed',el);if(sss)sss.onchange=()=>{if(!link.manual&&link.sim&&S.recording){sss.value=simSpeed();toast('Stop the roast before changing the simulator speed');return}cfg.simSpeed=Number(sss.value);saveCfg();if(!link.manual&&link.sim)link.connect(true)};
   const cs=$('#sConnSave');if(cs)cs.onclick=()=>{$$('[data-cfg]',el).forEach(i=>i.onchange());saveCfg();if(!link.manual&&!link.sim)link.connect(false);toast('Connection settings saved')};
   $$('[data-delp]',el).forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.delp.split(':');cfg.presets[k].splice(Number(i),1);saveCfg();buildCtl();renderCtl();renderSettings()});
   $$('[data-addp]',el).forEach(b=>b.onclick=()=>{const k=b.dataset.addp,v=num($('#addp_'+k).value);if(v==null||v<0||v>100){toast('Enter a value from 0 to 100');return}cfg.presets[k]=[...new Set([...(cfg.presets[k]||[]),Math.round(v)])].sort((a,b)=>a-b);saveCfg();buildCtl();renderCtl();renderSettings()});
@@ -1590,9 +1594,7 @@ async function init(){
   const setup=store.get('zr2.setup',null);if(setup){S.roast.meta={...blankMeta(),...setup};}
   $('#nav').onclick=e=>{const b=e.target.closest('button');if(b)showScreen(b.dataset.s)};
   $('#snav').onclick=e=>{const b=e.target.closest('button');if(b){curPane=b.dataset.p;renderSettings()}};
-  $('#btnConnect').onclick=()=>{if(!link.manual&&!link.sim)link.disconnect();else link.connect(false)};
-  $('#btnSim').onclick=()=>{if(!link.manual&&link.sim)link.disconnect();else link.connect(true)};
-  let simSpeedNow=$('#simSpeed').value;$('#simSpeed').onchange=()=>{if(!link.manual&&link.sim){if(S.recording){$('#simSpeed').value=simSpeedNow;toast('Stop the roast before changing the simulator speed');return}link.connect(true)}simSpeedNow=$('#simSpeed').value};
+  $('#btnConnect').onclick=()=>{if(!link.manual)link.disconnect();else link.connect(false)};
   $('#btnControl').onclick=()=>setControl(!C.on);$('#btnCtlOn').onclick=()=>setControl(true);
   $('#chartTitle').onclick=()=>openDrawer();
   $('#roBT').onclick=()=>{if(S.alarm.active){S.alarm.muted=true;checkBtAlarm()}};
