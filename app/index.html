@@ -352,8 +352,8 @@ tr.sel .ipCard .n{color:var(--accent)}
 #ipChips{display:flex;gap:6px;margin-left:auto;margin-right:10px;text-transform:none;letter-spacing:0;font-weight:500}
 #ipChips span{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:calc(13px*var(--ts,1));color:var(--text2);white-space:nowrap}
 #ipChips b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
-.ipad .spx .ab{width:58px;height:58px;font-size:calc(17px*var(--ts,1))}
-.ipad .pre button{padding:12px 0;min-height:48px}
+.ipad .spx .ab{width:54px;height:54px;font-size:calc(17px*var(--ts,1))}
+.ipad .pre button{padding:10px 0;min-height:46px}
 .ipad .pre{flex-wrap:wrap}.ipad .pre button{flex:1 0 calc((100% - 30px)/6)}
 .ipad .sw button{padding:18px 14px;min-height:64px}
 .ipad #sw{grid-template-columns:1fr 1fr}
@@ -374,7 +374,9 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipad #rightCol>.pt:first-child{display:none}
 .ipad .big3{display:grid;grid-template-columns:1fr 1fr}
 .ipad #roBT{grid-column:1/-1;order:-1;border-bottom:1px solid var(--line2)}
-.ipad #roBT .v{font-size:calc(66px*var(--bs,1))}
+.ipad #roBT .v{font-size:calc(62px*var(--bs,1))}
+.ipad .ro{padding-top:5px;padding-bottom:5px}
+.ipad .ctloff{margin:2px 16px 4px;padding:6px 11px}
 .ipad .big3 .ro:not(#roBT){border-bottom:1px solid var(--line2)}
 .ipad .big3 .ro:not(#roBT) .v{font-size:calc(42px*var(--bs,1))}
 .ipad #roRor{border-left:1px solid var(--line2)}
@@ -383,9 +385,37 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipad .spx[data-k=fan] .l span:first-child::before{background:var(--c-air)}
 .ipad .spx[data-k=drum] .l span:first-child::before{background:var(--c-drum)}
 .ipad .spx .ab{font-size:calc(26px*var(--ts,1));font-weight:400}
-.ipad .spx{padding-bottom:14px}
+.ipad .spx{padding-bottom:8px}
 .ipCoolHead{border-top:1px solid var(--line2);padding-top:12px}
 .ipad #sw{border-top:0;padding-top:4px}
+.ipad .sps{flex:none;overflow:visible}
+.ipad .ipCoolHead{margin-top:auto}
+.ipTd{margin:6px 16px 10px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.ipTdH{display:flex;align-items:center;gap:8px;width:100%;border:0;border-radius:0;background:transparent;min-height:40px;padding:6px 14px;font-size:calc(11.5px*var(--ts,1));font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
+.ipTdH>span:first-child{flex:1}
+.ipDots{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end;max-width:130px}
+.ipDots i{width:7px;height:6px;border-radius:3px;background:var(--border)}.ipDots i.d{background:var(--good)}.ipDots i.c{background:var(--accent)}
+.ipTdR{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line2)}
+.ipTdR>b{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:13px;color:var(--text2);flex:none}
+.ipTdR em{display:block;font-style:normal;font-size:calc(11.5px*var(--ts,1));font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2)}
+.ipTdR span{font-size:calc(15px*var(--ts,1));font-weight:500}.ipTdR small{color:var(--text2);font-size:inherit;font-weight:500}
+.ipTdR.now{background:var(--accentSoft);border-top-color:color-mix(in srgb,var(--accent) 18%,var(--panel))}
+.ipTdR.now>b{background:var(--accent);border-color:var(--accent);color:#fff}.ipTdR.now em{color:var(--accent)}.ipTdR.now span{font-weight:600}
+.ipTdAll{color:var(--accent);text-transform:none;letter-spacing:0;font-size:calc(13.5px*var(--ts,1));white-space:nowrap}
+.ipTdR small.nx{display:block;color:var(--text2);font-size:calc(13px*var(--ts,1));font-weight:500;margin-top:1px}
+.ipTdR{padding:8px 14px}
+.ipTd{margin:4px 16px 6px}
+.ipad .spx{padding-bottom:8px}.ipad .spx .rowv{margin-top:-2px}
+.ipad .ipCoolHead{padding-top:8px;padding-bottom:0}.ipad #sw{padding-bottom:12px}
+.ipBl{width:min(620px,94vw)!important}
+.ipBlList{display:flex;flex-direction:column;max-height:60vh;overflow:auto;border:1px solid var(--line2);border-radius:10px}
+.ipBlRow{display:flex;align-items:center;gap:12px;border:0;border-radius:0;border-bottom:1px solid var(--line2);min-height:58px;padding:0 14px;text-align:left;background:var(--panel)}
+.ipBlRow:last-child{border-bottom:0}
+.ipBlRow>b{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:13px;flex:none;color:var(--text2)}
+.ipBlRow span{flex:1;font-size:calc(15.5px*var(--ts,1));font-weight:500}.ipBlRow small{display:block;color:var(--text2);font-size:calc(12.5px*var(--ts,1))}
+.ipBlRow em{font-style:normal;color:var(--text2);font-size:calc(13.5px*var(--ts,1));font-variant-numeric:tabular-nums}
+.ipBlRow.d>b{background:var(--good);border-color:var(--good);color:#fff}.ipBlRow.d span{color:var(--text2)}
+.ipBlRow.c{background:var(--accentSoft)}.ipBlRow.c>b{background:var(--accent);border-color:var(--accent);color:#fff}.ipBlRow.c em{color:var(--accent);font-weight:600}
 /* iPad chart header: chips + legend instead of phase text */
 .ipad #phaseTxt{display:none}
 .ipLegend{display:flex;gap:16px;padding:0 16px 2px;font-size:calc(12px*var(--ts,1));color:var(--text2)}
@@ -486,6 +516,7 @@ tr.sel .ipCard .n{color:var(--accent)}
     <div class="pt" style="border-top:1px solid var(--line2);padding-top:10px"><span>Setpoints</span></div>
     <div class="ctloff" id="ctlOff"><span>Control is off — watching only.</span><button class="sm pri" id="btnCtlOn">Turn on</button></div>
     <div class="sps" id="sps"></div>
+    <div id="ipToday" class="ipOnly"></div>
     <div class="pt ipOnly ipCoolHead"><span>Cooling tray</span></div>
     <div class="sw" id="sw"></div>
   </section>
@@ -881,6 +912,25 @@ async function ipadEventTap(k){const r=S.roast,t=r.events[k];
 function ipadNavSync(n){const more=$('#navMore');if(!more)return;const inMore=n==='cupping'||n==='settings';more.classList.toggle('on',inMore);more.textContent=inMore?(n==='cupping'?'Cupping':'Settings'):'More';$$('#moreMenu button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));$('#moreMenu').hidden=true}
 function ipConnBar(){const live=!link.manual,c=live&&link.connected();
   return `<div class="ipConnBar ${c?'on':live?'wait':''}"><i></i><b>${c?(link.sim?'Simulator running':'Connected'):live?'Connecting…':'Not connected'}</b><span>${link.sim&&live?'Pretend P12 for practice':`ws://${esc(cfg.host)}:${esc(cfg.port)}/${esc(String(cfg.path).replace(/^\//,''))} · every ${esc(cfg.interval)} s`}</span><span class="sp"></span><button id="ipConnBtn">${live?(link.sim?'Stop simulator':'Disconnect'):'Connect'}</button></div>`}
+function ipBatchInfo(){const items=PLAN.items,done=items.filter(x=>x.status==='done').length,cur=items.find(x=>x.id===S.planCur&&x.status!=='done'),
+    rest=items.filter(x=>x.status!=='done'&&(!cur||x.id!==cur.id));return {items,done,cur,next:rest[0]}}
+function renderIpToday(){const el=$('#ipToday');if(!el)return;const {items,done,cur,next}=ipBatchInfo();if(!items.length){el.innerHTML='';return}
+  const n=x=>items.indexOf(x)+1,lb=x=>x.green?` <small>· ${esc(x.green)} lb</small>`:'',nm=x=>esc(x.name||x.coffee||'Batch');
+  const row=cur||next;
+  el.innerHTML=`<div class="ipTd"><button class="ipTdH" id="ipTdAll"><span>Today · ${done} of ${items.length} done</span><span class="ipDots">${items.map(x=>`<i class="${x.status==='done'?'d':cur&&x.id===cur.id?'c':''}"></i>`).join('')}</span><span class="ipTdAll">See all ›</span></button>
+    ${row?`<div class="ipTdR ${cur?'now':''}"><b>${n(row)}</b><div><em>${cur?(S.recording?'Now roasting':'Loaded'):'Up next'}</em><span>${nm(row)}${lb(row)}</span>${cur&&next?`<small class="nx">Next: ${nm(next)}${next.green?' · '+esc(next.green)+' lb':''}</small>`:''}</div></div>`
+      :`<div class="ipTdR"><b>✓</b><div><em>All done</em><span>Every batch for today is roasted</span></div></div>`}</div>`;
+  $('#ipTdAll').onclick=openBatchList}
+function openBatchList(){const root=$('#modalRoot'),{items,done,cur}=ipBatchInfo();
+  root.innerHTML=`<div class="modalbg"><div class="modal ipBl" role="dialog" aria-modal="true"><div class="row"><h3 style="flex:1">Today · ${done} of ${items.length} done</h3><button id="blEdit">Edit plan</button><button class="pri" id="blDone">Done</button></div>
+    ${S.recording?'<p class="muted" style="margin:0">Finish and save this roast before switching batches.</p>':''}
+    <div class="ipBlList">${items.map((x,i)=>{const d=x.status==='done',c=cur&&x.id===cur.id;
+      return `<button class="ipBlRow ${d?'d':''} ${c?'c':''}" data-b="${x.id}" ${!d&&!c&&S.recording?'disabled':''}><b>${d?'✓':c?'▶':i+1}</b><span>${esc(x.name||x.coffee||'Batch')}<small>${esc(x.coffee&&x.name?x.coffee:'')}</small></span><em>${d?'Roasted #'+x.roastNum:c?(S.recording?'Roasting':'Loaded'):esc(x.green||'—')+' lb'}</em></button>`}).join('')}</div></div></div>`;
+  const close=()=>{root.innerHTML=''};$('#blDone').onclick=close;$('#blEdit').onclick=()=>{close();setMachineSheet(false);showScreen('today')};
+  root.firstChild.addEventListener('click',e=>{if(e.target===root.firstChild)close()});
+  $$('.ipBlRow',root).forEach(b=>b.onclick=()=>{const it=PLAN.items.find(x=>x.id===b.dataset.b);if(!it)return;
+    if(it.status==='done'){close();openRoast(it.roastId);return}if(it.id===S.planCur){close();return}
+    if(S.dirty&&S.roast.samples.length&&!S.viewingId){toast('Save or discard the roast on screen first');return}close();loadBatch(it.id)})}
 function setMachineSheet(on){document.documentElement.classList.toggle('machineOpen',on);$('#btnMachine').classList.toggle('on-acc',on)}
 function ipadInit(){
   {const L=$('#leftCol'),orig=[...L.children];orig.forEach(el=>{if(el.classList.contains('pt')&&/Other values|^Machine$/.test(el.textContent.trim()))el.classList.add('ipHide')});
@@ -1328,7 +1378,7 @@ function loadBatch(id,quiet){const it=PLAN.items.find(x=>x.id===id);if(!it||it.s
   S.roast=newRoast();S.viewingId=null;S.dirty=false;S.evStack=[];const m=batchMeta(it);S.roast.meta=m;fillForm(m);S.planCur=id;store.set('zr2.planCur',id);
   if(S.bgMode!=='auto')setBgMode('auto');else resolveBg();renderAll();renderTodayMini();if(!quiet)toast(`Loaded batch ${PLAN.items.indexOf(it)+1}: ${it.name||it.coffee} · ${it.green} lb`)}
 function planMarkDone(r){const it=PLAN.items.find(x=>x.id===S.planCur);if(!it||it.status==='done')return null;it.status='done';it.roastId=r.id;it.roastNum=r.num;savePlan();return it}
-function renderTodayMini(){const el=$('#todayMini');if(!el)return;if(!PLAN.items.length){el.innerHTML='';return}
+function renderTodayMini(){if(IPAD)renderIpToday();const el=$('#todayMini');if(!el)return;if(!PLAN.items.length){el.innerHTML='';return}
   const done=PLAN.items.filter(x=>x.status==='done').length,cur=PLAN.items.find(x=>x.id===S.planCur&&x.status!=='done');
   el.innerHTML=`<div class="pt" style="margin-top:6px"><span>Today · ${done} of ${PLAN.items.length} done</span><button class="sm" id="tmEdit" style="text-transform:none;letter-spacing:0">Edit</button></div><div class="tm">${PLAN.items.map((x,i)=>{const c=x.status==='done'?'done':cur&&x.id===cur.id?'cur':'';
     return `<button class="it ${c}" data-b="${x.id}" ${x.status==='done'?'title="Roasted as #'+x.roastNum+'"':''}><i>${x.status==='done'?'✓':c==='cur'?'▶':i+1}</i><span>${esc(x.name||x.coffee||'Batch')}</span><small>${x.status==='done'?'#'+x.roastNum:esc(x.green)+' lb'}</small></button>`}).join('')}</div>`;
@@ -1796,7 +1846,7 @@ function wireSettings(){const el=$('#scont');
 function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));if(IPAD)ipadNavSync(n);$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
   if(n==='roast'){renderAll();renderTodayMini()}else if(n==='today')renderToday();else if(n==='profiles')renderProfiles();else if(n==='roasts')renderRoasts();else if(n==='green'){gMode='view';setGView(gViewMode)}else if(n==='cupping'){cupMode='view';renderCupping()}else if(n==='settings')renderSettings()}
 function renderUnits(){$$('.up').forEach(e=>e.textContent=pU());$$('.u').forEach(e=>e.textContent='°'+cfg.unit);$$('.ur').forEach(e=>e.textContent='°'+cfg.unit+'/min')}
-function renderAll(){renderUnits();renderHeader();renderLive();renderFkeys();renderNotes();renderBgSelect();if($('#drawer').classList.contains('open'))renderDrawer();tick();scheduleDraw()}
+function renderAll(){if(IPAD)renderIpToday();renderUnits();renderHeader();renderLive();renderFkeys();renderNotes();renderBgSelect();if($('#drawer').classList.contains('open'))renderDrawer();tick();scheduleDraw()}
 function handleKey(e){if(e.metaKey||e.ctrlKey||e.altKey)return;if($('#modalRoot').firstChild)return;const tg=e.target.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tg))return;if(curScreen!=='roast')return;
   const k=e.key.length===1?e.key.toLowerCase():e.key;
   if(k===cfg.startKey){e.preventDefault();S.recording?stopRoast():startRoast(false);return}
