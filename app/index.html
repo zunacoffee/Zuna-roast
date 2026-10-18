@@ -406,6 +406,27 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipad #snav button{min-height:50px;font-size:calc(15.5px*var(--ts,1))}
 .ipad .seg button{min-height:40px;padding:0 14px}
 .ipad .ph button{min-height:44px}
+.stepper{display:flex;align-items:center;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--panel)}
+.stepper button{flex:none;width:56px;min-height:48px;border:0;border-radius:0;font-size:24px;padding:0;background:var(--panel);color:var(--text)}
+.stepper input{flex:1 1 0;min-width:0;width:0!important}
+.ipad .grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ipad .grid2>*{min-width:0}
+.ipad header select{font-size:calc(13px*var(--ts,1))!important;min-height:40px}
+.stepper button:first-child{border-right:1px solid var(--border)}.stepper button:last-child{border-left:1px solid var(--border)}
+.stepper input{border:0!important;text-align:center;font-size:18px!important;border-radius:0}
+/* iPad Settings like the mockup: wider menu, data card, status bar, on/off switches */
+.ipad #scr-settings .wrap{grid-template-columns:290px minmax(0,1fr)}
+.ipData{margin:10px 4px 4px;padding:12px 12px 4px;border-top:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1));line-height:1.45;color:var(--text2);display:flex;flex-direction:column;gap:2px}
+.ipData b{color:var(--text);font-size:calc(14.5px*var(--ts,1))}
+.ipConnBar{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--line2);border-radius:10px;padding:0 14px;min-height:56px;font-size:calc(14.5px*var(--ts,1));margin:4px 0 6px}
+.ipConnBar i{width:10px;height:10px;border-radius:50%;background:var(--border);flex:none}
+.ipConnBar span:not(.sp){color:var(--text2)}.ipConnBar .sp{flex:1}
+.ipConnBar.on{background:color-mix(in srgb,var(--good) 10%,var(--panel));border-color:color-mix(in srgb,var(--good) 35%,var(--panel))}.ipConnBar.on i{background:var(--good)}
+.ipConnBar.wait i{background:var(--warn)}
+.ipad #scont .chk{justify-content:space-between;flex-direction:row-reverse;padding:12px 0;border-bottom:1px solid var(--line2);font-size:calc(15.5px*var(--ts,1))}
+.ipad #scont .chk input[type=checkbox]{-webkit-appearance:none;appearance:none;width:56px;height:34px;border-radius:17px;background:var(--border);position:relative;margin:0;border:0;cursor:pointer;transition:background .15s}
+.ipad #scont .chk input[type=checkbox]::after{content:'';position:absolute;left:3px;top:3px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.ipad #scont .chk input[type=checkbox]:checked{background:var(--good)}
+.ipad #scont .chk input[type=checkbox]:checked::after{left:25px}
 </style>
 </head>
 <body>
@@ -538,6 +559,7 @@ tr.sel .ipCard .n{color:var(--accent)}
   <div class="wrap">
     <div class="card snav" id="snav">
       <button data-p="conn" class="on">Connection</button><button data-p="ctl">Control &amp; presets</button><button data-p="ev">Event buttons</button><button data-p="biz">Business</button><button data-p="look">Appearance</button><button data-p="scale">Chart scales</button><button data-p="store">Saving &amp; storage</button><button data-p="log">Connection log</button>
+      <div class="ipOnly ipData" id="ipDataCard"></div>
     </div>
     <div class="card scont" id="scont"></div>
   </div>
@@ -857,6 +879,8 @@ async function ipadEventTap(k){const r=S.roast,t=r.events[k];
   const v=await askChoice(`${lab} is already marked`,`Marked at ${at}. Move it to now, or remove it?`,[{label:'Cancel',value:null},{label:'Remove',value:'rm',cls:'dark'},{label:'Move to now',value:'mv',cls:'pri'}]);
   if(v==='mv')markEvent(k,'manual');else if(v==='rm')removeEvent(k)}
 function ipadNavSync(n){const more=$('#navMore');if(!more)return;const inMore=n==='cupping'||n==='settings';more.classList.toggle('on',inMore);more.textContent=inMore?(n==='cupping'?'Cupping':'Settings'):'More';$$('#moreMenu button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));$('#moreMenu').hidden=true}
+function ipConnBar(){const live=!link.manual,c=live&&link.connected();
+  return `<div class="ipConnBar ${c?'on':live?'wait':''}"><i></i><b>${c?(link.sim?'Simulator running':'Connected'):live?'Connecting…':'Not connected'}</b><span>${link.sim&&live?'Pretend P12 for practice':`ws://${esc(cfg.host)}:${esc(cfg.port)}/${esc(String(cfg.path).replace(/^\//,''))} · every ${esc(cfg.interval)} s`}</span><span class="sp"></span><button id="ipConnBtn">${live?(link.sim?'Stop simulator':'Disconnect'):'Connect'}</button></div>`}
 function setMachineSheet(on){document.documentElement.classList.toggle('machineOpen',on);$('#btnMachine').classList.toggle('on-acc',on)}
 function ipadInit(){
   {const L=$('#leftCol'),orig=[...L.children];orig.forEach(el=>{if(el.classList.contains('pt')&&/Other values|^Machine$/.test(el.textContent.trim()))el.classList.add('ipHide')});
@@ -1327,13 +1351,14 @@ function renderToday(){planRoll();$('#tDate').textContent=new Date().toLocaleDat
   $('#tSide').innerHTML=`<div class="dtitle">Add batches</div>
     <label class="field">Profile<select id="tProf"><option value="">— no profile —</option>${profs.map(r=>`<option value="${r.id}">${esc(r.meta.name)}</option>`).join('')}</select></label>
     <label class="field">Green coffee<select id="tInv"><option value="">— not from inventory —</option>${INV.filter(l=>invLeft(l)>0.001).map(l=>`<option value="${l.id}">${esc(l.name)}${l.lot?' · lot '+esc(l.lot):''} — ${invLeft(l).toFixed(1)} lb</option>`).join('')}</select></label>
-    <div class="grid2"><label class="field">Green weight per batch (lb)<input id="tGreen" inputmode="decimal"></label><label class="field">Number of batches<input id="tCount" inputmode="numeric" value="1"></label></div>
+    <div class="grid2"><label class="field">Green weight per batch (lb)<input id="tGreen" inputmode="decimal"></label>${IPAD?`<div class="field">Number of batches<div class="stepper"><button type="button" data-tc="-1" aria-label="Fewer batches">−</button><input id="tCount" inputmode="numeric" value="1"><button type="button" data-tc="1" aria-label="More batches">+</button></div></div>`:`<label class="field">Number of batches<input id="tCount" inputmode="numeric" value="1"></label>`}</div>
     <button class="pri" id="tAdd">Add to today</button>
     <div><div class="h3" style="margin:8px 0 4px">Green coffee needed</div>${Object.keys(need).length?Object.entries(need).map(([id,lb])=>{const l=INV.find(v=>v.id===id);if(!l)return'';const left=invLeft(l),short=lb>left+1e-6;
       return `<div class="kv"><span>${esc(l.name)}</span><b class="tnum ${short?'dangerTxt':''}">${lb.toFixed(1)} lb needed · ${left.toFixed(1)} on hand${short?' — short '+(lb-left).toFixed(1)+' lb':' ✓'}</b></div>`}).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Add batches to see how much green you need.</div>'}</div>
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1));line-height:1.5">When you save a planned roast, it’s checked off and the next batch loads by itself: profile, background, coffee and weight. Just charge the roaster.</div>`;
   const fillFromProf=()=>{const r=HIST.find(x=>x.id===$('#tProf').value);if(!r)return;const l=INV.find(v=>v.id===r.meta.invId&&invLeft(v)>0.001);$('#tInv').value=l?l.id:'';$('#tGreen').value=r.meta.green||''};
   $('#tProf').onchange=fillFromProf;
+  $$('[data-tc]').forEach(b=>b.onclick=()=>{const i=$('#tCount');i.value=clamp(Math.round(num(i.value)||1)+Number(b.dataset.tc),1,30)});
   $('#tAdd').onclick=()=>{const r=HIST.find(x=>x.id===$('#tProf').value),invId=$('#tInv').value,l=INV.find(v=>v.id===invId),g=num($('#tGreen').value),n=Math.round(num($('#tCount').value)||1);
     if(!r&&!l){toast('Pick a profile or a green coffee');return}if(!g||g<=0){toast('Enter the green weight per batch');return}if(n<1||n>30){toast('Number of batches: 1 to 30');return}
     for(let i=0;i<n;i++)PLAN.items.push({id:'b'+Date.now().toString(36)+i+Math.random().toString(36).slice(2,4),name:r?r.meta.name:'',invId:invId||'',coffee:l?l.name:(r?r.meta.coffee:''),lot:l?(l.lot||''):(r?r.meta.lot:''),green:String(g),status:'planned'});
@@ -1597,7 +1622,7 @@ function renderCupDetail(){const el=$('#cDetail');
    ================================================================ */
 function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.classList.toggle('on',b.dataset.p===curPane));
   const P={
-  conn:()=>`<h2>Connection</h2><div class="sub">Same settings as your Artisan WebSocket setup for the P12 III.</div>
+  conn:()=>`<h2>Connection</h2><div class="sub">Same settings as your Artisan WebSocket setup for the P12 III.${IPAD?' The iPad must be on the roaster’s Wi-Fi.':''}</div>${IPAD?ipConnBar():''}
     <div class="sgrid">${[['host','Host (roaster IP)'],['port','Port'],['path','Path'],['roasterId','Machine ID'],['interval','Sampling interval (s)'],['requestTimeout','Request timeout (s)'],['connectTimeout','Connect timeout (s)'],['reconnect','Reconnect delay (s)'],['keepAlive','Keep-alive every (s, 0 = off)']].map(([k,l])=>`<label class="field">${l}<input data-cfg="${k}" value="${esc(cfg[k])}"></label>`).join('')}</div>
     <label class="chk"><input type="checkbox" data-cfgb="startOnCharge" ${cfg.startOnCharge?'checked':''}> Start recording automatically when the roaster charges</label>
     <div class="h3" style="margin-top:6px">Simulator</div>
@@ -1710,6 +1735,8 @@ function wireSettings(){const el=$('#scont');
   $$('[data-cfgb]',el).forEach(i=>i.onchange=()=>{cfg[i.dataset.cfgb]=i.checked;saveCfg();if(i.dataset.cfgb==='showNextBar')renderNext();if(i.dataset.cfgb==='bizHeader')renderBrand();if(i.dataset.cfgb==='nextHighlight')renderFkeys()});
   $$('[data-node]',el).forEach(i=>i.onchange=()=>{cfg.nodes[i.dataset.node]=i.value.trim();saveCfg()});
   $$('[data-ch]',el).forEach(i=>i.onchange=()=>{const c=cfg.channels[i.dataset.ch],f=i.dataset.f;c[f]=f==='scale'?(num(i.value)??1):i.value.trim();saveCfg()});
+  const icb=$('#ipConnBtn',el);if(icb)icb.onclick=()=>{if(!link.manual)link.disconnect();else link.connect(false);setTimeout(renderSettings,300)};
+  if(IPAD){const dc=$('#ipDataCard'),f=window.ZR_NATIVE&&ZR_NATIVE.folder;dc.innerHTML=`<b>Your roast data</b><span>${f?'Saved in '+esc(String(f).split('/').slice(-2).join(' › ')):FS.dir?'Saved in the folder '+esc(FS.dir.name):'Not saved to a folder yet — see Saving &amp; storage.'}</span>`}
   const ssb=$('#sSim',el);if(ssb)ssb.onclick=()=>{if(!link.manual&&link.sim)link.disconnect();else link.connect(true);renderSettings()};
   const sss=$('#sSimSpeed',el);if(sss)sss.onchange=()=>{if(!link.manual&&link.sim&&S.recording){sss.value=simSpeed();toast('Stop the roast before changing the simulator speed');return}cfg.simSpeed=Number(sss.value);saveCfg();if(!link.manual&&link.sim)link.connect(true)};
   const cs=$('#sConnSave');if(cs)cs.onclick=()=>{$$('[data-cfg]',el).forEach(i=>i.onchange());saveCfg();if(!link.manual&&!link.sim)link.connect(false);toast('Connection settings saved')};
