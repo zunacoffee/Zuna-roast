@@ -313,8 +313,37 @@ html:not(.ipad) .ipOnly{display:none!important}
 .ipad #btnDetails,.ipad #clock,.ipad .swk{display:none}
 .ipad .fk>small{display:none}
 .ipad #scr-roast{grid-template-columns:minmax(0,1fr) 380px}
-.ipad #leftCol{position:fixed;top:68px;left:12px;bottom:12px;width:400px;z-index:46;box-shadow:0 24px 60px rgba(0,0,0,.25);transform:translateX(-112%);transition:transform .22s ease;overflow:auto}
-.ipad.machineOpen #leftCol{transform:none}
+.ipad #leftCol{position:fixed;top:84px;left:50%;width:700px;max-height:calc(100vh - 110px);z-index:46;box-shadow:0 24px 60px rgba(0,0,0,.25);border-radius:18px;overflow:auto;transform:translate(-50%,8px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+.ipad.machineOpen #leftCol{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.ipad #leftCol .ipHide{display:none!important}
+.ipad #swL{grid-template-columns:repeat(3,minmax(0,1fr));padding:6px 22px 10px}
+.ipad #spsL{padding:0 22px 6px}
+.ipad #leftCol .pt{padding-left:22px;padding-right:22px}
+.ipad #leftCol .notes{padding:4px 22px 16px;flex:none}
+#ipCtlRow{display:flex;align-items:center;gap:14px;padding:12px 22px 6px}
+#ipCtlRow b{display:block;font-size:calc(16px*var(--ts,1))}#ipCtlRow small{color:var(--text2);font-size:calc(13px*var(--ts,1))}
+.tog{width:64px;height:38px;border-radius:19px;border:0;background:var(--border);position:relative;padding:0;flex:none}
+.tog::after{content:'';position:absolute;left:3px;top:3px;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.tog.on{background:var(--good)}.tog.on::after{left:29px}
+#ipLive{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:6px 22px 14px}
+#ipLive div{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:calc(12.5px*var(--ts,1));color:var(--text2)}
+#ipLive b{display:block;font-size:calc(24px*var(--ss,1));font-weight:400;color:var(--text);font-variant-numeric:tabular-nums}
+.ipSheetHead small{display:block;font-size:calc(13px*var(--ts,1));color:var(--text2);font-weight:400;margin-top:2px}
+/* iPad lists as cards (Roasts, Profiles, Green, Cupping) */
+.ipad #scr-roasts .split,.ipad #scr-profiles .split{grid-template-columns:440px minmax(0,1fr)}
+.ipad #scr-cupping .split{grid-template-columns:340px minmax(0,1fr)}
+.ipad #scr-green .split{grid-template-columns:minmax(0,1fr) 390px}
+.ipad #scr-today .split{grid-template-columns:minmax(0,1fr) 370px}
+.ipad #scr-roasts thead,.ipad #scr-profiles thead,.ipad #scr-cupping thead,.ipad #scr-green thead{display:none}
+.ipad td.ipCard{white-space:normal;padding:12px 16px}
+.ipCard .c{display:flex;align-items:center;gap:12px}
+.ipCard .m{flex:1;min-width:0}.ipCard .m>b{font-size:calc(15.5px*var(--ts,1));font-weight:600}
+.ipCard .s{font-size:calc(13px*var(--ts,1));color:var(--text2);margin-top:2px}
+.ipCard .n{width:48px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+tr.sel .ipCard .n{color:var(--accent)}
+.ipCard .r{font-size:calc(13px*var(--ts,1));color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
+.ipCard .k{display:flex;gap:14px;font-size:calc(13px*var(--ts,1));margin-top:6px;font-variant-numeric:tabular-nums}
+.ipCard .gb{display:flex;align-items:center;gap:8px;width:190px}.ipCard .gb .bar{flex:1}
 #ipBackdrop{position:fixed;inset:56px 0 0 0;background:rgba(21,24,27,.32);z-index:45;opacity:0;pointer-events:none;transition:opacity .2s}
 .ipad.machineOpen #ipBackdrop{opacity:1;pointer-events:auto}
 .ipSheetHead{font-size:calc(17px*var(--ts,1));text-transform:none;letter-spacing:0;color:var(--text);padding:14px 16px 8px}
@@ -334,6 +363,49 @@ html:not(.ipad) .ipOnly{display:none!important}
 .ipad .drawer{width:min(600px,94vw)}
 .ipad td{padding:14px 12px}
 .ipad .modal{width:min(480px,92vw)}.ipad .modal button{min-height:48px;padding:0 18px}
+/* iPad header: Green / More, Roaster light, Background label */
+.ipad #nav button[data-s=cupping],.ipad #nav button[data-s=settings]{display:none}
+.ipad .hinfo>.muted{display:inline!important}
+#moreMenu{position:fixed;z-index:70;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.18);padding:6px;display:flex;flex-direction:column;min-width:200px}
+#moreMenu button{border:0;background:transparent;text-align:left;min-height:48px;padding:0 14px;font-size:calc(15px*var(--ts,1));border-radius:8px}
+#moreMenu button.on{background:var(--accentSoft);color:var(--accent);font-weight:600}
+.ipSheetHead .on-acc{background:var(--accent);border-color:var(--accent);color:#fff}
+/* iPad right panel: Bean temp on top, then Roast time + RoR side by side */
+.ipad #rightCol>.pt:first-child{display:none}
+.ipad .big3{display:grid;grid-template-columns:1fr 1fr}
+.ipad #roBT{grid-column:1/-1;order:-1;border-bottom:1px solid var(--line2)}
+.ipad #roBT .v{font-size:calc(66px*var(--bs,1))}
+.ipad .big3 .ro:not(#roBT){border-bottom:1px solid var(--line2)}
+.ipad .big3 .ro:not(#roBT) .v{font-size:calc(42px*var(--bs,1))}
+.ipad #roRor{border-left:1px solid var(--line2)}
+.ipad .big3 .ro:not(#roBT) .d{display:none}
+.ipad .spx .l span:first-child::before{content:'';display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:9px;vertical-align:2px;background:var(--c-burner)}
+.ipad .spx[data-k=fan] .l span:first-child::before{background:var(--c-air)}
+.ipad .spx[data-k=drum] .l span:first-child::before{background:var(--c-drum)}
+.ipad .spx .ab{font-size:calc(26px*var(--ts,1));font-weight:400}
+.ipad .spx{padding-bottom:14px}
+.ipCoolHead{border-top:1px solid var(--line2);padding-top:12px}
+.ipad #sw{border-top:0;padding-top:4px}
+/* iPad chart header: chips + legend instead of phase text */
+.ipad #phaseTxt{display:none}
+.ipLegend{display:flex;gap:16px;padding:0 16px 2px;font-size:calc(12px*var(--ts,1));color:var(--text2)}
+.ipLegend span{display:flex;align-items:center;gap:6px}
+.ipLegend i{width:16px;height:0;border-top:3px solid;border-radius:2px}
+/* iPad event keys: time · BT under marked keys, Next on the next one, Drop dark */
+.ipad .fk .sub{display:block;font-size:calc(12px*var(--ts,1));font-weight:500;color:var(--text2);margin-top:2px}
+.ipad .fk.nx .sub{color:var(--accent)}
+.ipad .fk.dropk{background:var(--text);border-color:var(--text);color:var(--panel)}
+.ipad .fk.dropk .sub{color:inherit;opacity:.75}
+.ipad .fk:focus,.ipad button:focus:not(:focus-visible){outline:none}
+.ipad #spsL .spx .l,.ipad #spsL .spx .d{display:none}
+.ipad .lamp{color:var(--text);font-weight:500;font-size:calc(13px*var(--ts,1))}
+/* iPad forms and Settings: finger-sized, and 16px+ text so iPadOS doesn't zoom on tap */
+.ipad input:not([type=checkbox]):not([type=radio]):not([type=color]),.ipad select,.ipad textarea{font-size:max(16px,calc(15px*var(--ts,1)));min-height:48px}
+.ipad input[type=checkbox],.ipad input[type=radio]{width:24px;height:24px;flex:none}
+.ipad .chk{min-height:44px;align-items:center}
+.ipad #snav button{min-height:50px;font-size:calc(15.5px*var(--ts,1))}
+.ipad .seg button{min-height:40px;padding:0 14px}
+.ipad .ph button{min-height:44px}
 </style>
 </head>
 <body>
@@ -357,10 +429,13 @@ html:not(.ipad) .ipOnly{display:none!important}
 <!-- ================= ROAST ================= -->
 <div class="screen" id="scr-roast">
   <section class="panel" id="leftCol">
-    <div class="pt ipOnly ipSheetHead"><span>Machine</span><button class="pri" id="btnMachineDone">Done</button></div>
+    <div class="pt ipOnly ipSheetHead"><span>Machine<small id="ipLinkTxt"></small></span><span class="row"><button id="btnDisc">Disconnect</button><button class="pri" id="btnMachineDone">Done</button></span></div>
     <div class="pt">Other values</div>
+    <div class="ipOnly" id="ipCtlRow"><div style="flex:1"><b>Control from this iPad</b><small>Only one device controls at a time. When it is off, this iPad only watches.</small></div><button class="tog" id="ipCtlTog" aria-label="Control"></button></div>
+    <div class="pt ipOnly" id="ipSwHead"><span>Switches</span></div>
     <div class="ro" id="roEx"><div class="l"><span>Exhaust</span><span class="u">°F</span></div><div class="v sm" id="vEx">—</div></div>
     <div class="ro" id="roPa"><div class="l"><span>Air pressure</span><span class="up">Pa</span></div><div class="v sm" id="vPa">—</div></div>
+    <div class="pt ipOnly" id="ipLiveHead"><span>Live values</span></div><div id="ipLive" class="ipOnly"></div>
     <div id="todayMini"></div>
     <div class="pt" id="notesHead" style="margin-top:6px"><span>Notes</span></div>
     <div class="notes" id="notes"></div>
@@ -371,6 +446,7 @@ html:not(.ipad) .ipOnly{display:none!important}
 
   <section class="panel">
     <div class="pt"><button id="chartTitle" title="Open Roast details"></button><span id="ipChips" class="ipOnly"></span><span id="phaseTxt" class="tnum"></span></div>
+    <div class="ipLegend ipOnly"><span><i style="border-color:var(--c-bt)"></i>Bean temp</span><span><i style="border-color:var(--c-ror)"></i>Rate of rise</span><span><i style="border-color:var(--c-bkg);border-top-style:dashed"></i>Background</span><span><i style="border-color:var(--c-burner)"></i>Burner</span><span><i style="border-color:var(--c-air)"></i>Air</span></div>
     <div class="chartwrap" style="position:relative">
       <canvas id="cvMain"></canvas>
       <canvas id="cvStrip"></canvas>
@@ -389,6 +465,7 @@ html:not(.ipad) .ipOnly{display:none!important}
     <div class="pt" style="border-top:1px solid var(--line2);padding-top:10px"><span>Setpoints</span></div>
     <div class="ctloff" id="ctlOff"><span>Control is off — watching only.</span><button class="sm pri" id="btnCtlOn">Turn on</button></div>
     <div class="sps" id="sps"></div>
+    <div class="pt ipOnly ipCoolHead"><span>Cooling tray</span></div>
     <div class="sw" id="sw"></div>
   </section>
 
@@ -496,6 +573,7 @@ html:not(.ipad) .ipOnly{display:none!important}
 <div id="banners"></div>
 <div id="toast"></div>
 <div id="ipBackdrop" class="ipOnly"></div>
+<div id="moreMenu" class="ipOnly" hidden><button data-s="cupping">Cupping</button><button data-s="settings">Settings</button></div>
 <div id="modalRoot"></div>
 
 <script src="native.js"></script>
@@ -775,16 +853,29 @@ function removeEvent(k){const r=S.roast;if(r.events[k]==null)return;delete r.eve
 async function ipadEventTap(k){const r=S.roast,t=r.events[k];
   if(!S.recording||t==null)return markEvent(k,'manual');
   const e=cfg.events.find(x=>x.k===k),lab=e?e.label:k,s=sampleAt(r.samples,t),at=mmss(t-(r.events.CHARGE??0))+(s?` · ${fT(s.bt)}°`:'');
+  if(k==='DROP'){const v=await askChoice('Finish the roast?',`Drop is marked at ${at}.`,[{label:'Cancel',value:null},{label:'Remove Drop',value:'rm'},{label:'Move Drop to now',value:'mv'},{label:'Finish roast',value:'fin',cls:'pri'}]);if(v==='fin')stopRoast();else if(v==='mv')markEvent(k,'manual');else if(v==='rm')removeEvent(k);return}
   const v=await askChoice(`${lab} is already marked`,`Marked at ${at}. Move it to now, or remove it?`,[{label:'Cancel',value:null},{label:'Remove',value:'rm',cls:'dark'},{label:'Move to now',value:'mv',cls:'pri'}]);
   if(v==='mv')markEvent(k,'manual');else if(v==='rm')removeEvent(k)}
+function ipadNavSync(n){const more=$('#navMore');if(!more)return;const inMore=n==='cupping'||n==='settings';more.classList.toggle('on',inMore);more.textContent=inMore?(n==='cupping'?'Cupping':'Settings'):'More';$$('#moreMenu button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));$('#moreMenu').hidden=true}
 function setMachineSheet(on){document.documentElement.classList.toggle('machineOpen',on);$('#btnMachine').classList.toggle('on-acc',on)}
 function ipadInit(){
+  {const L=$('#leftCol'),orig=[...L.children];orig.forEach(el=>{if(el.classList.contains('pt')&&/Other values|^Machine$/.test(el.textContent.trim()))el.classList.add('ipHide')});
+    ['#roEx','#roPa','#todayMini'].forEach(q=>$(q).classList.add('ipHide'));
+    const drumHead=document.createElement('div');drumHead.className='pt';drumHead.innerHTML='<span>Drum speed</span>';
+    for(const el of [$('.ipSheetHead'),$('#ipCtlRow'),$('#ipSwHead'),$('#swL'),drumHead,$('#spsL'),$('#ipLiveHead'),$('#ipLive'),$('#notesHead'),$('#notes')])L.appendChild(el);
+    $('#ipCtlTog').onclick=()=>setControl(!C.on)}
+  const g=$('#nav button[data-s=green]');if(g)g.textContent='Green';
+  const more=document.createElement('button');more.id='navMore';more.textContent='More';$('#nav').appendChild(more);
+  more.onclick=e=>{e.stopPropagation();const m=$('#moreMenu'),b=more.getBoundingClientRect();m.style.left=b.left+'px';m.style.top=(b.bottom+6)+'px';m.hidden=!m.hidden};
+  $('#moreMenu').onclick=e=>{const b=e.target.closest('button');if(b){setMachineSheet(false);showScreen(b.dataset.s)}};
+  document.addEventListener('click',e=>{if(!e.target.closest('#moreMenu,#navMore'))$('#moreMenu').hidden=true});
+  $('#btnDisc').onclick=()=>link.disconnect();
   $('#btnMachine').onclick=()=>{if(curScreen!=='roast')showScreen('roast');setMachineSheet(!document.documentElement.classList.contains('machineOpen'))};
   $('#btnMachineDone').onclick=()=>setMachineSheet(false);$('#ipBackdrop').onclick=()=>setMachineSheet(false);
   // tap or drag on the chart shows the readout
   for(const id of ['#cvMain','#cvStrip'])$(id).addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')onHover(e)});
   // swipe left/right to change screens — never on the Roast screen while recording
-  const order=()=>$$('#nav button').map(b=>b.dataset.s);let sw=null;
+  const order=()=>$$('#nav button').map(b=>b.dataset.s).filter(Boolean);let sw=null;
   document.addEventListener('touchstart',e=>{const t=e.touches[0];sw=null;if(e.touches.length!==1)return;
     if(e.target.closest('input,textarea,select,canvas,.scroll,.drawer,#leftCol,.modalbg,.sps,.pre'))return;sw={x:t.clientX,y:t.clientY,at:Date.now()}},{passive:true});
   document.addEventListener('touchend',e=>{if(!sw)return;const t=e.changedTouches[0],dx=t.clientX-sw.x,dy=t.clientY-sw.y,ms=Date.now()-sw.at;sw=null;
@@ -979,7 +1070,7 @@ async function setControl(on){
   C.on=on;C.target={};wakeLock(on||link.connected());log('ctl',on?'Control ON':'Control released');renderAll()}
 function buildCtl(){
   const spx=c=>{const pre=cfg.presets[c.key]||[];return `<div class="spx" data-k="${c.key}"><div class="l"><span>${c.label}</span><span>%</span></div>
-    <div class="rowv"><button class="ab" data-d="-1" aria-label="${c.label} down">▼</button><div class="v" title="Click to type an exact value">—</div><button class="ab" data-d="1" aria-label="${c.label} up">▲</button></div>
+    <div class="rowv"><button class="ab" data-d="-1" aria-label="${c.label} down">${IPAD?'−':'▼'}</button><div class="v" title="Click to type an exact value">—</div><button class="ab" data-d="1" aria-label="${c.label} up">${IPAD?'+':'▲'}</button></div>
     ${pre.length?`<div class="pre">${pre.map(v=>`<button data-p="${v}">${v}</button>`).join('')}</div>`:''}
     <div class="d"></div></div>`};$('#sps').innerHTML=CTL.filter(c=>c.key!=='drum').map(spx).join('');$('#spsL').innerHTML=spx(CTL.find(c=>c.key==='drum')).replace('class="spx"','class="spx" style="border-bottom:0"');
   const swb=w=>{const k=cfg.swKeys[w.p];return `<button data-sw="${w.p}"><i></i>${w.label}${k?`<kbd class="swk">${esc(keyName(k))}</kbd>`:''}<b>—</b></button>`};$('#sw').innerHTML=SWITCHES.filter(w=>!w.confirm).map(swb).join('');$('#swL').innerHTML=SWITCHES.filter(w=>w.confirm).map(swb).join('')}
@@ -1025,21 +1116,21 @@ function renderNotes(){const el=$('#notes');if(!el)return;const rems=(S.bg&&S.bg
 let curScreen='roast',curPane='conn';
 function renderHeader(){
   let s=link.state;if((s==='connected'||s==='sim')&&link.missed>=3)s='nodata';
-  const L=[['Link',s==='connected'||s==='sim'?'on':s==='nodata'?'bad':s==='offline'?'':'wait']];
+  const L=[[IPAD?'Roaster':'Link',s==='connected'||s==='sim'?'on':s==='nodata'?'bad':s==='offline'?'':'wait']];
   $('#lamps').innerHTML=L.map(([n,c])=>`<span class="lamp"><i class="${c}"></i>${n}${n==='Link'&&link.sim?' (sim)':''}</span>`).join('');
   const r=S.roast,mt=r.meta;{const inv=INV.find(l=>l.id===mt.invId),cof=inv?inv.name:(mt.coffee||''),parts=[];
     if(cof)parts.push(esc(cof));if(num(mt.green))parts.push(`${esc(mt.green)} lb`);
     $('#chartTitle').innerHTML=`#${r.num||nextNum()} · ${mt.name?esc(mt.name):'<span>No profile name</span>'}`+(parts.length?` <span>— ${parts.join(' · ')}</span>`:` <span class="warn2">— no coffee picked (Roast details)</span>`)}
   $('#hRoast').textContent=`Roast #${r.num||nextNum()}${r.meta.name?' · '+r.meta.name:''}`;
   const live=!link.manual;$('#btnConnect').textContent=live?(link.sim?'Stop simulator':'Disconnect'):'Connect';$('#btnConnect').className=live?'on-acc':'';if(curScreen==='settings'&&curPane==='conn'&&$('#sSim'))$('#sSim').textContent=live&&link.sim?'Stop simulator':'Start simulator';
-    $('#btnControl').textContent=C.on?'Control ON':'Control';$('#btnControl').className=C.on?'on-ctl':''}
+    $('#btnControl').textContent=C.on?(IPAD?'Control on':'Control ON'):'Control';if(IPAD){$('#ipCtlTog').classList.toggle('on',C.on);$('#ipLinkTxt').textContent=live?(link.sim?'Simulator connected':`P12 III connected · ${cfg.host}`):'Not connected';$('#btnConnect').hidden=live;$('#btnDisc').hidden=!live;$('#btnDisc').textContent=link.sim?'Stop simulator':'Disconnect'}$('#btnControl').className=C.on?'on-ctl':''}
 const rorStart=ev=>ev.CHARGE==null?null:cfg.rorFrom==='tp'?(ev.TP??ev.CHARGE+45):ev.CHARGE;
 function curTime(){const r=S.roast;if(S.recording)return link.clock()-r.t0;return r.samples.length?r.samples.at(-1).t:null}
 function renderLive(){const v=S.latest,r=S.roast,last=S.recording?r.samples.at(-1):null;
-  $('#vBT').textContent=fT(v.bt);const rorHide=cfg.rorFrom==='tp'&&S.recording&&r.events.CHARGE!=null&&(r.events.TP==null||r.events.DROP!=null);$('#vRoR').textContent=rorHide?'—':fR(last?last.ror:S.liveRor);$('#vEx').textContent=fT(v.exhaust);$('#vPa').textContent=fP(v.pressure);if(IPAD)$('#ipChips').innerHTML=`<span>Exhaust <b>${fT(v.exhaust)}°</b></span><span>Air <b>${fP(v.pressure)} ${pU()}</b></span>`;
+  $('#vBT').textContent=fT(v.bt);const rorHide=cfg.rorFrom==='tp'&&S.recording&&r.events.CHARGE!=null&&(r.events.TP==null||r.events.DROP!=null);$('#vRoR').textContent=rorHide?'—':fR(last?last.ror:S.liveRor);$('#vEx').textContent=fT(v.exhaust);$('#vPa').textContent=fP(v.pressure);if(IPAD){$('#ipLive').innerHTML=`<div>Exhaust<b>${fT(v.exhaust)}°</b></div><div>Air pressure<b>${fP(v.pressure)} <span style="font-size:13px;color:var(--text2)">${pU()}</span></b></div><div>Inlet<b>${fT(v.inlet)}°</b></div><div>Ambient<b>${fT(v.et)}°</b></div>`;const ev=r.events,now=last?last.t:null,dev=S.recording&&ev.FCs!=null&&ev.CHARGE!=null&&now!=null?(ev.DROP??now)-ev.FCs:null,tot=dev!=null?(ev.DROP??now)-ev.CHARGE:0;$('#ipChips').innerHTML=`<span>Exhaust <b>${fT(v.exhaust)}°</b></span><span>Air <b>${fP(v.pressure)} ${pU()}</b></span>`+(dev!=null?`<span>Dev <b>${mmss(dev)} · ${tot>0?Math.round(dev/tot*100):0}%</b></span>`:'')}
   let dbt='',dror='';if(S.bg&&S.recording&&last&&r.events.CHARGE!=null){const rc=S.bg.events.CHARGE??0,x=last.t-r.events.CHARGE;
     const rb=interp(S.bg.samples,'bt',x+rc),rr=interp(S.bg.samples,'ror',x+rc);
-    const f=(d,dig)=>ok(d)?`Δ BKG <b class="${Math.abs(d)<.05?'':d>0?'pos':'neg'}">${d>0?'+':''}${d.toFixed(dig)}</b>`:'';
+    const f=(d,dig)=>ok(d)?`${IPAD?'Background at '+mmss(x)+' ·':'Δ BKG'} <b class="${Math.abs(d)<.05?'':d>0?'pos':'neg'}">${d>0?'+':''}${d.toFixed(dig)}</b>`:'';
     dbt=ok(rb)&&ok(last.bt)?f(toD(last.bt)-toD(rb),1):'';dror=ok(rr)&&ok(last.ror)?f(toDR(last.ror)-toDR(rr),1):''}
   $('#dBT').innerHTML=dbt;$('#dRoR').innerHTML=dror;renderCtl();renderNext()}
 function renderNext(){const el=$('#nextbar');el.hidden=!cfg.showNextBar;if(!cfg.showNextBar)return;if(!S.bg){el.innerHTML=`<span class="muted">No background profile.</span><span class="sp"></span><button class="sm" id="nbProf">Pick a profile</button>`;$('#nbProf').onclick=()=>showScreen('profiles');return}
@@ -1080,7 +1171,12 @@ function tick(){checkBtAlarm();checkAutoOff();if(S.autoOff)renderCtl();const r=S
   else if(lost&&performance.now()-(S.lostBeepAt||0)>6000){beep(2);S.lostBeepAt=performance.now()}
   else if(!lost&&bn)bn.remove();
   if(S.bg&&S.recording)renderNext()}
-function renderFkeys(){const ev=S.roast.events,nx=S.recording&&cfg.nextHighlight?nextEventKey():null;
+function renderFkeys(){const ev=S.roast.events,nx=S.recording&&(cfg.nextHighlight||IPAD)?nextEventKey():null;
+  if(IPAD){const r=S.roast,c=ev.CHARGE??0,at=k=>{const s=sampleAt(r.samples,ev[k]);return mmss(ev[k]-c)+(s&&ok(s.bt)?` · ${fT(s.bt)}°`:'')};
+    $('#fkeys').innerHTML=cfg.events.filter(e=>e.show&&e.k!=='UNDO').map(e=>{const done=ev[e.k]!=null,isDrop=e.k==='DROP';let lab=esc(e.label),sub='';
+      if(isDrop&&done&&S.recording){lab='Finish roast';sub='Drop '+at('DROP')}else if(done)sub=at(e.k);else if(e.k===nx)sub='Next';
+      else if(isDrop&&S.bg&&S.bg.events.DROP!=null)sub='Background '+mmss(S.bg.events.DROP-(S.bg.events.CHARGE??0));
+      return `<button class="fk ${done&&!(isDrop&&S.recording)?'done':''} ${e.k===nx?'nx':''} ${isDrop?'dropk':''}" data-k="${e.k}">${lab}${sub?`<span class="sub">${sub}</span>`:''}</button>`}).join('');return}
   const keys=cfg.events.filter(e=>e.show&&!(IPAD&&e.k==='UNDO')).map(e=>{const done=e.k!=='UNDO'&&ev[e.k]!=null;return `<button class="fk ${done?'done':''} ${e.k===nx?'nx':''} ${e.bg||e.fg?'custom':''}" style="${fkStyle(e.bg,e.fg)}" data-k="${e.k}" ${e.k==='UNDO'&&(!S.recording||!S.evStack.length)?'disabled':''}><small>${esc(e.key||'')}</small>${esc(e.label)}${done?' ✓':''}</button>`}).join('');
   $('#fkeys').innerHTML=`<button class="fk ${S.recording?'stop':'start'} ${cfg.startBg||cfg.startFg?'custom':''}" style="${fkStyle(cfg.startBg,cfg.startFg)}" id="fkStart"><small>${esc(keyName(cfg.startKey))}</small>${S.recording?'Stop':'Start'}</button>`+keys}
 const fkStyle=(bg,fg)=>(bg?`background:${bg};border-color:${bg};`:'')+(fg?`color:${fg};`:'');
@@ -1258,6 +1354,7 @@ function renderProfiles(){const q=normName($('#pSearch').value),list=HIST.filter
   $('#pFolder').innerHTML=FS.state==='granted'?`📁 <b style="color:var(--text)">${esc(FS.dir.name)}/Profiles</b> · ${list.length} profiles`:`${list.length} profiles`;
   if(!list.find(r=>r.id===selProfile))selProfile=list[0]?.id||null;
   $('#pRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),key=normName(r.meta.name),uses=HIST.filter(x=>normName(x.meta.name)===key),last=uses.map(x=>x.chargedAt||x.created).sort().at(-1),sel=r.id===selProfile;
+    if(IPAD)return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(r.meta.name)}</b><div class="s">${esc(r.meta.coffee||'—')}${r.meta.green?' · '+esc(r.meta.green)+' lb':''} · roasted ${uses.length}×${last?' · last '+fmtDate(last,false):''}</div></div><span class="r">from #${r.num}</span></div><div class="k"><span>FC ${mmss(s.fcs)}</span><span>Drop ${mmss(s.drop)}</span><span>Dev ${mmss(s.dev)}</span><span>W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span><span>Cup ${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</span></div></td></tr>`;
     return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b></td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
     <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
@@ -1304,6 +1401,7 @@ function roastList(){const q=normName($('#rSearch').value),wk=Date.now()-7*864e5
   return !q||normName(['#'+r.num,r.num,r.meta.name,r.meta.coffee,r.meta.lot,r.meta.notes].join(' ')).includes(q)})}
 function renderRoasts(){const list=roastList();if(!list.find(r=>r.id===selRoast))selRoast=list[0]?.id||null;
   $('#rRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),sp=spreadOf(r.meta),c=costOf(r),dt=r.chargedAt||r.created;
+    if(IPAD)return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><span class="n">#${r.num}</span><div class="m"><b>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</b><div class="s">${esc(r.meta.coffee||'—')} · ${fmtDate(dt)}</div></div><span class="r">W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span></div></td></tr>`;
     return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(dt)}</td><td class="tnum">${ageOf(dt)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?'<span class="badge">Profile</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td>
     <td class="n">${esc(r.meta.green||'—')}</td><td class="n">${esc(r.meta.roasted||'—')}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':'—'}</td><td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${ok(sp)?sp:'—'}</td>
     <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):'—'}</td><td class="n">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
@@ -1356,6 +1454,7 @@ function renderGreen(){const q=normName($('#gSearch').value);const list=INV.filt
   $('#gTiles').innerHTML=`<div class="card tile"><div class="l">On hand</div><div class="v">${onHand.toFixed(1)}<small>lb</small></div></div><div class="card tile"><div class="l">Value on hand${noPrice?' (lots with a price)':''}</div><div class="v">${money0(value)}<small>· ${inStock.length} lots</small></div></div>
   <div class="card tile"><div class="l">Roasted this month</div><div class="v">${month.toFixed(1)}<small>lb green</small></div></div><div class="card tile"><div class="l">Running low</div><div class="v" style="${low?'color:var(--danger)':''}">${low}<small>${low===1?'lot':'lots'} under ${LOW} lb</small></div></div>`;
   $('#gRows').innerHTML=list.map(l=>{const left=invLeft(l),start=(num(l.startLb)||0)+(l.adj||[]).filter(x=>num(x.lb)>0).reduce((a,x)=>a+num(x.lb),0),pct=start?clamp(left/start*100,0,100):0,lw=left<LOW&&left>0;
+    if(IPAD)return `<tr class="${l.id===selGreen&&gMode!=='add'?'sel':''}" data-id="${l.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(l.name)}</b><div class="s">${esc([l.process,l.arrived].filter(Boolean).join(' · ')||l.origin||'')}</div></div><span class="r" style="width:80px;text-align:left">${esc(l.lot||'')}</span><span class="r" style="width:60px">${ok(num(l.price))?money(num(l.price)):'—'}</span><div class="gb"><div class="bar ${lw?'low':''}"><i style="width:${pct}%"></i></div><b class="tnum" style="${lw?'color:var(--danger)':''}">${left.toFixed(1)}</b></div></div></td></tr>`;
     return `<tr class="${l.id===selGreen&&gMode!=='add'?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b></td><td>${esc(l.origin||'')}</td><td class="muted">${esc(l.process||'')}</td><td class="tnum">${esc(l.lot||'')}</td><td class="muted">${esc(l.supplier||'')}</td><td class="muted tnum">${esc(l.arrived||'')}</td>
     <td class="n">${ok(num(l.price))?money(num(l.price)):'—'}</td><td class="n">${start.toFixed(1)}</td><td class="n">${invUsed(l.id).toFixed(1)}</td><td><div class="row tnum" style="justify-content:space-between;flex-wrap:nowrap"><b style="${lw?'color:var(--danger)':''}">${left.toFixed(1)} lb</b>${lw?'<span class="badge r">Low</span>':''}</div><div class="bar ${lw?'low':''}"><i style="width:${pct}%"></i></div></td></tr>`}).join('');
   $('#gEmpty').innerHTML=list.length?'':`<div class="empty">${INV.length?'Nothing here.':'No green coffee yet. Press <b>+ Add coffee</b> to add your first lot.'}</div>`;renderGreenDetail()}
@@ -1457,6 +1556,7 @@ const cupScore=x=>ATTRS.reduce((a,k)=>a+(Number(x.scores[k[0]])||0),0)+CUPK.redu
 function cupClass(v){return v>=90?'Outstanding':v>=85?'Excellent':v>=80?'Very good · specialty':'Below specialty'}
 function renderCupping(){const list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date)));if(cupMode==='view'&&!list.find(s=>s.id===selSession))selSession=list[0]?.id||null;
   $('#cRows').innerHTML=list.map(s=>{const sc=s.samples.map(cupScore),best=sc.length?Math.max(...sc):null,avg=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null;
+    if(IPAD)return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(s.name)}</b><div class="s">${s.samples.length} sample${s.samples.length===1?'':'s'} · Best ${ok(best)?best.toFixed(2):'—'} · Avg ${ok(avg)?avg.toFixed(2):'—'}</div></div><span class="r">${fmtDate(s.date,false)}</span></div></td></tr>`;
     return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b></td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td><td>${esc(s.cuppers||'')}</td><td class="n"><span class="cup">${ok(best)?best.toFixed(2):'—'}</span></td><td class="n">${ok(avg)?avg.toFixed(2):'—'}</td></tr>`}).join('');
   $('#cEmpty').innerHTML=list.length?'':'<div class="empty">No cupping sessions yet. Press <b>+ New session</b> and pick the roasts on the table.</div>';renderCupDetail()}
 function renderCupDetail(){const el=$('#cDetail');
@@ -1666,7 +1766,7 @@ function wireSettings(){const el=$('#scont');
 /* ================================================================
    Screens & wiring
    ================================================================ */
-function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
+function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));if(IPAD)ipadNavSync(n);$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
   if(n==='roast'){renderAll();renderTodayMini()}else if(n==='today')renderToday();else if(n==='profiles')renderProfiles();else if(n==='roasts')renderRoasts();else if(n==='green'){gMode='view';setGView(gViewMode)}else if(n==='cupping'){cupMode='view';renderCupping()}else if(n==='settings')renderSettings()}
 function renderUnits(){$$('.up').forEach(e=>e.textContent=pU());$$('.u').forEach(e=>e.textContent='°'+cfg.unit);$$('.ur').forEach(e=>e.textContent='°'+cfg.unit+'/min')}
 function renderAll(){renderUnits();renderHeader();renderLive();renderFkeys();renderNotes();renderBgSelect();if($('#drawer').classList.contains('open'))renderDrawer();tick();scheduleDraw()}
@@ -1678,7 +1778,7 @@ function handleKey(e){if(e.metaKey||e.ctrlKey||e.altKey)return;if($('#modalRoot'
 async function init(){
   applyTheme();renderBrand();buildCtl();
   const setup=store.get('zr2.setup',null);if(setup){S.roast.meta={...blankMeta(),...setup};}
-  $('#nav').onclick=e=>{const b=e.target.closest('button');if(b)showScreen(b.dataset.s)};
+  $('#nav').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.s)showScreen(b.dataset.s)};
   $('#snav').onclick=e=>{const b=e.target.closest('button');if(b){curPane=b.dataset.p;renderSettings()}};
   $('#btnConnect').onclick=()=>{if(!link.manual)link.disconnect();else link.connect(false)};
   $('#btnControl').onclick=()=>setControl(!C.on);$('#btnCtlOn').onclick=()=>setControl(true);
