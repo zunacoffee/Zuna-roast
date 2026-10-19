@@ -212,7 +212,7 @@
       setTimeout(async () => {
         if (N.folderPicked || !window.ask) return;
         const yes = await ask('Choose your roast folder',
-          'Pick iCloud Drive › Desktop › ZUNA COFFEE so this iPad uses the same roasts, profiles, green coffee and settings as the iMac. You only do this once.',
+          'Pick iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast so this iPad uses the same roasts, profiles, green coffee and settings as the iMac. You only do this once.',
           'Choose folder');
         if (yes && window.chooseFolder) chooseFolder();
       }, 1200);

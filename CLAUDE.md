@@ -7,7 +7,7 @@ Older HTML files in the claude.ai project (zuna_roast.html, _p12, _focus, _conso
 - `app/index.html` — the whole app screen (single file). Started from Ty's build 33.
 - `app/native.js` — Mac-app bridge: data folder, roaster WebSocket, keep-awake, Save dialogs, updates. Inert in a browser.
 - `src-tauri/` — Tauri 2 Mac shell. `files.rs` = atomic writes inside the data folder; `roaster.rs` = native WebSocket (tries browser-style → lowercase path → plain handshakes; the P12 returned 400 to the plain one).
-- Data is NOT here: it lives in `~/Documents/Zuna Roast` on Ty's Mac (Roasts/, Profiles/, Green coffee/, Cupping/, Settings/).
+- Data is NOT here: it lives in `Desktop/ZUNA COFFEE/Zuna Roast` (iCloud Desktop) on Ty’s Macs (Roasts/, Profiles/, Green coffee/, Cupping/, Settings/).
 
 ## Shipping a change
 1. Edit, then `npm run check` (JS syntax). Test in a browser with the built-in Simulator.
@@ -19,7 +19,7 @@ Older HTML files in the claude.ai project (zuna_roast.html, _p12, _focus, _conso
 ## iPad version (branch `ipad` until it's merged)
 - Same `app/index.html`; iPad layout only when `<html>` has class `ipad` (touch iPad, or `?ipad=1` in a browser).
   `ipc` = compact layout for iPads shorter than the 13" (10.5"/11"; `?ipc=1` to test). The iMac and the 13" must never change from iPad work — compare screenshots before/after.
-- `src-tauri/plugins/zuna-ios` is iPad-only (folder picker that remembers iCloud Drive › Desktop › ZUNA COFFEE, iCloud download, keep screen on, share sheet). The Mac build never includes it; updater/process plugins are `cfg(desktop)`.
+- `src-tauri/plugins/zuna-ios` is iPad-only (folder picker that remembers iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast, iCloud download, keep screen on, share sheet). The Mac build never includes it; updater/process plugins are `cfg(desktop)`.
 - `Release iPad app` workflow: unsigned simulator build on every `ipad` push; signed TestFlight upload when run by hand and on the 1st of every other month (TestFlight builds expire after 90 days; schedules only fire once the file is on `main`). Secrets: APPLE_TEAM_ID, APPLE_API_KEY_ID, APPLE_API_ISSUER, APPLE_API_KEY_P8.
 
 ## Rules Ty cares about

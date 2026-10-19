@@ -2,7 +2,7 @@
 //! `target_os = "ios"` dependency in src-tauri/Cargo.toml) — the Mac app never includes it.
 //!
 //! * pick_folder / restore_folder — the iPad can't open a folder by path the way the Mac
-//!   does. It shows the Files picker once (pick iCloud Drive › Desktop › ZUNA COFFEE),
+//!   does. It shows the Files picker once (pick iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast),
 //!   remembers that choice, and re-opens it every time the app starts.
 //! * download_folder — makes sure every roast file in that iCloud folder is actually on
 //!   the iPad (iCloud can leave files "in the cloud" until they're asked for).

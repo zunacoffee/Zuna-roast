@@ -14,7 +14,7 @@ class ZunaIosPlugin: Plugin, UIDocumentPickerDelegate {
     private var pendingPick: Invoke?
     private var folder: URL?
 
-    // MARK: roast folder (iCloud Drive › Desktop › ZUNA COFFEE)
+    // MARK: roast folder (iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast)
 
     private func remember(_ url: URL) throws {
         let data = try url.bookmarkData(options: [], includingResourceValuesForKeys: nil, relativeTo: nil)
