@@ -3,7 +3,10 @@
 # • Every push to the `ipad` branch: an unsigned build for the iPad simulator, just to prove
 #   the iPad app still compiles. Nothing is uploaded.
 # • Run by hand (Actions tab → "Release iPad app" → Run workflow): a signed build that is sent
-#   to TestFlight, ready to install on the iPad. Needs these repository secrets:
+#   to TestFlight, ready to install on the iPad.
+# • Automatically on the 1st of every other month: the same signed build, so the iPad app never
+#   reaches TestFlight's 90-day limit. (Scheduled runs only start once this file is on `main`.)
+# Signed builds need these repository secrets:
 #     APPLE_TEAM_ID       10-character Team ID   (developer.apple.com → Membership details)
 #     APPLE_API_KEY_ID    App Store Connect API key ID
 #     APPLE_API_ISSUER    App Store Connect issuer ID
@@ -20,6 +23,8 @@ on:
       - 'src-tauri/**'
       - 'package*.json'
       - '.github/workflows/release-ios.yml'
+  schedule:
+    - cron: '17 9 1 */2 *'   # 09:17 UTC on the 1st of Jan, Mar, May, Jul, Sep, Nov
   workflow_dispatch:
     inputs:
       upload:
@@ -29,6 +34,7 @@ on:
 
 permissions:
   contents: read
+  actions: write   # lets the scheduled run keep itself switched on
 
 concurrency:
   group: ios-${{ github.ref }}-${{ github.event_name }}
@@ -39,7 +45,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 60
     env:
-      SIGNED: ${{ github.event_name == 'workflow_dispatch' && inputs.upload }}
+      SIGNED: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.upload) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -107,6 +113,13 @@ jobs:
           xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER"
           echo "### Sent to TestFlight" >> "$GITHUB_STEP_SUMMARY"
           echo "Build ${{ github.run_number }} of version $(node -p "require('./package.json').version") — it shows up in the TestFlight app on the iPad after Apple finishes processing (usually 5–30 minutes)." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the automatic refresh switched on
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # GitHub pauses scheduled workflows in repos with no commits for 60 days; re-enabling keeps it going.
+        run: gh workflow enable release-ios.yml -R "${{ github.repository }}" || true
 
       - name: Keep the build
         if: always() && env.IPA != ''
