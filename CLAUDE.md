@@ -16,6 +16,12 @@ Older HTML files in the claude.ai project (zuna_roast.html, _p12, _focus, _conso
    Tag pushes are blocked from Claude sessions; the workflow creates the `vX.Y.Z` tag itself.
 4. Installed apps offer the update when they open (never mid-roast). Check `releases/latest/download/latest.json`.
 
+## iPad version (branch `ipad` until it's merged)
+- Same `app/index.html`; iPad layout only when `<html>` has class `ipad` (touch iPad, or `?ipad=1` in a browser).
+  `ipc` = compact layout for iPads shorter than the 13" (10.5"/11"; `?ipc=1` to test). The iMac and the 13" must never change from iPad work — compare screenshots before/after.
+- `src-tauri/plugins/zuna-ios` is iPad-only (folder picker that remembers iCloud Drive › Desktop › ZUNA COFFEE, iCloud download, keep screen on, share sheet). The Mac build never includes it; updater/process plugins are `cfg(desktop)`.
+- `Release iPad app` workflow: unsigned simulator build on every `ipad` push; signed TestFlight upload when run by hand and on the 1st of every other month (TestFlight builds expire after 90 days; schedules only fire once the file is on `main`). Secrets: APPLE_TEAM_ID, APPLE_API_KEY_ID, APPLE_API_ISSUER, APPLE_API_KEY_P8.
+
 ## Rules Ty cares about
 - Never change the data folder layout or file names; new roast fields must be optional so old roasts still open.
 - Pressure is stored in Pa; the Pa/mbar setting only changes display.
