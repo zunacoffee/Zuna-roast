@@ -290,6 +290,7 @@ tr.tdone td{color:var(--text2)}
 .crow{display:grid;grid-template-columns:1fr 38px 104px;gap:10px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1))}
 .crow input[type=color]{width:38px;height:30px;padding:2px;border-radius:6px}
 .crow input[type=text]{font-family:var(--mono);font-size:calc(13px*var(--ts,1));padding:6px 8px}
+.cupbands{max-width:620px}.cupbands input[data-cupl]{font-family:var(--font)}
 .warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--panel));border-radius:8px;padding:9px 12px;font-size:calc(13px*var(--ts,1))}
 .evtbl td{padding:6px 10px}
 .evtbl input{padding:5px 8px;font-size:calc(13px*var(--ts,1))}
@@ -520,7 +521,8 @@ const DEF={
   startKey:'Escape',swKeys:{coolingFanState:'c',stirrerState:'s'},
   pUnit:'Pa',
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
-  theme:{name:'White',colors:{...WHITE}},customThemes:[]
+  theme:{name:'White',colors:{...WHITE}},customThemes:[],
+  cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}]
 };
 const FONTS=[['system','System (SF Pro)','-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif'],['rounded','SF Rounded','ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,sans-serif'],['helvetica','Helvetica Neue','"Helvetica Neue",Helvetica,Arial,sans-serif'],['avenir','Avenir Next','"Avenir Next",Avenir,"Helvetica Neue",sans-serif'],['din','DIN Alternate','"DIN Alternate","DIN Condensed","Helvetica Neue",sans-serif'],['futura','Futura','Futura,"Trebuchet MS",sans-serif'],['gill','Gill Sans','"Gill Sans","Gill Sans MT",sans-serif'],['optima','Optima','Optima,"Helvetica Neue",sans-serif'],['verdana','Verdana','Verdana,Geneva,sans-serif'],['georgia','Georgia (serif)','Georgia,"Times New Roman",serif'],['mono','SF Mono (monospace)','ui-monospace,"SF Mono",Menlo,monospace'],['custom','Other font…','']];
 function fontStack(key,custom){if(key==='custom'&&custom&&custom.trim())return `"${custom.trim().replace(/"/g,'')}",-apple-system,BlinkMacSystemFont,sans-serif`;const f=FONTS.find(x=>x[0]===key);return f&&f[2]?f[2]:FONTS[0][2]}
@@ -532,6 +534,7 @@ function loadCfg(){const s=store.get(LS.cfg,{})||{},c=JSON.parse(JSON.stringify(
   for(const k of Object.keys(c.channels))Object.assign(c.channels[k],(s.channels||{})[k]||{});
   if(s.theme)c.theme={name:s.theme.name||'Custom',colors:{...WHITE,...(s.theme.colors||{})}};
   c.swKeys={...DEF.swKeys,...(s.swKeys||{})};
+  if(!Array.isArray(c.cupBands)||c.cupBands.length!==4)c.cupBands=JSON.parse(JSON.stringify(DEF.cupBands));
   if(!Array.isArray(c.events)||!c.events.length)c.events=JSON.parse(JSON.stringify(DEF.events));
   if(s.keyV!==2&&Array.isArray(s.events)){const oldK={UNDO:'F8',CHARGE:'F1',DRY:'F2',FCs:'F3',FCe:'F4',SCs:'F5',COOL:'F7',DROP:'F6'},newK={UNDO:'0',CHARGE:'1',DRY:'2',FCs:'3',FCe:'4',SCs:'5',COOL:'7',DROP:'6'};
     const used=new Set(c.events.map(e=>e.key).filter(Boolean));for(const e of c.events)if(e.key===oldK[e.k]&&!used.has(newK[e.k])){used.delete(e.key);e.key=newK[e.k];used.add(e.key)}c.keyV=2}
@@ -1195,14 +1198,14 @@ function renderProfiles(){const q=normName($('#pSearch').value),list=HIST.filter
   $('#pRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),key=normName(r.meta.name),uses=HIST.filter(x=>normName(x.meta.name)===key),last=uses.map(x=>x.chargedAt||x.created).sort().at(-1),sel=r.id===selProfile;
     return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b></td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
-    <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
+    <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
   $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.some(r=>r.isProfile&&!r.archived)?'No profiles match.':'No profiles yet.<br>After a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>,<br>or pick any roast on the Roasts tab and press <b>Make profile</b>.'}</div>`;
   renderProfileDetail()}
 function renderProfileDetail(){const el=$('#pDetail'),r=HIST.find(x=>x.id===selProfile);if(!r){el.innerHTML='<div class="empty">Select a profile.</div>';return}
   const s=r.summary||summarize(r),adj=adjustments(r),rc=r.events.CHARGE??0,uses=HIST.filter(x=>x.id!==r.id&&normName(x.meta.name)===normName(r.meta.name)).slice(0,8),cost=costOf(r);
   const groups={};for(const a of adj){const k=mmss(a.t-rc);(groups[k]=groups[k]||[]).push(`${a.label} ${Math.round(a.to)}`)}
   const first=r.samples.find(x=>x.t>=rc);
-  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${esc(r.meta.name)}</div><div class="muted" style="margin-top:3px">From roast #${r.num} · ${fmtLong(r.chargedAt||r.created)} · ${ageOf(r.chargedAt||r.created)} · roasted ${uses.length+1}×</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:calc(14px*var(--ts,1));padding:4px 10px">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin-top:4px">cupping score</div></div>`:''}</div>
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${esc(r.meta.name)}</div><div class="muted" style="margin-top:3px">From roast #${r.num} · ${fmtLong(r.chargedAt||r.created)} · ${ageOf(r.chargedAt||r.created)} · roasted ${uses.length+1}×</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:calc(14px*var(--ts,1));padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin-top:4px">cupping score</div></div>`:''}</div>
   <div class="minic"><canvas id="pBig"></canvas></div>
   <div class="stats"><div class="stat"><div class="l">Charge</div><div class="v">${fT(s.charge)}<small>°${cfg.unit}</small></div></div><div class="stat"><div class="l">First crack</div><div class="v">${mmss(s.fcs)}</div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(s.drop)}</div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(s.dev)}</div></div></div>
   <div class="grid2" style="gap:22px"><div><div class="h3" style="margin-bottom:8px">Burner &amp; air plan</div><div class="plan">${first?`<span>0:00</span><b>Burner ${f0(first.burner)} · Air ${f0(first.fan)} · Drum ${f0(first.drum)}</b>`:''}${Object.entries(groups).map(([t,v])=>`<span>${t}</span><b>${v.join(' · ')}</b>`).join('')}</div></div>
@@ -1241,7 +1244,7 @@ function renderRoasts(){const list=roastList();if(!list.find(r=>r.id===selRoast)
   $('#rRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),sp=spreadOf(r.meta),c=costOf(r),dt=r.chargedAt||r.created;
     return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(dt)}</td><td class="tnum">${ageOf(dt)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?'<span class="badge">Profile</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td>
     <td class="n">${esc(r.meta.green||'—')}</td><td class="n">${esc(r.meta.roasted||'—')}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':'—'}</td><td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${ok(sp)?sp:'—'}</td>
-    <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):'—'}</td><td class="n">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
+    <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):'—'}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
   $('#rEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.length?'No roasts match.':'No saved roasts yet. Record a roast and press Save in Roast details.'}</div>`;renderRoastDetail()}
 function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoast);if(!r){el.innerHTML='<div class="empty">Select a roast.</div>';return}
   const s=r.summary||summarize(r),c=costOf(r),adj=adjustments(r),rc=r.events.CHARGE??0,dt=r.chargedAt||r.created;
@@ -1253,7 +1256,7 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   <div class="kv"><span>Batch cost</span><b class="tnum">${c&&ok(c.batch)?money(c.batch)+' green'+(ok(c.perLb)?' · '+money(c.perLb)+' / lb roasted':''):'—'}</b></div>
   <div class="kv"><span>Color whole / ground · spread</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · '+spreadOf(r.meta):''}</b></div>
   <div class="kv"><span>Adjustments</span><b>${adj.map(a=>`${a.label} ${Math.round(a.from)}→${Math.round(a.to)} at ${mmss(a.t-rc)}`).join(' · ')||'—'}</b></div>
-  <div class="kv"><span>Cupping score</span><b class="tnum">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div></div>
+  <div class="kv"><span>Cupping score</span><b class="tnum" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div></div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}${(r.tnotes||[]).length?'\n\n'+r.tnotes.map(n=>mmss(n.t-rc)+'  '+esc(n.text)).join('\n'):''}</div></div>
   <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="dangerTxt" id="rDel">Delete</button></div>`;
   requestAnimationFrame(()=>miniCurve($('#rBig'),r,{axis:true}));
@@ -1389,10 +1392,13 @@ const TAGS=['Milk chocolate','Dark chocolate','Caramel','Brown sugar','Nutty','C
 let selSession=null,selSample=0,cupMode='view';
 function newSample(roastId){return {roastId,scores:Object.fromEntries(ATTRS.map(a=>[a[0],7.5])),cups:Object.fromEntries(CUPK.map(c=>[c[0],[true,true,true,true,true]])),defects:0,tags:[],comments:''}}
 const cupScore=x=>ATTRS.reduce((a,k)=>a+(Number(x.scores[k[0]])||0),0)+CUPK.reduce((a,k)=>a+x.cups[k[0]].filter(Boolean).length*2,0)-(Number(x.defects)||0);
-function cupClass(v){return v>=90?'Outstanding':v>=85?'Excellent':v>=80?'Very good · specialty':'Below specialty'}
+function cupBand(v){const b=cfg.cupBands;for(let i=0;i<b.length-1;i++)if(v>=Number(b[i].min))return b[i];return b[b.length-1]}
+function cupClass(v){return cupBand(v).label}
+function cupSt(v){return cfg.cupColorsOn&&ok(Number(v))?`color:${cupBand(Number(v)).col}`:''}
+function cupPillSt(v){return cfg.cupColorsOn&&ok(Number(v))?`color:${cupBand(Number(v)).col};background:${rgba(cupBand(Number(v)).col,.12)}`:''}
 function renderCupping(){const list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date)));if(cupMode==='view'&&!list.find(s=>s.id===selSession))selSession=list[0]?.id||null;
   $('#cRows').innerHTML=list.map(s=>{const sc=s.samples.map(cupScore),best=sc.length?Math.max(...sc):null,avg=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null;
-    return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b></td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td><td>${esc(s.cuppers||'')}</td><td class="n"><span class="cup">${ok(best)?best.toFixed(2):'—'}</span></td><td class="n">${ok(avg)?avg.toFixed(2):'—'}</td></tr>`}).join('');
+    return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b></td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td><td>${esc(s.cuppers||'')}</td><td class="n"><span class="cup" style="${cupPillSt(best)}">${ok(best)?best.toFixed(2):'—'}</span></td><td class="n" style="${cupSt(avg)}">${ok(avg)?avg.toFixed(2):'—'}</td></tr>`}).join('');
   $('#cEmpty').innerHTML=list.length?'':'<div class="empty">No cupping sessions yet. Press <b>+ New session</b> and pick the roasts on the table.</div>';renderCupDetail()}
 function renderCupDetail(){const el=$('#cDetail');
   if(cupMode==='new'){const recent=HIST.filter(r=>!r.archived).slice(0,40);
@@ -1411,7 +1417,7 @@ function renderCupDetail(){const el=$('#cDetail');
   <div class="attrs">${ATTRS.map(a=>`<div class="at"><span class="nm">${a[1]}</span><div class="st"><button data-a="${a[0]}" data-d="-0.25">−</button><b>${Number(x.scores[a[0]]).toFixed(2)}</b><button data-a="${a[0]}" data-d="0.25">+</button></div></div>`).join('')}
     <div class="at"><span class="nm">Defects</span><div class="st"><button data-def="-2">−</button><b>${x.defects}</b><button data-def="2">+</button></div></div>
     ${CUPK.map(c=>`<div class="at"><span class="nm">${c[1]}</span><div class="cups">${x.cups[c[0]].map((v,i)=>`<button class="${v?'':'x'}" data-c="${c[0]}" data-ci="${i}" title="Cup ${i+1}"></button>`).join('')}</div></div>`).join('')}</div>
-  <div class="total"><div><div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Final score</div><div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:2px">${cupClass(total)} · ${scored.toFixed(2)} scored + ${cups} cups − ${x.defects} defects</div></div><b class="tnum">${total.toFixed(2)}</b></div>
+  <div class="total"><div><div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Final score</div><div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:2px"><span style="${cupSt(total)}">${esc(cupClass(total))}</span> · ${scored.toFixed(2)} scored + ${cups} cups − ${x.defects} defects</div></div><b class="tnum" style="${cupSt(total)}">${total.toFixed(2)}</b></div>
   <div><div class="h3" style="margin-bottom:8px">Flavor notes</div><div class="tags">${[...new Set([...TAGS,...(x.tags||[])])].map(t=>`<button class="${x.tags.includes(t)?'on':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button id="tagAdd">+ Add</button></div></div>
   <label class="field">Comments<textarea id="cComm">${esc(x.comments||'')}</textarea></label>
   <div class="row" style="margin-top:auto"><button class="pri" id="cSave">Save score</button>${r?`<button id="cOpen">Open roast #${r.num}</button>`:''}<span class="sp"></span><button id="cPrev" ${selSample===0?'disabled':''}>Previous sample</button><button id="cNext" ${selSample>=s.samples.length-1?'disabled':''}>Next sample</button></div>`;
@@ -1504,7 +1510,11 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Big numbers: roast time, bean temp, rate of rise and setpoints. Small numbers: exhaust, air pressure, preset buttons, stats and tiles. For “Other font…”, type the name exactly as it shows in the Mac’s Font Book.</div>
     <div class="cols"><div><div class="h3" style="margin:6px 0">Screen</div>${COLOR_ROWS.screen.map(([k,l])=>crow(k,l)).join('')}<div class="h3" style="margin:16px 0 6px">Big numbers &amp; setpoints (right side)</div>${COLOR_ROWS.big.map(([k,l])=>crow(k,l)).join('')}</div><div><div class="h3" style="margin:6px 0">Chart</div>${COLOR_ROWS.chart.map(([k,l])=>crow(k,l)).join('')}</div></div>
     ${warns.length?`<div class="warn">${warns.join(' ')}</div>`:''}
-    <div class="row"><button id="thSave">Save as my look…</button><span class="sp"></span><button id="thReset">Reset to White</button></div>`},
+    <div class="row"><button id="thSave">Save as my look…</button><span class="sp"></span><button id="thReset">Reset to White</button></div>
+    <div class="h3" style="margin-top:10px">Cupping score colors</div>
+    <label class="chk"><input type="checkbox" id="cupOn" ${cfg.cupColorsOn?'checked':''}> Color cupping scores by grade (Cupping, Roasts, Profiles and roast details)</label>
+    <div class="cupbands">${cfg.cupBands.map((b,i)=>{const last=i===cfg.cupBands.length-1;return `<div class="crow" style="grid-template-columns:150px 1fr 44px 96px">${last?`<span class="muted">Below ${esc(String(cfg.cupBands[i-1].min))}</span>`:`<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="muted">From</span><input type="number" step="0.25" data-cupm="${i}" value="${esc(String(b.min))}" style="width:80px"></label>`}<input type="text" data-cupl="${i}" value="${esc(b.label)}" placeholder="Grade name"><input type="color" data-cupc="${i}" value="${b.col}"><input type="text" data-cuph="${i}" value="${b.col.toUpperCase()}" maxlength="7"></div>`}).join('')}</div>
+    <div class="row"><span style="font-size:calc(22px*var(--ss,1));font-family:var(--numFont);font-weight:var(--smallW);display:flex;gap:22px">${cfg.cupBands.map((b,i)=>{const v=i===cfg.cupBands.length-1?Number(cfg.cupBands[i-1].min)-2:Number(b.min)+1.5;return `<span style="${cupSt(v)}">${v.toFixed(2)}</span>`}).join('')}</span><span class="sp"></span><button id="cupReset">Reset score colors</button></div>`},
   scale:()=>{const s=cfg.scales;return `<h2>Chart scales</h2><div class="sub">The numbers along the sides and bottom of the roast chart.</div>
     <label class="chk"><input type="checkbox" data-sc="auto" ${s.auto?'checked':''}> Fit the temperature scale to the roast automatically</label>
     <div class="sgrid">${[['tMin',`Temperature min (°${cfg.unit})`],['tMax',`Temperature max (°${cfg.unit})`],['tStep','Temperature label step'],['rMin',`Rate of rise min (°${cfg.unit}/min)`],['rMax','Rate of rise max'],['rStep','Rate of rise label step'],['minutes','Minutes shown before the roast fills it'],['pMax',`Air pressure strip max (${pU()}, 0 = auto)`]].map(([k,l])=>`<label class="field">${l}<input data-scv="${k}" value="${esc(k==='pMax'&&isMbar()?+(s[k]/100).toFixed(2):s[k])}" inputmode="decimal"></label>`).join('')}</div>
@@ -1575,6 +1585,14 @@ function wireSettings(){const el=$('#scont');
   $$('[data-hex]',el).forEach(i=>i.onchange=()=>{let v=i.value.trim();if(!v.startsWith('#'))v='#'+v;if(setCol(i.dataset.hex,v)){renderSettings()}else{toast('Use a 6-digit hex code like #1463FF');i.value=cfg.theme.colors[i.dataset.hex].toUpperCase()}});
   $$('[data-theme]',el).forEach(b=>b.onclick=e=>{if(e.target.dataset.deltheme!=null){cfg.customThemes.splice(Number(e.target.dataset.deltheme),1);saveCfg();renderSettings();return}const all=[{name:'White',colors:WHITE},{name:'Dark',colors:DARK},...cfg.customThemes],t=all[Number(b.dataset.theme)];cfg.theme={name:t.name,colors:{...WHITE,tTime:t.colors.text||WHITE.tTime,tBT:t.colors.text||WHITE.tBT,tRoR:t.colors.ror||WHITE.tRoR,tSpB:t.colors.text||WHITE.tSpB,tSpA:t.colors.text||WHITE.tSpA,tSpD:t.colors.text||WHITE.tSpD,...t.colors}};saveCfg();applyTheme();renderSettings();renderAll()});
   const ts=$('#thSave');if(ts)ts.onclick=async()=>{const n=await askText('Save this look','Name','My roasting room');if(!n||!n.trim())return;cfg.customThemes=cfg.customThemes.filter(t=>t.name!==n.trim());cfg.customThemes.push({name:n.trim(),colors:{...cfg.theme.colors}});cfg.theme.name=n.trim();saveCfg();renderSettings()};
+  const co=$('#cupOn');if(co)co.onchange=()=>{cfg.cupColorsOn=co.checked;saveCfg();renderSettings();renderAll()};
+  const cupSet=()=>{saveCfg();renderAll()};
+  $$('[data-cupc]',el).forEach(i=>{i.oninput=()=>{cfg.cupBands[+i.dataset.cupc].col=i.value;$(`[data-cuph="${i.dataset.cupc}"]`,el).value=i.value.toUpperCase();cupSet()};i.onchange=()=>renderSettings()});
+  $$('[data-cuph]',el).forEach(i=>i.onchange=()=>{let v=i.value.trim();if(!v.startsWith('#'))v='#'+v;const b=cfg.cupBands[+i.dataset.cuph];if(/^#[0-9a-f]{6}$/i.test(v)){b.col=v.toLowerCase();cupSet();renderSettings()}else{toast('Use a 6-digit hex code like #1E8E3E');i.value=b.col.toUpperCase()}});
+  $$('[data-cupl]',el).forEach(i=>i.onchange=()=>{const t=i.value.trim();if(!t){i.value=cfg.cupBands[+i.dataset.cupl].label;return}cfg.cupBands[+i.dataset.cupl].label=t;cupSet()});
+  $$('[data-cupm]',el).forEach(i=>i.onchange=()=>{const k=+i.dataset.cupm,v=Number(i.value),B=cfg.cupBands,hi=k>0?Number(B[k-1].min):Infinity,lo=k<B.length-2?Number(B[k+1].min):-Infinity;
+    if(!isFinite(v)||v>=hi||v<=lo||v<0||v>100){toast('Each grade must start lower than the one above it and higher than the one below it (0–100)');i.value=B[k].min;return}B[k].min=v;cupSet();renderSettings()});
+  const cr=$('#cupReset');if(cr)cr.onclick=()=>{cfg.cupBands=JSON.parse(JSON.stringify(DEF.cupBands));cfg.cupColorsOn=true;cupSet();renderSettings()};
   const tr=$('#thReset');if(tr)tr.onclick=()=>{cfg.theme={name:'White',colors:{...WHITE}};saveCfg();applyTheme();renderSettings();renderAll()};
   $$('[data-sc]',el).forEach(i=>i.onchange=()=>{cfg.scales[i.dataset.sc]=i.checked;saveCfg();scheduleDraw()});
   $$('[data-scv]',el).forEach(i=>i.onchange=()=>{const v=num(i.value);if(v==null){i.value=cfg.scales[i.dataset.scv];return}cfg.scales[i.dataset.scv]=i.dataset.scv==='pMax'&&isMbar()?v*100:v;const s=cfg.scales;if(s.tMax<=s.tMin)s.tMax=s.tMin+50;if(s.rMax<=s.rMin)s.rMax=s.rMin+10;if(s.tStep<=0)s.tStep=25;if(s.rStep<=0)s.rStep=5;saveCfg();scheduleDraw()});
