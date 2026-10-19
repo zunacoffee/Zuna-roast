@@ -30,10 +30,16 @@ fn keep_awake(state: State<Awake>, on: bool) -> Result<(), String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_dialog::init())
+    let builder = tauri::Builder::default().plugin(tauri_plugin_dialog::init());
+    // Mac: app restart + self-updater, exactly as before. The iPad gets updates from TestFlight instead.
+    #[cfg(desktop)]
+    let builder = builder
         .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build());
+    // iPad: roast-folder picker (iCloud), keep screen on, share sheet.
+    #[cfg(target_os = "ios")]
+    let builder = builder.plugin(tauri_plugin_zuna_ios::init());
+    builder
         .manage(files::DataFolder(Mutex::new(None)))
         .manage(roaster::Sockets::default())
         .manage(Awake::default())

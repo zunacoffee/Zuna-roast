@@ -16,6 +16,14 @@
   const invoke = T.core.invoke;
   const N = { version: '', folder: '' };
   window.ZR_NATIVE = N;
+  /* iPad app (Tauri on iPadOS). The Mac app's web view never reports touch, so this is false there. */
+  const IOS = /iPad|iPhone/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+  N.ios = IOS;
+  const ios = (cmd, args) => invoke('plugin:zuna-ios|' + cmd, args || {});
+  /* "…/Mobile Documents/com~apple~CloudDocs/Desktop/ZUNA COFFEE" → "iCloud Drive › Desktop › ZUNA COFFEE" */
+  const nice = p => { const s = String(p || ''), i = s.indexOf('com~apple~CloudDocs/');
+    return i >= 0 ? 'iCloud Drive › ' + s.slice(i + 20).split('/').filter(Boolean).join(' › ') : s; };
+  N.folderPicked = false;
 
   /* ---------------- data folder ---------------- */
   const join = (a, b) => (a ? a + '/' + b : b);
@@ -59,15 +67,36 @@
     async requestPermission() { return 'granted'; }
   }
 
-  N.root = async () => { const p = await invoke('data_folder'); N.folder = p; return new DirH('', lastPart(p)); };
+  async function iosOpen(path) {
+    const r = await invoke('set_data_folder', { path: String(path) });
+    N.folder = nice(r); N.folderPicked = true;
+    try {
+      const t = setTimeout(() => { if (window.toast) toast('Getting your roasts from iCloud…'); }, 800);
+      const d = await ios('download_folder'); clearTimeout(t);
+      if (d && d.pending && window.toast) toast(`${d.pending} file(s) are still downloading from iCloud — they'll show up shortly`);
+    } catch (e) {}
+    return new DirH('', lastPart(r));
+  }
+  N.root = async () => {
+    if (IOS) {
+      try { const r = await ios('restore_folder'); if (r && r.path) return await iosOpen(r.path); } catch (e) {}
+    }
+    const p = await invoke('data_folder'); N.folder = IOS ? nice(p) : p; return new DirH('', lastPart(p));
+  };
   N.chooseFolder = async () => {
+    if (IOS) {
+      const r = await ios('pick_folder');
+      if (!r || !r.path) return null;
+      return await iosOpen(r.path);
+    }
     const p = await T.dialog.open({ directory: true, multiple: false, title: 'Choose the folder for your roast data' });
     if (!p) return null;
     const r = await invoke('set_data_folder', { path: String(p) });
     N.folder = r; return new DirH('', lastPart(r));
   };
-  N.reveal = () => invoke('reveal_data_folder').catch(e => window.toast && toast('Could not open Finder: ' + e));
+  N.reveal = () => IOS ? (window.toast && toast('Open the Files app › ' + N.folder)) : invoke('reveal_data_folder').catch(e => window.toast && toast('Could not open Finder: ' + e));
   N.saveExport = async (name, text) => {
+    if (IOS) { const r = await ios('share_file', { name: String(name), text: String(text) }); return !!(r && r.done); }
     const p = await T.dialog.save({ defaultPath: name, title: 'Save export' });
     if (!p) return false;
     await invoke('save_export', { path: String(p), text: String(text) });
@@ -123,7 +152,7 @@
   N.awake = (why, on) => {
     on ? awakeFor.add(why) : awakeFor.delete(why);
     const want = awakeFor.size > 0;
-    if (want !== awakeOn) { awakeOn = want; invoke('keep_awake', { on: want }).catch(() => {}); }
+    if (want !== awakeOn) { awakeOn = want; (IOS ? ios('keep_awake', { on: want }) : invoke('keep_awake', { on: want })).catch(() => {}); }
   };
   try {
     Object.defineProperty(navigator, 'wakeLock', {
@@ -178,6 +207,17 @@
 
   window.addEventListener('DOMContentLoaded', async () => {
     try { N.version = await T.app.getVersion(); } catch (e) {}
+    if (IOS) {
+      /* First time on the iPad: point it at the shared iCloud roast folder */
+      setTimeout(async () => {
+        if (N.folderPicked || !window.ask) return;
+        const yes = await ask('Choose your roast folder',
+          'Pick iCloud Drive › Desktop › ZUNA COFFEE so this iPad uses the same roasts, profiles, green coffee and settings as the iMac. You only do this once.',
+          'Choose folder');
+        if (yes && window.chooseFolder) chooseFolder();
+      }, 1200);
+      return;
+    }
     guardClose();
     setTimeout(() => N.checkUpdate(false), 5000);
   });

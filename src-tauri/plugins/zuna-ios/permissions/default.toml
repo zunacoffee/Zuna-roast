@@ -1,0 +1,11 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = "Everything the Zuna Roast iPad app needs from this plugin."
+permissions = [
+  "allow-pick-folder",
+  "allow-restore-folder",
+  "allow-download-folder",
+  "allow-keep-awake",
+  "allow-share-file",
+]

@@ -1,0 +1,15 @@
+[package]
+name = "tauri-plugin-zuna-ios"
+version = "0.1.0"
+description = "iPad-only helpers for Zuna Roast: roast-folder picker (iCloud), iCloud download, keep screen awake, share sheet"
+edition = "2021"
+publish = false
+links = "tauri-plugin-zuna-ios"
+
+[dependencies]
+tauri = { version = "2" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }

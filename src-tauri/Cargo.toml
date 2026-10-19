@@ -24,6 +24,11 @@ tokio = { version = "1", features = ["sync", "time", "macros"] }
 tokio-tungstenite = "0.30"
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 
+# iPad only: folder picker for the iCloud roast folder, iCloud download, keep screen on, share sheet.
+# Never part of the Mac build.
+[target.'cfg(target_os = "ios")'.dependencies]
+tauri-plugin-zuna-ios = { path = "plugins/zuna-ios" }
+
 [profile.release]
 codegen-units = 1
 lto = true

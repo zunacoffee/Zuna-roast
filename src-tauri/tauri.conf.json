@@ -43,6 +43,9 @@
     "macOS": {
       "minimumSystemVersion": "13.0",
       "signingIdentity": "-"
+    },
+    "iOS": {
+      "minimumSystemVersion": "16.2"
     }
   },
   "plugins": {
