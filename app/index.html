@@ -240,6 +240,10 @@ tr.tdone td{color:var(--text2)}
 .ychart canvas{height:100%}
 .legend{display:flex;gap:18px;font-size:calc(13px*var(--ts,1));color:var(--text2);align-items:center}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.origins{padding:18px 20px 6px}.otitle{font-size:calc(20px*var(--ts,1));font-weight:700;margin-bottom:6px}
+.orow{padding:12px 0 14px;border-bottom:1px solid var(--line2)}.orow:last-child{border-bottom:0}
+.otop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.oname{font-size:calc(17px*var(--ts,1))}.olb{font-family:var(--numFont);font-size:calc(17px*var(--ts,1));font-variant-numeric:tabular-nums}.olb small{color:var(--text2);margin-left:5px;font-size:.85em}
+.obar{height:8px;border-radius:5px;background:var(--line2);overflow:hidden}.obar i{display:block;height:100%;border-radius:5px}
 .ygrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
 .delta{font-size:calc(12px*var(--ts,1));color:var(--text2);margin-top:3px}
 
@@ -1294,9 +1298,12 @@ const FLAGS=[['ethiopia','ET'],['kenya','KE'],['rwanda','RW'],['burundi','BI'],[
  ['colombia','CO'],['brazil','BR'],['peru','PE'],['bolivia','BO'],['ecuador','EC'],['venezuela','VE'],['guatemala','GT'],['honduras','HN'],['el salvador','SV'],['salvador','SV'],['nicaragua','NI'],['costa rica','CR'],['panama','PA'],['mexico','MX'],
  ['jamaica','JM'],['dominican','DO'],['haiti','HT'],['cuba','CU'],['puerto rico','PR'],['hawaii','US'],['kona','US'],['indonesia','ID'],['sumatra','ID'],['java','ID'],['sulawesi','ID'],['bali','ID'],['flores','ID'],['aceh','ID'],
  ['papua new guinea','PG'],['png','PG'],['timor','TL'],['india','IN'],['myanmar','MM'],['vietnam','VN'],['laos','LA'],['thailand','TH'],['china','CN'],['yunnan','CN'],['philippines','PH'],['taiwan','TW'],['nepal','NP'],['australia','AU'],['united states','US']];
-function flagOf(o){const t=' '+String(o||'').toLowerCase().replace(/[^a-z]+/g,' ')+' ';let best=null,at=1e9;
-  for(const [n,c] of FLAGS){const k=t.indexOf(' '+n+' ');if(k>=0&&k<at){at=k;best=c}}
-  return best?String.fromCodePoint(...[...best].map(c=>0x1F1A5+c.charCodeAt(0))):''}
+function countryCode(o){const t=' '+String(o||'').toLowerCase().replace(/[^a-z]+/g,' ')+' ';let best=null,at=1e9;
+  for(const [n,c] of FLAGS){const k=t.indexOf(' '+n+' ');if(k>=0&&k<at){at=k;best=c}}return best}
+const flagFor=c=>c?String.fromCodePoint(...[...c].map(x=>0x1F1A5+x.charCodeAt(0))):'';
+function flagOf(o){return flagFor(countryCode(o))}
+let regionNames=null;try{regionNames=new Intl.DisplayNames(['en'],{type:'region'})}catch(e){}
+function countryOf(o){const c=countryCode(o);if(c)return {key:c,flag:flagFor(c),name:regionNames?regionNames.of(c):String(o).trim()};const t=String(o||'').trim();return {key:'?'+t.toLowerCase(),flag:'',name:t||'No origin set'}}
 /* a soft color tag for the process — matched by the words set in Settings → Appearance, checked top to bottom, so "Anaerobic natural" or "EA decaf" sort into the right color */
 const procWords=r=>String(r.words||'').toLowerCase().split(',').map(w=>w.trim()).filter(Boolean);
 function procTag(p){const t=String(p||'').trim();if(!t)return '';const lt=t.toLowerCase(),f=cfg.procColorsOn?cfg.procColors.find(r=>procWords(r).some(w=>lt.includes(w))):null;
@@ -1349,12 +1356,13 @@ function renderGreenDetail(){const el=$('#gDetail');
 let gViewMode='inv',gYear=new Date().getFullYear(),yBars=[];
 const rDate=r=>new Date(r.chargedAt||r.created);
 function yearStats(y,cut){const rs=HIST.filter(r=>rDate(r).getFullYear()===y&&r.samples&&r.samples.length&&(!cut||rDate(r)<=cut));
-  const tot={n:0,g:0,w:0,gw:0,ww:0,cost:0,costN:0},mon=Array.from({length:12},()=>({n:0,g:0,w:0,gw:0,ww:0,cost:0})),byC={};
+  const tot={n:0,g:0,w:0,gw:0,ww:0,cost:0,costN:0},mon=Array.from({length:12},()=>({n:0,g:0,w:0,gw:0,ww:0,cost:0})),byC={},byO={};
   for(const r of rs){const g=num(r.meta.green)||0,w=num(r.meta.roasted),p=priceOf(r.meta.invId),m=mon[rDate(r).getMonth()],nm=r.meta.coffee||r.meta.name||'(no coffee named)';
-    const c=byC[nm]=byC[nm]||{name:nm,n:0,g:0,w:0,gw:0,ww:0,cost:0};
+    const c=byC[nm]=byC[nm]||{name:nm,n:0,g:0,w:0,gw:0,ww:0,cost:0},lot=INV.find(l=>l.id===r.meta.invId),co=countryOf(lot?lot.origin:''),oo=byO[co.key]=byO[co.key]||{...co,n:0,g:0};oo.n++;oo.g+=g;
     for(const o of [tot,m,c]){o.n++;o.g+=g;if(ok(w)){o.w+=w;if(g>0){o.gw+=g;o.ww+=w}}if(ok(p)&&g)o.cost+=p*g}
     if(ok(p)&&g)tot.costN++}
-  return {rs,tot,mon,coffees:Object.values(byC).sort((a,b)=>b.g-a.g)}}
+  if(y===new Date().getFullYear())for(const l of INV)if(invLeft(l)>0.001&&l.origin){const co=countryOf(l.origin);if(!byO[co.key])byO[co.key]={...co,n:0,g:0}}
+  return {rs,tot,mon,coffees:Object.values(byC).sort((a,b)=>b.g-a.g),origins:Object.values(byO).sort((a,b)=>b.g-a.g||a.name.localeCompare(b.name))}}
 const lossOf=o=>o.gw>0?(o.gw-o.ww)/o.gw*100:null;
 const lb1=v=>v.toLocaleString([], {minimumFractionDigits:1,maximumFractionDigits:1});
 function setGView(v){gViewMode=v;$$('#gView button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));const y=v==='year';
@@ -1377,8 +1385,7 @@ function renderYear(){const years=[...new Set([new Date().getFullYear(),...HIST.
   <div class="ygrid"><div class="card"><table><thead><tr><th>Month</th><th class="n">Roasts</th><th class="n">Green lb</th><th class="n">Roasted lb</th><th class="n">Loss</th><th class="n">Green cost</th></tr></thead><tbody>
     ${Y.mon.map((m,i)=>`<tr style="cursor:default" class="${m.n?'':'muted'}"><td>${MONTHS[i]}</td><td class="n">${m.n||'—'}</td><td class="n">${m.n?lb1(m.g):'—'}</td><td class="n">${m.w?lb1(m.w):'—'}</td><td class="n">${ok(lossOf(m))?lossOf(m).toFixed(1)+'%':'—'}</td><td class="n">${m.cost?money0(m.cost):'—'}</td></tr>`).join('')}
     <tr style="cursor:default"><td><b>Total</b></td><td class="n"><b>${t.n}</b></td><td class="n"><b>${lb1(t.g)}</b></td><td class="n"><b>${lb1(t.w)}</b></td><td class="n"><b>${ok(loss)?loss.toFixed(1)+'%':'—'}</b></td><td class="n"><b>${money0(t.cost)}</b></td></tr></tbody></table></div>
-    <div class="card"><table><thead><tr><th>Coffee</th><th class="n">Roasts</th><th class="n">Green lb</th><th class="n">Roasted lb</th><th class="n">Loss</th></tr></thead><tbody>
-    ${Y.coffees.map(c=>`<tr style="cursor:default"><td>${esc(c.name)}</td><td class="n">${c.n}</td><td class="n">${lb1(c.g)}</td><td class="n">${c.w?lb1(c.w):'—'}</td><td class="n">${ok(lossOf(c))?lossOf(c).toFixed(1)+'%':'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
+    <div class="card origins"><div class="otitle">By origin</div>${(()=>{const mx=Math.max(1,...Y.origins.map(o=>o.g));return Y.origins.map(o=>`<div class="orow" title="${o.n} roast${o.n===1?'':'s'}"><div class="otop"><span class="oname">${o.flag?`<span class="flag">${o.flag}</span>`:''}${esc(o.name)}</span><span class="olb">${Math.round(o.g).toLocaleString()}<small>lbs</small></span></div><div class="obar"><i style="width:${o.g/mx*100}%;background:${COL.drum}"></i></div></div>`).join('')})()}</div></div>`;
   requestAnimationFrame(()=>drawYear(Y));
   const cv=$('#cvYear');cv.onmousemove=e=>{const b=cv.getBoundingClientRect(),x=e.clientX-b.left,hit=yBars.find(h=>x>=h.x0&&x<=h.x1),tip=$('#yTip');if(!hit){tip.hidden=true;return}
     const m=Y.mon[hit.i];tip.innerHTML=`<b>${MONTHS[hit.i]} ${gYear}</b><br>${m.n} roast${m.n===1?'':'s'}<br>Green ${lb1(m.g)} lb · Roasted ${lb1(m.w)} lb${ok(lossOf(m))?'<br>Loss '+lossOf(m).toFixed(1)+' %':''}`;tip.hidden=false;
