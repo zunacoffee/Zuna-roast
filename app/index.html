@@ -240,7 +240,7 @@ td.prc span{display:block;font-weight:600}td.prc small{display:block;font-size:c
 .bagbox{border:1px solid var(--line2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .pin{display:grid;grid-template-columns:90px 1fr 110px 70px;gap:10px;align-items:center;font-size:calc(13.5px*var(--ts,1))}
 .pin.h{font-size:calc(11px*var(--ts,1));text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600}
-.pin input{padding:5px 8px;text-align:right}.pin .n{text-align:right}
+.pin input{padding:5px 8px;text-align:right}.pin input::placeholder{color:var(--text2);opacity:.5}.pin .n{text-align:right}
 table.mini th{position:static;padding:7px 8px}table.mini td{padding:7px 8px;cursor:default}table.mini tbody tr:hover td{background:none}
 #prCosts{flex:1}
 .prgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-content:start}
@@ -439,12 +439,12 @@ table.mini th{position:static;padding:7px 8px}table.mini td{padding:7px 8px;curs
 <!-- ================= PRICING ================= -->
 <div class="screen" id="scr-pricing" hidden>
   <div class="page">
-    <div class="ph"><h1>Pricing</h1><div class="seg" id="prView"><button data-v="prices" class="on">Prices</button><button data-v="costs">Costs &amp; settings</button></div><input type="search" id="prSearch" placeholder="Search coffee…">
+    <div class="ph"><h1>Pricing</h1><div class="seg" id="prView"><button data-v="prices" class="on">Prices</button><button data-v="costs">Costs &amp; settings</button></div><div class="seg" id="prSide"><button data-s="w" class="on">Wholesale</button><button data-s="r">Retail</button></div><input type="search" id="prSearch" placeholder="Search coffee…">
       <div class="sp"></div><button id="btnPrSheet">Wholesale price sheet</button></div>
     <div class="tiles" id="prTiles"></div>
     <div class="card prwhat" id="prWhat"></div>
     <div class="split" id="prSplit">
-      <div class="card scroll"><table><thead><tr><th>Coffee</th><th class="n">Green $/lb</th><th class="n">Loss</th><th class="n">Cost / lb</th><th class="n">12 oz</th><th class="n">2 lb</th><th class="n">5 lb</th><th>Margin</th></tr></thead><tbody id="prRows"></tbody></table><div id="prEmpty"></div></div>
+      <div class="card scroll"><table><thead><tr><th>Coffee</th><th class="n">Green $/lb</th><th class="n">Loss</th><th class="n">Cost / lb</th><th class="n">12 oz</th><th class="n">2 lb</th><th class="n">5 lb</th><th>Status</th></tr></thead><tbody id="prRows"></tbody></table><div id="prEmpty"></div></div>
       <div class="card detail" id="prDetail"></div>
     </div>
     <div id="prCosts" class="scroll" hidden></div>
@@ -1712,7 +1712,7 @@ function PRC(){const p=cfg.pricing||{},d=JSON.parse(JSON.stringify(PR_DEF)),o={.
   if(!Array.isArray(o.overhead))o.overhead=d.overhead;if(!Array.isArray(o.tiers))o.tiers=d.tiers;
   o.actual=p.actual&&typeof p.actual==='object'?p.actual:{};return o}
 function savePR(o){cfg.pricing=o;saveCfg()}
-let PRW={days:null,green:0},prSel=null,prView='prices';
+let PRW={days:null,green:0},prSel=null,prView='prices',prSide='w';
 const prKey=l=>normName(l.name);
 const prRound=(v,step)=>ok(v)?(step>0?Math.ceil(v/step-1e-9)*step:v):null;
 const pct=v=>ok(v)?v.toFixed(0)+' %':'—';
@@ -1741,11 +1741,12 @@ function prCalc(l,o,ctx){const hasPrice=ok(num(l.price)),landed=(num(l.price)||0
 
 function renderPricing(){const o=PRC(),ctx=prContext(o);
   $$('#prView button').forEach(b=>b.classList.toggle('on',b.dataset.v===prView));
-  $('#prSplit').hidden=prView!=='prices';$('#prSearch').hidden=prView!=='prices';$('#prCosts').hidden=prView!=='costs';
+  $('#prSplit').hidden=prView!=='prices';$('#prSearch').hidden=prView!=='prices';$('#prSide').hidden=prView!=='prices';
+  $$('#prSide button').forEach(b=>b.classList.toggle('on',b.dataset.s===prSide));$('#prCosts').hidden=prView!=='costs';
   const what=PRW.days!=null||Number(PRW.green);
   $('#prTiles').innerHTML=`<div class="card tile"><div class="l">Overhead / month</div><div class="v">${money0(ctx.ohMonth)}</div></div>
     <div class="card tile"><div class="l">Roasted / month${what?' (what-if)':ctx.useAuto?' · from your roasts':' · your estimate'}</div><div class="v">${ok(ctx.month)?Math.round(ctx.month).toLocaleString():'—'}<small>lb</small></div></div>
-    <div class="card tile"><div class="l">Overhead per lb roasted</div><div class="v" ${ctx.ohPerLb>6?'style="color:var(--warn)"':''}>${ok(ctx.ohPerLb)?money(ctx.ohPerLb):'—'}</div></div>
+    <div class="card tile"><div class="l">Overhead per lb roasted</div><div class="v" ${ctx.ohPerLb>6?'style="color:var(--warn)"':''}>${ok(ctx.ohPerLb)?money(ctx.ohPerLb):'—'}</div><div class="delta">Rent, gas &amp; other costs spread over every lb. Drops as you roast more.</div></div>
     <div class="card tile"><div class="l">Labor per lb roasted</div><div class="v">${money(ctx.labPerLb)}<small>@ ${money0(num(o.rate))}/hr</small></div></div>`;
   const wb=$('#prWhat');wb.classList.toggle('on',!!what);
   wb.innerHTML=`<span class="h3">What if</span>
@@ -1761,13 +1762,15 @@ function renderPricing(){const o=PRC(),ctx=prContext(o);
 function renderPrPrices(o,ctx){const q=normName($('#prSearch').value);
   const list=INV.filter(l=>invLeft(l)>0.001&&(!q||normName([l.name,l.origin,l.lot].join(' ')).includes(q)));
   if(!list.find(l=>l.id===prSel))prSel=list[0]?.id||null;
-  const cell=(b,k)=>{const v=b[k],mine=ok(b[k==='w'?'aw':'ar']),low=k==='w'?b.lowW:b.lowR;return `<span class="${low?'dangerTxt':mine?'':'sug'}">${money(v)}</span>`};
-  $('#prRows').innerHTML=list.map(l=>{const c=prCalc(l,o,ctx);
+  const k=prSide,tgt=k==='w'?o.wMargin:o.rMargin,sideName=k==='w'?'wholesale':'retail';
+  const cell=b=>{const v=b[k],mine=ok(b[k==='w'?'aw':'ar']),m=b[k==='w'?'mw':'mr'],low=mine&&m<tgt-0.05;
+    return `<span class="${low?'dangerTxt':mine?'':'sug'}">${money(v)}</span><small class="${low?'dangerTxt':'muted'}">${ok(m)?m.toFixed(0)+' %':'—'}${mine?'':' · suggested'}</small>`};
+  $('#prRows').innerHTML=list.map(l=>{const c=prCalc(l,o,ctx),lowBags=c.bags.filter(b=>k==='w'?b.lowW:b.lowR).map(b=>b.label);
     return `<tr class="${l.id===prSel?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b><div class="muted" style="font-size:calc(12px*var(--ts,1))">${esc([l.origin,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></td>
-      <td class="n">${c.hasPrice?money(c.landed):'—'}</td><td class="n">${c.loss.toFixed(1)}%${c.lossN?'':'<sup class="muted">*</sup>'}</td><td class="n"><b>${c.hasPrice?money(c.perLb):'—'}</b></td>
-      ${c.bags.map(b=>`<td class="n prc">${c.hasPrice?`${cell(b,'w')}<small>${cell(b,'r')}</small>`:'—'}</td>`).join('')}
-      <td>${!c.hasPrice?'<span class="badge gray">No green price</span>':c.low?'<span class="badge r">Below target</span>':'<span class="badge g">OK</span>'}</td></tr>`}).join('');
-  $('#prEmpty').innerHTML=list.length?`<div class="muted" style="padding:10px 14px;font-size:calc(12px*var(--ts,1))">Top number wholesale, bottom retail · <span class="sug">gray = suggested</span>, black = your price · <sup>*</sup> no roasts yet, using ${num(o.lossDefault)} % loss</div>`:`<div class="empty">No green coffee in stock.<br>Add coffee on the Green coffee screen, with its price per lb, to see prices here.</div>`;
+      <td class="n">${c.hasPrice?money(c.landed):'—'}</td><td class="n">${c.loss.toFixed(1)}%${c.lossN?'':' <span class="muted">(est.)</span>'}</td><td class="n"><b>${c.hasPrice?money(c.perLb):'—'}</b></td>
+      ${c.bags.map(b=>`<td class="n prc">${c.hasPrice?cell(b):'—'}</td>`).join('')}
+      <td>${!c.hasPrice?'<span class="badge gray">No green price</span>':lowBags.length?`<span class="badge r">${lowBags.join(', ')} below target</span>`:'<span class="badge g">OK</span>'}</td></tr>`}).join('');
+  $('#prEmpty').innerHTML=list.length?`<div class="muted" style="padding:10px 14px;font-size:calc(12.5px*var(--ts,1));line-height:1.6">Showing <b style="color:var(--text)">${sideName}</b> prices per bag, with the margin under each one. Target: ${num(tgt)} %. <span class="sug">Gray</span> = suggested, black = your price, <span class="dangerTxt">red</span> = below target.<br><b style="color:var(--text)">Margin is not markup.</b> Margin is the share of the price you keep: a $10 cost at ${num(tgt)} % margin sells for ${money(10/(1-tgt/100))}, not ${money(10*(1+tgt/100))}.${list.some(l=>!prCalc(l,o,ctx).lossN)?` “(est.)” = no roasts of that coffee yet, so ${num(o.lossDefault)} % loss is assumed.`:''}</div>`:`<div class="empty">No green coffee in stock.<br>Add coffee on the Green coffee screen, with its price per lb, to see prices here.</div>`;
   renderPrDetail(o,ctx)}
 
 function renderPrDetail(o,ctx){const el=$('#prDetail'),l=INV.find(x=>x.id===prSel);if(!l){el.innerHTML='<div class="empty">Pick a coffee to see its costs.</div>';return}
@@ -1906,7 +1909,7 @@ async function init(){
   $('#gRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selGreen=tr.dataset.id;gMode='view';renderGreen()}};
   $('#gView').onclick=e=>{const b=e.target.closest('button');if(b)setGView(b.dataset.v)};$('#gYearSel').onchange=e=>{gYear=Number(e.target.value);renderYear()};$('#btnYearCsv').onclick=()=>download(`green_use_${gYear}.csv`,yearCSV());
   $('#btnAddGreen').onclick=()=>{gMode='add';renderGreen()};$('#btnInvCsv').onclick=()=>download('green_inventory_'+new Date().toISOString().slice(0,10)+'.csv',invCSV());
-  $('#prView').onclick=e=>{const b=e.target.closest('button');if(b){prView=b.dataset.v;renderPricing()}};$('#prSearch').oninput=renderPricing;
+  $('#prView').onclick=e=>{const b=e.target.closest('button');if(b){prView=b.dataset.v;renderPricing()}};$('#prSearch').oninput=renderPricing;$('#prSide').onclick=e=>{const b=e.target.closest('button');if(b){prSide=b.dataset.s;renderPricing()}};
   $('#prRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){prSel=tr.dataset.id;renderPricing()}};$('#btnPrSheet').onclick=priceSheet;
   $('#cRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selSession=tr.dataset.id;selSample=0;cupMode='view';renderCupping()}};
   $('#btnNewSession').onclick=()=>{cupMode='new';renderCupping()};$('#btnCupCsv').onclick=()=>download('cupping_'+new Date().toISOString().slice(0,10)+'.csv',cupCSV());
