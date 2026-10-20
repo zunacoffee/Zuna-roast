@@ -242,7 +242,19 @@ td.prc span{display:block;font-weight:600}td.prc small{display:block;font-size:c
 .pin.h{font-size:calc(11px*var(--ts,1));text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600}
 .pin input{padding:5px 8px;text-align:right}.pin input::placeholder{color:var(--text2);opacity:.5}.pin .n{text-align:right}
 table.mini th{position:static;padding:7px 8px}table.mini td{padding:7px 8px;cursor:default}table.mini tbody tr:hover td{background:none}
-#prCosts{flex:1}
+#prCosts,#prOverview{flex:1}
+.ovgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-content:start}
+.ovcard{padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+.ovbig{font-size:calc(34px*var(--ss,1));font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.ovbig small{font-size:calc(14px*var(--ts,1));font-weight:500;color:var(--text2);margin-left:6px;letter-spacing:0}
+.ovsay{font-size:calc(15px*var(--ts,1));line-height:1.55}
+.ovstat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ovstat>div{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:10px 14px}
+.ovstat .l{font-size:calc(12px*var(--ts,1));color:var(--text2)}.ovstat .v{font-size:calc(22px*var(--ss,1));font-weight:500;font-variant-numeric:tabular-nums;margin-top:2px}
+.dayb{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:150px;padding-top:6px}
+.dayb>div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;font-size:calc(12.5px*var(--ts,1))}
+.dayb i{display:block;width:100%;max-width:64px;border-radius:5px 5px 0 0;background:color-mix(in srgb,var(--accent) 30%,var(--panel))}
+.dayb .on i{background:var(--accent)}.dayb .on b{color:var(--accent)}
+table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover td{background:none}
 .prgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-content:start}
 .prcard{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
 .prrow{display:grid;grid-template-columns:1fr 110px 70px 32px;gap:8px;align-items:center}.prrow.t{grid-template-columns:1fr 110px 80px 32px}
@@ -439,12 +451,11 @@ table.mini th{position:static;padding:7px 8px}table.mini td{padding:7px 8px;curs
 <!-- ================= PRICING ================= -->
 <div class="screen" id="scr-pricing" hidden>
   <div class="page">
-    <div class="ph"><h1>Pricing</h1><div class="seg" id="prView"><button data-v="prices" class="on">Prices</button><button data-v="costs">Costs &amp; settings</button></div><div class="seg" id="prSide"><button data-s="w" class="on">Wholesale</button><button data-s="r">Retail</button></div><input type="search" id="prSearch" placeholder="Search coffee…">
-      <div class="sp"></div><button id="btnPrSheet">Wholesale price sheet</button></div>
-    <div class="tiles" id="prTiles"></div>
-    <div class="card prwhat" id="prWhat"></div>
+    <div class="ph"><h1>Pricing</h1><div class="seg" id="prView"><button data-v="prices" class="on">Price list</button><button data-v="overview">Overview</button><button data-v="costs">Costs &amp; settings</button></div><div class="seg" id="prSide"><button data-s="w" class="on">Wholesale</button><button data-s="r">Retail</button></div><input type="search" id="prSearch" placeholder="Search coffee…">
+      <div class="sp"></div><span id="prWhatTag"></span><button id="btnPrSheet">Wholesale price sheet</button></div>
+    <div id="prOverview" class="scroll" hidden></div>
     <div class="split" id="prSplit">
-      <div class="card scroll"><table><thead><tr><th>Coffee</th><th class="n">Green $/lb</th><th class="n">Loss</th><th class="n">Cost / lb</th><th class="n">12 oz</th><th class="n">2 lb</th><th class="n">5 lb</th><th>Status</th></tr></thead><tbody id="prRows"></tbody></table><div id="prEmpty"></div></div>
+      <div class="card scroll"><table><thead><tr><th>Coffee</th><th class="n">Cost / lb</th><th class="n">12 oz</th><th class="n">2 lb</th><th class="n">5 lb</th><th>Status</th></tr></thead><tbody id="prRows"></tbody></table><div id="prEmpty"></div></div>
       <div class="card detail" id="prDetail"></div>
     </div>
     <div id="prCosts" class="scroll" hidden></div>
@@ -1741,36 +1752,66 @@ function prCalc(l,o,ctx){const hasPrice=ok(num(l.price)),landed=(num(l.price)||0
 
 function renderPricing(){const o=PRC(),ctx=prContext(o);
   $$('#prView button').forEach(b=>b.classList.toggle('on',b.dataset.v===prView));
-  $('#prSplit').hidden=prView!=='prices';$('#prSearch').hidden=prView!=='prices';$('#prSide').hidden=prView!=='prices';
-  $$('#prSide button').forEach(b=>b.classList.toggle('on',b.dataset.s===prSide));$('#prCosts').hidden=prView!=='costs';
+  const L=prView==='prices';$('#prSplit').hidden=!L;$('#prSearch').hidden=!L;$('#prSide').hidden=!L;$('#btnPrSheet').hidden=!L;
+  $('#prOverview').hidden=prView!=='overview';$('#prCosts').hidden=prView!=='costs';
+  $$('#prSide button').forEach(b=>b.classList.toggle('on',b.dataset.s===prSide));
   const what=PRW.days!=null||Number(PRW.green);
-  $('#prTiles').innerHTML=`<div class="card tile"><div class="l">Overhead / month</div><div class="v">${money0(ctx.ohMonth)}</div></div>
-    <div class="card tile"><div class="l">Roasted / month${what?' (what-if)':ctx.useAuto?' · from your roasts':' · your estimate'}</div><div class="v">${ok(ctx.month)?Math.round(ctx.month).toLocaleString():'—'}<small>lb</small></div></div>
-    <div class="card tile"><div class="l">Overhead per lb roasted</div><div class="v" ${ctx.ohPerLb>6?'style="color:var(--warn)"':''}>${ok(ctx.ohPerLb)?money(ctx.ohPerLb):'—'}</div><div class="delta">Rent, gas &amp; other costs spread over every lb. Drops as you roast more.</div></div>
-    <div class="card tile"><div class="l">Labor per lb roasted</div><div class="v">${money(ctx.labPerLb)}<small>@ ${money0(num(o.rate))}/hr</small></div></div>`;
-  const wb=$('#prWhat');wb.classList.toggle('on',!!what);
-  wb.innerHTML=`<span class="h3">What if</span>
-    <span class="row" style="gap:6px"><span class="muted">Roast days a week</span><button class="sm" id="prDm">−</button><b class="tnum" style="min-width:18px;text-align:center">${ctx.days}</b><button class="sm" id="prDp">+</button></span>
-    <span class="row" style="gap:6px"><span class="muted">Green price change</span><input id="prGc" inputmode="decimal" value="${Number(PRW.green)?PRW.green:''}" placeholder="0.00" style="width:80px;padding:5px 8px"><span class="muted">$ / lb</span></span>
-    <span class="sp"></span>${what?'<span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Showing what-if prices — nothing is saved</span><button class="sm" id="prWr">Reset</button>':'<span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Try a change to see every price update</span>'}`;
+  $('#prWhatTag').innerHTML=what&&prView!=='overview'?`<span class="badge" style="background:color-mix(in srgb,var(--warn) 14%,var(--panel));color:var(--warn);margin:0">What-if prices showing</span> <button class="sm" id="prWr2">Reset</button>`:'';
+  if($('#prWr2'))$('#prWr2').onclick=()=>{PRW={days:null,green:0};renderPricing()};
+  if(prView==='costs')renderPrCosts(o,ctx);else if(prView==='overview')renderPrOverview(o,ctx);else renderPrPrices(o,ctx)}
+
+/* Volume (lb roasted / month) at which a price reaches a margin m. null = never, even with no rent at all. */
+function prVolFor(price,b,m,ohMonth){const other=b.parts.coffee+b.parts.labor+b.parts.pack,room=price*(1-m/100)-other;return room>0?ohMonth/(room/b.lb):null}
+function renderPrOverview(o,ctx){const el=$('#prOverview'),what=PRW.days!=null||Number(PRW.green);
+  const list=INV.filter(l=>invLeft(l)>0.001&&ok(num(l.price))),calc=list.map(l=>({l,c:prCalc(l,o,ctx)}));
+  const avg=k=>calc.length?calc.reduce((a,x)=>a+x.c[k],0)/calc.length:null,avgCoffee=avg('coffee'),avgPer=avg('perLb');
+  const ohShare=ok(avgPer)&&avgPer>0?ctx.ohPerLb/avgPer*100:null;
+  // pounds/month & overhead/lb for 1–5 roast days
+  const perDay=ctx.daysNow>0?ctx.base/ctx.daysNow:0,days=[1,2,3,4,5].map(d=>({d,lb:perDay*d,oh:perDay*d>0?ctx.ohMonth/(perDay*d):null})),maxOh=Math.max(...days.map(x=>x.oh||0));
+  // break-even for every price Ty has typed in
+  const rows=[];calc.forEach(({l,c})=>c.bags.forEach(b=>[['w','Wholesale',o.wMargin],['r','Retail',o.rMargin]].forEach(([k,n,m])=>{const p=b['a'+k];if(!ok(p))return;
+    rows.push({l,b,n,p,m,zero:prVolFor(p,b,0,ctx.ohMonth),tgt:prVolFor(p,b,m,ctx.ohMonth)})})));
+  rows.sort((x,y)=>(y.tgt??1e9)-(x.tgt??1e9));
+  const vol=v=>v==null?'<span class="dangerTxt">never</span>':ok(v)?`${Math.round(v).toLocaleString()} lb`:'—';
+  const okNow=v=>v!=null&&v<=ctx.month+0.5;
+  el.innerHTML=`<div class="ovgrid">
+  <div class="card ovcard"><div class="h3">Your roasting${what?' — what-if':''}</div>
+    <div class="ovsay">You roast about <b>${ok(ctx.month)?Math.round(ctx.month).toLocaleString():'—'} lb</b> a month on <b>${ctx.days} day${ctx.days===1?'':'s'}</b> a week. Your fixed costs are <b>${money0(ctx.ohMonth)}</b> a month, so every pound carries <b style="color:var(--warn)">${money(ctx.ohPerLb)}</b> of overhead${ok(ohShare)?` — about <b>${Math.round(ohShare)} %</b> of what a pound costs you`:''}.</div>
+    <div class="ovstat"><div><div class="l">Overhead / month</div><div class="v">${money0(ctx.ohMonth)}</div></div><div><div class="l">Roasted / month${ctx.useAuto&&!what?' · your roasts':''}</div><div class="v">${ok(ctx.month)?Math.round(ctx.month).toLocaleString():'—'} <small class="muted">lb</small></div></div><div><div class="l">Labor per lb</div><div class="v">${money(ctx.labPerLb)}</div></div></div>
+    ${ok(avgPer)?`<div><div class="row" style="font-size:calc(13px*var(--ts,1));margin-bottom:6px"><span class="muted">Where an average pound’s cost goes</span><span class="sp"></span><b class="tnum">${money(avgPer)} / lb</b></div>
+      <div class="stack" style="height:14px"><i style="width:${avgCoffee/avgPer*100}%;background:var(--text)"></i><i style="width:${ctx.ohPerLb/avgPer*100}%;background:var(--accent)"></i><i style="width:${ctx.labPerLb/avgPer*100}%;background:var(--warn)"></i></div>
+      <div class="row" style="gap:16px;font-size:calc(12.5px*var(--ts,1));margin-top:6px"><span><b>${money(avgCoffee)}</b> <span class="muted">green coffee</span></span><span><b style="color:var(--accent)">${money(ctx.ohPerLb)}</b> <span class="muted">overhead</span></span><span><b>${money(ctx.labPerLb)}</b> <span class="muted">labor</span></span><span class="muted">+ bags, per size</span></div></div>`:''}</div>
+  <div class="card ovcard"><div class="row"><div class="h3">What if</div><span class="sp"></span>${what?'<span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Nothing is saved</span><button class="sm" id="prWr">Reset</button>':''}</div>
+    <div class="row" style="gap:18px"><span class="row" style="gap:6px"><span class="muted">Roast days a week</span><button class="sm" id="prDm">−</button><b class="tnum" style="min-width:18px;text-align:center">${ctx.days}</b><button class="sm" id="prDp">+</button></span>
+      <span class="row" style="gap:6px"><span class="muted">Green price change</span><input id="prGc" inputmode="decimal" value="${Number(PRW.green)?PRW.green:''}" placeholder="0.00" style="width:80px;padding:5px 8px"><span class="muted">$ / lb</span></span></div>
+    <div class="muted" style="font-size:calc(13px*var(--ts,1))">Overhead per lb at each roast schedule (same rent &amp; gas, more coffee):</div>
+    <div class="dayb">${days.map(x=>`<div class="${x.d===ctx.days?'on':''}"><b class="tnum">${money(x.oh)}</b><i style="height:${x.oh&&maxOh?Math.max(4,x.oh/maxOh*100):0}%"></i><span class="muted">${x.d} day${x.d===1?'':'s'}</span></div>`).join('')}</div>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Every price on the Price list follows these settings while they’re on.</div></div>
+  <div class="card ovcard" style="grid-column:1/-1"><div class="h3">Do your prices work?</div>
+    ${rows.length?`<div class="muted" style="font-size:calc(13px*var(--ts,1));margin-top:-4px">For each price you’ve set: how many lb you need to roast a month to cover all costs, and to reach your target margin. You roast about <b style="color:var(--text)">${Math.round(ctx.month).toLocaleString()} lb</b> now.</div>
+    <table class="be"><thead><tr><th>Coffee</th><th>Bag</th><th class="n">Your price</th><th class="n">Covers costs at</th><th class="n">Hits target at</th><th></th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td><b>${esc(r.l.name)}</b></td><td>${r.b.label} · ${r.n.toLowerCase()}</td><td class="n">${money(r.p)}</td><td class="n">${vol(r.zero)}</td><td class="n">${vol(r.tgt)} <span class="muted">(${r.m} %)</span></td>
+      <td>${okNow(r.tgt)?'<span class="badge g">Works now</span>':r.tgt==null?'<span class="badge r">Raise price</span>':okNow(r.zero)?'<span class="badge" style="background:color-mix(in srgb,var(--warn) 14%,var(--panel));color:var(--warn)">Needs more volume</span>':'<span class="badge r">Losing money now</span>'}</td></tr>`).join('')}</tbody></table>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">“Never” means the price doesn’t cover the coffee, labor and bag even with no rent at all.</div>`
+    :'<div class="empty" style="padding:20px">Type your prices on the Price list to see how many pounds a month each one needs.</div>'}</div>
+  </div>`;
   $('#prDm').onclick=()=>{PRW.days=Math.max(1,ctx.days-1);if(PRW.days===ctx.daysNow)PRW.days=null;renderPricing()};
   $('#prDp').onclick=()=>{PRW.days=Math.min(7,ctx.days+1);if(PRW.days===ctx.daysNow)PRW.days=null;renderPricing()};
   $('#prGc').onchange=e=>{const v=num(e.target.value);PRW.green=ok(v)?v:0;renderPricing()};
-  if($('#prWr'))$('#prWr').onclick=()=>{PRW={days:null,green:0};renderPricing()};
-  if(prView==='costs')renderPrCosts(o,ctx);else renderPrPrices(o,ctx)}
+  if($('#prWr'))$('#prWr').onclick=()=>{PRW={days:null,green:0};renderPricing()}}
 
 function renderPrPrices(o,ctx){const q=normName($('#prSearch').value);
   const list=INV.filter(l=>invLeft(l)>0.001&&(!q||normName([l.name,l.origin,l.lot].join(' ')).includes(q)));
   if(!list.find(l=>l.id===prSel))prSel=list[0]?.id||null;
   const k=prSide,tgt=k==='w'?o.wMargin:o.rMargin,sideName=k==='w'?'wholesale':'retail';
   const cell=b=>{const v=b[k],mine=ok(b[k==='w'?'aw':'ar']),m=b[k==='w'?'mw':'mr'],low=mine&&m<tgt-0.05;
-    return `<span class="${low?'dangerTxt':mine?'':'sug'}">${money(v)}</span><small class="${low?'dangerTxt':'muted'}">${ok(m)?m.toFixed(0)+' %':'—'}${mine?'':' · suggested'}</small>`};
+    return `<span class="${low?'dangerTxt':mine?'':'sug'}">${money(v)}</span><small class="${low?'dangerTxt':'muted'}">${b.lb!==1?money(v/b.lb)+'/lb · ':''}${ok(m)?m.toFixed(0)+' %':'—'}${mine?'':' · sugg.'}</small>`};
   $('#prRows').innerHTML=list.map(l=>{const c=prCalc(l,o,ctx),lowBags=c.bags.filter(b=>k==='w'?b.lowW:b.lowR).map(b=>b.label);
     return `<tr class="${l.id===prSel?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b><div class="muted" style="font-size:calc(12px*var(--ts,1))">${esc([l.origin,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></td>
-      <td class="n">${c.hasPrice?money(c.landed):'—'}</td><td class="n">${c.loss.toFixed(1)}%${c.lossN?'':' <span class="muted">(est.)</span>'}</td><td class="n"><b>${c.hasPrice?money(c.perLb):'—'}</b></td>
+      <td class="n"><b>${c.hasPrice?money(c.perLb):'—'}</b>${c.lossN?'':'<small class="muted" style="display:block;font-size:calc(11.5px*var(--ts,1))">est. loss</small>'}</td>
       ${c.bags.map(b=>`<td class="n prc">${c.hasPrice?cell(b):'—'}</td>`).join('')}
       <td>${!c.hasPrice?'<span class="badge gray">No green price</span>':lowBags.length?`<span class="badge r">${lowBags.join(', ')} below target</span>`:'<span class="badge g">OK</span>'}</td></tr>`}).join('');
-  $('#prEmpty').innerHTML=list.length?`<div class="muted" style="padding:10px 14px;font-size:calc(12.5px*var(--ts,1));line-height:1.6">Showing <b style="color:var(--text)">${sideName}</b> prices per bag, with the margin under each one. Target: ${num(tgt)} %. <span class="sug">Gray</span> = suggested, black = your price, <span class="dangerTxt">red</span> = below target.<br><b style="color:var(--text)">Margin is not markup.</b> Margin is the share of the price you keep: a $10 cost at ${num(tgt)} % margin sells for ${money(10/(1-tgt/100))}, not ${money(10*(1+tgt/100))}.${list.some(l=>!prCalc(l,o,ctx).lossN)?` “(est.)” = no roasts of that coffee yet, so ${num(o.lossDefault)} % loss is assumed.`:''}</div>`:`<div class="empty">No green coffee in stock.<br>Add coffee on the Green coffee screen, with its price per lb, to see prices here.</div>`;
+  $('#prEmpty').innerHTML=list.length?`<div class="muted" style="padding:10px 14px;font-size:calc(12.5px*var(--ts,1));line-height:1.6">Showing <b style="color:var(--text)">${sideName}</b> prices per bag, with the margin under each one. Target: ${num(tgt)} %. <span class="sug">Gray</span> = suggested, black = your price, <span class="dangerTxt">red</span> = below target. Under each price: price per lb · margin.<br><b style="color:var(--text)">Margin is not markup.</b> Margin is the share of the price you keep: a $10 cost at ${num(tgt)} % margin sells for ${money(10/(1-tgt/100))}, not ${money(10*(1+tgt/100))}.${list.some(l=>!prCalc(l,o,ctx).lossN)?` “est. loss” = no roasts of that coffee yet, so ${num(o.lossDefault)} % loss is assumed.`:''}</div>`:`<div class="empty">No green coffee in stock.<br>Add coffee on the Green coffee screen, with its price per lb, to see prices here.</div>`;
   renderPrDetail(o,ctx)}
 
 function renderPrDetail(o,ctx){const el=$('#prDetail'),l=INV.find(x=>x.id===prSel);if(!l){el.innerHTML='<div class="empty">Pick a coffee to see its costs.</div>';return}
@@ -1809,7 +1850,7 @@ function renderPrCosts(o,ctx){const el=$('#prCosts');
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin:-4px 0 0 24px">${ctx.rs.length} roast${ctx.rs.length===1?'':'s'} counted · simulator roasts left out</div>
     <label class="row"><input type="radio" name="prVol" value="manual" ${o.volMode==='manual'?'checked':''} style="width:auto"> My own number ${inp('volManual',o.volManual,'90px','150')} <span class="muted">lb roasted / month</span></label>
     <label class="field">Roast days a week right now${inp('daysNow',o.daysNow,'90px','1')}</label>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Overhead per lb = ${money(ctx.ohMonth)} ÷ ${ok(ctx.base)?Math.round(ctx.base):'—'} lb = <b>${money(ctx.base>0?ctx.ohMonth/ctx.base:null)}</b>. It drops as you roast more — try the What if box above.</div></div>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Overhead per lb = ${money(ctx.ohMonth)} ÷ ${ok(ctx.base)?Math.round(ctx.base):'—'} lb = <b>${money(ctx.base>0?ctx.ohMonth/ctx.base:null)}</b>. It drops as you roast more — try the What if box on the Overview.</div></div>
   <div class="card prcard"><div class="h3">Labor</div>
     <div class="grid2"><label class="field">Hourly rate ($)${inp('rate',o.rate,'100%','20')}</label><label class="field">Minutes per batch, all-in${inp('batchMin',o.batchMin,'100%','25')}</label></div>
     <label class="field">Batch size, lb roasted${ctx.batchFromHist?` — your average is ${ctx.batchLb.toFixed(1)} lb`:''}${ctx.batchFromHist?'':inp('batchLb',o.batchLb,'100%','20')}</label>
@@ -1849,7 +1890,7 @@ table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;text
 td{padding:10px;border-bottom:1px solid #E3E6EA}.n{text-align:right;font-variant-numeric:tabular-nums}td small{color:#6B7280;display:block;margin-top:2px}.foot{margin-top:24px;color:#6B7280;line-height:1.6}
 @media print{body{margin:24px}}</style></head><body><h1>${esc(biz)}</h1><div class="sub">Wholesale price list · ${esc(d)}</div>
 <table><thead><tr><th>Coffee</th>${BAGS.map(b=>`<th class="n">${b.label}</th>`).join('')}</tr></thead><tbody>
-${rows.map(({l,c})=>`<tr><td><b>${esc(l.name)}</b><small>${esc([l.origin,l.process].filter(Boolean).join(' · '))}</small></td>${c.bags.map(b=>`<td class="n">${money(b.w)}</td>`).join('')}</tr>`).join('')}
+${rows.map(({l,c})=>`<tr><td><b>${esc(l.name)}</b><small>${esc([l.origin,l.process].filter(Boolean).join(' · '))}</small></td>${c.bags.map(b=>`<td class="n">${money(b.w)}${b.lb!==1?`<small>${money(b.w/b.lb)} / lb</small>`:''}</td>`).join('')}</tr>`).join('')}
 </tbody></table><div class="foot">${tiers.length?'Volume pricing: '+tiers.map(t=>`${esc(t.name)} — ${num(t.off)} % off`).join(' · ')+'<br>':''}Prices per bag, whole bean. Subject to change with green coffee prices.</div></body></html>`;
   download('wholesale_prices_'+new Date().toISOString().slice(0,10)+'.html',html,'text/html');
   toast('Price sheet saved — open it in Safari and choose File › Export as PDF')}
