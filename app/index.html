@@ -290,7 +290,7 @@ tr.tdone td{color:var(--text2)}
 .crow{display:grid;grid-template-columns:1fr 38px 104px;gap:10px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1))}
 .crow input[type=color]{width:38px;height:30px;padding:2px;border-radius:6px}
 .crow input[type=text]{font-family:var(--mono);font-size:calc(13px*var(--ts,1));padding:6px 8px}
-.cupbands{max-width:620px}.ptag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:calc(12.5px*var(--ts,1));font-weight:500;white-space:nowrap}.flag{font-size:1.15em;margin-right:8px;vertical-align:-1px;font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif}.cupbands input[data-cupl]{font-family:var(--font)}
+.cupbands{max-width:620px}.ptag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:calc(12.5px*var(--ts,1));font-weight:500;white-space:nowrap}.flag{font-size:1.15em;margin-right:8px;vertical-align:-1px;font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif}.cupbands input[data-cupl],.cupbands input[data-procw]{font-family:var(--font)}
 .warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--panel));border-radius:8px;padding:9px 12px;font-size:calc(13px*var(--ts,1))}
 .evtbl td{padding:6px 10px}
 .evtbl input{padding:5px 8px;font-size:calc(13px*var(--ts,1))}
@@ -522,7 +522,8 @@ const DEF={
   pUnit:'Pa',
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[],
-  cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}]
+  cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}],
+  procColorsOn:true,procColors:[{words:'decaf',col:'#6B7280'},{words:'anaerobic, carbonic, ferment',col:'#7B4FB0'},{words:'wet-hulled, wet hulled, giling',col:'#5F7A36'},{words:'honey, pulped',col:'#B7791F'},{words:'natural, dry',col:'#B0452B'},{words:'washed, wet',col:'#2B6CB0'}]
 };
 const FONTS=[['system','System (SF Pro)','-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif'],['rounded','SF Rounded','ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,sans-serif'],['helvetica','Helvetica Neue','"Helvetica Neue",Helvetica,Arial,sans-serif'],['avenir','Avenir Next','"Avenir Next",Avenir,"Helvetica Neue",sans-serif'],['din','DIN Alternate','"DIN Alternate","DIN Condensed","Helvetica Neue",sans-serif'],['futura','Futura','Futura,"Trebuchet MS",sans-serif'],['gill','Gill Sans','"Gill Sans","Gill Sans MT",sans-serif'],['optima','Optima','Optima,"Helvetica Neue",sans-serif'],['verdana','Verdana','Verdana,Geneva,sans-serif'],['georgia','Georgia (serif)','Georgia,"Times New Roman",serif'],['mono','SF Mono (monospace)','ui-monospace,"SF Mono",Menlo,monospace'],['custom','Other font…','']];
 function fontStack(key,custom){if(key==='custom'&&custom&&custom.trim())return `"${custom.trim().replace(/"/g,'')}",-apple-system,BlinkMacSystemFont,sans-serif`;const f=FONTS.find(x=>x[0]===key);return f&&f[2]?f[2]:FONTS[0][2]}
@@ -534,6 +535,7 @@ function loadCfg(){const s=store.get(LS.cfg,{})||{},c=JSON.parse(JSON.stringify(
   for(const k of Object.keys(c.channels))Object.assign(c.channels[k],(s.channels||{})[k]||{});
   if(s.theme)c.theme={name:s.theme.name||'Custom',colors:{...WHITE,...(s.theme.colors||{})}};
   c.swKeys={...DEF.swKeys,...(s.swKeys||{})};
+  if(!Array.isArray(c.procColors))c.procColors=JSON.parse(JSON.stringify(DEF.procColors));
   if(!Array.isArray(c.cupBands)||c.cupBands.length!==4)c.cupBands=JSON.parse(JSON.stringify(DEF.cupBands));
   if(!Array.isArray(c.events)||!c.events.length)c.events=JSON.parse(JSON.stringify(DEF.events));
   if(s.keyV!==2&&Array.isArray(s.events)){const oldK={UNDO:'F8',CHARGE:'F1',DRY:'F2',FCs:'F3',FCe:'F4',SCs:'F5',COOL:'F7',DROP:'F6'},newK={UNDO:'0',CHARGE:'1',DRY:'2',FCs:'3',FCe:'4',SCs:'5',COOL:'7',DROP:'6'};
@@ -1295,10 +1297,10 @@ const FLAGS=[['ethiopia','ET'],['kenya','KE'],['rwanda','RW'],['burundi','BI'],[
 function flagOf(o){const t=' '+String(o||'').toLowerCase().replace(/[^a-z]+/g,' ')+' ';let best=null,at=1e9;
   for(const [n,c] of FLAGS){const k=t.indexOf(' '+n+' ');if(k>=0&&k<at){at=k;best=c}}
   return best?String.fromCodePoint(...[...best].map(c=>0x1F1A5+c.charCodeAt(0))):''}
-/* a soft color tag for the process — matched by keyword, so "Anaerobic natural" or "EA decaf" still sort into the right color */
-const PROC=[['decaf','#6B7280'],['anaerob','#7B4FB0'],['carbonic','#7B4FB0'],['ferment','#7B4FB0'],['wet-hull','#5F7A36'],['wet hull','#5F7A36'],['giling','#5F7A36'],['honey','#B7791F'],['pulped','#B7791F'],['natural','#B0452B'],['dry','#B0452B'],['washed','#2B6CB0'],['wet','#2B6CB0']];
-function procTag(p){const t=String(p||'').trim();if(!t)return '';const f=PROC.find(([k])=>t.toLowerCase().includes(k));
-  return f?`<span class="ptag" style="color:${f[1]};background:${rgba(f[1],.1)}">${esc(t)}</span>`:`<span class="muted">${esc(t)}</span>`}
+/* a soft color tag for the process — matched by the words set in Settings → Appearance, checked top to bottom, so "Anaerobic natural" or "EA decaf" sort into the right color */
+const procWords=r=>String(r.words||'').toLowerCase().split(',').map(w=>w.trim()).filter(Boolean);
+function procTag(p){const t=String(p||'').trim();if(!t)return '';const lt=t.toLowerCase(),f=cfg.procColorsOn?cfg.procColors.find(r=>procWords(r).some(w=>lt.includes(w))):null;
+  return f?`<span class="ptag" style="color:${f.col};background:${rgba(f.col,.1)}">${esc(t)}</span>`:`<span class="muted">${esc(t)}</span>`}
 function renderGreen(){const q=normName($('#gSearch').value);const list=INV.filter(l=>(gFilter==='stock'?invLeft(l)>0.001:invLeft(l)<=0.001)&&(!q||normName([l.name,l.origin,l.lot,l.supplier].join(' ')).includes(q)));
   if(gMode==='view'&&!list.find(l=>l.id===selGreen))selGreen=list[0]?.id||null;
   const inStock=INV.filter(l=>invLeft(l)>0.001),onHand=inStock.reduce((a,l)=>a+invLeft(l),0),value=inStock.reduce((a,l)=>a+(ok(num(l.price))?num(l.price)*invLeft(l):0),0),noPrice=inStock.some(l=>!ok(num(l.price)));
@@ -1526,7 +1528,12 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="h3" style="margin-top:10px">Cupping score colors</div>
     <label class="chk"><input type="checkbox" id="cupOn" ${cfg.cupColorsOn?'checked':''}> Color cupping scores by grade (Cupping, Roasts, Profiles and roast details)</label>
     <div class="cupbands">${cfg.cupBands.map((b,i)=>{const last=i===cfg.cupBands.length-1;return `<div class="crow" style="grid-template-columns:150px 1fr 44px 96px">${last?`<span class="muted">Below ${esc(String(cfg.cupBands[i-1].min))}</span>`:`<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="muted">From</span><input type="number" step="0.25" data-cupm="${i}" value="${esc(String(b.min))}" style="width:80px"></label>`}<input type="text" data-cupl="${i}" value="${esc(b.label)}" placeholder="Grade name"><input type="color" data-cupc="${i}" value="${b.col}"><input type="text" data-cuph="${i}" value="${b.col.toUpperCase()}" maxlength="7"></div>`}).join('')}</div>
-    <div class="row"><span style="font-size:calc(22px*var(--ss,1));font-family:var(--numFont);font-weight:var(--smallW);display:flex;gap:22px">${cfg.cupBands.map((b,i)=>{const v=i===cfg.cupBands.length-1?Number(cfg.cupBands[i-1].min)-2:Number(b.min)+1.5;return `<span style="${cupSt(v)}">${v.toFixed(2)}</span>`}).join('')}</span><span class="sp"></span><button id="cupReset">Reset score colors</button></div>`},
+    <div class="row"><span style="font-size:calc(22px*var(--ss,1));font-family:var(--numFont);font-weight:var(--smallW);display:flex;gap:22px">${cfg.cupBands.map((b,i)=>{const v=i===cfg.cupBands.length-1?Number(cfg.cupBands[i-1].min)-2:Number(b.min)+1.5;return `<span style="${cupSt(v)}">${v.toFixed(2)}</span>`}).join('')}</span><span class="sp"></span><button id="cupReset">Reset score colors</button></div>
+    <div class="h3" style="margin-top:10px">Process colors (Green coffee list)</div>
+    <label class="chk"><input type="checkbox" id="procOn" ${cfg.procColorsOn?'checked':''}> Color the process by type</label>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">A process gets the color of the first row whose words appear in it, checked top to bottom. Separate words with commas — “anaerobic” above “natural” makes “Anaerobic natural” purple.</div>
+    <div class="cupbands" style="max-width:760px">${cfg.procColors.map((r,i)=>`<div class="crow" style="grid-template-columns:150px 1fr 44px 96px 92px"><span>${procTag(procWords(r)[0]?procWords(r)[0].replace(/^./,c=>c.toUpperCase()):'—')}</span><input type="text" data-procw="${i}" value="${esc(r.words)}" placeholder="Words, separated by commas"><input type="color" data-procc="${i}" value="${r.col}"><input type="text" data-proch="${i}" value="${r.col.toUpperCase()}" maxlength="7"><span class="row" style="gap:4px;flex-wrap:nowrap"><button class="sm" data-procup="${i}" ${i===0?'disabled':''} title="Move up">↑</button><button class="sm" data-procdel="${i}" title="Remove">✕</button></span></div>`).join('')}</div>
+    <div class="row"><button id="procAdd">+ Add process</button><span class="sp"></span><button id="procReset">Reset process colors</button></div>`},
   scale:()=>{const s=cfg.scales;return `<h2>Chart scales</h2><div class="sub">The numbers along the sides and bottom of the roast chart.</div>
     <label class="chk"><input type="checkbox" data-sc="auto" ${s.auto?'checked':''}> Fit the temperature scale to the roast automatically</label>
     <div class="sgrid">${[['tMin',`Temperature min (°${cfg.unit})`],['tMax',`Temperature max (°${cfg.unit})`],['tStep','Temperature label step'],['rMin',`Rate of rise min (°${cfg.unit}/min)`],['rMax','Rate of rise max'],['rStep','Rate of rise label step'],['minutes','Minutes shown before the roast fills it'],['pMax',`Air pressure strip max (${pU()}, 0 = auto)`]].map(([k,l])=>`<label class="field">${l}<input data-scv="${k}" value="${esc(k==='pMax'&&isMbar()?+(s[k]/100).toFixed(2):s[k])}" inputmode="decimal"></label>`).join('')}</div>
@@ -1604,6 +1611,14 @@ function wireSettings(){const el=$('#scont');
   $$('[data-cupl]',el).forEach(i=>i.onchange=()=>{const t=i.value.trim();if(!t){i.value=cfg.cupBands[+i.dataset.cupl].label;return}cfg.cupBands[+i.dataset.cupl].label=t;cupSet()});
   $$('[data-cupm]',el).forEach(i=>i.onchange=()=>{const k=+i.dataset.cupm,v=Number(i.value),B=cfg.cupBands,hi=k>0?Number(B[k-1].min):Infinity,lo=k<B.length-2?Number(B[k+1].min):-Infinity;
     if(!isFinite(v)||v>=hi||v<=lo||v<0||v>100){toast('Each grade must start lower than the one above it and higher than the one below it (0–100)');i.value=B[k].min;return}B[k].min=v;cupSet();renderSettings()});
+  const po=$('#procOn');if(po)po.onchange=()=>{cfg.procColorsOn=po.checked;saveCfg();renderSettings()};
+  $$('[data-procw]',el).forEach(i=>i.onchange=()=>{cfg.procColors[+i.dataset.procw].words=i.value;saveCfg();renderSettings()});
+  $$('[data-procc]',el).forEach(i=>{i.oninput=()=>{cfg.procColors[+i.dataset.procc].col=i.value;$(`[data-proch="${i.dataset.procc}"]`,el).value=i.value.toUpperCase();saveCfg()};i.onchange=()=>renderSettings()});
+  $$('[data-proch]',el).forEach(i=>i.onchange=()=>{let v=i.value.trim();if(!v.startsWith('#'))v='#'+v;const r=cfg.procColors[+i.dataset.proch];if(/^#[0-9a-f]{6}$/i.test(v)){r.col=v.toLowerCase();saveCfg();renderSettings()}else{toast('Use a 6-digit hex code like #2B6CB0');i.value=r.col.toUpperCase()}});
+  $$('[data-procup]',el).forEach(b=>b.onclick=()=>{const k=+b.dataset.procup,P=cfg.procColors;if(k>0){[P[k-1],P[k]]=[P[k],P[k-1]];saveCfg();renderSettings()}});
+  $$('[data-procdel]',el).forEach(b=>b.onclick=()=>{cfg.procColors.splice(+b.dataset.procdel,1);saveCfg();renderSettings()});
+  const pa=$('#procAdd');if(pa)pa.onclick=()=>{cfg.procColors.push({words:'',col:'#8A929B'});saveCfg();renderSettings();const w=$$('[data-procw]',el).at(-1);if(w)w.focus()};
+  const pr=$('#procReset');if(pr)pr.onclick=()=>{cfg.procColors=JSON.parse(JSON.stringify(DEF.procColors));cfg.procColorsOn=true;saveCfg();renderSettings()};
   const cr=$('#cupReset');if(cr)cr.onclick=()=>{cfg.cupBands=JSON.parse(JSON.stringify(DEF.cupBands));cfg.cupColorsOn=true;cupSet();renderSettings()};
   const tr=$('#thReset');if(tr)tr.onclick=()=>{cfg.theme={name:'White',colors:{...WHITE}};saveCfg();applyTheme();renderSettings();renderAll()};
   $$('[data-sc]',el).forEach(i=>i.onchange=()=>{cfg.scales[i.dataset.sc]=i.checked;saveCfg();scheduleDraw()});
