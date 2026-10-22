@@ -1166,8 +1166,10 @@ function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)re
       if(cfg.scales[fk]&&(r===S.roast||cfg.scales.fillBkg)){ctx.fillStyle=rgba(R.col,r===S.roast?.16:.07);ctx.beginPath();let x0=null,xl=null;const cl=()=>{if(x0!=null){ctx.lineTo(xl,top+h);ctx.lineTo(x0,top+h);ctx.closePath();x0=null}};
         for(const s of r.samples){if(end!=null&&s.t>end)break;const vv=s[R.k];if(!ok(vv)){cl();continue}const x=X(s.t-o),y=Yv(vv);if(x0==null){x0=x;ctx.moveTo(x,y)}else ctx.lineTo(x,y);xl=x}cl();ctx.fill()}ctx.globalAlpha=alpha;ctx.strokeStyle=R.col;ctx.lineWidth=lw;ctx.setLineDash(dash);ctx.beginPath();let pen=false;
       for(const s of r.samples){if(end!=null&&s.t>end)break;const vv=s[R.k];if(!ok(vv)){pen=false;continue}const x=X(s.t-o),y=Yv(vv);pen?ctx.lineTo(x,y):ctx.moveTo(x,y);pen=true}ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
-      if(lab&&!R.noLabels){ctx.font=`600 ${11*TS()}px ${font}`;for(const a of adjustments(r).filter(a=>a.key===R.k)){const x=X(a.t-o),y=Yv(a.to),tx=Math.round(a.to)+'%',tw=ctx.measureText(tx).width+8,oy=lab.below?4:-16;
-        ctx.fillStyle=lab.bg==='col'?R.col:COL.chartBg;ctx.fillRect(x+3,y+oy,tw,13);ctx.fillStyle=lab.fg==='col'?R.col:lab.fg;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(tx,x+7,y+oy+6.5)}}
+      if(lab&&!R.noLabels){ctx.font=`600 ${11*TS()}px ${font}`;const adj=adjustments(r).filter(a=>a.key===R.k);adj.forEach((a,ai)=>{const x=X(a.t-o),y=Yv(a.to),tx=Math.round(a.to)+'%',tw=ctx.measureText(tx).width+8;
+        const nx=adj[ai+1];if(nx&&X(nx.t-o)-x<tw+6)return; /* a quick follow-up change: show only the value it settled on */
+        let oy=lab.below?4:-16;if(!lab.below&&y+oy<top-3)oy=4;if(lab.below&&y+oy+13>top+h+8)oy=-16; /* keep labels inside their own row */
+        ctx.fillStyle=lab.bg==='col'?R.col:COL.chartBg;ctx.fillRect(x+3,y+oy,tw,13);ctx.fillStyle=lab.fg==='col'?R.col:lab.fg;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(tx,x+7,y+oy+6.5)})}
       ctx.restore()};
     if(S.bg)series(S.bg,[5,4],.55,1.5,{bg:'bg',fg:COL.axis,below:true},S.bg.events.DROP!=null?S.bg.events.DROP+60:null);
     series(S.roast,[],1,2.2,{bg:'col',fg:'#fff'})});
