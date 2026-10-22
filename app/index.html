@@ -361,7 +361,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 <header>
   <div class="brand" id="brand"></div>
   <nav id="nav">
-    <button data-s="roast" class="on">Roast</button><button data-s="today">Today</button><button data-s="profiles">Profiles</button><button data-s="roasts">Roasts</button><button data-s="green">Green coffee</button><button data-s="pricing">Pricing</button><button data-s="cupping">Cupping</button><button data-s="settings">Settings</button>
+    <button data-s="roast" class="on">Roast</button><button data-s="today">Today</button><button data-s="profiles">Profiles</button><button data-s="roasts">History</button><button data-s="green">Green coffee</button><button data-s="pricing">Pricing</button><button data-s="cupping">Cupping</button><button data-s="settings">Settings</button>
   </nav>
   <div class="lamps" id="lamps"></div>
   <div class="sp"></div>
@@ -437,7 +437,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 <!-- ================= ROASTS ================= -->
 <div class="screen" id="scr-roasts" hidden>
   <div class="page">
-    <div class="ph"><h1>Roasts</h1><input type="search" id="rSearch" placeholder="Search name, coffee, lot, #…">
+    <div class="ph"><h1>History</h1><input type="search" id="rSearch" placeholder="Search name, coffee, lot, #…">
       <div class="seg" id="rFilter"><button data-f="all" class="on">All</button><button data-f="prof">Profiles ★</button><button data-f="week">This week</button></div>
       <div class="sp"></div><button id="btnImport">Import</button><button id="btnExportAll">Export all</button><input type="file" id="fileImport" accept=".json" hidden></div>
     <div class="split">
@@ -1275,7 +1275,7 @@ function renderProfiles(){const q=normName($('#pSearch').value),list=HIST.filter
     return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b></td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
     <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
-  $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.some(r=>r.isProfile&&!r.archived)?'No profiles match.':'No profiles yet.<br>After a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>,<br>or pick any roast on the Roasts tab and press <b>Make profile</b>.'}</div>`;
+  $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.some(r=>r.isProfile&&!r.archived)?'No profiles match.':'No profiles yet.<br>After a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>,<br>or pick any roast on the History tab and press <b>Make profile</b>.'}</div>`;
   renderProfileDetail()}
 function renderProfileDetail(){const el=$('#pDetail'),r=HIST.find(x=>x.id===selProfile);if(!r){el.innerHTML='<div class="empty">Select a profile.</div>';return}
   const s=r.summary||summarize(r),adj=adjustments(r),rc=r.events.CHARGE??0,uses=HIST.filter(x=>x.id!==r.id&&normName(x.meta.name)===normName(r.meta.name)).slice(0,8),cost=costOf(r);
@@ -1614,7 +1614,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="sech">Pricing</div>
     <div class="cols"><div>${COLOR_ROWS.pricing.slice(0,3).map(([k,l])=>crow(k,l)).join('')}</div><div>${COLOR_ROWS.pricing.slice(3).map(([k,l])=>crow(k,l)).join('')}</div></div>
     <div class="sech">Cupping</div>
-    <label class="chk"><input type="checkbox" id="cupOn" ${cfg.cupColorsOn?'checked':''}> Color cupping scores by grade (Cupping, Roasts, Profiles and roast details)</label>
+    <label class="chk"><input type="checkbox" id="cupOn" ${cfg.cupColorsOn?'checked':''}> Color cupping scores by grade (Cupping, History, Profiles and roast details)</label>
     <div class="cupbands">${cfg.cupBands.map((b,i)=>{const last=i===cfg.cupBands.length-1;return `<div class="crow" style="grid-template-columns:150px 1fr 44px 96px">${last?`<span class="muted">Below ${esc(String(cfg.cupBands[i-1].min))}</span>`:`<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="muted">From</span><input type="number" step="0.25" data-cupm="${i}" value="${esc(String(b.min))}" style="width:80px"></label>`}<input type="text" data-cupl="${i}" value="${esc(b.label)}" placeholder="Grade name"><input type="color" data-cupc="${i}" value="${b.col}"><input type="text" data-cuph="${i}" value="${b.col.toUpperCase()}" maxlength="7"></div>`}).join('')}</div>
     <div class="row"><span style="font-size:calc(22px*var(--ss,1));font-family:var(--numFont);font-weight:var(--smallW);display:flex;gap:22px">${cfg.cupBands.map((b,i)=>{const v=i===cfg.cupBands.length-1?Number(cfg.cupBands[i-1].min)-2:Number(b.min)+1.5;return `<span style="${cupSt(v)}">${v.toFixed(2)}</span>`}).join('')}</span><span class="sp"></span><button id="cupReset">Reset score colors</button></div>
     ${warns.length?`<div class="warn">${warns.join(' ')}</div>`:''}
