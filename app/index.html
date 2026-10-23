@@ -632,7 +632,7 @@ const DEF={
   pUnit:'Pa',
   anDtrLow:17,anDtrHigh:24,anRorFC:10.5,anLong:12,anShort:8,anSpread:5,
   // Brewed Behavior targets (stored °C, °C/min, seconds)
-  bbTp:90,bbTpTol:20,bbDryMin:210,bbDryMax:300,bbDryC:(300-32)*5/9,bbDryTol:10/1.8,bb6Slow:12/1.8,bb6Ideal:15/1.8,bb6Fast:20/1.8,bbFcC:(378-32)*5/9,bbFcTol:8/1.8,bbDevMin:120,bbDevMax:240,anBurnerStep:5,anAirStep:5,anCupLow:7.25,
+  bbTp:90,bbTpTol:20,bbDryMin:210,bbDryMax:300,bbDryC:(300-32)*5/9,bbDryTol:10/1.8,bb6Slow:12/1.8,bb6Ideal:15/1.8,bb6Fast:20/1.8,bbFcC:(396-32)*5/9,bbFcTol:8/1.8,bbDevMin:120,bbDevMax:240,anBurnerStep:5,anAirStep:5,anCupLow:7.25,
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[],
   cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}],
@@ -1399,7 +1399,7 @@ const XNAMES=['Drying check','Yellow','Cinnamon','Maillard check','Pre-crack','F
 
 function bldDefaults(){const F=isF(),d=v=>F?v:+((v-32)*5/9).toFixed(0);
   return {mode:'scratch',srcId:'',editId:null,name:'',invId:'',coffee:'',lot:'',green:'13',notes:'',
-    charge:d(400),tp:'1:30',tpBT:d(195),dry:'4:00',dryBT:d(300),fc:'9:15',fcBT:d(378),dropT:'11:45',dropBT:d(400),style:'std',
+    charge:d(400),tp:'1:30',tpBT:d(195),dry:'4:00',dryBT:d(310),fc:'9:30',fcBT:d(396),dropT:'11:55',dropBT:d(413),style:'std',
     steps:[{when:'ev',at:'CHARGE',burner:'80',fan:'40',drum:''},{when:'ev',at:'DRY',burner:'65',fan:'50',drum:''},{when:'ev',at:'FCs',burner:'45',fan:'65',drum:''}],
     extra:[],chargeAdj:'0',burnerAdj:'0',srcBatch:null}}
 // read the milestones and burner/air plan out of an existing profile (real or planned)
@@ -2318,7 +2318,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     ${window.ZR_NATIVE?`<div class="box"><span>Zuna Roast for Mac · version <b>${esc(ZR_NATIVE.version||'—')}</b></span><button id="stUpd">Check for updates</button></div>`:''}`,
   an:()=>`<h2>Analyze rules</h2><div class="sub">The starting rules the Analyze screen uses. Once a coffee has history, it also learns from that coffee's own results and sizes the steps up or down on its own.</div>
     <div class="h3">What counts as a problem on the curve</div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">From the Brewed Behavior roasting manual. The first crack mark is machine-specific — set it to where your P12 cracks.</div>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">From the Brewed Behavior roasting manual. The first crack mark is machine-specific — the manual's roasters crack at 378°F; yours is set to where your P12 cracks.</div>
     <div class="sgrid"><label class="field">Turning point target (m:ss)<input data-cfgm="bbTp" value="${mmss(cfg.bbTp)}"></label><label class="field">Turning point — within (seconds)<input data-cfg="bbTpTol" value="${esc(cfg.bbTpTol)}"></label>
       <label class="field">Color change — earliest (m:ss)<input data-cfgm="bbDryMin" value="${mmss(cfg.bbDryMin)}"></label><label class="field">Color change — latest (m:ss)<input data-cfgm="bbDryMax" value="${mmss(cfg.bbDryMax)}"></label>
       <label class="field">Color change temp (°${cfg.unit})<input data-cfgt="bbDryC" value="${fT(cfg.bbDryC)}"></label><label class="field">Color change temp — within ± (°${cfg.unit})<input data-cfgr="bbDryTol" value="${toDR(cfg.bbDryTol).toFixed(0)}"></label>
