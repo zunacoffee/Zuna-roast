@@ -630,7 +630,9 @@ const DEF={
   events:[{k:'UNDO',label:'Undo',show:true,key:'0'},{k:'CHARGE',label:'Charge',show:true,key:'1'},{k:'DRY',label:'Dry end',show:true,key:'2'},{k:'FCs',label:'FC start',show:true,key:'3'},{k:'FCe',label:'FC end',show:true,key:'4'},{k:'SCs',label:'SC start',show:false,key:'5'},{k:'SCe',label:'SC end',show:false,key:''},{k:'COOL',label:'Cool end',show:false,key:'7'},{k:'DROP',label:'Drop',show:true,key:'6'}],evOrderV:2,keyV:2,
   startKey:'Escape',swKeys:{coolingFanState:'c',stirrerState:'s'},
   pUnit:'Pa',
-  anDtrLow:17,anDtrHigh:24,anRorFC:10.5,anLong:12.5,anShort:8.5,anSpread:10,anBurnerStep:5,anAirStep:5,anCupLow:7.25,
+  anDtrLow:17,anDtrHigh:24,anRorFC:10.5,anLong:12,anShort:8,anSpread:5,
+  // Brewed Behavior targets (stored °C, °C/min, seconds)
+  bbTp:90,bbTpTol:20,bbDryMin:210,bbDryMax:300,bbDryC:(300-32)*5/9,bbDryTol:10/1.8,bb6Slow:12/1.8,bb6Ideal:15/1.8,bb6Fast:20/1.8,bbFcC:(378-32)*5/9,bbFcTol:8/1.8,bbDevMin:120,bbDevMax:240,anBurnerStep:5,anAirStep:5,anCupLow:7.25,
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[],
   cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}],
@@ -647,6 +649,7 @@ function loadCfg(){const s=store.get(LS.cfg,{})||{},c=JSON.parse(JSON.stringify(
   for(const k of Object.keys(c.channels))Object.assign(c.channels[k],(s.channels||{})[k]||{});
   if(s.theme)c.theme={name:s.theme.name||'Custom',colors:{...WHITE,...(s.theme.colors||{})}};
   c.swKeys={...DEF.swKeys,...(s.swKeys||{})};
+  if(s.bbV!==1){if(s.anLong===12.5)c.anLong=12;if(s.anShort===8.5)c.anShort=8;if(s.anSpread===10)c.anSpread=5;c.bbV=1}   // Brewed Behavior defaults (1.0.19)
   if(!Array.isArray(c.procColors))c.procColors=JSON.parse(JSON.stringify(DEF.procColors));
   if(!Array.isArray(c.cupBands)||c.cupBands.length!==4)c.cupBands=JSON.parse(JSON.stringify(DEF.cupBands));
   if(!Array.isArray(c.events)||!c.events.length)c.events=JSON.parse(JSON.stringify(DEF.events));
@@ -1396,26 +1399,27 @@ const XNAMES=['Drying check','Yellow','Cinnamon','Maillard check','Pre-crack','F
 
 function bldDefaults(){const F=isF(),d=v=>F?v:+((v-32)*5/9).toFixed(0);
   return {mode:'scratch',srcId:'',editId:null,name:'',invId:'',coffee:'',lot:'',green:'13',notes:'',
-    charge:d(400),tp:'1:15',tpBT:d(190),dry:'4:45',dryBT:d(320),fc:'8:30',fcBT:d(392),devMode:'pct',devPct:'20',devTime:'2:00',dropBT:d(405),
-    steps:[{when:'ev',at:'CHARGE',burner:'70',fan:'40',drum:''},{when:'ev',at:'DRY',burner:'60',fan:'50',drum:''},{when:'ev',at:'FCs',burner:'40',fan:'65',drum:''}],
+    charge:d(400),tp:'1:30',tpBT:d(195),dry:'4:00',dryBT:d(300),fc:'9:15',fcBT:d(378),dropT:'11:45',dropBT:d(400),style:'std',
+    steps:[{when:'ev',at:'CHARGE',burner:'80',fan:'40',drum:''},{when:'ev',at:'DRY',burner:'65',fan:'50',drum:''},{when:'ev',at:'FCs',burner:'45',fan:'65',drum:''}],
     extra:[],chargeAdj:'0',burnerAdj:'0',srcBatch:null}}
 // read the milestones and burner/air plan out of an existing profile (real or planned)
 function bldFromRecord(r,mode){const b=bldDefaults();b.mode=mode;b.srcId=r.id;b.name=r.meta.name||'';b.invId=r.meta.invId||'';b.coffee=r.meta.coffee||'';b.lot=r.meta.lot||'';b.green=r.meta.green||'';b.notes=mode==='copy'?'':(r.meta.notes||'');b.srcBatch=batchOf(r);
-  if(r.planned&&r.inputs){Object.assign(b,JSON.parse(JSON.stringify(r.inputs)));if(!Array.isArray(b.extra))b.extra=[];if(mode==='copy')b.notes='';b.mode=mode;b.srcId=r.id;b.srcBatch=batchOf(r);b.editId=null;
+  if(r.planned&&r.inputs){Object.assign(b,JSON.parse(JSON.stringify(r.inputs)));if(!Array.isArray(b.extra))b.extra=[];if(!('dropT' in r.inputs)){b.dropT=ok(r.events.DROP)?mmss(r.events.DROP):''}   // 1.0.18 plans stored development, not drop time
+    if(mode==='copy')b.notes='';b.mode=mode;b.srcId=r.id;b.srcBatch=batchOf(r);b.editId=null;
     const ca=num(b.chargeAdj)||0,ba=num(b.burnerAdj)||0;if(ca&&ok(num(b.charge)))b.charge=String(num(b.charge)+ca);if(ba)for(const x of b.steps)if(ok(num(x.burner)))x.burner=String(clamp(Math.round(num(x.burner)*(1+ba/100)),0,100));b.chargeAdj='0';b.burnerAdj='0';return b}
   const ev=r.events||{},c=ev.CHARGE??0,bt=t=>{const s=t==null?null:sampleAt(r.samples,t);return s&&ok(s.bt)?dT(s.bt):''};
   let tp=ev.TP;if(tp==null){let mn=null;for(const s of r.samples)if(s.t>c+5&&s.t<c+240&&ok(s.bt)&&(!mn||s.bt<mn.bt))mn=s;tp=mn?mn.t:null}
   if(ev.CHARGE!=null)b.charge=bt(c);if(tp!=null){b.tp=mmss(tp-c);b.tpBT=bt(tp)}if(ev.DRY!=null){b.dry=mmss(ev.DRY-c);b.dryBT=bt(ev.DRY)}
   if(ev.FCs!=null){b.fc=mmss(ev.FCs-c);b.fcBT=bt(ev.FCs)}
   if(ev.FCe!=null&&ev.FCs!=null&&ev.DROP!=null&&ev.FCe>ev.FCs+10&&ev.FCe<ev.DROP-10)b.extra=[{id:xid(),name:'FC end',t:mmss(ev.FCe-c),bt:String(bt(ev.FCe))}];
-  if(ev.FCs!=null&&ev.DROP!=null){b.devMode='time';b.devTime=mmss(ev.DROP-ev.FCs);b.devPct=String(+((ev.DROP-ev.FCs)/(ev.DROP-c)*100).toFixed(1));b.dropBT=bt(ev.DROP)}
+  if(ev.DROP!=null){b.dropT=mmss(ev.DROP-c);b.dropBT=bt(ev.DROP)}
   const first=r.samples.find(x=>x.t>=c),st=[];if(first)st.push({when:'ev',at:'CHARGE',burner:ok(first.burner)?String(Math.round(first.burner)):'',fan:ok(first.fan)?String(Math.round(first.fan)):'',drum:ok(first.drum)?String(Math.round(first.drum)):''});
   const grp=new Map(),evN=[['TP',tp],['DRY',ev.DRY],['FCs',ev.FCs]].filter(x=>x[1]!=null);for(const a of adjustments(r)){if(a.t<=c+2)continue;const near=evN.find(x=>Math.abs(a.t-x[1])<=10),k=near?near[0]:Math.round((a.t-c)/5)*5;const g=grp.get(k)||(near?{when:'ev',at:near[0],burner:'',fan:'',drum:''}:{when:'t',at:mmss(k),burner:'',fan:'',drum:''});g[a.key]=String(Math.round(a.to));grp.set(k,g)}
   b.steps=st.concat([...grp.values()]);if(!b.steps.length)b.steps=bldDefaults().steps;return b}
 
 // milestone times in seconds from charge, temps in °C
 function bldPoints(b){const tp=pT(b.tp),dry=pT(b.dry),fc=pT(b.fc),adj=num(b.chargeAdj)||0;let drop=null;
-  if(ok(fc)){if(b.devMode==='pct'){const p=num(b.devPct);if(ok(p)&&p>0&&p<60)drop=fc/(1-p/100)}else{const d=pT(b.devTime);if(ok(d))drop=fc+d}}
+  drop=pT(b.dropT);
   const C=v=>{const x=num(v);return ok(x)?fromD(x):null};
   const P={tp,dry,fc,drop:ok(drop)?Math.round(drop):null,charge:ok(C(b.charge))?C(b.charge)+(isF()?adj*5/9:adj):null,tpBT:C(b.tpBT),dryBT:C(b.dryBT),fcBT:C(b.fcBT),dropBT:C(b.dropBT)};
   P.extra=(b.extra||[]).map(x=>({id:x.id,name:(x.name||'').trim()||'Milestone',t:pT(x.t),bt:C(x.bt)}));
@@ -1426,7 +1430,7 @@ function bldPoints(b){const tp=pT(b.tp),dry=pT(b.dry),fc=pT(b.fc),adj=num(b.char
 function bldErrors(P){const e=[];
   if(!ok(P.charge))e.push('Enter a charge temperature.');if(!ok(P.tp)||!ok(P.tpBT))e.push('Enter the turning point time and temperature.');
   if(!ok(P.dry)||!ok(P.dryBT))e.push('Enter the dry end time and temperature.');if(!ok(P.fc)||!ok(P.fcBT))e.push('Enter the first crack time and temperature.');
-  if(!ok(P.drop))e.push('Enter development (percent or time).');if(!ok(P.dropBT))e.push('Enter the drop temperature.');
+  if(!ok(P.drop))e.push('Enter the drop time.');if(!ok(P.dropBT))e.push('Enter the drop temperature.');
   for(const x of P.extra)if(!ok(x.t)||!ok(x.bt))e.push(`Enter a time and temperature for “${x.name}”, or remove it.`);
   if(e.length)return e;
   if(!(P.tp>0&&P.dry>P.tp&&P.fc>P.dry&&P.drop>P.fc))e.push('Times must run in order: turning point → dry end → first crack → drop.');
@@ -1436,8 +1440,8 @@ function bldErrors(P){const e=[];
   const K=P.knots;for(let i=1;i<K.length;i++){if(K[i].t-K[i-1].t<10)e.push(`${K[i-1].name} and ${K[i].name} are less than 10 seconds apart.`);else if(!(K[i].bt>K[i-1].bt))e.push(`Bean temp has to rise from ${K[i-1].name} to ${K[i].name}.`)}
   if(K.length&&!(K[0].bt>P.tpBT))e.push(`Bean temp has to rise from the turning point to ${K[0].name}.`);
   return e}
-// Curve from a rate-of-rise model. RoR is 0 at the turning point, ramps up over 30 s, then falls along a
-// smooth decay (a + b·e^(−t/τ)) fitted to dry end, first crack and drop. Any extra milestones bend that decay
+// Curve from a rate-of-rise model. RoR is 0 at the turning point, ramps up over 30 s, then eases down along a
+// smooth, steady decay (a + b·e^(−t/τ)) fitted to dry end, first crack and drop — no stalls, dips or spikes. Any extra milestones bend that decay
 // locally — the smallest smooth correction that still puts the bean temp exactly on every milestone.
 function bldSolve(M,N){for(let c=0;c<N;c++){let pv=c;for(let r=c+1;r<N;r++)if(Math.abs(M[r][c])>Math.abs(M[pv][c]))pv=r;[M[c],M[pv]]=[M[pv],M[c]];const d=M[c][c];if(!d)continue;
     for(let r=0;r<N;r++){if(r===c)continue;const f=M[r][c]/d;if(!f)continue;for(let k=c;k<=N;k++)M[r][k]-=f*M[c][k]}}return M.map((row,i)=>row[i]?row[N]/row[i]:0)}
@@ -1479,19 +1483,21 @@ function bldBuild(b){const P=bldPoints(b),err=bldErrors(P);if(err.length)return 
   const samples=curve.map(s=>{for(const x of steps)if(x.t<=s.t+.01)for(const k of ['burner','fan','drum'])if(ok(x[k]))cur[k]=x[k];return {...s,burner:cur.burner,fan:cur.fan,drum:cur.drum}});
   for(let d=2;d<=30;d+=2)samples.push({t:P.drop+d,bt:+(P.dropBT-1.6*d).toFixed(2),ror:null,burner:cur.burner,fan:cur.fan,drum:cur.drum});
   const events={CHARGE:0,TP:P.tp,DRY:P.dry,FCs:P.fc,DROP:P.drop};
-  // checks against the Analyze rules
-  const at=t=>curve.reduce((a,s)=>Math.abs(s.t-t)<Math.abs(a.t-t)?s:a,curve[0]),rorFC=at(P.fc).ror,rorDrop=at(P.drop-2).ror,dev=P.drop-P.fc,dtr=dev/P.drop*100,chk=[];
-  if(dtr<cfg.anDtrLow)chk.push(['warn',`Development ${dtr.toFixed(0)}% is under your ${cfg.anDtrLow}% target.`]);else if(dtr>cfg.anDtrHigh)chk.push(['warn',`Development ${dtr.toFixed(0)}% is over your ${cfg.anDtrHigh}% target.`]);else chk.push(['good',`Development ${dtr.toFixed(0)}% (${mmss(dev)}) is inside your ${cfg.anDtrLow}–${cfg.anDtrHigh}% target.`]);
-  if(P.drop>cfg.anLong*60)chk.push(['warn',`Total time ${mmss(P.drop)} is longer than ${cfg.anLong} min — watch for baked flavors.`]);else if(P.drop<cfg.anShort*60)chk.push(['warn',`Total time ${mmss(P.drop)} is shorter than ${cfg.anShort} min.`]);else chk.push(['good',`Total time ${mmss(P.drop)}.`]);
-  if(ok(rorFC)&&rorFC>cfg.anRorFC)chk.push(['warn',`RoR at first crack is ${fR(rorFC)}°/min — over your ${fR(cfg.anRorFC)} limit, fast into crack.`]);else if(ok(rorFC)&&rorFC<0)chk.push(['warn',`RoR is falling below zero at first crack (${fR(rorFC)}°/min) — the bean temp would drop.`]);else if(ok(rorFC))chk.push(['good',`RoR at first crack ${fR(rorFC)}°/min.`]);
+  // checks: Brewed Behavior targets
+  const at=t=>curve.reduce((a,s)=>Math.abs(s.t-t)<Math.abs(a.t-t)?s:a,curve[0]),rorFC=at(P.fc).ror,rorDrop=at(P.drop-2).ror,dev=P.drop-P.fc,ror6=P.drop>=360?at(360).ror:null;
+  const chk=bbChecks({tp:P.tp,dry:P.dry,dryBT:P.dryBT,ror6,fc:P.fc,fcBT:P.fcBT,dev,drop:P.drop});
+  if(ok(rorFC)&&rorFC<0)chk.push(['warn',`RoR is falling below zero at first crack (${fR(rorFC)}°/min) — the bean temp would drop.`]);
   // RoR should only fall after its early peak; name the stretch where it has to climb
-  const kp=curve.k.pts.filter(x=>x.t>=curve.k.A),nameAt=t=>{let a='the turning point',z='Drop';for(const q of P.knots){if(q.t<=t)a=q.name;else{z=q.name;break}}return [a,z]},seen=new Set();
-  for(let i=1;i<kp.length;i++)if(kp[i].r>kp[i-1].r+.15*(kp[i].t-kp[i-1].t)/15){const [a,z]=nameAt(kp[i].t-.1),key=a+z;if(seen.has(key))continue;seen.add(key);
+  const scurve=b.style==='scurve',kp=curve.k.pts.filter(x=>x.t>=curve.k.A),nameAt=t=>{let a='the turning point',z='Drop';for(const q of P.knots){if(q.t<=t)a=q.name;else{z=q.name;break}}return [a,z]},seen=new Set();
+  if(scurve)chk.push(['good','Hard bean S-curve: RoR is meant to dip around first crack and climb again for the finish.']);
+  // steady RoR: flag a climb (flick) or a sharp fall (crash) between milestones
+  {const ror=curve.k.ror,K=P.knots;for(let i=0;i<K.length-1;i++){const t0=K[i].t,t1=K[i+1].t;if(scurve||t0<P.dry||t1-t0<20)continue;const fall=(ror(t0+3)-ror(t1-3))/(t1-t0-6)*60;   // °C/min per minute, averaged over the stretch
+    if(fall>5){const key='f'+K[i].name+K[i+1].name;if(!seen.has(key)){seen.add(key);chk.push(['warn',`RoR falls sharply between ${K[i].name} and ${K[i+1].name} — the roast may stall or crash. Raise ${K[i+1].key==='DROP'?'the drop temp':K[i+1].name} or move it earlier.`])}}}}
+  for(let i=1;i<kp.length;i++)if(!scurve&&kp[i].r>kp[i-1].r+.15*(kp[i].t-kp[i-1].t)/15){const [a,z]=nameAt(kp[i].t-.1),key=a+z;if(seen.has(key))continue;seen.add(key);
     chk.push(['warn',kp[i].t>P.fc?`RoR climbs between ${a} and ${z} — risk of a flick. Lower ${z==='Drop'?'the drop temp':z} or give it more time.`:`RoR has to climb between ${a} and ${z} to hit these temps — the curve may flick. Lower ${z} or move it later.`])}
   if(kp.some(x=>x.r<-.05))chk.push(['warn','These milestones need a falling bean temp somewhere — check the temperatures.']);
   if(ok(rorDrop)&&rorDrop>=0&&rorDrop<1)chk.push(['warn','RoR is close to zero at drop — risk of a flat, baked finish.']);
-  const pDry=P.dry/P.drop*100,pMai=(P.fc-P.dry)/P.drop*100;
-  return {P,err:[],curve,samples,events,steps,chk,rorFC,dtr,dev,phases:{dry:pDry,mai:pMai,dev:dtr}}}
+  return {P,err:[],curve,samples,events,steps,chk,rorFC,ror6,dev,phases:{dry:P.dry,mai:P.fc-P.dry,dev}}}
 function bldRecord(b,R){const id=b.editId||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),old=PLANNED.find(x=>x.id===id),now=new Date().toISOString();
   const l=INV.find(x=>x.id===b.invId);
   const inputs=JSON.parse(JSON.stringify(b));delete inputs.editId;
@@ -1537,6 +1543,25 @@ function bldSuggest(b,R,model){if(!R||R.err.length)return null;const th=model.th
 function bldSugText(m){const g=num(BLD&&BLD.green);return m.roasts?`Based on roast ${rTag(m.ref)} of ${esc(m.coffee)} at ${lbTxt(g)}, with the burner response learned from ${m.roasts} roast${m.roasts>1?'s':''} of this coffee at this size. Gets closer with every roast.`
   :`Starting guess — no roasts of ${esc(m.coffee||'this coffee')} at ${lbTxt(g)} yet. It learns from each roast of this coffee at this size.`}
 
+/* ---------- Brewed Behavior checks (builder and Analyze) ----------
+   x: {tp, dry, dryBT, ror6, fc, fcBT, dev, drop, spread, colorWhole}; times are seconds from charge, temps °C. */
+const secPerDeg=r=>ok(r)&&r>0?(60/toDR(r)).toFixed(1):'—';
+function bbChecks(x){const out=[],u='°'+cfg.unit,T=v=>Math.round(toD(v))+'°',D=v=>Math.round(toDR(v)),tol=cfg.bbTpTol||20;
+  if(ok(x.tp)){const d=x.tp-cfg.bbTp;out.push(Math.abs(d)<=tol?['good',`Turning point ${mmss(x.tp)} (target ${mmss(cfg.bbTp)}).`]:d>0?['warn',`Turning point ${mmss(x.tp)} is late (target ${mmss(cfg.bbTp)}) — charge hotter, add gas or air, or lower the batch size.`]:['warn',`Turning point ${mmss(x.tp)} is early (target ${mmss(cfg.bbTp)}) — charge cooler or start with less gas.`])}
+  if(ok(x.dry)){const inT=x.dry>=cfg.bbDryMin&&x.dry<=cfg.bbDryMax,inB=!ok(x.dryBT)||Math.abs(x.dryBT-cfg.bbDryC)<=cfg.bbDryTol+1e-6;
+    out.push(inT&&inB?['good',`Color change ${mmss(x.dry)}${ok(x.dryBT)?' at '+T(x.dryBT):''} — inside ${mmss(cfg.bbDryMin)}–${mmss(cfg.bbDryMax)} and ${T(cfg.bbDryC)} ± ${D(cfg.bbDryTol)}.`]
+      :['warn',`Color change ${mmss(x.dry)}${ok(x.dryBT)?' at '+T(x.dryBT):''} — the target is ${mmss(cfg.bbDryMin)}–${mmss(cfg.bbDryMax)} at ${T(cfg.bbDryC)} ± ${D(cfg.bbDryTol)}${!inT?(x.dry<cfg.bbDryMin?'. Drying is fast — less early heat.':'. Drying is slow — more early heat.'):''}`])}
+  if(ok(x.ror6)){const r=x.ror6,txt=`RoR at 6:00 is ${fR(r)}${u}/min — 1° every ${secPerDeg(r)} s`;
+    out.push(r>=cfg.bb6Fast?['warn',`${txt}. Too fast for the 6-minute rule (aim for 1° every ${secPerDeg(cfg.bb6Ideal)} s) — scorch risk.`]
+      :r<=cfg.bb6Slow?['warn',`${txt}. Too slow for the 6-minute rule (aim for 1° every ${secPerDeg(cfg.bb6Ideal)} s) — it may bake.`]
+      :['good',`${txt}. On the 6-minute rule${Math.abs(r-cfg.bb6Ideal)>1.1?(r>cfg.bb6Ideal?', on the fast side':', on the slow side'):''}.`])}
+  if(ok(x.fcBT))out.push(Math.abs(x.fcBT-cfg.bbFcC)<=cfg.bbFcTol+1e-6?['good',`First crack at ${T(x.fcBT)} (your roaster's mark: ${T(cfg.bbFcC)}).`]:['warn',`First crack at ${T(x.fcBT)} vs your roaster's ${T(cfg.bbFcC)} mark. If your P12 usually cracks there, update the mark in Settings → Analyze rules.`]);
+  if(ok(x.dev))out.push(x.dev<cfg.bbDevMin?['warn',`Development ${mmss(x.dev)} is short — the target is ${mmss(cfg.bbDevMin)}–${mmss(cfg.bbDevMax)} after first crack.`]:x.dev>cfg.bbDevMax?['warn',`Development ${mmss(x.dev)} is long — the target is ${mmss(cfg.bbDevMin)}–${mmss(cfg.bbDevMax)} after first crack.`]:['good',`Development ${mmss(x.dev)} after first crack.`]);
+  if(ok(x.drop))out.push(x.drop>cfg.anLong*60?['warn',`Total time ${mmss(x.drop)} is over ${cfg.anLong} min — watch for baked flavors.`]:x.drop<cfg.anShort*60?['warn',`Total time ${mmss(x.drop)} is under ${cfg.anShort} min.`]:['good',`Total time ${mmss(x.drop)}.`]);
+  if(ok(x.spread)){const w=num(x.colorWhole);out.push(x.spread<=cfg.anSpread?['good',`Color spread ${x.spread} — at or under your ${cfg.anSpread}-point target.`]
+    :ok(w)&&w>45&&x.spread<=10?['warn',`Color spread ${x.spread} — acceptable for a roast over Agtron 45 (10 points), but over your ${cfg.anSpread}-point target.`]:['warn',`Color spread ${x.spread} — the inside is lighter than the outside. Your target is ${cfg.anSpread} or less.`])}
+  return out}
+
 /* ---------- builder screen ---------- */
 function openBuilder(mode,srcId){if(mode==='scratch')BLD=bldDefaults();else{const r=findAny(srcId);if(!r)return;BLD=bldFromRecord(r,mode);if(mode==='edit'&&r.planned)BLD.editId=r.id}
   $('#pList').hidden=true;$('#pBuild').hidden=false;renderBuilder()}
@@ -1560,14 +1585,16 @@ function renderBuilder(){if(!BLD)return;const b=BLD,u='°'+cfg.unit,el=$('#pBuil
         ${diffSize?`<div class="bbox"><div class="h3" style="margin-bottom:6px">Batch change ${lbTxt(b.srcBatch)} → ${lbTxt(g)}</div>
           <div class="grid2"><label class="field">Charge temp change (${u})${inp('chargeAdj','0')}</label><label class="field">Burner change (%)${inp('burnerAdj','0')}</label></div>
           <div class="bhint" style="margin-top:6px" id="bAdjTxt"></div><div class="bhint" style="margin-top:6px">Starting guesses, not tuned to your P12. A bigger load usually needs a hotter charge and more burner; first crack and drop times stay as planned.</div></div>`:''}
+        ${b.mode==='scratch'?`<div class="row"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Start with</span><button class="sm${b.style!=='scurve'?' on-acc':''}" data-preset="std">Brewed Behavior targets</button><button class="sm${b.style==='scurve'?' on-acc':''}" data-preset="scurve">Hard bean S-curve</button></div>`:''}
         <div class="h3" style="margin-top:4px">Milestones <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">time from charge · bean temp</span></div>
         <div class="mstones">
           <span>Charge</span><span class="muted">0:00</span>${inp('charge','400')}<span class="muted">${u}</span>
           <span>Turning point</span>${inp('tp','1:15')}${inp('tpBT','190')}<span class="muted">${u}</span>
           <span>Dry end</span>${inp('dry','4:45')}${inp('dryBT','320')}<span class="muted">${u}</span>
           <span>First crack</span>${inp('fc','8:30')}${inp('fcBT','392')}<span class="muted">${u}</span>
-          <span>Development</span><div class="seg" id="bDev"><button data-d="pct" class="${b.devMode==='pct'?'on':''}">%</button><button data-d="time" class="${b.devMode==='time'?'on':''}">time</button></div>${b.devMode==='pct'?inp('devPct','20'):inp('devTime','2:00')}<span class="muted">${b.devMode==='pct'?'%':'m:ss'}</span>
-          <span>Drop</span><span class="muted tnum" id="bDropT"></span>${inp('dropBT','405')}<span class="muted">${u}</span>
+
+          <span>Drop</span>${inp('dropT','11:45')}${inp('dropBT','400')}<span class="muted">${u}</span>
+          <span class="muted">Development</span><span class="muted tnum" id="bDropT"></span><span></span><span></span>
           ${b.extra.map((x,i)=>`<input data-xi="${i}" data-xk="name" value="${esc(x.name)}" list="bXNames" class="xname"><input data-xi="${i}" data-xk="t" value="${esc(x.t)}" placeholder="6:30"><input data-xi="${i}" data-xk="bt" value="${esc(x.bt)}" inputmode="decimal"><button class="sm" data-xdel="${i}" title="Remove">✕</button>`).join('')}
         </div>
         <datalist id="bXNames">${XNAMES.map(n=>`<option value="${n}">`).join('')}</datalist>
@@ -1597,7 +1624,7 @@ function renderBuilder(){if(!BLD)return;const b=BLD,u='°'+cfg.unit,el=$('#pBuil
   $$('[data-b]',el).forEach(i=>i.oninput=()=>{b[i.dataset.b]=i.value;if(i.dataset.b==='green')bldSizeGuess();renderBuildOut()});
   $$('[data-b="green"]',el).forEach(i=>i.onchange=()=>renderBuilder());
   $$('[data-lb]',el).forEach(x=>x.onclick=()=>{b.green=x.dataset.lb;bldSizeGuess();renderBuilder()});
-  $$('#bDev button',el).forEach(x=>x.onclick=()=>{const P=bldPoints(b);if(x.dataset.d===b.devMode)return;if(ok(P.fc)&&ok(P.drop)){b.devTime=mmss(P.drop-P.fc);b.devPct=String(+((P.drop-P.fc)/P.drop*100).toFixed(1))}b.devMode=x.dataset.d;renderBuilder()});
+  $$('[data-preset]',el).forEach(x=>x.onclick=()=>{bldPreset(b,x.dataset.preset);renderBuilder()});
   $$('[data-bw]',el).forEach(x=>x.onchange=()=>{const s=b.steps[Number(x.dataset.bw)],P=bldPoints(b);if(x.value==='__t'){const t=bldStepTime(s,P);s.when='t';s.at=ok(t)?mmss(t):''}else{s.when='ev';s.at=x.value}renderBuilder()});
   $$('[data-bs]',el).forEach(x=>x.oninput=()=>{b.steps[Number(x.dataset.bs)][x.dataset.k]=x.value;if(x.dataset.k==='burner'&&b.autoBurner){b.autoBurner=false;$('#bAuto').checked=false;toast('Burner matching is off — your number is kept')}renderBuildOut()});
   $$('[data-bd]',el).forEach(x=>x.onclick=()=>{b.steps.splice(Number(x.dataset.bd),1);renderBuilder()});
@@ -1614,6 +1641,13 @@ function renderBuilder(){if(!BLD)return;const b=BLD,u='°'+cfg.unit,el=$('#pBuil
   bldWireDrag();
   $('#bSave').onclick=bldSave;
   renderBuildOut()}
+// starting shapes: the Brewed Behavior targets, or the manual's dark-roast hard-bean S-curve (90% → 20% → 60% heat)
+function bldPreset(b,k){const d=v=>String(isF()?v:Math.round((v-32)*5/9)),D=bldDefaults();
+  if(k==='scurve'){Object.assign(b,{style:'scurve',charge:d(410),tp:'2:00',tpBT:d(190),dry:'4:45',dryBT:d(300),fc:'7:45',fcBT:d(375),dropT:'14:20',dropBT:d(410),
+      extra:[{id:xid(),name:'Hold',t:'10:00',bt:d(394)},{id:xid(),name:'Second crack',t:'12:20',bt:d(400)}],
+      steps:[{when:'ev',at:'CHARGE',burner:'90',fan:'40',drum:''},{when:'t',at:'6:00',burner:'20',fan:'50',drum:''},{when:'t',at:'12:00',burner:'60',fan:'60',drum:''}]});
+    toast('Hard bean S-curve loaded — from the manual’s dark-roast example. Adjust it to your coffee.')}
+  else Object.assign(b,{style:'std',charge:D.charge,tp:D.tp,tpBT:D.tpBT,dry:D.dry,dryBT:D.dryBT,fc:D.fc,fcBT:D.fcBT,dropT:D.dropT,dropBT:D.dropBT,extra:[],steps:D.steps})}
 function bldSizeGuess(){const b=BLD;if(b.mode!=='copy'||!ok(b.srcBatch))return;const g=num(b.green);if(!ok(g)||sameBatch(g,b.srcBatch)){b.chargeAdj='0';b.burnerAdj='0';return}
   const dlb=g-b.srcBatch;b.chargeAdj=String(Math.round((isF()?1:5/9)*dlb));b.burnerAdj=String(Math.round(clamp(dlb/b.srcBatch*30,-30,40)))}
 function bldApplySug(b,sug){let ch=false;for(const x of sug){if(x.burner==null)continue;const v=String(x.burner);if(b.steps[x.i].burner!==v){b.steps[x.i].burner=v;ch=true;const el=$(`[data-bs="${x.i}"][data-k="burner"]`);if(el)el.value=v}}return ch}
@@ -1624,13 +1658,13 @@ function renderBuildOut(){const b=BLD;if(!b||!$('#bOut'))return;let R=bldBuild(b
       :`<div class="row" style="gap:6px">${sug.map(x=>`<span class="chipb">${esc(nm(x))} <b>${x.burner??'—'}%</b></span>`).join('')}<span class="sp"></span><button class="sm pri" id="bSugUse">Use these</button></div><div style="margin-top:6px">${bldSugText(model)}</div>`;
     const u=$('#bSugUse');if(u)u.onclick=()=>{b.burnerAdj='0';bldApplySug(b,sug);BLDSUG=false;renderBuilder();toast('Burner plan updated from the curve')}}}
   R.sug=(BLDSUG&&!b.autoBurner)?sug:null;const P=R.P,src=b.srcId?findAny(b.srcId):null,g=num(b.green);
-  $('#bDropT').textContent=ok(P.drop)?mmss(P.drop):'—';
+  $('#bDropT').textContent=ok(P.drop)&&ok(P.fc)&&P.drop>P.fc?mmss(P.drop-P.fc)+' after first crack':'—';
   if($('#bAdjTxt')){const ba=num(b.burnerAdj)||0;$('#bAdjTxt').innerHTML=`Charge goes to <b>${ok(P.charge)?fT(P.charge):'—'}°</b>${ba?`, every burner step ${ba>0?'+':''}${ba}%`:''}.`}
   $('#bTitle').textContent=(b.name.trim()||'Untitled profile')+(ok(g)?' · '+lbTxt(g):'');
   $('#bLegend').innerHTML=`<span style="color:var(--good)">┅ planned</span>${src&&src.samples&&src.samples.length?`  <span>— — ${src.planned?'planned':'roast #'+src.num}</span>`:''}`;
   if(R.err.length){$('#bStats').innerHTML='';$('#bPhase').innerHTML='';$('#bChk').innerHTML=R.err.map(t=>`<div class="chk2 cw">!<span>${esc(t)}</span></div>`).join('');$('#bSave').disabled=true;bldDraw(null,src);$('#bSlot').textContent='';return}
-  $('#bStats').innerHTML=`<div class="stat"><div class="l">First crack</div><div class="v">${mmss(P.fc)}<small>${fT(P.fcBT)}°</small></div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(P.drop)}<small>${fT(P.dropBT)}°</small></div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(R.dev)}<small>${R.dtr.toFixed(0)}%</small></div></div><div class="stat"><div class="l">RoR at FC</div><div class="v">${fR(R.rorFC)}<small>°/min</small></div></div>`;
-  const ph=R.phases;$('#bPhase').innerHTML=`<div class="pbar"><i style="width:${ph.dry}%">Drying ${ph.dry.toFixed(0)}%</i><i style="width:${ph.mai}%">Maillard ${ph.mai.toFixed(0)}%</i><i style="width:${ph.dev}%">Dev ${ph.dev.toFixed(0)}%</i></div>`;
+  $('#bStats').innerHTML=`<div class="stat"><div class="l">Color change</div><div class="v">${mmss(P.dry)}<small>${fT(P.dryBT)}°</small></div></div><div class="stat"><div class="l">RoR at 6:00</div><div class="v">${fR(R.ror6)}<small>1°/${secPerDeg(R.ror6)} s</small></div></div><div class="stat"><div class="l">First crack</div><div class="v">${mmss(P.fc)}<small>${fT(P.fcBT)}°</small></div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(R.dev)}<small>drop ${mmss(P.drop)}</small></div></div>`;
+  const ph=R.phases,W0=P.drop/100;$('#bPhase').innerHTML=`<div class="pbar"><i style="width:${ph.dry/W0}%">Drying ${mmss(ph.dry)}</i><i style="width:${ph.mai/W0}%">Maillard ${mmss(ph.mai)}</i><i style="width:${ph.dev/W0}%">Development ${mmss(ph.dev)}</i></div>`;
   $('#bChk').innerHTML=R.chk.map(([k,t])=>`<div class="chk2 ${k==='warn'?'cw':'cg'}">${k==='warn'?'!':'✓'}<span>${esc(t)}</span></div>`).join('');
   const name=b.name.trim(),slot=name&&ok(g)?allProfiles().find(x=>x.id!==b.editId&&normName(x.meta.name)===normName(name)&&ok(batchOf(x))&&sameBatch(batchOf(x),g)):null;
   $('#bSave').disabled=!name||!ok(g);$('#bSlot').textContent=!name?'Give it a profile name':!ok(g)?'Enter the batch size':slot?`Replaces the current ${lbTxt(batchOf(slot))} “${slot.meta.name}” profile (${rTag(slot)})`:`New ${lbTxt(g)} profile`;
@@ -1655,6 +1689,9 @@ function bldDraw(R,src){const cv=$('#bCv');if(!cv)return;const bx=cv.getBounding
   const gC=getComputedStyle(document.body).getPropertyValue('--good').trim()||'#2a8';
   if(R){ln(R.curve,0,'ror',gC,1.5,YR,null,null,[3,3]);ln(R.curve,0,'bt',gC,2.4,Y,null,null,[3,3])}
   c.restore();
+  if(R&&R.P.drop>=360){const x=X(360),y1=YR(cfg.bb6Fast),y2=YR(cfg.bb6Slow),yi=YR(cfg.bb6Ideal);c.save();c.fillStyle=rgba(COL.ror,.1);c.fillRect(X(330),y1,X(390)-X(330),y2-y1);
+    c.strokeStyle=rgba(COL.ror,.55);c.setLineDash([2,3]);c.lineWidth=1;c.beginPath();c.moveTo(x,T);c.lineTo(x,H-B);c.stroke();c.setLineDash([]);c.lineWidth=2;c.beginPath();c.moveTo(X(330),yi);c.lineTo(X(390),yi);c.stroke();
+    c.font='600 '+font(10);c.fillStyle=COL.ror;c.textAlign='left';c.fillText('6:00 rule',X(392),y1+10);c.restore()}
   const hs=[];BLDG={X,Y,TS0,end,L,Rr,T,B,W,H,hs};
   if(R){c.font='600 '+font(10.5);c.textAlign='center';let k=0;
     const marks=[['CHARGE','Charge',0,R.P.charge],['TP','TP',R.P.tp,R.P.tpBT],...R.P.knots.map(q=>[q.key,q.key==='DRY'?'DRY':q.key==='FCs'?'FC':q.key==='DROP'?'DROP':q.name,q.t,q.bt])];
@@ -1695,7 +1732,7 @@ function bldDragTo(p){const b=BLD,G=BLDG,k=BLDDRAG.key;if(!b||!G)return;
   else if(k==='TP'){set('tp',mmss(tt));set('tpBT',temp)}
   else if(k==='DRY'){set('dry',mmss(tt));set('dryBT',temp)}
   else if(k==='FCs'){set('fc',mmss(tt));set('fcBT',temp)}
-  else if(k==='DROP'){set('dropBT',temp);if(b.devMode==='pct')set('devPct',+((tt-P.fc)/tt*100).toFixed(1));else set('devTime',mmss(tt-P.fc))}
+  else if(k==='DROP'){set('dropBT',temp);set('dropT',mmss(tt))}
   else if(k.startsWith('x:')){const j=b.extra.findIndex(x=>'x:'+x.id===k);if(j<0)return;b.extra[j].t=mmss(tt);b.extra[j].bt=String(temp);
     const a=$(`[data-xi="${j}"][data-xk="t"]`),c=$(`[data-xi="${j}"][data-xk="bt"]`);if(a)a.value=b.extra[j].t;if(c)c.value=b.extra[j].bt}
   renderBuildOut()}
@@ -1711,7 +1748,7 @@ function renderPlannedDetail(el,r){const s=summarize(r),inp=r.inputs||{},steps=b
   el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${esc(r.meta.name)}${ok(batchOf(r))?` <span class="badge gray">${lbTxt(batchOf(r))}</span>`:''} <span class="badge g">Planned</span></div>
     <div class="muted" style="margin-top:3px">Built ${fmtLong(r.created)}${r.savedAt!==r.created?' · edited '+fmtDate(r.savedAt):''}${from?` · started from ${esc(from.meta.name)} ${ok(batchOf(from))?lbTxt(batchOf(from)):''} (${rTag(from)})`:''} · not roasted yet</div></div></div>
   <div class="minic"><canvas id="pBig"></canvas></div>
-  <div class="stats"><div class="stat"><div class="l">Charge</div><div class="v">${fT(s.charge)}<small>°${cfg.unit}</small></div></div><div class="stat"><div class="l">First crack</div><div class="v">${mmss(s.fcs)}</div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(s.drop)}</div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(s.dev)}<small>${ok(s.dev)&&s.drop?(s.dev/s.drop*100).toFixed(0)+'%':''}</small></div></div></div>
+  <div class="stats"><div class="stat"><div class="l">Charge</div><div class="v">${fT(s.charge)}<small>°${cfg.unit}</small></div></div><div class="stat"><div class="l">First crack</div><div class="v">${mmss(s.fcs)}</div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(s.drop)}</div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(s.dev)}<small>after FC</small></div></div></div>
   <div class="grid2" style="gap:22px"><div><div class="h3" style="margin-bottom:8px">Burner &amp; air plan</div><div class="plan">${steps.map(x=>`<span>${mmss(x.t)}</span><b>${[ok(x.burner)?'Burner '+x.burner:'',ok(x.fan)?'Air '+x.fan:'',ok(x.drum)?'Drum '+x.drum:''].filter(Boolean).join(' · ')}</b>`).join('')||'<span></span><b class="muted">No changes planned</b>'}</div></div>
     <div><div class="h3" style="margin-bottom:6px">Milestones</div>${[...[['TP','Turning point'],['DRY','Dry end'],['FCs','First crack'],['DROP','Drop']].map(([k,l])=>{const t=r.events[k],x=sampleAt(r.samples,t);return {t,l,bt:x&&x.bt}}),...((r.target&&r.target.marks)||[]).map(m=>({t:m.t,l:m.name,bt:m.bt}))].sort((a,c)=>a.t-c.t).map(m=>`<div class="kv"><span>${esc(m.l)}</span><b class="tnum">${mmss(m.t)} · ${fT(m.bt)}°</b></div>`).join('')}
       <div class="kv"><span>Green</span><b>${esc(r.meta.coffee||'—')}</b></div></div></div>
@@ -1968,7 +2005,7 @@ function tasteText(r){const t=tasteEff(r);return TASTE.filter(([k])=>t[k]>0).map
 function anMetrics(r){const ev=r.events||{},c=ev.CHARGE??0,S0=r.samples||[],s=r.summary||summarize(r),m={...s};
   const btAt=t=>interp(S0,'bt',t),rorAvg=(a,b)=>{const v=S0.filter(x=>x.t>=a&&x.t<=b&&ok(x.ror)).map(x=>x.ror);return v.length?v.reduce((p,q)=>p+q,0)/v.length:null};
   if(m.dry==null){const x=S0.find(p=>p.t>c+60&&ok(p.bt)&&p.bt>=150);m.dry=x?x.t-c:null;m.dryEst=true}
-  m.dtr=ok(m.dev)&&ok(m.drop)&&m.drop>0?m.dev/m.drop*100:null;
+  m.ror6=ok(m.drop)&&m.drop>=370?rorAvg(c+350,c+370):null;m.dryBT=ev.DRY!=null?btAt(ev.DRY):m.dryEst&&ok(m.dry)?btAt(c+m.dry):null;
   m.dryPct=ok(m.dry)&&ok(m.drop)?m.dry/m.drop*100:null;
   m.mail=ok(m.dry)&&ok(m.fcs)?m.fcs-m.dry:null;m.mailPct=ok(m.mail)&&ok(m.drop)?m.mail/m.drop*100:null;
   if(ev.FCs!=null){const F=ev.FCs;m.rorFC=rorAvg(F-20,F);const after=S0.filter(x=>x.t>=F&&x.t<=Math.min(F+100,ev.DROP??F+100)&&ok(x.ror));
@@ -1983,28 +2020,30 @@ function anMetrics(r){const ev=r.events||{},c=ev.CHARGE??0,S0=r.samples||[],s=r.
   m.b0=ctlAt('burner',c+5);m.f0=ctlAt('fan',c+5);m.bFC=ev.FCs!=null?ctlAt('burner',ev.FCs-5):null;m.fFC=ev.FCs!=null?ctlAt('fan',ev.FCs-5):null;
   m.bDry=ok(m.dry)?ctlAt('burner',c+m.dry):null;m.fDry=ok(m.dry)?ctlAt('fan',c+m.dry-30):null;m.fDev=ev.DROP!=null?ctlAt('fan',ev.DROP-10):null;
   m.adj=adjustments(r).map(a=>({...a,rt:a.t-c}));
-  m.spread=spreadOf(r.meta);return m}
+  m.spread=spreadOf(r.meta);m.colorWhole=r.meta.colorWhole;
+  // weight loss vs other roasts of the same green at about the same color (inner development, per the manual)
+  const w0=num(r.meta.colorWhole);if(ok(m.loss)&&ok(w0)){const same=HIST.filter(x=>x.id!==r.id&&!x.planned&&coffeeKey(x)===coffeeKey(r)&&(!r.meta.invId||x.meta.invId===r.meta.invId)&&ok(num(x.meta.colorWhole))&&Math.abs(num(x.meta.colorWhole)-w0)<=2).map(x=>({n:x.num,l:(x.summary||summarize(x)).loss})).filter(x=>ok(x.l));
+    if(same.length)m.lossCmp={avg:same.reduce((a,x)=>a+x.l,0)/same.length,nums:same.map(x=>x.n)}}
+  return m}
 
 /* ---------- curve check: plain observations, no taste needed ---------- */
-function anChecks(m){const out=[],F=isF();const R=v=>toDR(v).toFixed(1)+'°'+cfg.unit+'/min';
-  if(ok(m.dtr))out.push(m.dtr<cfg.anDtrLow?['warn',`Development is short: ${mmss(m.dev)} (${m.dtr.toFixed(0)}% of the roast). Your target is ${cfg.anDtrLow}–${cfg.anDtrHigh}%.`]:m.dtr>cfg.anDtrHigh?['warn',`Development is long: ${mmss(m.dev)} (${m.dtr.toFixed(0)}% of the roast).`]:['good',`Development ${mmss(m.dev)} (${m.dtr.toFixed(0)}%) is inside your target.`]);
-  if(m.crash)out.push(['warn',`RoR crashed after first crack — fell from ${R(m.rorFC)} to ${R(m.rorMin)} at ${mmss(m.rorMinT)}. A crash often tastes baked or flat.`]);
+function anChecks(m){const out=[],R=v=>toDR(v).toFixed(1)+'°'+cfg.unit+'/min';
+  out.push(...bbChecks({tp:m.tp,dry:m.dry,dryBT:m.dryBT,ror6:m.ror6,fc:m.fcs,fcBT:m.fcsBT,dev:m.dev,drop:m.drop,spread:m.spread,colorWhole:m.colorWhole}));
+  if(m.crash)out.push(['warn',`RoR crashed after first crack — fell from ${R(m.rorFC)} to ${R(m.rorMin)} at ${mmss(m.rorMinT)}. The manual's rule is a steady, straight RoR; a crash often tastes baked or flat.`]);
   if(m.flick)out.push(['warn',`RoR flicked back up by ${toDR(m.flickBy).toFixed(1)}° after the dip — can push roasty or smoky notes.`]);
   if(m.stall)out.push(['warn',`RoR stalled (climbed again) around ${mmss(m.stallT)} — momentum loss in Maillard can bake the cup.`]);
-  if(ok(m.rorFC)&&m.rorFC>cfg.anRorFC)out.push(['warn',`RoR at first crack is high (${R(m.rorFC)}) — fast into crack.`]);
-  if(ok(m.drop)&&m.drop>cfg.anLong*60)out.push(['warn',`Long roast overall (${mmss(m.drop)}).`]);
-  if(ok(m.spread)&&m.spread>cfg.anSpread)out.push(['warn',`Big color spread (${m.spread}) — the inside is lighter than the outside, a sign of roasting fast.`]);
-  if(!out.some(x=>x[0]==='warn')&&ok(m.drop))out.push(['good','No problems spotted on the curve.']);
+  if(m.lossCmp){const d=m.loss-m.lossCmp.avg,ref=m.lossCmp.nums.map(n=>'#'+n).join(', ');
+    out.push(Math.abs(d)<.2?['good',`Weight loss ${m.loss.toFixed(1)}% — same as ${ref} at a similar color.`]:d>0?['good',`Weight loss ${m.loss.toFixed(1)}% vs ${m.lossCmp.avg.toFixed(1)}% on ${ref} at a similar color — more inner development.`]:['warn',`Weight loss ${m.loss.toFixed(1)}% vs ${m.lossCmp.avg.toFixed(1)}% on ${ref} at a similar color — less inner development.`])}
   return out}
 
 /* ---------- rules: what to change, tied to a point in the roast ---------- */
 const anD=c=>Math.round(toD(c)),anDT=c=>Math.round(c*(isF()?1.8:1));       // temp, temp difference in display units
 const anPct=v=>ok(v)?Math.round(v)+'%':'—';
 const RULES=[
- {id:'dev_longer',faults:{underdev:1,sour:.8,light:.5,sharp:.4},when:m=>ok(m.dev)&&ok(m.fcs)&&(m.dtr<cfg.anDtrHigh-3||m.dev<80),
-  make(m,k){const add=Math.round(clamp(15*k,8,40)),drop=m.drop+add,dev=m.dev+add;return {title:`Drop ${add} s later — about ${mmss(drop)}`,detail:`Development ${mmss(m.dev)} → ${mmss(dev)} (${(dev/drop*100).toFixed(0)}%). Keep burner and air where they were after first crack.`,rem:[{type:'time',at:Math.max(0,drop-20),text:`Drop in ~20 s (target ${mmss(drop)})`,dropRem:true}],tgt:{dev},exp:[{kind:'dev',base:m.dev,v:dev}]}}},
- {id:'dev_shorter',faults:{roasty:1,dark:.8,ashy:.4},when:m=>ok(m.dev)&&ok(m.fcs)&&(m.dtr>cfg.anDtrLow+1||m.dev>75),
-  make(m,k){const cut=Math.round(clamp(12*k,6,35)),drop=m.drop-cut,dev=m.dev-cut;return {title:`Drop ${cut} s earlier — about ${mmss(drop)}`,detail:`Development ${mmss(m.dev)} → ${mmss(dev)} (${(dev/drop*100).toFixed(0)}%).`,rem:[{type:'time',at:Math.max(0,drop-20),text:`Drop in ~20 s (target ${mmss(drop)})`,dropRem:true}],tgt:{dev},exp:[{kind:'dev',base:m.dev,v:dev}]}}},
+ {id:'dev_longer',faults:{underdev:1,sour:.8,light:.5,sharp:.4},when:m=>ok(m.dev)&&ok(m.fcs)&&m.dev<cfg.bbDevMax-15,
+  make(m,k){const add=Math.round(clamp(15*k,8,40)),drop=m.drop+add,dev=m.dev+add;return {title:`Drop ${add} s later — about ${mmss(drop)}`,detail:`Development ${mmss(m.dev)} → ${mmss(dev)} after first crack (target ${mmss(cfg.bbDevMin)}–${mmss(cfg.bbDevMax)}). Keep burner and air where they were after first crack.`,rem:[{type:'time',at:Math.max(0,drop-20),text:`Drop in ~20 s (target ${mmss(drop)})`,dropRem:true}],tgt:{dev},exp:[{kind:'dev',base:m.dev,v:dev}]}}},
+ {id:'dev_shorter',faults:{roasty:1,dark:.8,ashy:.4},when:m=>ok(m.dev)&&ok(m.fcs)&&m.dev>cfg.bbDevMin+10,
+  make(m,k){const cut=Math.round(clamp(12*k,6,35)),drop=m.drop-cut,dev=m.dev-cut;return {title:`Drop ${cut} s earlier — about ${mmss(drop)}`,detail:`Development ${mmss(m.dev)} → ${mmss(dev)} after first crack (target ${mmss(cfg.bbDevMin)}–${mmss(cfg.bbDevMax)}).`,rem:[{type:'time',at:Math.max(0,drop-20),text:`Drop in ~20 s (target ${mmss(drop)})`,dropRem:true}],tgt:{dev},exp:[{kind:'dev',base:m.dev,v:dev}]}}},
  {id:'soften_cut',faults:{baked:1,flat:.9,thin:.4},when:m=>m.crash,
   make(m,k){const cut=m.adj.filter(a=>a.key==='burner'&&a.to<a.from&&ok(m.fcs)&&a.rt>=m.fcs-150&&a.rt<=m.fcs+45).at(-1);
    if(cut){const keep=Math.round(cut.from-(cut.from-cut.to)*clamp(.5/k,.2,.8));return {title:`At ${mmss(cut.rt)}: burner to ${keep}% instead of ${Math.round(cut.to)}%`,detail:`That cut (${Math.round(cut.from)} → ${Math.round(cut.to)}%) let RoR crash after first crack. A smaller cut keeps momentum.`,rem:[{type:'time',at:cut.rt,text:`Burner ${keep}% (not ${Math.round(cut.to)}%)`}],exp:[{key:'burner',t:cut.rt,v:keep,base:Math.round(cut.to)}]}}
@@ -2013,13 +2052,13 @@ const RULES=[
    const up=Math.round(cfg.anBurnerStep*k);return {title:`Keep ${up}% more burner through first crack`,detail:`RoR crashed with no big burner or air move — add a little heat from ${mmss(m.fcs-60)} so it eases down instead.`,rem:[{type:'time',at:Math.max(0,m.fcs-60),text:`Burner ${ok(m.bFC)?m.bFC+up+'%':'+'+up+'%'}`}],exp:ok(m.bFC)?[{key:'burner',t:Math.max(0,m.fcs-60),v:m.bFC+up,base:m.bFC}]:[]}}},
  {id:'earlier_cut',faults:{roasty:.8,ashy:1,baked:.5},when:m=>m.flick&&ok(m.fcs),
   make(m,k){const step=Math.round(cfg.anBurnerStep*k),t=Math.max(0,m.fcs-45),b=ok(m.bFC)?m.bFC:null;return {title:`Cut burner ${step}% at ${mmss(t)} (45 s before crack)`,detail:`RoR rebounded after the dip. An earlier, smaller cut stops the flick${b!=null?` — ${b}% → ${b-step}%`:''}.`,rem:[{type:'time',at:t,text:b!=null?`Burner ${b-step}%`:`Burner −${step}%`}],exp:b!=null?[{key:'burner',ev:'FCs',dt:-45,v:b-step,base:b}]:[]}}},
- {id:'more_early_heat',faults:{baked:1,flat:.8,thin:.3,underdev:.3},when:m=>m.stall||(ok(m.drop)&&m.drop>(cfg.anLong-1)*60)||(ok(m.mailPct)&&m.mailPct>42),
-  make(m,k){const step=Math.round(cfg.anBurnerStep*k),b=m.b0;return {title:`Start with ${step}% more burner, until dry end`,detail:`${m.stall?'RoR stalled around '+mmss(m.stallT)+'. ':''}More heat early keeps momentum and shortens the middle of the roast${b!=null?` (${b}% → ${b+step}%)`:''}.`,rem:[{type:'event',at:'CHARGE',text:b!=null?`Burner ${b+step}% until dry end`:`Burner +${step}% until dry end`},...(m.bDry!=null?[{type:'event',at:'DRY',text:`Burner back to ${m.bDry}%`}]:[])],exp:b!=null?[{key:'burner',ev:'CHARGE',dt:40,v:b+step,base:b}]:[]}}},
- {id:'gentler_start',faults:{ashy:1,roasty:.5,underdev:.4,sour:.3},when:m=>(ok(m.rorFC)&&m.rorFC>cfg.anRorFC)||(ok(m.spread)&&m.spread>cfg.anSpread)||(ok(m.drop)&&m.drop<cfg.anShort*60),
+ {id:'more_early_heat',faults:{baked:1,flat:.8,thin:.3,underdev:.3},when:m=>m.stall||(ok(m.drop)&&m.drop>(cfg.anLong-1)*60)||(ok(m.ror6)&&m.ror6<cfg.bb6Slow+.3)||(ok(m.dry)&&m.dry>cfg.bbDryMax),
+  make(m,k){const step=Math.round(cfg.anBurnerStep*k),b=m.b0;return {title:`Start with ${step}% more burner, until dry end`,detail:`${m.stall?'RoR stalled around '+mmss(m.stallT)+'. ':ok(m.ror6)&&m.ror6<cfg.bb6Slow+.3?'At 6:00 it was rising 1° every '+secPerDeg(m.ror6)+' s — slow for the 6-minute rule. ':ok(m.dry)&&m.dry>cfg.bbDryMax?'Color change came late ('+mmss(m.dry)+'). ':''}More heat early keeps momentum and shortens the middle of the roast${b!=null?` (${b}% → ${b+step}%)`:''}.`,rem:[{type:'event',at:'CHARGE',text:b!=null?`Burner ${b+step}% until dry end`:`Burner +${step}% until dry end`},...(m.bDry!=null?[{type:'event',at:'DRY',text:`Burner back to ${m.bDry}%`}]:[])],exp:b!=null?[{key:'burner',ev:'CHARGE',dt:40,v:b+step,base:b}]:[]}}},
+ {id:'gentler_start',faults:{ashy:1,roasty:.5,underdev:.4,sour:.3},when:m=>(ok(m.ror6)&&m.ror6>=cfg.bb6Fast-.3)||(ok(m.spread)&&m.spread>cfg.anSpread)||(ok(m.drop)&&m.drop<cfg.anShort*60),
   make(m,k){const step=Math.round(cfg.anBurnerStep*k),t=ok(m.fcs)?Math.max(0,m.fcs-120):null,b=t!=null?sampleAt(S_an.r.samples,(S_an.r.events.CHARGE??0)+t)?.burner:null;
-   return {title:`Lower burner ${step}% two minutes before crack${t!=null?' ('+mmss(t)+')':''}`,detail:`${ok(m.rorFC)&&m.rorFC>cfg.anRorFC?'Coming into crack fast ('+toDR(m.rorFC).toFixed(1)+'°/min)':ok(m.spread)&&m.spread>cfg.anSpread?'A big color spread ('+m.spread+')':'A short roast ('+mmss(m.drop)+')'} means the outside is roasting ahead of the inside.`,rem:t!=null?[{type:'time',at:t,text:ok(b)?`Burner ${Math.round(b)-step}%`:`Burner −${step}%`}]:[],exp:t!=null&&ok(b)?[{key:'burner',t,v:Math.round(b)-step,base:Math.round(b)}]:[]}}},
- {id:'longer_mail',faults:{sharp:1,sour:.6},when:m=>ok(m.mailPct)&&m.mailPct<36,
-  make(m,k){const step=Math.round(cfg.anBurnerStep*k);return {title:`Lower burner ${step}% at dry end`,detail:`Maillard was ${mmss(m.mail)} (${anPct(m.mailPct)}). Stretching it ~20–30 s rounds off sharp acidity${m.bDry!=null?` (${m.bDry}% → ${m.bDry-step}%)`:''}.`,rem:[{type:'event',at:'DRY',text:m.bDry!=null?`Burner ${m.bDry-step}%`:`Burner −${step}%`}],exp:m.bDry!=null?[{key:'burner',ev:'DRY',dt:20,v:m.bDry-step,base:m.bDry}]:[]}}},
+   return {title:`Lower burner ${step}% two minutes before crack${t!=null?' ('+mmss(t)+')':''}`,detail:`${ok(m.ror6)&&m.ror6>=cfg.bb6Fast-.3?'At 6:00 it was rising 1° every '+secPerDeg(m.ror6)+' s — fast for the 6-minute rule ('+secPerDeg(cfg.bb6Ideal)+' s is the aim)':ok(m.spread)&&m.spread>cfg.anSpread?'A big color spread ('+m.spread+')':'A short roast ('+mmss(m.drop)+')'} means the outside is roasting ahead of the inside.`,rem:t!=null?[{type:'time',at:t,text:ok(b)?`Burner ${Math.round(b)-step}%`:`Burner −${step}%`}]:[],exp:t!=null&&ok(b)?[{key:'burner',t,v:Math.round(b)-step,base:Math.round(b)}]:[]}}},
+ {id:'longer_mail',faults:{sharp:1,sour:.6},when:m=>(ok(m.dry)&&m.dry<cfg.bbDryMin)||(ok(m.ror6)&&m.ror6>cfg.bb6Ideal+1),
+  make(m,k){const step=Math.round(cfg.anBurnerStep*k);return {title:`Lower burner ${step}% at dry end`,detail:`Maillard was ${mmss(m.mail)}. Stretching it ~20–30 s rounds off sharp acidity${m.bDry!=null?` (${m.bDry}% → ${m.bDry-step}%)`:''}.`,rem:[{type:'event',at:'DRY',text:m.bDry!=null?`Burner ${m.bDry-step}%`:`Burner −${step}%`}],exp:m.bDry!=null?[{key:'burner',ev:'DRY',dt:20,v:m.bDry-step,base:m.bDry}]:[]}}},
  {id:'less_air_dry',faults:{thin:1,flat:.4},when:m=>m.fDry!=null,
   make(m,k){const step=Math.round(cfg.anAirStep*k);return {title:`Less air while drying: ${m.fDry}% → ${Math.max(0,m.fDry-step)}%`,detail:`Lower airflow early builds more body; bring air back at dry end.`,rem:[{type:'event',at:'CHARGE',text:`Air ${Math.max(0,m.fDry-step)}% until dry end`},{type:'event',at:'DRY',text:`Air back to ${m.fDry}%`}],exp:[{key:'fan',ev:'CHARGE',dt:60,v:Math.max(0,m.fDry-step),base:m.fDry}]}}},
  {id:'more_air_dev',faults:{ashy:1,roasty:.5},when:m=>m.fFC!=null&&(m.fDev==null||m.fDev<=m.fFC+2),
@@ -2082,8 +2121,8 @@ function tasteEditor(el,r,onChange){if(!el||!r)return;const t=tasteEff(r),mine=t
 let selAn=null,anOff={};
 function renderAnalyze(){const q=normName($('#aSearch').value),list=HIST.filter(r=>r.samples&&r.samples.length&&(!q||normName(['#'+r.num,r.meta.name,r.meta.coffee].join(' ')).includes(q)));
   if(!list.find(r=>r.id===selAn))selAn=list[0]?.id||null;
-  $('#aRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),dtr=ok(s.dev)&&ok(s.drop)&&s.drop?s.dev/s.drop*100:null;
-    return `<tr class="${r.id===selAn?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(r.chargedAt||r.created,false)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span class="muted">★</span>':''}</td><td class="n tnum">${lbTxt(batchOf(r))}</td><td class="n">${ok(dtr)?dtr.toFixed(0)+'%':'—'}</td><td class="n">${ok(r.cup)?`<span class="cup" style="${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span>`:'<span class="muted">—</span>'}</td><td class="muted ttxt">${hasTaste(r)?esc(tasteText(r)):'<span class="dim">not tasted</span>'}</td></tr>`}).join('');
+  $('#aRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r);
+    return `<tr class="${r.id===selAn?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(r.chargedAt||r.created,false)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span class="muted">★</span>':''}</td><td class="n tnum">${lbTxt(batchOf(r))}</td><td class="n">${mmss(s.dev)}</td><td class="n">${ok(r.cup)?`<span class="cup" style="${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span>`:'<span class="muted">—</span>'}</td><td class="muted ttxt">${hasTaste(r)?esc(tasteText(r)):'<span class="dim">not tasted</span>'}</td></tr>`}).join('');
   $('#aEmpty').innerHTML=list.length?'':'<div class="empty">No roasts with curve data yet.</div>';
   $$('#aRows tr').forEach(tr=>tr.onclick=()=>{selAn=tr.dataset.id;renderAnalyze()});renderAnDetail()}
 function anPrev(r){return HIST.filter(x=>x.id!==r.id&&(x.num||0)<(r.num||0)&&sameSlot(x,r)&&x.samples&&x.samples.length).sort((a,b)=>(b.num||0)-(a.num||0))[0]||null}
@@ -2091,12 +2130,12 @@ function renderAnDetail(){const el=$('#aDetail'),r=HIST.find(x=>x.id===selAn);if
   const {m,recs,keep}=anRecommend(r),prev=anPrev(r),checks=anChecks(m),off=anOff[r.id]||(anOff[r.id]={});recs.forEach(x=>{if(off[x.id]!=null)x.on=off[x.id]});
   const pj=anProject(r,m,keep?[]:recs.filter(x=>x.on));
   const src=HIST.find(x=>x.id===r.bgId),srcPlan=src&&src.plan&&anNextOf(src)?.id===r.id?src.plan.recs:null;
-  const stat=(l,v,flag)=>`<div class="stat${flag?' flag-'+flag:''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;const dtrBad=ok(m.dtr)&&(m.dtr<cfg.anDtrLow||m.dtr>cfg.anDtrHigh);
+  const stat=(l,v,flag)=>`<div class="stat${flag?' flag-'+flag:''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;const devBad=ok(m.dev)&&(m.dev<cfg.bbDevMin||m.dev>cfg.bbDevMax),r6Bad=ok(m.ror6)&&(m.ror6>=cfg.bb6Fast||m.ror6<=cfg.bb6Slow);
   el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">#${r.num} · ${esc(r.meta.name||'Untitled')}</div><div class="muted" style="margin-top:3px">${fmtLong(r.chargedAt||r.created)} · ${esc(r.meta.coffee||'')}${r.meta.green?' · <b>'+esc(r.meta.green)+' lb batch</b>':''} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:calc(14px*var(--ts,1));padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin-top:4px">cupping score</div></div>`:''}</div>
   <div class="anchart"><canvas id="aCv"></canvas></div>
   <div class="legend"><span><i style="background:${COL.bt}"></i>Bean temp</span><span><i style="background:${COL.ror}"></i>RoR</span>${prev?`<span><i style="background:${COL.bkg||COL.axis}"></i>#${prev.num} (last time)</span>`:''}<span><i style="background:var(--warn)"></i>Burner / air changes</span>${recs.some(x=>x.on)?`<span><i style="background:var(--good)"></i>Recommended changes${pj?' &amp; target curve':''}</span>`:''}</div>
-  ${pj?`<div class="tgtline"><b>Target for next roast</b><span>First crack ${mmss(pj.fcs)} <small>(was ${mmss(m.fcs)})</small></span><span>Drop ${mmss(pj.drop)} @ ${fT(pj.dropBT)}°${cfg.unit} <small>(was ${mmss(m.drop)} @ ${fT(m.dropBT)}°)</small></span><span>Development ${mmss(pj.dev)} · ${(pj.dev/pj.drop*100).toFixed(0)}% <small>(was ${anPct(m.dtr)})</small></span></div>`:''}
-  <div class="stats stats6">${stat('Dry end',ok(m.dry)?mmss(m.dry)+`<small>${anPct(m.dryPct)}${m.dryEst?' est.':''}</small>`:'—')}${stat('Maillard',ok(m.mail)?mmss(m.mail)+`<small>${anPct(m.mailPct)}</small>`:'—')}${stat('Development',ok(m.dev)?mmss(m.dev)+`<small>${anPct(m.dtr)}</small>`:'—',dtrBad?'w':'')}${stat('RoR at FC',ok(m.rorFC)?toDR(m.rorFC).toFixed(1)+'<small>°/min</small>':'—',m.crash||m.flick?'w':'')}${stat('Drop',ok(m.drop)?mmss(m.drop)+`<small>${fT(m.dropBT)}°</small>`:'—')}${stat('Loss',ok(m.loss)?m.loss.toFixed(1)+'<small>%</small>':'—')}</div>
+  ${pj?`<div class="tgtline"><b>Target for next roast</b><span>First crack ${mmss(pj.fcs)} <small>(was ${mmss(m.fcs)})</small></span><span>Drop ${mmss(pj.drop)} @ ${fT(pj.dropBT)}°${cfg.unit} <small>(was ${mmss(m.drop)} @ ${fT(m.dropBT)}°)</small></span><span>Development ${mmss(pj.dev)} <small>(was ${mmss(m.dev)})</small></span></div>`:''}
+  <div class="stats stats6">${stat('Color change',ok(m.dry)?mmss(m.dry)+`<small>${ok(m.dryBT)?fT(m.dryBT)+'°':''}${m.dryEst?' est.':''}</small>`:'—')}${stat('RoR at 6:00',ok(m.ror6)?toDR(m.ror6).toFixed(1)+`<small>1°/${secPerDeg(m.ror6)} s</small>`:'—',r6Bad?'w':'')}${stat('Development',ok(m.dev)?mmss(m.dev)+'<small>after FC</small>':'—',devBad?'w':'')}${stat('RoR at FC',ok(m.rorFC)?toDR(m.rorFC).toFixed(1)+'<small>°/min</small>':'—',m.crash||m.flick?'w':'')}${stat('Drop',ok(m.drop)?mmss(m.drop)+`<small>${fT(m.dropBT)}°</small>`:'—')}${stat('Loss',ok(m.loss)?m.loss.toFixed(1)+'<small>%</small>':'—')}</div>
   <div><div class="h3" style="margin-bottom:6px">Curve check</div>${checks.map(([k,t])=>`<div class="chk2 ${k==='good'?'cg':'cw'}">${k==='good'?'✓':'!'}<span>${esc(t)}</span></div>`).join('')}</div>
   ${srcPlan?`<div class="note"><b>This roast used the plan from #${src.num}:</b>${!sameBatch(batchOf(src),batchOf(r))?`<div class="pl n">Batch size changed (${lbTxt(batchOf(src))} → ${lbTxt(batchOf(r))}), so none of these are counted.</div>`:''}${srcPlan.map(x=>{const f=anFollowed(x.exp,r)&&sameBatch(batchOf(src),batchOf(r));return `<div class="pl ${f?'y':'n'}">${f?'✓':'✗'} ${esc(x.title)}${f||!sameBatch(batchOf(src),batchOf(r))?'':' <span class="muted">— not made, so it isn\'t counted</span>'}</div>`}).join('')}${hasTaste(src)&&hasTaste(r)?`<br><span class="muted">Then: ${esc(tasteText(src))} → now: ${esc(tasteText(r))}</span>`:''}</div>`:''}
   <div><div class="h3" style="margin-bottom:8px">How did it taste?</div><div id="aTaste"></div></div>
@@ -2279,10 +2318,16 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     ${window.ZR_NATIVE?`<div class="box"><span>Zuna Roast for Mac · version <b>${esc(ZR_NATIVE.version||'—')}</b></span><button id="stUpd">Check for updates</button></div>`:''}`,
   an:()=>`<h2>Analyze rules</h2><div class="sub">The starting rules the Analyze screen uses. Once a coffee has history, it also learns from that coffee's own results and sizes the steps up or down on its own.</div>
     <div class="h3">What counts as a problem on the curve</div>
-    <div class="sgrid"><label class="field">Development target, low (%)<input data-cfg="anDtrLow" value="${esc(cfg.anDtrLow)}"></label><label class="field">Development target, high (%)<input data-cfg="anDtrHigh" value="${esc(cfg.anDtrHigh)}"></label>
-      <label class="field">RoR at first crack is fast above (°${cfg.unit}/min)<input id="sAnRor" inputmode="decimal" value="${toDR(cfg.anRorFC).toFixed(1)}"></label>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">From the Brewed Behavior roasting manual. The first crack mark is machine-specific — set it to where your P12 cracks.</div>
+    <div class="sgrid"><label class="field">Turning point target (m:ss)<input data-cfgm="bbTp" value="${mmss(cfg.bbTp)}"></label><label class="field">Turning point — within (seconds)<input data-cfg="bbTpTol" value="${esc(cfg.bbTpTol)}"></label>
+      <label class="field">Color change — earliest (m:ss)<input data-cfgm="bbDryMin" value="${mmss(cfg.bbDryMin)}"></label><label class="field">Color change — latest (m:ss)<input data-cfgm="bbDryMax" value="${mmss(cfg.bbDryMax)}"></label>
+      <label class="field">Color change temp (°${cfg.unit})<input data-cfgt="bbDryC" value="${fT(cfg.bbDryC)}"></label><label class="field">Color change temp — within ± (°${cfg.unit})<input data-cfgr="bbDryTol" value="${toDR(cfg.bbDryTol).toFixed(0)}"></label>
+      <label class="field">6:00 RoR — too slow at or below (°${cfg.unit}/min)<input data-cfgr="bb6Slow" value="${toDR(cfg.bb6Slow).toFixed(1)}"></label><label class="field">6:00 RoR — ideal (°${cfg.unit}/min)<input data-cfgr="bb6Ideal" value="${toDR(cfg.bb6Ideal).toFixed(1)}"></label>
+      <label class="field">6:00 RoR — too fast at or above (°${cfg.unit}/min)<input data-cfgr="bb6Fast" value="${toDR(cfg.bb6Fast).toFixed(1)}"></label><label class="field">First crack mark on your roaster (°${cfg.unit})<input data-cfgt="bbFcC" value="${fT(cfg.bbFcC)}"></label>
+      <label class="field">Development — shortest (m:ss)<input data-cfgm="bbDevMin" value="${mmss(cfg.bbDevMin)}"></label><label class="field">Development — longest (m:ss)<input data-cfgm="bbDevMax" value="${mmss(cfg.bbDevMax)}"></label>
       <label class="field">Long roast — over (minutes)<input data-cfg="anLong" value="${esc(cfg.anLong)}"></label><label class="field">Short roast — under (minutes)<input data-cfg="anShort" value="${esc(cfg.anShort)}"></label>
-      <label class="field">Big color spread — over (Agtron)<input data-cfg="anSpread" value="${esc(cfg.anSpread)}"></label></div>
+      <label class="field">Color spread target — at or under (Agtron)<input data-cfg="anSpread" value="${esc(cfg.anSpread)}"></label></div>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">6-minute rule: 15°F/min is 1° every 4 s; 20 (1° every 3 s) is too fast, 12 (1° every 5 s) too slow.</div>
     <div class="h3">Size of each suggested change</div>
     <div class="sgrid"><label class="field">Burner step (%)<input data-cfg="anBurnerStep" value="${esc(cfg.anBurnerStep)}"></label><label class="field">Air step (%)<input data-cfg="anAirStep" value="${esc(cfg.anAirStep)}"></label></div>
     <div class="h3">Cupping form</div>
@@ -2367,7 +2412,10 @@ function wireSettings(){const el=$('#scont');
   const ac=$('#sAutoCool');if(ac)ac.onchange=()=>{const v=num(ac.value);if(v==null||v<50){toast('Enter a temperature like 400');ac.value=Math.round(toD(cfg.autoCoolC));return}cfg.autoCoolC=fromD(v);saveCfg();toast(`Auto cooling at ${Math.round(v)}°${cfg.unit}`)};
   const as=$('#sAutoStir');if(as)as.onchange=()=>{const v=num(as.value);if(v==null||v<0||v>120){toast('Enter 0 to 120 seconds');as.value=cfg.autoStirDelay;return}cfg.autoStirDelay=v;saveCfg()};
   const ar=$('#sAnRor');if(ar)ar.onchange=()=>{const v=num(ar.value);if(v==null||v<=0){ar.value=toDR(cfg.anRorFC).toFixed(1);return}cfg.anRorFC=isF()?v/1.8:v;saveCfg()};
-  const arr=$('#sAnReset');if(arr)arr.onclick=()=>{for(const k of Object.keys(DEF))if(k.startsWith('an'))cfg[k]=DEF[k];saveCfg();renderSettings();toast('Analyze rules reset')};
+  $$('[data-cfgm]',el).forEach(i=>i.onchange=()=>{const k=i.dataset.cfgm,v=pT(i.value);if(!ok(v)||v<0){i.value=mmss(cfg[k]);return}cfg[k]=Math.round(v);i.value=mmss(cfg[k]);saveCfg()});
+  $$('[data-cfgt]',el).forEach(i=>i.onchange=()=>{const k=i.dataset.cfgt,v=num(i.value);if(!ok(v)){i.value=fT(cfg[k]);return}cfg[k]=fromD(v);saveCfg()});
+  $$('[data-cfgr]',el).forEach(i=>i.onchange=()=>{const k=i.dataset.cfgr,v=num(i.value);if(!ok(v)||v<0){i.value=toDR(cfg[k]).toFixed(1);return}cfg[k]=isF()?v/1.8:v;saveCfg()});
+  const arr=$('#sAnReset');if(arr)arr.onclick=()=>{for(const k of Object.keys(DEF))if(k.startsWith('an')||k.startsWith('bb'))cfg[k]=DEF[k];saveCfg();renderSettings();toast('Analyze rules reset')};
   const ba=$('#sBtAlarm');if(ba)ba.onchange=()=>{const v=num(ba.value);if(v==null||v<50){toast('Enter a temperature like 460');ba.value=Math.round(toD(cfg.btAlarmC));return}cfg.btAlarmC=fromD(v);S.alarm={};saveCfg();checkBtAlarm();toast(`Bean temp alarm set to ${Math.round(v)}°${cfg.unit}`)};
   $$('[data-scale]',el).forEach(i=>{i.oninput=()=>{cfg[i.dataset.scale]=Number(i.value);$('#lbl_'+i.dataset.scale).textContent=i.value+'%';applyTheme()};i.onchange=()=>{saveCfg();scheduleDraw()}});
   const szr=$('#sizeReset',el);if(szr)szr.onclick=()=>{cfg.textScale=cfg.bigScale=cfg.smallScale=100;saveCfg();applyTheme();renderSettings()};
