@@ -317,6 +317,21 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 
 
 /* ---------- analyze ---------- */
+.bsplit{flex:1;display:grid;grid-template-columns:minmax(440px,36%) minmax(0,1fr);gap:14px;min-height:0}
+.bform{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.bform .on-acc{background:var(--accent);border-color:var(--accent);color:#fff}
+.bsug{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:9px 11px;font-size:calc(12.5px*var(--ts,1));color:var(--text2);line-height:1.45}
+.chipb{background:var(--panel);border:1px solid var(--line2);border-radius:6px;padding:3px 8px;color:var(--text)}.chipb b{color:var(--burner,inherit);font-weight:600}
+.bhint{font-size:calc(12.5px*var(--ts,1));color:var(--text2);line-height:1.45}
+.bbox{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:10px 12px}
+.mstones{display:grid;grid-template-columns:130px 1fr 1fr 34px;gap:6px 8px;align-items:center;font-size:calc(13.5px*var(--ts,1))}
+.mstones .xname{grid-column:1}.mstones .seg{padding:2px}.mstones .seg button{padding:3px 8px;flex:1}
+.bsteps{display:grid;grid-template-columns:1.3fr .8fr .7fr .7fr .7fr 30px;gap:6px;align-items:center;font-size:calc(12px*var(--ts,1))}
+.bsteps input,.bsteps select{padding:6px 7px}
+.bchart{flex:1;min-height:340px;touch-action:none;border:1px solid var(--line2);border-radius:8px;background:var(--chartBg)}
+.pbar{display:flex;border-radius:7px;overflow:hidden;font-size:calc(12px*var(--ts,1));font-weight:600}
+.pbar i{font-style:normal;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.pbar i:nth-child(1){background:color-mix(in srgb,var(--good) 16%,var(--panel))}.pbar i:nth-child(2){background:color-mix(in srgb,var(--warn) 18%,var(--panel))}.pbar i:nth-child(3){background:color-mix(in srgb,var(--danger) 16%,var(--panel))}
 .ansplit{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(620px,56%);gap:14px;min-height:0}
 .anchart{height:300px;border:1px solid var(--line2);border-radius:8px;background:var(--chartBg)}
 .stats6{grid-template-columns:repeat(6,1fr)}.stat.flag-w{border-color:color-mix(in srgb,var(--warn) 55%,var(--panel));background:color-mix(in srgb,var(--warn) 7%,var(--panel))}
@@ -442,11 +457,12 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 <!-- ================= PROFILES ================= -->
 <div class="screen" id="scr-profiles" hidden>
   <div class="page">
-    <div class="ph"><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:calc(12.5px*var(--ts,1))"></span></div>
+    <div id="pList" style="display:contents"><div class="ph"><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:calc(12.5px*var(--ts,1))"></span><button class="pri" id="btnNewProfile">+ New profile</button></div>
     <div class="split">
       <div class="card scroll"><table><thead><tr><th>Profile</th><th>Coffee</th><th class="n">Batch</th><th class="n">Roasted</th><th>Last roasted</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">Color W / G</th><th class="n">Cup</th></tr></thead><tbody id="pRows"></tbody></table><div id="pEmpty"></div></div>
       <div class="card detail" id="pDetail"></div>
-    </div>
+    </div></div>
+    <div id="pBuild" hidden style="flex:1;min-height:0;display:flex;flex-direction:column;gap:14px"></div>
   </div>
 </div>
 
@@ -843,8 +859,8 @@ function renderFormCalc(){const m=readMeta(),g=num(m.green),w=num(m.roasted);
   if(l){const left=invLeft(l)+(saved&&saved.meta.invId===l.id?num(saved.meta.green)||0:0),after=left-(g||0);
     $('#hInv').innerHTML=`<span class="${after<0?'dangerTxt':''}">${left.toFixed(1)} lb in stock${g?` → ${after.toFixed(1)} lb after this roast`:''}${after<0?' — not enough green':''}</span>`}
   else $('#hInv').textContent=INV.length?'':'Add your green coffee on the Green coffee screen to pick it here.';
-  const nm=normName(m.name);if(!nm){$('#hName').textContent='';}else{const p2=profileByName(m.name,g);$('#hName').innerHTML=p2?`<span style="color:var(--good)">★ Profile found — roast #${p2.num} (${lbTxt(batchOf(p2))}) is the background</span>${ok(g)&&!sameBatch(g,batchOf(p2))?`<br><span style="color:var(--warn)">No ${lbTxt(g)} profile yet — using the ${lbTxt(batchOf(p2))} one. Save this roast as the profile to start one for ${lbTxt(g)}.</span>`:''}`:'<span class="muted">New profile name</span>'}
-  $('#profNames').innerHTML=[...new Set(HIST.filter(r=>r.isProfile&&r.meta.name).map(r=>r.meta.name))].map(n=>`<option value="${esc(n)}">`).join('')}
+  const nm=normName(m.name);if(!nm){$('#hName').textContent='';}else{const p2=profileByName(m.name,g);$('#hName').innerHTML=p2?`<span style="color:var(--good)">★ Profile found — ${p2.planned?'the planned profile':'roast #'+p2.num} (${lbTxt(batchOf(p2))}) is the background</span>${ok(g)&&!sameBatch(g,batchOf(p2))?`<br><span style="color:var(--warn)">No ${lbTxt(g)} profile yet — using the ${lbTxt(batchOf(p2))} one. Save this roast as the profile to start one for ${lbTxt(g)}.</span>`:''}`:'<span class="muted">New profile name</span>'}
+  $('#profNames').innerHTML=[...new Set(allProfiles().filter(r=>r.meta.name).map(r=>r.meta.name))].map(n=>`<option value="${esc(n)}">`).join('')}
 function onFormInput(e){if(S.viewingId||S.recording||S.roast.samples.length)S.dirty=true;
   if(e&&e.target===$('#fInv')){const l=INV.find(x=>x.id===$('#fInv').value);if(l){$('#fCoffee').value=l.name;$('#fLot').value=l.lot||''}}
   if(e&&e.target===$('#fName')&&!S.recording&&!S.viewingId&&!S.roast.samples.length){const pr=profileByName($('#fName').value,num($('#fGreen').value));
@@ -866,10 +882,10 @@ const sameBatch=(a,b)=>!ok(a)||!ok(b)||Math.abs(a-b)<=Math.max(a,b)*.12;
 const lbTxt=v=>ok(v)?(+v.toFixed(1))+' lb':'—';
 // one profile per name AND batch size — a 13 lb and a 25 lb profile of the same coffee live side by side
 const sameSlot=(a,b)=>normName(a.meta.name)===normName(b.meta.name)&&sameBatch(batchOf(a),batchOf(b));
-const profileByName=(n,g)=>{const x=normName(n);if(!x)return null;const all=HIST.filter(r=>r.isProfile&&!r.archived&&normName(r.meta.name)===x);if(!all.length)return null;
+const profileByName=(n,g)=>{const x=normName(n);if(!x)return null;const all=allProfiles().filter(r=>normName(r.meta.name)===x);if(!all.length)return null;
   if(ok(g)){const hit=all.find(r=>ok(batchOf(r))&&sameBatch(g,batchOf(r)));if(hit)return hit;return all.slice().sort((a,b)=>Math.abs((batchOf(a)??g)-g)-Math.abs((batchOf(b)??g)-g))[0]}
   return all.slice().sort((a,b)=>String(b.chargedAt||b.created).localeCompare(String(a.chargedAt||a.created)))[0]};
-const unprofileSlot=async r=>{for(const x of HIST)if(x.id!==r.id&&x.isProfile&&sameSlot(x,r)){x.isProfile=false;await commitRoast(x,true)}};
+const unprofileSlot=async r=>{for(const x of HIST)if(x.id!==r.id&&x.isProfile&&sameSlot(x,r)){x.isProfile=false;await commitRoast(x,true)}await dropPlannedSlot(r)};
 const safe=s=>String(s||'roast').trim().replace(/[\/\\:*?"<>|]+/g,'-').replace(/\s+/g,' ').slice(0,90);
 function stamp(iso){const d=new Date(iso||Date.now()),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`}
 function roastPath(r){const d=new Date(r.chargedAt||r.created||Date.now());return ['Roasts',String(d.getFullYear()),String(d.getMonth()+1).padStart(2,'0')+' '+MONTHS[d.getMonth()]]}
@@ -937,6 +953,8 @@ async function syncFolder(){
   const inFolder=new Set(found.map(r=>r.id));for(const r of HIST)if(!inFolder.has(r.id))await writeRoastFiles(r);
   if(invFile&&Array.isArray(invFile.items)&&String(invFile.savedAt||'')>String(INVsavedAt||'')){INV=invFile.items;INVsavedAt=invFile.savedAt}else if(INV.length)await persistInv();
   if(cupFile&&Array.isArray(cupFile.sessions)&&String(cupFile.savedAt||'')>String(CUPsavedAt||'')){CUP=cupFile.sessions;CUPsavedAt=cupFile.savedAt}else if(CUP.length)await persistCup();
+  const ppf=await readFolderJSON(['Profiles'],'planned-profiles.json');
+  if(ppf&&Array.isArray(ppf.items)&&String(ppf.savedAt||'')>String(PLANNEDsavedAt||'')){PLANNED=ppf.items;PLANNEDsavedAt=ppf.savedAt;if(idb.db)await idb.set('planned',ppf)}else if(PLANNED.length)await savePlanned();
   const sf=await readFolderJSON(['Settings'],'settings.json');
   if(sf&&sf.settings&&String(sf.savedAt||'')>String(cfg.savedAt||'')){applySettings(sf.settings);log('sys','Settings loaded from the folder')}
   const pf=await readFolderJSON(['Settings'],'today-plan.json');
@@ -951,6 +969,7 @@ async function initStorage(){await idb.open();
   const h=idb.db?await idb.get('hist'):null;HIST=Array.isArray(h)?h:[];sortHist();
   const iv=idb.db?await idb.get('inv'):null;if(iv&&Array.isArray(iv.items)){INV=iv.items;INVsavedAt=iv.savedAt||''}
   const cp=idb.db?await idb.get('cup'):null;if(cp&&Array.isArray(cp.sessions)){CUP=cp.sessions;CUPsavedAt=cp.savedAt||''}
+  const pp=idb.db?await idb.get('planned'):null;if(pp&&Array.isArray(pp.items)){PLANNED=pp.items;PLANNEDsavedAt=pp.savedAt||''}
   if(window.ZR_NATIVE){try{FS.dir=await ZR_NATIVE.root();FS.state='granted'}catch(e){log('err','Could not open the data folder: '+e);toast('Could not open the data folder: '+e)}}
   else if(FS.supported&&idb.db){const d=await idb.get('dir');if(d){FS.dir=d;try{FS.state=(await d.queryPermission({mode:'readwrite'}))==='granted'?'granted':'prompt'}catch(e){FS.state='prompt'}}}
   if(FS.state==='granted')await syncFolder();renderStorageStatus()}
@@ -981,13 +1000,13 @@ function download(name,text,type='text/csv'){if(window.ZR_NATIVE){ZR_NATIVE.save
    Background profile
    ================================================================ */
 function resolveBg(){let r=null;const m=S.bgMode;
-  if(m==='auto')r=profileByName($('#fName').value,num($('#fGreen').value));else if(m&&m!=='none')r=HIST.find(x=>x.id===m)||null;
+  if(m==='auto')r=profileByName($('#fName').value,num($('#fGreen').value));else if(m&&m!=='none')r=findAny(m);
   if(r&&S.roast&&r.id===S.roast.id&&!S.recording&&S.viewingId)r=r; // viewing a profile shows itself
   S.bg=r;S.bgAdj=r?adjustments(r):[];renderBgSelect();renderHeader();renderNotes();scheduleDraw()}
 function setBgMode(m){S.bgMode=m||'none';store.set(LS.bg,S.bgMode);resolveBg()}
-function renderBgSelect(){const sel=$('#bgSel'),prof=HIST.filter(r=>r.isProfile&&!r.archived),rec=HIST.filter(r=>!r.archived).slice(0,25);
-  const o=r=>`<option value="${r.id}">${r.isProfile?'★ ':''}#${r.num} ${esc(r.meta.name||'Untitled')}${ok(batchOf(r))?' · '+lbTxt(batchOf(r)):''}</option>`;
-  const autoLbl=S.bgMode==='auto'?(S.bg?`Auto: #${S.bg.num} ${esc(S.bg.meta.name)}${ok(batchOf(S.bg))?' · '+lbTxt(batchOf(S.bg)):''}`:'Auto (matching profile)'):'Auto (matching profile)';
+function renderBgSelect(){const sel=$('#bgSel'),prof=allProfiles(),rec=HIST.filter(r=>!r.archived).slice(0,25);
+  const o=r=>`<option value="${r.id}">${r.isProfile?'★ ':''}${rTag(r)} ${esc(r.meta.name||'Untitled')}${ok(batchOf(r))?' · '+lbTxt(batchOf(r)):''}</option>`;
+  const autoLbl=S.bgMode==='auto'?(S.bg?`Auto: ${rTag(S.bg)} ${esc(S.bg.meta.name)}${ok(batchOf(S.bg))?' · '+lbTxt(batchOf(S.bg)):''}`:'Auto (matching profile)'):'Auto (matching profile)';
   sel.innerHTML=`<option value="auto">${autoLbl}</option><option value="none">None</option>`+(prof.length?`<optgroup label="Profiles">${prof.map(o).join('')}</optgroup>`:'')+(rec.length?`<optgroup label="Recent roasts">${rec.map(o).join('')}</optgroup>`:'');
   sel.value=[...sel.options].some(x=>x.value===S.bgMode)?S.bgMode:'auto'}
 function bgTimeNow(){const r=S.roast,c=r.events.CHARGE,last=r.samples.at(-1);if(c==null||!last)return null;return last.t-c}
@@ -1056,9 +1075,9 @@ function renderNotes(){const el=$('#notes');if(!el)return;const rems=(S.bg&&S.bg
   const gNow=num($('#fGreen')?$('#fGreen').value:r.meta.green),bMis=S.bg&&ok(gNow)&&!sameBatch(gNow,batchOf(S.bg));
   const hasAny=rems.length||(S.bg&&S.bg.meta.notes)||tn.length||bMis;
   $('#notesHead').hidden=!hasAny;
-  let h=bMis?`<div class="warn">Background #${S.bg.num} was a ${lbTxt(batchOf(S.bg))} batch — this one is ${lbTxt(gNow)}. Its curve${S.bg.target?', target':''} and reminders may not fit.</div>`:'';
+  let h=bMis?`<div class="warn">Background ${rTag(S.bg)} was a ${lbTxt(batchOf(S.bg))} batch — this one is ${lbTxt(gNow)}. Its curve${S.bg.target?', target':''} and reminders may not fit.</div>`:'';
   h+=rems.map((m,i)=>`<div class="rm ${S.firedRem[i]?'done':i===nextIdx?'next':''} ${S.flashRem===i?'flash':''}"><i>${S.firedRem[i]?'✓':i===nextIdx?'▶':''}</i><div><b>${esc(remWhen(m))}</b>${esc(m.text)}</div></div>`).join('');
-  if(S.bg&&S.bg.meta.notes)h+=`<div class="pn">“${esc(S.bg.meta.notes)}”<span style="display:block;font-size:calc(11.5px*var(--ts,1));margin-top:3px">— last time (#${S.bg.num})</span></div>`;
+  if(S.bg&&S.bg.meta.notes)h+=`<div class="pn">“${esc(S.bg.meta.notes)}”<span style="display:block;font-size:calc(11.5px*var(--ts,1));margin-top:3px">— ${S.bg.planned?'plan note':'last time ('+rTag(S.bg)+')'}</span></div>`;
   h+=tn.map(n=>`<div class="tnote"><span>${mmss(n.t-(r.events.CHARGE??0))}</span>${esc(n.text)}</div>`).join('');
   if(S.recording)h+=S.noteOpen?`<div class="addnote"><input id="noteIn" placeholder="Add a note…"><button class="sm" id="noteAdd">Add</button></div>`:`<button class="sm" id="noteOpen" style="align-self:flex-start;color:var(--text2)">+ Note</button>`;
   el.innerHTML=h;S.flashRem=null;
@@ -1092,7 +1111,7 @@ function renderLive(){const v=S.latest,r=S.roast,last=S.recording?r.samples.at(-
   $('#dBT').innerHTML=dbt;$('#dRoR').innerHTML=dror;renderCtl();renderNext()}
 function renderNext(){const el=$('#nextbar');el.hidden=!cfg.showNextBar;if(!cfg.showNextBar)return;if(!S.bg){el.innerHTML=`<span class="muted">No background profile.</span><span class="sp"></span><button class="sm" id="nbProf">Pick a profile</button>`;$('#nbProf').onclick=()=>showScreen('profiles');return}
   const nx=bgNext(),rc=S.bg.events.CHARGE??0,x=bgTimeNow();
-  if(!nx){el.innerHTML=`<span class="muted">Background #${S.bg.num} · ${esc(S.bg.meta.name||'')} — no more burner, air or drum changes.</span>`;return}
+  if(!nx){el.innerHTML=`<span class="muted">Background ${rTag(S.bg)} · ${esc(S.bg.meta.name||'')} — no more burner, air or drum changes.</span>`;return}
   const when=x!=null?`in <b class="tnum">${mmss(nx.t-rc-x)}</b>`:`at <b class="tnum">${mmss(nx.t-rc)}</b>`;
   el.innerHTML=`<span>Next (bkg): <b style="color:var(--c-${CTL.find(c=>c.key===nx.key).color})">${nx.label} ${Math.round(nx.from)} → ${Math.round(nx.to)}%</b> ${when}</span><span class="sp"></span>${C.on&&link.connected()?`<button class="pri" id="nbSend">Send</button>`:''}`;
   const b=$('#nbSend');if(b)b.onclick=()=>sendControl(nx.key,nx.to)}
@@ -1167,14 +1186,15 @@ function drawMain(){const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H
   const area=(arr,key,o,Yf,col,from,to,a)=>{const g=ctx.createLinearGradient(0,PAD.t,0,PAD.t+h);g.addColorStop(0,rgba(col,a));g.addColorStop(1,rgba(col,0));ctx.fillStyle=g;ctx.beginPath();let seg=null;const close=()=>{if(seg){ctx.lineTo(seg.x,PAD.t+h);ctx.lineTo(seg.x0,PAD.t+h);ctx.closePath();seg=null}};
     for(const p of arr){const v=p[key];if(!ok(v)||(from!=null&&p.t<from)||(to!=null&&p.t>to)){close();continue}const x=X(p.t-o),y=Yf(v);if(!seg){seg={x0:x,x};ctx.moveTo(x,y)}else{ctx.lineTo(x,y);seg.x=x}}close();ctx.fill()};
   ctx.save();ctx.beginPath();ctx.rect(PAD.l,PAD.t,w,h);ctx.clip();
-  {const F=cfg.scales;if(S.bg&&F.fillBkg){const b=S.bg,ro=b.events.CHARGE??0;area(b.samples,'bt',ro,Y,COL.bkg,ro-60,null,.16);area(b.samples,'ror',ro,YR,COL.ror,rorStart(b.events)??ro,b.events.DROP,.06)}
+  {const F=cfg.scales;if(S.bg&&F.fillBkg&&!S.bg.planned){const b=S.bg,ro=b.events.CHARGE??0;area(b.samples,'bt',ro,Y,COL.bkg,ro-60,null,.16);area(b.samples,'ror',ro,YR,COL.ror,rorStart(b.events)??ro,b.events.DROP,.06)}
     if(F.fillEx)area(smp,'exhaust',off,Y,COL.exhaust,null,null,.22);
     if(F.fillRor&&ev.CHARGE!=null)area(smp,'ror',off,YR,COL.ror,rorStart(ev),ev.DROP,.14);
     if(F.fillBt)area(smp,'bt',off,Y,COL.bt,null,null,.12)}
-  if(S.bg){const b=S.bg,ro=b.events.CHARGE??0;line(b.samples,'bt',ro,Y,COL.bkg,1.6,[6,5],ro-60);line(b.samples,'ror',ro,YR,rgba(COL.ror,.4),1.3,[6,5],rorStart(b.events)??ro,b.events.DROP);
-    for(const k of ['FCs','DROP']){const t=b.events[k];if(t==null)continue;const s=sampleAt(b.samples,t);if(s&&ok(s.bt)){ctx.strokeStyle=COL.bkg;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(t-ro),Y(s.bt),4,0,7);ctx.stroke()}}
+  if(S.bg){const b=S.bg,ro=b.events.CHARGE??0;if(!b.planned){line(b.samples,'bt',ro,Y,COL.bkg,1.6,[6,5],ro-60);line(b.samples,'ror',ro,YR,rgba(COL.ror,.4),1.3,[6,5],rorStart(b.events)??ro,b.events.DROP)}
+    if(!b.planned)for(const k of ['FCs','DROP']){const t=b.events[k];if(t==null)continue;const s=sampleAt(b.samples,t);if(s&&ok(s.bt)){ctx.strokeStyle=COL.bkg;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(t-ro),Y(s.bt),4,0,7);ctx.stroke()}}
     if(b.target&&b.target.samples){const g=getComputedStyle(document.body).getPropertyValue('--good').trim()||'#2a8',tg=b.target;line(tg.samples,'bt',0,Y,g,2,[3,3]);line(tg.samples,'ror',0,YR,g,1.3,[3,3],null,tg.events.DROP);
-      for(const k of ['FCs','DROP']){const t=tg.events[k];if(t==null)continue;const s=sampleAt(tg.samples,t);if(s&&ok(s.bt)){ctx.fillStyle=g;ctx.beginPath();ctx.arc(X(t),Y(s.bt),4,0,7);ctx.fill()}}}}
+      for(const k of ['FCs','DROP']){const t=tg.events[k];if(t==null)continue;const s=sampleAt(tg.samples,t);if(s&&ok(s.bt)){ctx.fillStyle=g;ctx.beginPath();ctx.arc(X(t),Y(s.bt),4,0,7);ctx.fill()}}
+      for(const m of tg.marks||[]){if(!ok(m.t)||!ok(m.bt))continue;const x=X(m.t),y=Y(m.bt);ctx.strokeStyle=g;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.stroke();ctx.fillStyle=g;ctx.font=`600 ${10.5*TS()}px ${getComputedStyle(document.body).fontFamily}`;ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(m.name,x+6,y-4)}}}
   line(smp,'exhaust',off,Y,COL.exhaust,1.3);
   if(ev.CHARGE!=null)line(smp,'ror',off,YR,COL.ror,2,null,rorStart(ev),ev.DROP);
   line(smp,'bt',off,Y,COL.bt,2.6);
@@ -1282,7 +1302,7 @@ function renderToday(){planRoll();$('#tDate').textContent=new Date().toLocaleDat
   $('#tEmpty').innerHTML=PLAN.items.length?'':`<div class="empty">No batches planned for today.<br>Add them on the right, in the order you’ll roast them.</div>`;
   if(PLAN.carried){$('#tEmpty').innerHTML+=`<div class="muted" style="padding:10px 14px;font-size:calc(13px*var(--ts,1))">${PLAN.carried} unroasted batch${PLAN.carried===1?' was':'es were'} carried over from your last roast day.</div>`;PLAN.carried=0;savePlan()}
   // side: add form + green needed
-  const profs=HIST.filter(r=>r.isProfile&&!r.archived).sort((a,b)=>String(a.meta.name).localeCompare(String(b.meta.name)));
+  const profs=allProfiles().sort((a,b)=>String(a.meta.name).localeCompare(String(b.meta.name)));
   const need={};for(const x of PLAN.items)if(x.status!=='done'&&x.invId)need[x.invId]=(need[x.invId]||0)+(num(x.green)||0);
   $('#tSide').innerHTML=`<div class="dtitle">Add batches</div>
     <label class="field">Profile<select id="tProf"><option value="">— no profile —</option>${profs.map(r=>`<option value="${r.id}">${esc(r.meta.name)}${ok(batchOf(r))?' · '+lbTxt(batchOf(r)):''}</option>`).join('')}</select></label>
@@ -1292,9 +1312,9 @@ function renderToday(){planRoll();$('#tDate').textContent=new Date().toLocaleDat
     <div><div class="h3" style="margin:8px 0 4px">Green coffee needed</div>${Object.keys(need).length?Object.entries(need).map(([id,lb])=>{const l=INV.find(v=>v.id===id);if(!l)return'';const left=invLeft(l),short=lb>left+1e-6;
       return `<div class="kv"><span>${esc(l.name)}</span><b class="tnum ${short?'dangerTxt':''}">${lb.toFixed(1)} lb needed · ${left.toFixed(1)} on hand${short?' — short '+(lb-left).toFixed(1)+' lb':' ✓'}</b></div>`}).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Add batches to see how much green you need.</div>'}</div>
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1));line-height:1.5">When you save a planned roast, it’s checked off and the next batch loads by itself: profile, background, coffee and weight. Just charge the roaster.</div>`;
-  const fillFromProf=()=>{const r=HIST.find(x=>x.id===$('#tProf').value);if(!r)return;const l=INV.find(v=>v.id===r.meta.invId&&invLeft(v)>0.001);$('#tInv').value=l?l.id:'';$('#tGreen').value=r.meta.green||''};
+  const fillFromProf=()=>{const r=findAny($('#tProf').value);if(!r)return;const l=INV.find(v=>v.id===r.meta.invId&&invLeft(v)>0.001);$('#tInv').value=l?l.id:'';$('#tGreen').value=r.meta.green||''};
   $('#tProf').onchange=fillFromProf;
-  $('#tAdd').onclick=()=>{const r=HIST.find(x=>x.id===$('#tProf').value),invId=$('#tInv').value,l=INV.find(v=>v.id===invId),g=num($('#tGreen').value),n=Math.round(num($('#tCount').value)||1);
+  $('#tAdd').onclick=()=>{const r=findAny($('#tProf').value),invId=$('#tInv').value,l=INV.find(v=>v.id===invId),g=num($('#tGreen').value),n=Math.round(num($('#tCount').value)||1);
     if(!r&&!l){toast('Pick a profile or a green coffee');return}if(!g||g<=0){toast('Enter the green weight per batch');return}if(n<1||n>30){toast('Number of batches: 1 to 30');return}
     for(let i=0;i<n;i++)PLAN.items.push({id:'b'+Date.now().toString(36)+i+Math.random().toString(36).slice(2,4),name:r?r.meta.name:'',invId:invId||'',coffee:l?l.name:(r?r.meta.coffee:''),lot:l?(l.lot||''):(r?r.meta.lot:''),green:String(g),status:'planned'});
     savePlan();renderToday();renderTodayMini();toast(`Added ${n} batch${n===1?'':'es'}`)};
@@ -1310,16 +1330,16 @@ function renderToday(){planRoll();$('#tDate').textContent=new Date().toLocaleDat
    Profiles screen
    ================================================================ */
 let selProfile=null;
-function renderProfiles(){const q=normName($('#pSearch').value),list=HIST.filter(r=>r.isProfile&&!r.archived&&(!q||normName(r.meta.name+' '+r.meta.coffee).includes(q))).sort((a,b)=>String(a.meta.name).localeCompare(String(b.meta.name))||(batchOf(a)||0)-(batchOf(b)||0));
+function renderProfiles(){if(BLD){renderBuilder();return}const q=normName($('#pSearch').value),list=allProfiles().filter(r=>(!q||normName(r.meta.name+' '+r.meta.coffee).includes(q))).sort((a,b)=>String(a.meta.name).localeCompare(String(b.meta.name))||(batchOf(a)||0)-(batchOf(b)||0));
   $('#pFolder').innerHTML=FS.state==='granted'?`📁 <b style="color:var(--text)">${esc(FS.dir.name)}/Profiles</b> · ${list.length} profiles`:`${list.length} profiles`;
   if(!list.find(r=>r.id===selProfile))selProfile=list[0]?.id||null;
   $('#pRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),key=normName(r.meta.name),uses=HIST.filter(x=>normName(x.meta.name)===key&&sameBatch(batchOf(x),batchOf(r))),last=uses.map(x=>x.chargedAt||x.created).sort().at(-1),sel=r.id===selProfile;
-    return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b></td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
+    return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b>${r.planned?' <span class="badge g">Planned</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
     <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
-  $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.some(r=>r.isProfile&&!r.archived)?'No profiles match.':'No profiles yet.<br>After a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>,<br>or pick any roast on the History tab and press <b>Make profile</b>.'}</div>`;
+  $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${allProfiles().length?'No profiles match.':'No profiles yet.<br>Press <b>+ New profile</b> to plan one before the first roast,<br>or after a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>.'}</div>`;
   renderProfileDetail()}
-function renderProfileDetail(){const el=$('#pDetail'),r=HIST.find(x=>x.id===selProfile);if(!r){el.innerHTML='<div class="empty">Select a profile.</div>';return}
+function renderProfileDetail(){const el=$('#pDetail'),r=findAny(selProfile);if(!r){el.innerHTML='<div class="empty">Select a profile.</div>';return}if(r.planned)return renderPlannedDetail(el,r);
   const s=r.summary||summarize(r),adj=adjustments(r),rc=r.events.CHARGE??0,uses=HIST.filter(x=>x.id!==r.id&&sameSlot(x,r)).slice(0,8),cost=costOf(r);
   const groups={};for(const a of adj){const k=mmss(a.t-rc);(groups[k]=groups[k]||[]).push(`${a.label} ${Math.round(a.to)}`)}
   const first=r.samples.find(x=>x.t>=rc);
@@ -1332,7 +1352,7 @@ function renderProfileDetail(){const el=$('#pDetail'),r=HIST.find(x=>x.id===selP
   <div><div class="h3" style="margin-bottom:6px">Reminders during the roast</div><div class="remlist">${(r.reminders||[]).map((m,i)=>`<div class="kv"><span>${esc(remWhen(m))}</span><b>${esc(m.text)} <button class="sm" data-delrem="${i}" title="Remove">✕</button></b></div>`).join('')||'<div class="muted" style="font-size:calc(13px*var(--ts,1));margin-bottom:6px">No reminders yet — e.g. “At first crack → open damper”.</div>'}</div>
     <div class="remadd" style="margin-top:8px"><select id="remType"><option value="event">At event</option><option value="time">At time</option><option value="temp">At temperature</option></select><span id="remAtWrap"></span><input id="remText" placeholder="Open damper"><button class="pri sm" id="remAdd">Add</button></div></div>
   <div><div class="h3" style="margin-bottom:4px">Roasted with this profile</div>${uses.length?uses.map(x=>{const ss=x.summary||summarize(x);return `<div class="kv"><span>#${x.num} · ${fmtDate(x.chargedAt||x.created,false)} (${ageOf(x.chargedAt||x.created)}) · drop ${mmss(ss.drop)} · ${esc(x.meta.colorWhole||'—')} / ${esc(x.meta.colorGround||'—')}</span><b class="tnum">${ok(x.cup)?'cup '+Number(x.cup).toFixed(2):'<span class="muted">not cupped</span>'}</b></div>`}).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Not roasted again yet.</div>'}</div>
-  <div class="row" style="margin-top:auto"><button class="pri" id="pRoast">Roast this ▶</button><button id="pOpen">Open roast #${r.num}</button><button id="pRename">Rename</button><span class="sp"></span><button id="pCsv">CSV</button><button class="dangerTxt" id="pRemove">Remove profile</button></div>`;
+  <div class="row" style="margin-top:auto"><button class="pri" id="pRoast">Roast this ▶</button><button id="pOpen">Open roast #${r.num}</button><button id="pRename">Rename</button><button id="pPlan" title="Plan a changed version (new lot, new roast goal) or another batch size">Edit as plan</button><span class="sp"></span><button id="pCsv">CSV</button><button class="dangerTxt" id="pRemove">Remove profile</button></div>`;
   requestAnimationFrame(()=>miniCurve($('#pBig'),r,{axis:true}));
   const remAt=()=>{const t=$('#remType').value;$('#remAtWrap').innerHTML=t==='event'?`<select id="remAt">${EVENTS_ALL.filter(e=>e.k!=='UNDO').map(e=>`<option value="${e.k}">${esc(evLabel(e.k))}</option>`).join('')}</select>`:t==='time'?`<input id="remAt" placeholder="9:30">`:`<input id="remAt" placeholder="400">`};
   remAt();$('#remType').onchange=remAt;
@@ -1341,16 +1361,366 @@ function renderProfileDetail(){const el=$('#pDetail'),r=HIST.find(x=>x.id===selP
     if(type==='temp'){const v=num(at);if(v==null){toast('Enter a temperature like 400');return}at=fromD(v)}
     (r.reminders=r.reminders||[]).push({type,at,text});r.reminders.sort((a,b)=>remOrder(a,r)-remOrder(b,r));await commitRoast(r,true);resolveBg();renderProfileDetail();toast('Reminder added')};
   $$('[data-delrem]',el).forEach(b=>b.onclick=async()=>{r.reminders.splice(Number(b.dataset.delrem),1);await commitRoast(r,true);resolveBg();renderProfileDetail()});
-  $('#pRoast').onclick=()=>roastThis(r.id);$('#pOpen').onclick=()=>openRoast(r.id);$('#pCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
+  $('#pRoast').onclick=()=>roastThis(r.id);$('#pPlan').onclick=()=>openBuilder('edit',r.id);$('#pOpen').onclick=()=>openRoast(r.id);$('#pCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
   $('#pRename').onclick=async()=>{const v=await askText('Rename profile','Profile name',r.meta.name);if(v==null||!v.trim())return;r.meta.name=v.trim();await commitRoast(r,true);renderProfiles();resolveBg()};
   $('#pRemove').onclick=async()=>{if(!await ask('Remove this profile?',`Roast #${r.num} stays in your roast history; it just stops being the ${lbTxt(batchOf(r))} profile for “${r.meta.name}”.`,'Remove profile',true))return;r.isProfile=false;await commitRoast(r,true);renderProfiles();resolveBg()}}
 function remOrder(m,r){if(m.type==='time')return m.at;if(m.type==='event'){const t=r.events[m.at];return t!=null?t-(r.events.CHARGE??0):9999}const s=r.samples.find(x=>x.t>(r.events.CHARGE??0)+20&&ok(x.bt)&&x.bt>=m.at);return s?s.t-(r.events.CHARGE??0):9999}
-async function roastThis(id){const r=HIST.find(x=>x.id===id);if(!r)return;if(S.recording){toast('Stop the current roast first');return}
+async function roastThis(id){const r=findAny(id);if(!r)return;if(S.recording){toast('Stop the current roast first');return}
   if(S.dirty&&S.roast.samples.length&&!S.viewingId&&!await ask('Discard the unsaved roast?','The roast on screen has not been saved.','Discard',true))return;
   S.roast=newRoast();S.viewingId=null;S.dirty=false;const m={...blankMeta(),name:r.meta.name,invId:INV.find(l=>l.id===r.meta.invId&&invLeft(l)>0)?r.meta.invId:'',coffee:r.meta.coffee,lot:r.meta.lot,green:r.meta.green};
-  S.roast.meta=m;fillForm(m);setBgMode(r.isProfile?'auto':r.id);if(r.isProfile)setBgMode('auto');showScreen('roast');openDrawer();toast(`Background: #${r.num} ${r.meta.name} — check the setup, then press Start`)}
+  S.roast.meta=m;fillForm(m);setBgMode(r.isProfile?'auto':r.id);if(r.isProfile)setBgMode('auto');showScreen('roast');openDrawer();toast(`Background: ${rTag(r)} ${r.meta.name} — check the setup, then press Start`)}
 function openRoast(id){const r=HIST.find(x=>x.id===id);if(!r)return;if(S.recording){toast('Stop the current roast first');return}
   S.roast=JSON.parse(JSON.stringify(r));S.viewingId=id;S.dirty=false;S.evStack=[];fillForm(S.roast.meta);if(S.bgMode==='auto')resolveBg();showScreen('roast');openDrawer();renderAll()}
+
+/* ================================================================
+   Profile builder — plan a profile before the first roast
+   (new coffee, new batch size, new lot, new roast goal).
+   A built profile has no roast number and never touches inventory,
+   history or Analyze. It lives in Profiles/planned-profiles.json and
+   becomes the background (green dotted target + burner/air marks)
+   for its coffee name and batch size until a real roast replaces it.
+   ================================================================ */
+let PLANNED=[],PLANNEDsavedAt='',BLD=null;
+const rTag=r=>r&&r.planned?'Planned':'#'+(r&&r.num||'—');
+const allProfiles=()=>[...HIST.filter(r=>r.isProfile&&!r.archived),...PLANNED];
+const findAny=id=>HIST.find(x=>x.id===id)||PLANNED.find(x=>x.id===id)||null;
+async function savePlanned(){PLANNEDsavedAt=new Date().toISOString();const p={savedAt:PLANNEDsavedAt,items:PLANNED};if(idb.db)await idb.set('planned',p);
+  if(FS.state==='granted')try{await writeAt(['Profiles'],'planned-profiles.json',JSON.stringify(p,null,1))}catch(e){log('err','Planned profiles write failed: '+e.message)}}
+async function dropPlannedSlot(r,keepId){const n=PLANNED.length;PLANNED=PLANNED.filter(x=>x.id===keepId||!sameSlot(x,r));if(PLANNED.length!==n)await savePlanned()}
+
+const BLD_EV=[['CHARGE','Charge'],['TP','Turning point'],['DRY','Dry end'],['FCs','FC start']];
+const pT=s=>{const m=String(s??'').trim().match(/^(\d+):(\d{1,2})$/);if(m)return Number(m[1])*60+Number(m[2]);const v=num(s);return ok(v)?v*60:null}; // "8:30" or minutes
+const dT=c=>ok(c)?+toD(c).toFixed(0):'';   // stored °C → display, rounded
+const xid=()=>'x'+Math.random().toString(36).slice(2,7);
+const XNAMES=['Drying check','Yellow','Cinnamon','Maillard check','Pre-crack','FC end','Development check'];
+
+function bldDefaults(){const F=isF(),d=v=>F?v:+((v-32)*5/9).toFixed(0);
+  return {mode:'scratch',srcId:'',editId:null,name:'',invId:'',coffee:'',lot:'',green:'13',notes:'',
+    charge:d(400),tp:'1:15',tpBT:d(190),dry:'4:45',dryBT:d(320),fc:'8:30',fcBT:d(392),devMode:'pct',devPct:'20',devTime:'2:00',dropBT:d(405),
+    steps:[{when:'ev',at:'CHARGE',burner:'70',fan:'40',drum:''},{when:'ev',at:'DRY',burner:'60',fan:'50',drum:''},{when:'ev',at:'FCs',burner:'40',fan:'65',drum:''}],
+    extra:[],chargeAdj:'0',burnerAdj:'0',srcBatch:null}}
+// read the milestones and burner/air plan out of an existing profile (real or planned)
+function bldFromRecord(r,mode){const b=bldDefaults();b.mode=mode;b.srcId=r.id;b.name=r.meta.name||'';b.invId=r.meta.invId||'';b.coffee=r.meta.coffee||'';b.lot=r.meta.lot||'';b.green=r.meta.green||'';b.notes=mode==='copy'?'':(r.meta.notes||'');b.srcBatch=batchOf(r);
+  if(r.planned&&r.inputs){Object.assign(b,JSON.parse(JSON.stringify(r.inputs)));if(!Array.isArray(b.extra))b.extra=[];if(mode==='copy')b.notes='';b.mode=mode;b.srcId=r.id;b.srcBatch=batchOf(r);b.editId=null;
+    const ca=num(b.chargeAdj)||0,ba=num(b.burnerAdj)||0;if(ca&&ok(num(b.charge)))b.charge=String(num(b.charge)+ca);if(ba)for(const x of b.steps)if(ok(num(x.burner)))x.burner=String(clamp(Math.round(num(x.burner)*(1+ba/100)),0,100));b.chargeAdj='0';b.burnerAdj='0';return b}
+  const ev=r.events||{},c=ev.CHARGE??0,bt=t=>{const s=t==null?null:sampleAt(r.samples,t);return s&&ok(s.bt)?dT(s.bt):''};
+  let tp=ev.TP;if(tp==null){let mn=null;for(const s of r.samples)if(s.t>c+5&&s.t<c+240&&ok(s.bt)&&(!mn||s.bt<mn.bt))mn=s;tp=mn?mn.t:null}
+  if(ev.CHARGE!=null)b.charge=bt(c);if(tp!=null){b.tp=mmss(tp-c);b.tpBT=bt(tp)}if(ev.DRY!=null){b.dry=mmss(ev.DRY-c);b.dryBT=bt(ev.DRY)}
+  if(ev.FCs!=null){b.fc=mmss(ev.FCs-c);b.fcBT=bt(ev.FCs)}
+  if(ev.FCe!=null&&ev.FCs!=null&&ev.DROP!=null&&ev.FCe>ev.FCs+10&&ev.FCe<ev.DROP-10)b.extra=[{id:xid(),name:'FC end',t:mmss(ev.FCe-c),bt:String(bt(ev.FCe))}];
+  if(ev.FCs!=null&&ev.DROP!=null){b.devMode='time';b.devTime=mmss(ev.DROP-ev.FCs);b.devPct=String(+((ev.DROP-ev.FCs)/(ev.DROP-c)*100).toFixed(1));b.dropBT=bt(ev.DROP)}
+  const first=r.samples.find(x=>x.t>=c),st=[];if(first)st.push({when:'ev',at:'CHARGE',burner:ok(first.burner)?String(Math.round(first.burner)):'',fan:ok(first.fan)?String(Math.round(first.fan)):'',drum:ok(first.drum)?String(Math.round(first.drum)):''});
+  const grp=new Map(),evN=[['TP',tp],['DRY',ev.DRY],['FCs',ev.FCs]].filter(x=>x[1]!=null);for(const a of adjustments(r)){if(a.t<=c+2)continue;const near=evN.find(x=>Math.abs(a.t-x[1])<=10),k=near?near[0]:Math.round((a.t-c)/5)*5;const g=grp.get(k)||(near?{when:'ev',at:near[0],burner:'',fan:'',drum:''}:{when:'t',at:mmss(k),burner:'',fan:'',drum:''});g[a.key]=String(Math.round(a.to));grp.set(k,g)}
+  b.steps=st.concat([...grp.values()]);if(!b.steps.length)b.steps=bldDefaults().steps;return b}
+
+// milestone times in seconds from charge, temps in °C
+function bldPoints(b){const tp=pT(b.tp),dry=pT(b.dry),fc=pT(b.fc),adj=num(b.chargeAdj)||0;let drop=null;
+  if(ok(fc)){if(b.devMode==='pct'){const p=num(b.devPct);if(ok(p)&&p>0&&p<60)drop=fc/(1-p/100)}else{const d=pT(b.devTime);if(ok(d))drop=fc+d}}
+  const C=v=>{const x=num(v);return ok(x)?fromD(x):null};
+  const P={tp,dry,fc,drop:ok(drop)?Math.round(drop):null,charge:ok(C(b.charge))?C(b.charge)+(isF()?adj*5/9:adj):null,tpBT:C(b.tpBT),dryBT:C(b.dryBT),fcBT:C(b.fcBT),dropBT:C(b.dropBT)};
+  P.extra=(b.extra||[]).map(x=>({id:x.id,name:(x.name||'').trim()||'Milestone',t:pT(x.t),bt:C(x.bt)}));
+  // every point after the turning point, in time order
+  P.knots=[{key:'DRY',name:'Dry end',t:P.dry,bt:P.dryBT},{key:'FCs',name:'First crack',t:P.fc,bt:P.fcBT},{key:'DROP',name:'Drop',t:P.drop,bt:P.dropBT},...P.extra.map(x=>({key:'x:'+x.id,name:x.name,t:x.t,bt:x.bt}))]
+    .filter(k=>ok(k.t)).sort((a,c)=>a.t-c.t);
+  return P}
+function bldErrors(P){const e=[];
+  if(!ok(P.charge))e.push('Enter a charge temperature.');if(!ok(P.tp)||!ok(P.tpBT))e.push('Enter the turning point time and temperature.');
+  if(!ok(P.dry)||!ok(P.dryBT))e.push('Enter the dry end time and temperature.');if(!ok(P.fc)||!ok(P.fcBT))e.push('Enter the first crack time and temperature.');
+  if(!ok(P.drop))e.push('Enter development (percent or time).');if(!ok(P.dropBT))e.push('Enter the drop temperature.');
+  for(const x of P.extra)if(!ok(x.t)||!ok(x.bt))e.push(`Enter a time and temperature for “${x.name}”, or remove it.`);
+  if(e.length)return e;
+  if(!(P.tp>0&&P.dry>P.tp&&P.fc>P.dry&&P.drop>P.fc))e.push('Times must run in order: turning point → dry end → first crack → drop.');
+  for(const x of P.extra)if(!(x.t>P.tp+10&&x.t<P.drop))e.push(`“${x.name}” has to fall between the turning point and drop.`);
+  if(!(P.tpBT<P.charge))e.push('Turning point should be cooler than the charge temperature.');
+  if(e.length)return e;
+  const K=P.knots;for(let i=1;i<K.length;i++){if(K[i].t-K[i-1].t<10)e.push(`${K[i-1].name} and ${K[i].name} are less than 10 seconds apart.`);else if(!(K[i].bt>K[i-1].bt))e.push(`Bean temp has to rise from ${K[i-1].name} to ${K[i].name}.`)}
+  if(K.length&&!(K[0].bt>P.tpBT))e.push(`Bean temp has to rise from the turning point to ${K[0].name}.`);
+  return e}
+// Curve from a rate-of-rise model. RoR is 0 at the turning point, ramps up over 30 s, then falls along a
+// smooth decay (a + b·e^(−t/τ)) fitted to dry end, first crack and drop. Any extra milestones bend that decay
+// locally — the smallest smooth correction that still puts the bean temp exactly on every milestone.
+function bldSolve(M,N){for(let c=0;c<N;c++){let pv=c;for(let r=c+1;r<N;r++)if(Math.abs(M[r][c])>Math.abs(M[pv][c]))pv=r;[M[c],M[pv]]=[M[pv],M[c]];const d=M[c][c];if(!d)continue;
+    for(let r=0;r<N;r++){if(r===c)continue;const f=M[r][c]/d;if(!f)continue;for(let k=c;k<=N;k++)M[r][k]-=f*M[c][k]}}return M.map((row,i)=>row[i]?row[N]/row[i]:0)}
+function bldRor(P){const K=P.knots,T0=P.tp,A=Math.min(T0+30,(T0+K[0].t)/2),ramp=t=>t<=T0?0:t>=A?1:(t-T0)/(A-T0);
+  const integ=(f,a,b)=>{let s=0;for(let t=a;t<b;t+=1){const h=Math.min(1,b-t);s+=f(t+h/2)*h}return s};   // ∫ f dt, seconds
+  // base decay fitted to the three main stretches
+  const main=[[T0,P.tpBT,P.dry,P.dryBT],[P.dry,P.dryBT,P.fc,P.fcBT],[P.fc,P.fcBT,P.drop,P.dropBT]];let best=null;
+  for(let tau=40;tau<=900;tau*=1.06){const g1=t=>ramp(t),g2=t=>ramp(t)*Math.exp(-(t-A)/tau),rows=main.map(([a,,b])=>[integ(g1,a,b),integ(g2,a,b)]),ys=main.map(([,ba,,bb])=>60*(bb-ba));
+    let s11=0,s12=0,s22=0,y1=0,y2=0;rows.forEach(([u,v],i)=>{s11+=u*u;s12+=u*v;s22+=v*v;y1+=u*ys[i];y2+=v*ys[i]});const det=s11*s22-s12*s12;if(!det)continue;
+    const a=(y1*s22-y2*s12)/det,b=(s11*y2-s12*y1)/det;if(b<0)continue;const err=rows.reduce((e,[u,v],i)=>e+(a*u+b*v-ys[i])**2,0);if(!best||err<best.err)best={a,b,tau,err}}
+  if(!best){const avg=main.map(([a,ba,b,bb])=>60*(bb-ba)/(b-a));best={a:avg[2],b:Math.max(0,avg[0]-avg[2]),tau:200,err:0}}
+  const base=t=>ramp(t)*(best.a+best.b*Math.exp(-(t-A)/best.tau));
+  // smooth correction on a 15 s grid so every milestone is hit exactly
+  const set=new Set([T0,A,...K.map(k=>k.t)]);for(let t=A+15;t<P.drop-7;t+=15)set.add(Math.round(t*2)/2);
+  const ts=[...set].sort((a,c)=>a-c),m=ts.length,iA=ts.indexOf(A),idx=new Map(ts.map((t,i)=>[t,i]));
+  const Q=Array.from({length:m},()=>new Array(m).fill(0));
+  for(let i=Math.max(1,iA);i<m-1;i++){const h0=ts[i]-ts[i-1],h1=ts[i+1]-ts[i],g=[[i-1,1/h0],[i,-1/h0-1/h1],[i+1,1/h1]],w=(h0+h1)/2;for(const [a,ga] of g)for(const [b,gb] of g)Q[a][b]+=ga*gb*w*900}
+  for(let i=0;i<m;i++)Q[i][i]+=.02*(i>0?ts[i]-ts[i-1]:1)/15;
+  const cons=[];{const r=new Array(m).fill(0);r[0]=1;cons.push([r,0])}
+  let prevT=T0,prevB=P.tpBT;for(const q of K){const r=new Array(m).fill(0),a=idx.get(prevT),b=idx.get(q.t);for(let i=a;i<b;i++){const h=ts[i+1]-ts[i];r[i]+=h/2;r[i+1]+=h/2}
+    cons.push([r,60*(q.bt-prevB)-integ(base,prevT,q.t)]);prevT=q.t;prevB=q.bt}
+  const n=cons.length,N=m+n,M=Array.from({length:N},()=>new Array(N+1).fill(0));
+  for(let i=0;i<m;i++)for(let j=0;j<m;j++)M[i][j]=Q[i][j];
+  cons.forEach(([r,d],ci)=>{for(let i=0;i<m;i++){M[m+ci][i]=r[i];M[i][m+ci]=r[i]}M[m+ci][N]=d});
+  const x=bldSolve(M,N);let ci=0;
+  const corr=t=>{while(ci>0&&t<ts[ci])ci--;while(ci<m-2&&t>ts[ci+1])ci++;const h=ts[ci+1]-ts[ci];return x[ci]+(x[ci+1]-x[ci])*(t-ts[ci])/h};
+  const ror=t=>t<T0?null:base(t)+corr(t);
+  return {A,ror,pts:ts.map(t=>({t,r:ror(t)}))}}
+function bldCurve(P){const k=bldRor(P),ror=k.ror;
+  const out=[],knots=new Set([P.tp,...P.knots.map(x=>x.t)].map(x=>Math.round(x*2)/2));let bt=P.tpBT;for(let t=0;t<=P.drop;t+=.5){let v;if(t<=P.tp)v=P.tpBT+(P.charge-P.tpBT)*Math.pow(1-t/P.tp,2.2);else{bt+=(ror(t-.25))/120;v=bt}
+    if(Math.abs(t%2)<1e-9||knots.has(t))out.push({t,bt:+v.toFixed(2),ror:t<P.tp?null:+ror(t).toFixed(2)})}
+  if(out.at(-1).t!==P.drop)out.push({t:P.drop,bt:+bt.toFixed(2),ror:+ror(P.drop).toFixed(2)});out.k=k;return out}
+function bldStepTime(s,P){if(s.when==='t')return pT(s.at);if(String(s.at).startsWith('x:')){const x=P.extra.find(e=>'x:'+e.id===s.at);return x?x.t:null}return {CHARGE:0,TP:P.tp,DRY:P.dry,FCs:P.fc}[s.at]??null}
+function bldSteps(b,P){const mul=1+(num(b.burnerAdj)||0)/100;
+  return b.steps.map(s=>({t:bldStepTime(s,P),burner:ok(num(s.burner))?clamp(Math.round(num(s.burner)*mul),0,100):null,fan:ok(num(s.fan))?clamp(num(s.fan),0,100):null,drum:ok(num(s.drum))?clamp(num(s.drum),0,100):null}))
+    .filter(s=>ok(s.t)&&s.t>=0&&s.t<=P.drop).sort((a,c)=>a.t-c.t)}
+function bldBuild(b){const P=bldPoints(b),err=bldErrors(P);if(err.length)return {P,err};
+  const curve=bldCurve(P),steps=bldSteps(b,P),cur={burner:null,fan:null,drum:null};
+  const samples=curve.map(s=>{for(const x of steps)if(x.t<=s.t+.01)for(const k of ['burner','fan','drum'])if(ok(x[k]))cur[k]=x[k];return {...s,burner:cur.burner,fan:cur.fan,drum:cur.drum}});
+  for(let d=2;d<=30;d+=2)samples.push({t:P.drop+d,bt:+(P.dropBT-1.6*d).toFixed(2),ror:null,burner:cur.burner,fan:cur.fan,drum:cur.drum});
+  const events={CHARGE:0,TP:P.tp,DRY:P.dry,FCs:P.fc,DROP:P.drop};
+  // checks against the Analyze rules
+  const at=t=>curve.reduce((a,s)=>Math.abs(s.t-t)<Math.abs(a.t-t)?s:a,curve[0]),rorFC=at(P.fc).ror,rorDrop=at(P.drop-2).ror,dev=P.drop-P.fc,dtr=dev/P.drop*100,chk=[];
+  if(dtr<cfg.anDtrLow)chk.push(['warn',`Development ${dtr.toFixed(0)}% is under your ${cfg.anDtrLow}% target.`]);else if(dtr>cfg.anDtrHigh)chk.push(['warn',`Development ${dtr.toFixed(0)}% is over your ${cfg.anDtrHigh}% target.`]);else chk.push(['good',`Development ${dtr.toFixed(0)}% (${mmss(dev)}) is inside your ${cfg.anDtrLow}–${cfg.anDtrHigh}% target.`]);
+  if(P.drop>cfg.anLong*60)chk.push(['warn',`Total time ${mmss(P.drop)} is longer than ${cfg.anLong} min — watch for baked flavors.`]);else if(P.drop<cfg.anShort*60)chk.push(['warn',`Total time ${mmss(P.drop)} is shorter than ${cfg.anShort} min.`]);else chk.push(['good',`Total time ${mmss(P.drop)}.`]);
+  if(ok(rorFC)&&rorFC>cfg.anRorFC)chk.push(['warn',`RoR at first crack is ${fR(rorFC)}°/min — over your ${fR(cfg.anRorFC)} limit, fast into crack.`]);else if(ok(rorFC)&&rorFC<0)chk.push(['warn',`RoR is falling below zero at first crack (${fR(rorFC)}°/min) — the bean temp would drop.`]);else if(ok(rorFC))chk.push(['good',`RoR at first crack ${fR(rorFC)}°/min.`]);
+  // RoR should only fall after its early peak; name the stretch where it has to climb
+  const kp=curve.k.pts.filter(x=>x.t>=curve.k.A),nameAt=t=>{let a='the turning point',z='Drop';for(const q of P.knots){if(q.t<=t)a=q.name;else{z=q.name;break}}return [a,z]},seen=new Set();
+  for(let i=1;i<kp.length;i++)if(kp[i].r>kp[i-1].r+.15*(kp[i].t-kp[i-1].t)/15){const [a,z]=nameAt(kp[i].t-.1),key=a+z;if(seen.has(key))continue;seen.add(key);
+    chk.push(['warn',kp[i].t>P.fc?`RoR climbs between ${a} and ${z} — risk of a flick. Lower ${z==='Drop'?'the drop temp':z} or give it more time.`:`RoR has to climb between ${a} and ${z} to hit these temps — the curve may flick. Lower ${z} or move it later.`])}
+  if(kp.some(x=>x.r<-.05))chk.push(['warn','These milestones need a falling bean temp somewhere — check the temperatures.']);
+  if(ok(rorDrop)&&rorDrop>=0&&rorDrop<1)chk.push(['warn','RoR is close to zero at drop — risk of a flat, baked finish.']);
+  const pDry=P.dry/P.drop*100,pMai=(P.fc-P.dry)/P.drop*100;
+  return {P,err:[],curve,samples,events,steps,chk,rorFC,dtr,dev,phases:{dry:pDry,mai:pMai,dev:dtr}}}
+function bldRecord(b,R){const id=b.editId||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),old=PLANNED.find(x=>x.id===id),now=new Date().toISOString();
+  const l=INV.find(x=>x.id===b.invId);
+  const inputs=JSON.parse(JSON.stringify(b));delete inputs.editId;
+  return {id,planned:true,isProfile:true,num:null,created:old?old.created:now,savedAt:now,machine:'Probat P12 III',source:'builder',
+    meta:{...blankMeta(),name:b.name.trim(),invId:l?l.id:'',coffee:l?l.name:b.coffee.trim(),lot:l?(l.lot||''):b.lot.trim(),green:b.green,notes:b.notes},
+    events:R.events,samples:R.samples,target:{at:now,samples:R.curve.map(s=>({t:s.t,bt:s.bt,ror:s.ror})),events:{CHARGE:0,FCs:R.events.FCs,DROP:R.events.DROP},marks:R.P.extra.map(x=>({t:x.t,bt:x.bt,name:x.name}))},
+    reminders:old?old.reminders||[]:[],tnotes:[],inputs,from:b.mode==='scratch'?null:{kind:b.mode,id:b.srcId}}}
+
+/* ---------- burner suggestions ----------
+   RoR a burner level gives on this P12, learned per coffee AND batch size from your own roasts:
+     RoR(t) ≈ α + β·burner(t − 45 s) + γ·bean temp(t)
+   With few roasts the fit leans on a general starting model; each roast of that coffee at that size pulls it
+   toward how your machine actually behaves. Roasts of other coffees are never used. */
+const BURN_LAG=45;
+function bldCoffeeKey(b){const l=INV.find(x=>x.id===b.invId);return coffeeKey({meta:{coffee:l?l.name:b.coffee,name:b.name}})}
+function bldHist(b){const ck=bldCoffeeKey(b),g=num(b.green);if(!ck||!ok(g))return [];
+  return realRoasts().filter(r=>!r.planned&&r.samples&&r.samples.length>60&&r.events&&r.events.CHARGE!=null&&r.events.DROP!=null&&coffeeKey(r)===ck&&sameBatch(batchOf(r),g))}
+function bldModel(b){const g=num(b.green)||13,hist=bldHist(b);
+  // general start: 13 lb, RoR in °C/min, burner and bean temp scaled /100 so the three numbers are alike in size
+  const th0=[13.4,17*Math.pow(13/g,.4),-9],L=[5,40,5],XtX=[[0,0,0],[0,0,0],[0,0,0]],Xty=[0,0,0];let n=0;const rows=[];
+  for(const r of hist){const c=r.events.CHARGE,tp=r.events.TP??c+90,sm=r.samples,avgB=(a,z)=>{let s=0,k=0;for(const x of sm)if(x.t>=a&&x.t<=z&&ok(x.burner)){s+=x.burner;k++}return k?s/k:null};
+    for(let t=tp+30;t<=r.events.DROP-20;t+=15){const y=interp(sm,'ror',t),bt=interp(sm,'bt',t),bu=avgB(t-BURN_LAG-15,t-BURN_LAG+15);if(!ok(y)||!ok(bt)||!ok(bu))continue;rows.push([1,bu/100,bt/100,y])}}
+  for(const [a,x1,x2,y] of rows){const x=[a,x1,x2];for(let i=0;i<3;i++){Xty[i]+=x[i]*y;for(let j=0;j<3;j++)XtX[i][j]+=x[i]*x[j]}n++}
+  const M=XtX.map((row,i)=>[...row.map((v,j)=>v+(i===j?L[i]:0)),Xty[i]+L[i]*th0[i]]);let th=bldSolve(M,3);
+  if(!(th[1]>4))th=[th[0]+(th[1]-4)*.5,4,th[2]];   // the burner always has to push RoR up
+  let miss=null;if(rows.length){let e=0;for(const [a,x1,x2,y] of rows)e+=(y-(th[0]+th[1]*x1+th[2]*x2))**2;miss=Math.sqrt(e/rows.length)}
+  // the reference roast: the one being copied or edited if it's this coffee and size, else the latest one
+  const src=b.srcId?hist.find(r=>r.id===b.srcId):null,ref=src||hist.slice().sort((a,c)=>String(c.chargedAt||c.created).localeCompare(String(a.chargedAt||a.created)))[0]||null;
+  return {th,ref,roasts:hist.length,rows:rows.length,miss,coffee:(INV.find(x=>x.id===b.invId)||{}).name||b.coffee||b.name}}
+function bldSuggest(b,R,model){if(!R||R.err.length)return null;const th=model.th,P=R.P,max=Number(cfg.burnerMax)||100,step=Number(cfg.anBurnerStep)||5,ref=model.ref,rc=ref?ref.events.CHARGE:0;
+  // line up the same stage of both roasts (turning point, dry end, first crack, drop), not the same clock time
+  const mp=ref?[[0,0],[P.tp,ref.events.TP],[P.dry,ref.events.DRY],[P.fc,ref.events.FCs],[P.drop,ref.events.DROP]].filter(x=>x[1]!=null).map(([a,b2])=>[a,b2-rc]).filter((x,i,arr)=>!i||x[1]>arr[i-1][1]&&x[0]>arr[i-1][0]):null;
+  const toRef=t=>{if(!mp||mp.length<2)return t;let i=0;while(i<mp.length-2&&t>mp[i+1][0])i++;const [a0,b0]=mp[i],[a1,b1]=mp[i+1];return b0+(t-a0)*(b1-b0)/(a1-a0)},refEnd=ref?ref.events.DROP-rc-10:0;
+  const refB=t=>{let s=0,k=0;for(const x of ref.samples)if(x.t>=rc+t-BURN_LAG-15&&x.t<=rc+t-BURN_LAG+15&&ok(x.burner)){s+=x.burner;k++}return k?s/k:null};
+  // with a reference roast: its burner, nudged by how much more or less RoR the plan asks for than it got.
+  // Without one: the learned levels directly.
+  const need=(ror,bt,t0)=>{const t=toRef(t0);if(ref&&t<=refEnd){const rr=interp(ref.samples,'ror',rc+t),rb=refB(t);if(ok(rr)&&ok(rb))return rb+(ror-rr)/th[1]*100}return (ror-th[0]-th[2]*bt/100)/th[1]*100};
+  const st=b.steps.map((x,i)=>({i,t:bldStepTime(x,P)})).filter(x=>ok(x.t)&&x.t>=0&&x.t<=P.drop).sort((a,c)=>a.t-c.t),out=[];let last=null;
+  st.forEach((x,k)=>{const a=Math.max(x.t+BURN_LAG,P.tp+30),z=Math.min((k<st.length-1?st[k+1].t:P.drop)+BURN_LAG,P.drop);let s=0,nn=0;
+    for(const c of R.curve)if(c.t>=a&&c.t<=z&&ok(c.ror)){s+=need(c.ror,c.bt,c.t);nn++}
+    const v=nn?clamp(Math.round(s/nn/step)*step,0,max):last;if(v!=null)last=v;out.push({i:x.i,t:x.t,burner:v})});
+  return out}
+function bldSugText(m){const g=num(BLD&&BLD.green);return m.roasts?`Based on roast ${rTag(m.ref)} of ${esc(m.coffee)} at ${lbTxt(g)}, with the burner response learned from ${m.roasts} roast${m.roasts>1?'s':''} of this coffee at this size. Gets closer with every roast.`
+  :`Starting guess — no roasts of ${esc(m.coffee||'this coffee')} at ${lbTxt(g)} yet. It learns from each roast of this coffee at this size.`}
+
+/* ---------- builder screen ---------- */
+function openBuilder(mode,srcId){if(mode==='scratch')BLD=bldDefaults();else{const r=findAny(srcId);if(!r)return;BLD=bldFromRecord(r,mode);if(mode==='edit'&&r.planned)BLD.editId=r.id}
+  $('#pList').hidden=true;$('#pBuild').hidden=false;renderBuilder()}
+function closeBuilder(){BLD=null;$('#pBuild').hidden=true;$('#pBuild').innerHTML='';$('#pList').hidden=false;renderProfiles()}
+function renderBuilder(){if(!BLD)return;const b=BLD,u='°'+cfg.unit,el=$('#pBuild'),srcs=allProfiles().filter(r=>r.id!==b.editId).sort((a,c)=>String(a.meta.name).localeCompare(String(c.meta.name))||(batchOf(a)||0)-(batchOf(c)||0));
+  const src=findAny(b.srcId),g=num(b.green),diffSize=b.mode==='copy'&&ok(b.srcBatch)&&ok(g)&&!sameBatch(b.srcBatch,g);
+  const inp=(k,ph,w)=>`<input data-b="${k}" value="${esc(b[k])}" placeholder="${esc(ph||'')}" inputmode="decimal"${w?` style="width:${w}px"`:''}>`;
+  const evOpts=s=>[...BLD_EV,...b.extra.map(x=>['x:'+x.id,(x.name||'Milestone').trim()])].map(([k,l])=>`<option value="${k}"${s.when==='ev'&&s.at===k?' selected':''}>${esc(l)}</option>`).join('')+`<option value="__t"${s.when==='t'?' selected':''}>At time…</option>`;
+  el.innerHTML=`<div class="ph"><button id="bBack">← Profiles</button><h1>${b.editId?'Edit profile':'New profile'}</h1>
+      <div class="seg" id="bMode">${[['scratch','From scratch'],['copy','From another profile'],['edit','Edit a profile']].map(([k,l])=>`<button data-m="${k}" class="${b.mode===k?'on':''}">${l}</button>`).join('')}</div>
+      <span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Plan the curve before the first roast — it becomes the green target on the Roast screen</span></div>
+    <div class="bsplit">
+      <div class="card scroll bform">
+        ${b.mode!=='scratch'?`<label class="field">${b.mode==='copy'?'Start from':'Profile to edit'}<select id="bSrc"><option value="">— pick a profile —</option>${srcs.map(r=>`<option value="${r.id}"${r.id===b.srcId?' selected':''}>${esc(r.meta.name)}${ok(batchOf(r))?' · '+lbTxt(batchOf(r)):''} · ${r.planned?'planned':'roast #'+r.num}</option>`).join('')}</select></label>
+          ${b.mode==='copy'?'<div class="bhint">Copies the curve and burner/air plan as a starting point only. Nothing the app learned about that coffee carries over.</div>':''}`:''}
+        <div class="h3">Setup</div>
+        <label class="field">Profile name<input data-b="name" list="profNames" value="${esc(b.name)}" placeholder="Ethiopia Guji — Filter"></label>
+        <label class="field">Green coffee<select id="bInv"><option value="">— not from inventory —</option>${INV.filter(l=>invLeft(l)>0.001||l.id===b.invId).map(l=>`<option value="${l.id}"${l.id===b.invId?' selected':''}>${esc(l.name)}${l.lot?' · lot '+esc(l.lot):''} — ${invLeft(l).toFixed(1)} lb</option>`).join('')}</select></label>
+        ${b.invId?'':`<div class="grid2"><label class="field">Coffee<input data-b="coffee" value="${esc(b.coffee)}"></label><label class="field">Lot<input data-b="lot" value="${esc(b.lot)}"></label></div>`}
+        <label class="field">Batch (green lb)<div class="row" style="flex-wrap:nowrap">${inp('green','13',110)}<button class="sm${ok(g)&&Math.abs(g-13)<.01?' on-acc':''}" data-lb="13">13 lb</button><button class="sm${ok(g)&&Math.abs(g-25)<.01?' on-acc':''}" data-lb="25">25 lb</button></div></label>
+        ${diffSize?`<div class="bbox"><div class="h3" style="margin-bottom:6px">Batch change ${lbTxt(b.srcBatch)} → ${lbTxt(g)}</div>
+          <div class="grid2"><label class="field">Charge temp change (${u})${inp('chargeAdj','0')}</label><label class="field">Burner change (%)${inp('burnerAdj','0')}</label></div>
+          <div class="bhint" style="margin-top:6px" id="bAdjTxt"></div><div class="bhint" style="margin-top:6px">Starting guesses, not tuned to your P12. A bigger load usually needs a hotter charge and more burner; first crack and drop times stay as planned.</div></div>`:''}
+        <div class="h3" style="margin-top:4px">Milestones <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">time from charge · bean temp</span></div>
+        <div class="mstones">
+          <span>Charge</span><span class="muted">0:00</span>${inp('charge','400')}<span class="muted">${u}</span>
+          <span>Turning point</span>${inp('tp','1:15')}${inp('tpBT','190')}<span class="muted">${u}</span>
+          <span>Dry end</span>${inp('dry','4:45')}${inp('dryBT','320')}<span class="muted">${u}</span>
+          <span>First crack</span>${inp('fc','8:30')}${inp('fcBT','392')}<span class="muted">${u}</span>
+          <span>Development</span><div class="seg" id="bDev"><button data-d="pct" class="${b.devMode==='pct'?'on':''}">%</button><button data-d="time" class="${b.devMode==='time'?'on':''}">time</button></div>${b.devMode==='pct'?inp('devPct','20'):inp('devTime','2:00')}<span class="muted">${b.devMode==='pct'?'%':'m:ss'}</span>
+          <span>Drop</span><span class="muted tnum" id="bDropT"></span>${inp('dropBT','405')}<span class="muted">${u}</span>
+          ${b.extra.map((x,i)=>`<input data-xi="${i}" data-xk="name" value="${esc(x.name)}" list="bXNames" class="xname"><input data-xi="${i}" data-xk="t" value="${esc(x.t)}" placeholder="6:30"><input data-xi="${i}" data-xk="bt" value="${esc(x.bt)}" inputmode="decimal"><button class="sm" data-xdel="${i}" title="Remove">✕</button>`).join('')}
+        </div>
+        <datalist id="bXNames">${XNAMES.map(n=>`<option value="${n}">`).join('')}</datalist>
+        <div class="row"><button class="sm" id="bAddMs">+ Add milestone</button><span class="muted" style="font-size:calc(12px*var(--ts,1))">Or drag the dots on the chart</span></div>
+        <div class="row" style="margin-top:4px"><div class="h3" style="flex:1">Burner &amp; air plan</div><label class="chk" style="padding:0;font-size:calc(12.5px*var(--ts,1))"><input type="checkbox" id="bAuto" style="width:auto"${b.autoBurner?' checked':''}> Match burner to the curve</label><button class="sm" id="bSug">Suggest burner</button></div>
+        <div class="bsug" id="bSugBox" hidden></div>
+        <div class="bsteps"><span class="muted">When</span><span></span><span class="muted">Burner %</span><span class="muted">Air %</span><span class="muted">Drum %</span><span></span>
+          ${b.steps.map((s,i)=>`<select data-bw="${i}">${evOpts(s)}</select>${s.when==='t'?`<input data-bs="${i}" data-k="at" value="${esc(s.at)}" placeholder="6:00">`:'<span></span>'}
+            <input data-bs="${i}" data-k="burner" value="${esc(s.burner)}" inputmode="decimal"><input data-bs="${i}" data-k="fan" value="${esc(s.fan)}" inputmode="decimal"><input data-bs="${i}" data-k="drum" value="${esc(s.drum)}" inputmode="decimal" placeholder="—"><button class="sm" data-bd="${i}" title="Remove">✕</button>`).join('')}
+        </div>
+        <div class="row"><button class="sm" id="bAddStep">+ Add change</button><span class="muted" style="font-size:calc(12px*var(--ts,1))">Blank = no change at that point</span></div>
+        <label class="field">Comments<textarea data-b="notes" placeholder="Why this plan — new crop, espresso version, customer spec…">${esc(b.notes)}</textarea></label>
+      </div>
+      <div class="card detail" id="bOut">
+        <div class="row"><div class="dtitle" style="flex:1" id="bTitle"></div><span class="muted" id="bLegend" style="font-size:calc(12px*var(--ts,1))"></span></div>
+        <div class="bchart"><canvas id="bCv"></canvas></div>
+        <div class="stats" id="bStats"></div>
+        <div id="bPhase"></div>
+        <div><div class="h3" style="margin-bottom:6px">Checks</div><div id="bChk"></div></div>
+        <div class="row" style="margin-top:auto"><button class="pri" id="bSave">Save profile ★</button><button id="bCancel">Cancel</button><span class="sp"></span><span class="muted" id="bSlot" style="font-size:calc(12.5px*var(--ts,1))"></span></div>
+      </div></div>`;
+  // wiring — typing only redraws the right side so inputs keep focus
+  $('#bBack').onclick=$('#bCancel').onclick=closeBuilder;
+  $$('#bMode button',el).forEach(x=>x.onclick=()=>{const m=x.dataset.m;if(m===b.mode)return;if(m==='scratch'){const keep={name:b.name,invId:b.invId,coffee:b.coffee,lot:b.lot,green:b.green,notes:b.notes};BLD={...bldDefaults(),...keep}}else{b.mode=m;b.editId=null}renderBuilder()});
+  if($('#bSrc'))$('#bSrc').onchange=e=>{const r=findAny(e.target.value);if(!r){b.srcId='';renderBuilder();return}BLD=bldFromRecord(r,b.mode);if(b.mode==='edit'&&r.planned)BLD.editId=r.id;renderBuilder()};
+  $('#bInv').onchange=e=>{b.invId=e.target.value;const l=INV.find(x=>x.id===b.invId);if(l){b.coffee=l.name;b.lot=l.lot||''}renderBuilder()};
+  $$('[data-b]',el).forEach(i=>i.oninput=()=>{b[i.dataset.b]=i.value;if(i.dataset.b==='green')bldSizeGuess();renderBuildOut()});
+  $$('[data-b="green"]',el).forEach(i=>i.onchange=()=>renderBuilder());
+  $$('[data-lb]',el).forEach(x=>x.onclick=()=>{b.green=x.dataset.lb;bldSizeGuess();renderBuilder()});
+  $$('#bDev button',el).forEach(x=>x.onclick=()=>{const P=bldPoints(b);if(x.dataset.d===b.devMode)return;if(ok(P.fc)&&ok(P.drop)){b.devTime=mmss(P.drop-P.fc);b.devPct=String(+((P.drop-P.fc)/P.drop*100).toFixed(1))}b.devMode=x.dataset.d;renderBuilder()});
+  $$('[data-bw]',el).forEach(x=>x.onchange=()=>{const s=b.steps[Number(x.dataset.bw)],P=bldPoints(b);if(x.value==='__t'){const t=bldStepTime(s,P);s.when='t';s.at=ok(t)?mmss(t):''}else{s.when='ev';s.at=x.value}renderBuilder()});
+  $$('[data-bs]',el).forEach(x=>x.oninput=()=>{b.steps[Number(x.dataset.bs)][x.dataset.k]=x.value;if(x.dataset.k==='burner'&&b.autoBurner){b.autoBurner=false;$('#bAuto').checked=false;toast('Burner matching is off — your number is kept')}renderBuildOut()});
+  $$('[data-bd]',el).forEach(x=>x.onclick=()=>{b.steps.splice(Number(x.dataset.bd),1);renderBuilder()});
+  $('#bAddStep').onclick=()=>{const P=bldPoints(b),last=b.steps.at(-1),t=ok(P.fc)&&ok(P.drop)?Math.round((P.fc+P.drop)/2/5)*5:null;b.steps.push({when:'t',at:ok(t)?mmss(t):'',burner:'',fan:'',drum:''});renderBuilder()};
+  $$('[data-xi]',el).forEach(x=>x.oninput=()=>{b.extra[Number(x.dataset.xi)][x.dataset.xk]=x.value;renderBuildOut()});
+  $$('[data-xi][data-xk="name"]',el).forEach(x=>x.onchange=()=>renderBuilder());
+  $$('[data-xdel]',el).forEach(x=>x.onclick=()=>{const [gone]=b.extra.splice(Number(x.dataset.xdel),1);for(const st of b.steps)if(st.when==='ev'&&st.at==='x:'+gone.id){const t=bldStepTime(st,bldPoints({...b,extra:[gone]}));st.when='t';st.at=ok(t)?mmss(t):''}renderBuilder()});
+  $('#bAddMs').onclick=()=>{const P=bldPoints(b),used=[P.tp,...P.knots.map(k=>k.t)].filter(ok).sort((a,c)=>a-c);let best=null;
+    for(let i=1;i<used.length;i++){const gap=used[i]-used[i-1];if(!best||gap>best.gap)best={gap,t:Math.round((used[i]+used[i-1])/2/5)*5}}
+    let bt='';const R0=bldBuild(b);if(best&&!R0.err.length){const sm=sampleAt(R0.curve,best.t);if(sm)bt=String(dT(sm.bt))}
+    const bt0=best?best.t:0,taken=n=>b.extra.some(x=>x.name===n),name=bt0>P.fc?(taken('FC end')?'Development check':'FC end'):bt0>P.dry?(taken('Maillard check')?'Pre-crack':'Maillard check'):'Drying check';b.extra.push({id:xid(),name,t:best?mmss(best.t):'',bt});renderBuilder()};
+  $('#bAuto').onchange=e=>{b.autoBurner=e.target.checked;if(b.autoBurner){b.burnerAdj='0';BLDSUG=true}renderBuilder()};
+  $('#bSug').onclick=()=>{BLDSUG=!BLDSUG;renderBuildOut()};
+  bldWireDrag();
+  $('#bSave').onclick=bldSave;
+  renderBuildOut()}
+function bldSizeGuess(){const b=BLD;if(b.mode!=='copy'||!ok(b.srcBatch))return;const g=num(b.green);if(!ok(g)||sameBatch(g,b.srcBatch)){b.chargeAdj='0';b.burnerAdj='0';return}
+  const dlb=g-b.srcBatch;b.chargeAdj=String(Math.round((isF()?1:5/9)*dlb));b.burnerAdj=String(Math.round(clamp(dlb/b.srcBatch*30,-30,40)))}
+function bldApplySug(b,sug){let ch=false;for(const x of sug){if(x.burner==null)continue;const v=String(x.burner);if(b.steps[x.i].burner!==v){b.steps[x.i].burner=v;ch=true;const el=$(`[data-bs="${x.i}"][data-k="burner"]`);if(el)el.value=v}}return ch}
+function renderBuildOut(){const b=BLD;if(!b||!$('#bOut'))return;let R=bldBuild(b);const model=bldModel(b);let sug=bldSuggest(b,R,model);
+  if(sug&&b.autoBurner&&bldApplySug(b,sug))R=bldBuild(b);
+  const box=$('#bSugBox');if(box){box.hidden=!(BLDSUG||b.autoBurner);if(!box.hidden){const nm=x=>{const st=b.steps[x.i];return st.when==='t'?mmss(x.t):(BLD_EV.find(e=>e[0]===st.at)||[0,((b.extra||[]).find(e=>'x:'+e.id===st.at)||{}).name||'—'])[1]};
+    box.innerHTML=!sug?'<span class="muted">Fix the milestones to get suggestions.</span>':b.autoBurner?`<div>${bldSugText(model)}</div>`
+      :`<div class="row" style="gap:6px">${sug.map(x=>`<span class="chipb">${esc(nm(x))} <b>${x.burner??'—'}%</b></span>`).join('')}<span class="sp"></span><button class="sm pri" id="bSugUse">Use these</button></div><div style="margin-top:6px">${bldSugText(model)}</div>`;
+    const u=$('#bSugUse');if(u)u.onclick=()=>{b.burnerAdj='0';bldApplySug(b,sug);BLDSUG=false;renderBuilder();toast('Burner plan updated from the curve')}}}
+  R.sug=(BLDSUG&&!b.autoBurner)?sug:null;const P=R.P,src=b.srcId?findAny(b.srcId):null,g=num(b.green);
+  $('#bDropT').textContent=ok(P.drop)?mmss(P.drop):'—';
+  if($('#bAdjTxt')){const ba=num(b.burnerAdj)||0;$('#bAdjTxt').innerHTML=`Charge goes to <b>${ok(P.charge)?fT(P.charge):'—'}°</b>${ba?`, every burner step ${ba>0?'+':''}${ba}%`:''}.`}
+  $('#bTitle').textContent=(b.name.trim()||'Untitled profile')+(ok(g)?' · '+lbTxt(g):'');
+  $('#bLegend').innerHTML=`<span style="color:var(--good)">┅ planned</span>${src&&src.samples&&src.samples.length?`  <span>— — ${src.planned?'planned':'roast #'+src.num}</span>`:''}`;
+  if(R.err.length){$('#bStats').innerHTML='';$('#bPhase').innerHTML='';$('#bChk').innerHTML=R.err.map(t=>`<div class="chk2 cw">!<span>${esc(t)}</span></div>`).join('');$('#bSave').disabled=true;bldDraw(null,src);$('#bSlot').textContent='';return}
+  $('#bStats').innerHTML=`<div class="stat"><div class="l">First crack</div><div class="v">${mmss(P.fc)}<small>${fT(P.fcBT)}°</small></div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(P.drop)}<small>${fT(P.dropBT)}°</small></div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(R.dev)}<small>${R.dtr.toFixed(0)}%</small></div></div><div class="stat"><div class="l">RoR at FC</div><div class="v">${fR(R.rorFC)}<small>°/min</small></div></div>`;
+  const ph=R.phases;$('#bPhase').innerHTML=`<div class="pbar"><i style="width:${ph.dry}%">Drying ${ph.dry.toFixed(0)}%</i><i style="width:${ph.mai}%">Maillard ${ph.mai.toFixed(0)}%</i><i style="width:${ph.dev}%">Dev ${ph.dev.toFixed(0)}%</i></div>`;
+  $('#bChk').innerHTML=R.chk.map(([k,t])=>`<div class="chk2 ${k==='warn'?'cw':'cg'}">${k==='warn'?'!':'✓'}<span>${esc(t)}</span></div>`).join('');
+  const name=b.name.trim(),slot=name&&ok(g)?allProfiles().find(x=>x.id!==b.editId&&normName(x.meta.name)===normName(name)&&ok(batchOf(x))&&sameBatch(batchOf(x),g)):null;
+  $('#bSave').disabled=!name||!ok(g);$('#bSlot').textContent=!name?'Give it a profile name':!ok(g)?'Enter the batch size':slot?`Replaces the current ${lbTxt(batchOf(slot))} “${slot.meta.name}” profile (${rTag(slot)})`:`New ${lbTxt(g)} profile`;
+  bldDraw(R,src)}
+let BLDG=null,BLDDRAG=null,BLDSUG=false;
+function bldDraw(R,src){const cv=$('#bCv');if(!cv)return;const bx=cv.getBoundingClientRect(),d=devicePixelRatio||1;if(bx.width<50)return;cv.width=bx.width*d;cv.height=bx.height*d;const c=cv.getContext('2d');c.scale(d,d);
+  const W=bx.width,H=bx.height,L=44,Rr=44,T=12,LANE=62,B=22+LANE,sc=cfg.scales,font=n=>n*TS()+'px '+getComputedStyle(document.body).fontFamily;
+  c.fillStyle=COL.chartBg;c.fillRect(0,0,W,H);
+  const so=src&&src.samples&&src.samples.length?(src.events.CHARGE??0):0,sEnd=src&&src.samples&&src.samples.length?(src.events.DROP??src.samples.at(-1).t)-so:0;
+  let end=Math.max(R?R.P.drop:0,sEnd,600)+40;
+  let lo=Infinity,hi=-Infinity;for(const arr of [R?R.curve:[],src&&src.samples?src.samples.filter(s=>s.t>=so-5&&s.t<=so+sEnd+30):[]])for(const s of arr){const v=toD(s.bt);if(ok(v)){lo=Math.min(lo,v);hi=Math.max(hi,v)}}
+  if(!isFinite(lo)){lo=sc.tMin;hi=sc.tMax}const st=sc.tStep||50;let TS0={min:Math.floor((lo-10)/st)*st,max:Math.ceil((hi+10)/st)*st,step:st};
+  if(BLDDRAG&&BLDG){TS0=BLDG.TS0;end=BLDG.end}   // hold the scales still while a dot is being dragged
+  const X=t=>L+(t+15)/(end+15)*(W-L-Rr),Y=v=>T+(1-(toD(v)-TS0.min)/(TS0.max-TS0.min))*(H-T-B),YR=v=>T+(1-(toDR(v)-sc.rMin)/(sc.rMax-sc.rMin))*(H-T-B);
+  c.font=font(11);c.strokeStyle=COL.grid;c.fillStyle=COL.axis;c.lineWidth=1;c.textAlign='center';
+  for(let mm=0;mm*60<end;mm++){const x=X(mm*60);c.beginPath();c.moveTo(x,T);c.lineTo(x,H-22);c.stroke();c.fillText(mm,x,H-8)}
+  c.textAlign='right';for(let v=TS0.min;v<=TS0.max;v+=TS0.step){const y=T+(1-(v-TS0.min)/(TS0.max-TS0.min))*(H-T-B);c.beginPath();c.moveTo(L,y);c.lineTo(W-Rr,y);c.stroke();c.fillText(v,L-6,y+4)}
+  c.textAlign='left';c.fillStyle=COL.ror;for(let v=sc.rMin;v<=sc.rMax;v+=sc.rStep||10){const y=T+(1-(v-sc.rMin)/(sc.rMax-sc.rMin))*(H-T-B);c.fillText(v,W-Rr+6,y+4)}
+  const ln=(arr,off,k,col,lw,Yf,from,to,dash)=>{c.strokeStyle=col;c.lineWidth=lw;c.setLineDash(dash||[]);c.beginPath();let p=false;for(const s of arr){const t=s.t-off;if(t<-15||(from!=null&&s.t<from)||(to!=null&&s.t>to)||!ok(s[k])){p=false;continue}const x=X(t),y=Yf(s[k]);p?c.lineTo(x,y):c.moveTo(x,y);p=true}c.stroke();c.setLineDash([])};
+  c.save();c.beginPath();c.rect(L,T,W-L-Rr,H-T-B);c.clip();
+  if(src&&src.samples&&src.samples.length){const sr=src.planned&&src.target?src.target.samples:src.samples,o2=src.planned?0:so;ln(sr,o2,'bt',COL.bkg||COL.axis,1.4,Y,null,src.planned?null:src.events.DROP,[5,4]);ln(sr,o2,'ror',COL.bkg||COL.axis,1.1,YR,src.planned?null:(rorStart(src.events)??so),src.planned?null:src.events.DROP,[5,4])}
+  const gC=getComputedStyle(document.body).getPropertyValue('--good').trim()||'#2a8';
+  if(R){ln(R.curve,0,'ror',gC,1.5,YR,null,null,[3,3]);ln(R.curve,0,'bt',gC,2.4,Y,null,null,[3,3])}
+  c.restore();
+  const hs=[];BLDG={X,Y,TS0,end,L,Rr,T,B,W,H,hs};
+  if(R){c.font='600 '+font(10.5);c.textAlign='center';let k=0;
+    const marks=[['CHARGE','Charge',0,R.P.charge],['TP','TP',R.P.tp,R.P.tpBT],...R.P.knots.map(q=>[q.key,q.key==='DRY'?'DRY':q.key==='FCs'?'FC':q.key==='DROP'?'DROP':q.name,q.t,q.bt])];
+    for(const [e,l,t,bt] of marks){const x=X(t),y=Y(bt),hot=BLDDRAG?BLDDRAG.key===e:BLDG.hover===e,isX=e.startsWith('x:');hs.push({key:e,x,y});
+      c.fillStyle=gC;c.strokeStyle=gC;c.lineWidth=2;c.beginPath();c.arc(x,y,hot?7:5,0,7);if(isX){c.fillStyle=COL.chartBg;c.fill();c.stroke()}else c.fill();
+      if(hot){c.strokeStyle=rgba(gC,.35);c.lineWidth=6;c.beginPath();c.arc(x,y,10,0,7);c.stroke()}
+      if(e==='CHARGE')continue;
+      const lab=`${l} ${mmss(t)} · ${fT(bt)}`,tw=c.measureText(lab).width+10,ly=Math.max(T+2,y-26-(k%2)*16),lx=clamp(x-tw/2,L+2,W-Rr-tw-2);c.fillStyle=COL.chartBg;c.strokeStyle=COL.grid;c.lineWidth=1;c.fillRect(lx,ly,tw,15);c.strokeRect(lx,ly,tw,15);c.fillStyle=COL.bt;c.fillText(lab,lx+tw/2,ly+11);k++}}
+  // burner / air lane
+  const top=H-B+10,lh=LANE-22;c.strokeStyle=COL.grid;c.beginPath();c.moveTo(L,top-4);c.lineTo(W-Rr,top-4);c.stroke();c.font=font(10.5);c.textAlign='right';c.fillStyle=COL.burner;c.fillText('Burner',L-4,top+10);c.fillStyle=COL.air;c.fillText('Air',L-4,top+lh-2);
+  const lane=(arr,off,k,col,lw,dash,to,labels)=>{c.strokeStyle=col;c.lineWidth=lw;c.setLineDash(dash||[]);c.beginPath();let p=false,prev=null;const Yl=v=>top+lh-clamp(v,0,100)/100*lh;for(const s of arr){const t=s.t-off;if(t<-5||(to!=null&&s.t>to)||!ok(s[k])){p=false;continue}const x=X(t),y=Yl(s[k]);if(p){c.lineTo(x,Yl(prev));c.lineTo(x,y)}else c.moveTo(x,y);p=true;prev=s[k]}c.stroke();c.setLineDash([])};
+  if(src&&src.samples&&src.samples.length&&!src.planned){lane(src.samples,so,'burner',rgba(COL.burner,.45),1.2,[4,3],src.events.DROP);lane(src.samples,so,'fan',rgba(COL.air,.45),1.2,[4,3],src.events.DROP)}
+  if(src&&src.planned){lane(src.samples,0,'burner',rgba(COL.burner,.45),1.2,[4,3],src.events.DROP);lane(src.samples,0,'fan',rgba(COL.air,.45),1.2,[4,3],src.events.DROP)}
+  if(R&&R.sug){const pts=[],sg=R.sug.filter(x=>x.burner!=null).sort((a,c)=>a.t-c.t);for(const x of sg)pts.push({t:x.t,burner:x.burner});if(pts.length){pts.push({t:R.P.drop,burner:pts.at(-1).burner});lane(pts,0,'burner',COL.burner,1.6,[2,3],R.P.drop)}}
+  if(R){lane(R.samples,0,'burner',COL.burner,2,null,R.P.drop);lane(R.samples,0,'fan',COL.air,2,null,R.P.drop);
+    c.font='600 '+font(10);c.textAlign='left';for(const s of R.steps){const x=X(s.t);if(ok(s.burner)){c.fillStyle=COL.burner;c.fillText(s.burner+'%',x+3,top+lh-clamp(s.burner,0,100)/100*lh-3)}if(ok(s.fan)){c.fillStyle=COL.air;c.fillText(s.fan+'%',x+3,top+lh-clamp(s.fan,0,100)/100*lh+11)}}}
+  if(!R){c.fillStyle=COL.axis;c.textAlign='center';c.font=font(13);c.fillText('Fill in the milestones to draw the curve',L+(W-L-Rr)/2,T+(H-T-B)/2)}}
+// Drag a dot: left/right changes its time, up/down its bean temp. Charge only moves up/down.
+function bldWireDrag(){const cv=$('#bCv');if(!cv)return;
+  const pos=e=>{const r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+  const hit=p=>{if(!BLDG)return null;let best=null;for(const h of BLDG.hs){const d=Math.hypot(h.x-p.x,h.y-p.y);if(d<=12&&(!best||d<best.d))best={...h,d}}return best};
+  cv.onpointermove=e=>{const p=pos(e);if(BLDDRAG){bldDragTo(p);return}const h=hit(p),k=h?h.key:null;cv.style.cursor=h?(h.key==='CHARGE'?'ns-resize':'move'):'default';if(BLDG&&BLDG.hover!==k){BLDG.hover=k;renderBuildOut()}};
+  cv.onpointerdown=e=>{const h=hit(pos(e));if(!h)return;e.preventDefault();cv.setPointerCapture(e.pointerId);BLDDRAG={key:h.key};renderBuildOut()};
+  cv.onpointerup=cv.onpointercancel=e=>{if(!BLDDRAG)return;BLDDRAG=null;try{cv.releasePointerCapture(e.pointerId)}catch(_){}renderBuilder()};
+  cv.onpointerleave=()=>{if(!BLDDRAG&&BLDG&&BLDG.hover){BLDG.hover=null;renderBuildOut()}}}
+function bldDragTo(p){const b=BLD,G=BLDG,k=BLDDRAG.key;if(!b||!G)return;
+  const w=G.W-G.L-G.Rr,h=G.H-G.T-G.B,t=Math.round(((p.x-G.L)/w*(G.end+15)-15)/5)*5;let temp=Math.round(G.TS0.max-(p.y-G.T)/h*(G.TS0.max-G.TS0.min));
+  const P=bldPoints(b),all=[{k:'TP',t:P.tp,bt:P.tpBT},...P.knots.map(q=>({k:q.key,t:q.t,bt:q.bt}))],i=all.findIndex(x=>x.k===k);
+  const lo=i>0?all[i-1].t+10:10,hi=i>=0&&i<all.length-1?all[i+1].t-10:G.end,tt=clamp(t,lo,Math.max(lo,hi));
+  // keep bean temp rising from dot to dot so the curve never breaks mid-drag
+  const D=v=>ok(v)?toD(v):null;let temp2=temp;if(k==='CHARGE'){const m=D(P.tpBT);if(ok(m))temp2=Math.max(temp,Math.ceil(m)+5)}
+  else if(i>=0){const mr=isF()?2:1.1,pv=i>0?D(all[i-1].bt):null,nx=i<all.length-1?D(all[i+1].bt):null;if(k==='TP'&&ok(D(P.charge)))temp2=Math.min(temp2,Math.floor(D(P.charge))-5);
+    // at least ~2°F/min of rise on each side, so a drag can't flatten a stretch
+    if(ok(pv))temp2=Math.max(temp2,Math.ceil(pv+mr*(tt-all[i-1].t)/60));if(ok(nx))temp2=Math.min(temp2,Math.floor(nx-mr*(all[i+1].t-tt)/60))}
+  temp=temp2;
+  const set=(f,v)=>{b[f]=String(v);const el=$(`[data-b="${f}"]`);if(el)el.value=String(v)};
+  if(k==='CHARGE'){set('charge',temp-(num(b.chargeAdj)||0))}
+  else if(k==='TP'){set('tp',mmss(tt));set('tpBT',temp)}
+  else if(k==='DRY'){set('dry',mmss(tt));set('dryBT',temp)}
+  else if(k==='FCs'){set('fc',mmss(tt));set('fcBT',temp)}
+  else if(k==='DROP'){set('dropBT',temp);if(b.devMode==='pct')set('devPct',+((tt-P.fc)/tt*100).toFixed(1));else set('devTime',mmss(tt-P.fc))}
+  else if(k.startsWith('x:')){const j=b.extra.findIndex(x=>'x:'+x.id===k);if(j<0)return;b.extra[j].t=mmss(tt);b.extra[j].bt=String(temp);
+    const a=$(`[data-xi="${j}"][data-xk="t"]`),c=$(`[data-xi="${j}"][data-xk="bt"]`);if(a)a.value=b.extra[j].t;if(c)c.value=b.extra[j].bt}
+  renderBuildOut()}
+async function bldSave(){const b=BLD,R=bldBuild(b);if(R.err.length){toast(R.err[0]);return}const name=b.name.trim(),g=num(b.green);if(!name||!ok(g))return;
+  const rec=bldRecord(b,R),slotReal=HIST.filter(x=>x.isProfile&&!x.archived&&sameSlot(x,rec)),slotPlan=PLANNED.filter(x=>x.id!==rec.id&&sameSlot(x,rec));
+  if(slotReal.length||slotPlan.length){const o=slotReal[0]||slotPlan[0];if(!await ask(`Replace the ${lbTxt(g)} “${name}” profile?`,slotReal.length?`Roast #${o.num} stays in your history; it just stops being the background for “${name}” at ${lbTxt(g)}. This plan takes its place until you save a real roast as the profile.`:`The other planned profile for “${name}” at ${lbTxt(g)} is replaced by this one.`,'Replace'))return}
+  for(const x of slotReal){x.isProfile=false;await commitRoast(x,true)}
+  PLANNED=PLANNED.filter(x=>x.id!==rec.id&&!sameSlot(x,rec));PLANNED.push(rec);await savePlanned();
+  selProfile=rec.id;BLD=null;$('#pBuild').hidden=true;$('#pBuild').innerHTML='';$('#pList').hidden=false;resolveBg();renderProfiles();renderBgSelect();
+  toast(`“${name}” ${lbTxt(g)} profile saved — it’s the background next time you roast it at ${lbTxt(g)}`)}
+function renderPlannedDetail(el,r){const s=summarize(r),inp=r.inputs||{},steps=bldSteps(inp,bldPoints(inp));
+  const from=r.from&&findAny(r.from.id);
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${esc(r.meta.name)}${ok(batchOf(r))?` <span class="badge gray">${lbTxt(batchOf(r))}</span>`:''} <span class="badge g">Planned</span></div>
+    <div class="muted" style="margin-top:3px">Built ${fmtLong(r.created)}${r.savedAt!==r.created?' · edited '+fmtDate(r.savedAt):''}${from?` · started from ${esc(from.meta.name)} ${ok(batchOf(from))?lbTxt(batchOf(from)):''} (${rTag(from)})`:''} · not roasted yet</div></div></div>
+  <div class="minic"><canvas id="pBig"></canvas></div>
+  <div class="stats"><div class="stat"><div class="l">Charge</div><div class="v">${fT(s.charge)}<small>°${cfg.unit}</small></div></div><div class="stat"><div class="l">First crack</div><div class="v">${mmss(s.fcs)}</div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(s.drop)}</div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(s.dev)}<small>${ok(s.dev)&&s.drop?(s.dev/s.drop*100).toFixed(0)+'%':''}</small></div></div></div>
+  <div class="grid2" style="gap:22px"><div><div class="h3" style="margin-bottom:8px">Burner &amp; air plan</div><div class="plan">${steps.map(x=>`<span>${mmss(x.t)}</span><b>${[ok(x.burner)?'Burner '+x.burner:'',ok(x.fan)?'Air '+x.fan:'',ok(x.drum)?'Drum '+x.drum:''].filter(Boolean).join(' · ')}</b>`).join('')||'<span></span><b class="muted">No changes planned</b>'}</div></div>
+    <div><div class="h3" style="margin-bottom:6px">Milestones</div>${[...[['TP','Turning point'],['DRY','Dry end'],['FCs','First crack'],['DROP','Drop']].map(([k,l])=>{const t=r.events[k],x=sampleAt(r.samples,t);return {t,l,bt:x&&x.bt}}),...((r.target&&r.target.marks)||[]).map(m=>({t:m.t,l:m.name,bt:m.bt}))].sort((a,c)=>a.t-c.t).map(m=>`<div class="kv"><span>${esc(m.l)}</span><b class="tnum">${mmss(m.t)} · ${fT(m.bt)}°</b></div>`).join('')}
+      <div class="kv"><span>Green</span><b>${esc(r.meta.coffee||'—')}</b></div></div></div>
+  <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}</div></div>
+  <div class="row" style="margin-top:auto"><button class="pri" id="pRoast">Roast this ▶</button><button id="pEdit">Edit</button><button id="pOther">Make a ${ok(batchOf(r))&&sameBatch(batchOf(r),25)?'13':'25'} lb version</button><span class="sp"></span><button class="dangerTxt" id="pRemove">Remove profile</button></div>`;
+  requestAnimationFrame(()=>miniCurve($('#pBig'),r,{axis:true}));
+  $('#pRoast').onclick=()=>roastThis(r.id);$('#pEdit').onclick=()=>openBuilder('edit',r.id);
+  $('#pOther').onclick=()=>{openBuilder('copy',r.id);BLD.green=ok(batchOf(r))&&sameBatch(batchOf(r),25)?'13':'25';bldSizeGuess();renderBuilder()};
+  $('#pRemove').onclick=async()=>{if(!await ask('Remove this planned profile?',`“${r.meta.name}” at ${lbTxt(batchOf(r))} hasn’t been roasted yet. Removing it deletes the plan.`,'Remove',true))return;PLANNED=PLANNED.filter(x=>x.id!==r.id);await savePlanned();resolveBg();renderProfiles()}}
 
 /* ================================================================
    Roasts screen
@@ -1761,7 +2131,7 @@ function anProject(r,m,recs){const ev=r.events,c=ev.CHARGE??0,S0=r.samples;if(!r
 async function anBuild(r,recs){const name=r.meta.name||'';if(!normName(name)){toast('Give this roast a profile name first (Roast details)');return}
   const lines=recs.flatMap(x=>x.rem.map(z=>remWhen(z)+' → '+z.text));
   if(!await ask(`Make #${r.num} the “${name}” profile for ${lbTxt(batchOf(r))}?`,`Next time you roast “${name}” at ${lbTxt(batchOf(r))}, this roast is the background${lines.length?' with these reminders: '+lines.join(' · '):' — repeat it as is'}.`,'Build profile'))return;
-  for(const x of HIST)if(x.id!==r.id&&x.isProfile&&sameSlot(x,r)){if(!(r.reminders||[]).some(z=>!z.auto))r.reminders=(x.reminders||[]).filter(z=>!z.auto).map(z=>({...z}));x.isProfile=false;await commitRoast(x,true)}
+  await dropPlannedSlot(r);for(const x of HIST)if(x.id!==r.id&&x.isProfile&&sameSlot(x,r)){if(!(r.reminders||[]).some(z=>!z.auto))r.reminders=(x.reminders||[]).filter(z=>!z.auto).map(z=>({...z}));x.isProfile=false;await commitRoast(x,true)}
   const pj=anProject(r,anMetrics(r),recs);
   if(pj)for(const x of recs)for(const z of x.rem)if(z.dropRem){z.at=Math.max(0,pj.drop-20);z.text=`Drop in ~20 s (target ${mmss(pj.drop)})`}   // drop time follows the projected first crack
   r.target=pj?{at:new Date().toISOString(),samples:pj.samples,events:pj.events}:null;
@@ -2009,7 +2379,7 @@ function wireSettings(){const el=$('#scont');
   const scr=$('#scReset');if(scr)scr.onclick=()=>{cfg.scales={...DEF.scales};if(!isF()){Object.assign(cfg.scales,{tMin:65,tMax:235,tStep:25,rMin:0,rMax:22,rStep:5})}saveCfg();scheduleDraw();renderSettings()};
   const b1=$('#stChoose')||$('#stChange');if(b1)b1.onclick=chooseFolder;const b2=$('#stRe');if(b2)b2.onclick=reconnectFolder;
   const srv=$('#stReveal');if(srv)srv.onclick=()=>ZR_NATIVE.reveal();const sup=$('#stUpd');if(sup)sup.onclick=()=>ZR_NATIVE.checkUpdate(true);
-  const ex=$('#stExport');if(ex)ex.onclick=()=>download('zuna_roast_export_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({app:'Zuna Roast',exported:new Date().toISOString(),roasts:HIST,green:INV,cupping:CUP,settings:cfg,plan:PLAN}),'application/json');
+  const ex=$('#stExport');if(ex)ex.onclick=()=>download('zuna_roast_export_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({app:'Zuna Roast',exported:new Date().toISOString(),roasts:HIST,green:INV,cupping:CUP,settings:cfg,plan:PLAN,planned:PLANNED}),'application/json');
   const lv=$('#logV');if(lv){lv.onchange=()=>{logVerbose=lv.checked;renderLogSoon()};$('#logClear').onclick=()=>{logBuf.length=0;renderLogSoon()};renderLogSoon()}}
 
 /* ================================================================
@@ -2250,10 +2620,10 @@ async function init(){
   for(const s of Object.values(FORM))$(s).addEventListener('input',onFormInput);$('#fGreen').addEventListener('input',()=>{if(S.bgMode==='auto'&&!S.recording)resolveBg();else renderNotes()});
   $('#btnSave').onclick=()=>saveRoast(false,false);$('#btnNewRoast').onclick=()=>newRoastFromCurrent();$('#btnSaveProf').onclick=()=>saveRoast(false,true);$('#btnCsv').onclick=()=>download(roastBase(S.roast)+'.csv',csvText(S.roast));
   for(const id of ['#cvMain','#cvStrip']){$(id).addEventListener('mousemove',onHover);$(id).addEventListener('mouseleave',clearHover)}
-  new ResizeObserver(scheduleDraw).observe($('#cvMain'));
+  new ResizeObserver(scheduleDraw).observe($('#cvMain'));new ResizeObserver(()=>{if(BLD)renderBuildOut()}).observe($('#pBuild'));
   document.addEventListener('keydown',handleKey);
   // profiles / roasts / green / cupping lists
-  $('#pSearch').oninput=renderProfiles;$('#aSearch').oninput=renderAnalyze;
+  $('#pSearch').oninput=renderProfiles;$('#btnNewProfile').onclick=()=>openBuilder('scratch');$('#aSearch').oninput=renderAnalyze;
   $('#pRows').onclick=e=>{const tr=e.target.closest('tr');if(tr&&tr.dataset.id!==selProfile){selProfile=tr.dataset.id;renderProfiles()}};
   $('#pRows').ondblclick=e=>{const tr=e.target.closest('tr');if(tr)roastThis(tr.dataset.id)};
   $('#rSearch').oninput=renderRoasts;$('#rFilter').onclick=e=>{const b=e.target.closest('button');if(!b)return;rFilter=b.dataset.f;$$('#rFilter button').forEach(x=>x.classList.toggle('on',x===b));renderRoasts()};
@@ -2264,6 +2634,7 @@ async function init(){
     let roasts=full?(d.roasts||[]):Array.isArray(d)?d:[d],n=0,g=0,c=0,skip=0;
     for(const r of roasts){if(!r||!Array.isArray(r.samples)||!r.events)continue;const ex=r.id&&HIST.find(x=>x.id===r.id);if(ex&&String(ex.savedAt||'')>=String(r.savedAt||'')){skip++;continue}if(!r.id)r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);r.meta={...blankMeta(),...(r.meta||{})};r.tnotes=r.tnotes||[];r.reminders=r.reminders||[];r.controlLog=r.controlLog||[];if(!r.num){r.num=nextNum();store.set(LS.num,r.num)}await commitRoast(r,true);n++}
     if(full&&Array.isArray(d.green)){for(const l of d.green){if(l&&l.id&&!INV.some(x=>x.id===l.id)){INV.push(l);g++}}if(g)await persistInv()}
+    if(full&&Array.isArray(d.planned)){let pn=0;for(const x of d.planned){if(x&&x.id&&x.planned&&!PLANNED.some(y=>y.id===x.id)){PLANNED.push(x);pn++}}if(pn)await savePlanned()}
     if(full&&Array.isArray(d.cupping)){for(const x of d.cupping){if(x&&x.id&&!CUP.some(y=>y.id===x.id)){CUP.push(x);c++}}if(c)await persistCup()}
     let st=false;if(full&&d.settings&&await ask('Restore settings too?','Replaces the connection, presets, event keys, alarms, scales, colors and logo on this Mac with the ones in the backup.','Restore settings')){applySettings(d.settings);saveCfg();st=true}
     if(full&&d.plan&&Array.isArray(d.plan.items)&&!PLAN.items.length&&d.plan.date===dayKey()){PLAN=d.plan;savePlan()}
