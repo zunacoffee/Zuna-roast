@@ -827,12 +827,13 @@ async function startRoast(fromMachine){
     if(fromMachine){await saveRoast(true)}else if(!await ask('Start a new roast?','The last roast has not been saved. Starting a new one discards it.','Discard and start',true))return false}
   const keep=readMeta();const meta={...blankMeta(),name:keep.name,invId:keep.invId,coffee:keep.coffee,lot:keep.lot,green:keep.green};
   S.roast=newRoast();S.roast.meta=meta;S.roast.t0=link.clock();S.roast.created=new Date().toISOString();S.roast.num=nextNum();S.roast.source=link.sim?'simulator':link.url();
-  S.autoOff=null;S.recording=true;S.dirty=true;S.tpMin=null;S.evStack=[];S.viewingId=null;S.firedRem={};
+  S.recording=true;S.dirty=true; /* S.autoOff is kept: the last batch is still in the cooling tray */
+  S.tpMin=null;S.evStack=[];S.viewingId=null;S.firedRem={};
   fillForm(meta);closeDrawer();resolveBg();log('sys','Recording started — roast #'+S.roast.num);renderAll();return true}
 async function stopRoast(force){
   if(!S.recording)return;
   if(!force&&S.roast.events.DROP==null&&!await ask('Stop recording?','Drop has not been marked yet.','Stop recording',true))return;
-  S.recording=false;clearDraft();log('sys','Recording stopped');renderAll();openDrawer();toast('Enter roasted weight, colors and comments, then Save')}
+  S.recording=false;S.stoppedAt=performance.now();clearDraft();log('sys','Recording stopped');renderAll();openDrawer();toast('Enter roasted weight, colors and comments, then Save')}
 function markEvent(k,src='manual'){
   if(k==='UNDO')return undoEvent();
   if(!S.recording){if(k==='CHARGE'&&src==='manual'){startRoast(false).then(okk=>{if(okk)markEvent('CHARGE','manual')});}else if(src==='manual')toast('Press START first');return}
@@ -842,11 +843,11 @@ function markEvent(k,src='manual'){
   S.evStack=S.evStack.filter(x=>x!==k);S.evStack.push(k);S.dirty=true;
   log('evt',`${k} at ${mmss(t-(r.events.CHARGE??0))} (${src})`);
   if(src==='manual')sendEventToRoaster(k);
-  if(k==='DROP')S.autoOff={at:link.clock(),cool:false,stir:false,warned:false,rid:r.id||r.created};
+  if(k==='DROP'){S.autoOff={at:link.clock(),cool:false,stir:false,warned:false,rid:r.id||r.created};if(cfg.autoOffOn)log('ctl',`Auto off started: cooling in ${cfg.coolOffMin} min, stirrer in ${cfg.stirOffMin} min`)}
   if(k==='DROP'&&cfg.dropSetOn){if(C.on&&link.connected()){const sent=[];for(const [key,ck,l] of [['burner','dropBurner','Burner'],['fan','dropAir','Air']]){const v=num(cfg[ck]);if(v!=null){sendControl(key,v);sent.push(`${l} ${Math.round(clamp(v,0,ctlMax(key)))}%`)}}if(sent.length){r.tnotes.push({t,text:'At Drop: '+sent.join(', ')});toast('At Drop: '+sent.join(', '))}}else{toast('Drop setpoints not sent — Control is off')}}
   if(k==='DROP'&&cfg.coolOnDrop&&C.on&&link.connected()){sendSwitch('coolingFanState',true,true);sendSwitch('stirrerState',true,true)}
   checkReminders(k);renderAll()}
-function undoEvent(){const k=S.evStack.pop();if(!k){toast('No event to undo');return}delete S.roast.events[k];if(k==='DROP')S.autoOff=null;if(k==='CHARGE'){delete S.roast.events.TP;S.tpMin=null;S.roast.chargedAt=null}log('evt','Removed '+k);renderAll()}
+function undoEvent(){const k=S.evStack.pop();if(!k){toast('No event to undo');return}delete S.roast.events[k];if(k==='DROP'&&S.autoOff){S.autoOff=null;log('ctl','Auto off cancelled (Drop undone)')}if(k==='CHARGE'){delete S.roast.events.TP;S.tpMin=null;S.roast.chargedAt=null}log('evt','Removed '+k);renderAll()}
 function nextEventKey(){const ev=S.roast.events;return ['CHARGE','DRY','FCs','FCe','DROP','COOL'].filter(k=>cfg.events.find(e=>e.k===k&&e.show)||k==='CHARGE'||k==='DROP').find(k=>ev[k]==null)}
 
 /* ---------- meta form ---------- */
@@ -1127,8 +1128,8 @@ function checkBtAlarm(){const bt=S.latest.bt,live=link.connected()&&performance.
   else if(bt<cfg.btAlarmC-5/(isF()?1.8:1)){A.active=false;A.muted=false}
   const el=$('#roBT');el.classList.toggle('alarm',!!A.active);$('#btLabel').textContent=A.active?(A.muted?`HIGH TEMP · over ${Math.round(toD(cfg.btAlarmC))}°`:'HIGH TEMP — click to silence'):'Bean temp';
   if(A.active&&!A.muted&&performance.now()-(A.last||0)>1400){A.last=performance.now();alarmSound()}}
-function autoOffLeft(p){const A=S.autoOff;if(p!=='coolingFanState'&&p!=='stirrerState')return null;if(!A||!cfg.autoOffOn||!link.connected())return null;const done=p==='coolingFanState'?A.cool:A.stir;if(done)return null;
-  const el=link.clock()-A.at;if(el<0){S.autoOff=null;return null}return (p==='coolingFanState'?cfg.coolOffMin:cfg.stirOffMin)*60-el}
+function autoOffLeft(p){const A=S.autoOff;if(p!=='coolingFanState'&&p!=='stirrerState')return null;if(!A||!cfg.autoOffOn)return null;const done=p==='coolingFanState'?A.cool:A.stir;if(done)return null;
+  const el=link.clock()-A.at;if(el<0){S.autoOff=null;log('ctl','Auto off cancelled (clock reset)');return null}return (p==='coolingFanState'?cfg.coolOffMin:cfg.stirOffMin)*60-el}
 function checkAutoOff(){const A=S.autoOff;if(!A||!cfg.autoOffOn||!link.connected())return;
   for(const [p,key,label] of [['coolingFanState','cool','Cooling fan'],['stirrerState','stir','Stirrer']]){const left=autoOffLeft(p);if(left==null||left>0)continue;A[key]=true;
     if(!C.on){if(!A.warned){A.warned=true;toast(`Auto off skipped — Control is off. Turn ${label.toLowerCase()} off at the roaster.`);beep(1)}log('ctl',`Auto off skipped for ${label} (Control off)`);continue}
@@ -2645,7 +2646,8 @@ function renderUnits(){$$('.up').forEach(e=>e.textContent=pU());$$('.u').forEach
 function renderAll(){renderUnits();renderHeader();renderLive();renderFkeys();renderNotes();renderBgSelect();if($('#drawer').classList.contains('open'))renderDrawer();tick();scheduleDraw()}
 function handleKey(e){if(e.metaKey||e.ctrlKey||e.altKey)return;if($('#modalRoot').firstChild)return;const tg=e.target.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tg))return;if(curScreen!=='roast')return;
   const k=e.key.length===1?e.key.toLowerCase():e.key;
-  if(k===cfg.startKey){e.preventDefault();S.recording?stopRoast():startRoast(false);return}
+  if(k===cfg.startKey){e.preventDefault();if(!S.recording&&$('#drawer').classList.contains('open')){closeDrawer();return}if(!S.recording&&S.stoppedAt&&performance.now()-S.stoppedAt<4000)return; /* double press right after Stop */
+    S.recording?stopRoast():startRoast(false);return}
   const swp=Object.keys(cfg.swKeys).find(p=>cfg.swKeys[p]&&cfg.swKeys[p]===k);if(swp){e.preventDefault();sendSwitch(swp,!(S.sw[swp]===true));return}
   const ev=cfg.events.find(x=>x.key&&x.key===k);if(ev){e.preventDefault();markEvent(ev.k,'manual')}}
 async function init(){
