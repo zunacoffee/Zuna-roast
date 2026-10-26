@@ -781,7 +781,7 @@ function interp(arr,key,t){if(!arr||!arr.length)return null;let lo=0,hi=arr.leng
 function summarize(r){const ev=r.events||{},c=ev.CHARGE??0,at=k=>ev[k]==null?null:sampleAt(r.samples,ev[k]);const g=num(r.meta.green),w=num(r.meta.roasted);
   return {charge:at('CHARGE')?.bt??null,tp:ev.TP!=null?ev.TP-c:null,tpBT:at('TP')?.bt??null,dry:ev.DRY!=null?ev.DRY-c:null,fcs:ev.FCs!=null?ev.FCs-c:null,fcsBT:at('FCs')?.bt??null,
     drop:ev.DROP!=null?ev.DROP-c:null,dropBT:at('DROP')?.bt??null,dev:ev.FCs!=null&&ev.DROP!=null?ev.DROP-ev.FCs:null,loss:g&&w?(g-w)/g*100:null}}
-function spreadOf(m){const a=num(m.colorWhole),b=num(m.colorGround);return ok(a)&&ok(b)?b-a:null}
+function spreadOf(m){const a=num(m.colorWhole),b=num(m.colorGround);return ok(a)&&ok(b)?+(b-a).toFixed(1):null} /* rounded: 68.6 − 57.4 would otherwise show 11.199999999999996 */
 const ADJ=[['burner','Burner'],['fan','Air'],['drum','Drum']];
 function adjustments(r){const out=[],ev=r.events||{},c=ev.CHARGE,d=ev.DROP;
   for(const [k,label] of ADJ){let lvl=null,cur=null;for(const s of r.samples){const v=s[k];if(!ok(v))continue;if(lvl==null){lvl=v;continue}
