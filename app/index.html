@@ -371,7 +371,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .crow{display:grid;grid-template-columns:1fr 38px 104px;gap:10px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1))}
 .crow input[type=color]{width:38px;height:30px;padding:2px;border-radius:6px}
 .crow input[type=text]{font-family:var(--mono);font-size:calc(13px*var(--ts,1));padding:6px 8px}
-.cupbands{max-width:620px}.sech{font-size:calc(16px*var(--ts,1));font-weight:700;margin-top:14px;padding-top:16px;border-top:1px solid var(--border)}.rlbox{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:10px}.rlgrid{display:grid;grid-template-columns:200px 260px minmax(0,460px);gap:18px;align-items:start}
+.cupbands{max-width:620px}.spx.locked .ab,.spx.locked .pre button,button.locked[data-sw]{opacity:.45}.sech{font-size:calc(16px*var(--ts,1));font-weight:700;margin-top:14px;padding-top:16px;border-top:1px solid var(--border)}.rlbox{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:10px}.rlgrid{display:grid;grid-template-columns:200px 260px minmax(0,460px);gap:18px;align-items:start}
 .evcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}.ptag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:calc(12.5px*var(--ts,1));font-weight:500;white-space:nowrap}.flag{font-size:1.15em;margin-right:8px;vertical-align:-1px;font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif}.cupbands input[data-cupl],.cupbands input[data-procw]{font-family:var(--font)}
 .warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--panel));border-radius:8px;padding:9px 12px;font-size:calc(13px*var(--ts,1))}
 .evtbl td{padding:6px 10px}
@@ -435,7 +435,6 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
       <div class="ro" id="roRor"><div class="l"><span>Rate of rise</span><span class="ur">°F/min</span></div><div class="v" id="vRoR">—</div><div class="d" id="dRoR"></div></div>
     </div>
     <div class="pt" style="border-top:1px solid var(--line2);padding-top:10px"><span>Setpoints</span></div>
-    <div class="ctloff" id="ctlOff"><span>Control is off — watching only.</span><button class="sm pri" id="btnCtlOn">Turn on</button></div>
     <div class="sps" id="sps"></div>
     <div class="sw" id="sw"></div>
   </section>
@@ -1026,12 +1025,12 @@ const C={on:false,target:{},deb:{},wake:null};
 const ctlMax=k=>k==='burner'?clamp(Number(cfg.burnerMax)||100,0,100):100;
 function ctlBase(k){const t=C.target[k];return t&&performance.now()-t.at<6000?t.v:(ok(S.latest[k])?S.latest[k]:0)}
 function sendControl(k,v){const c=CTL.find(x=>x.key===k);v=Math.round(clamp(v,0,ctlMax(k)));
-  if(!C.on){toast('Turn Control on first');return}if(!link.connected()){toast('Not connected — control is locked');return}
+  if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
   if(link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[c.param]:v}})==null)return;
   C.target[k]={v,at:performance.now()};if(S.recording){S.roast.controlLog.push({t:+(link.clock()-S.roast.t0).toFixed(2),key:k,value:v});S.dirty=true}
   log('ctl',`${c.label} → ${v}%`);renderCtl()}
 function nudge(k,d){if(!C.on||!link.connected())return;const v=Math.round(clamp(ctlBase(k)+d,0,ctlMax(k)));C.target[k]={v,at:performance.now(),pending:true};renderCtl();clearTimeout(C.deb[k]);C.deb[k]=setTimeout(()=>sendControl(k,v),350)}
-async function sendSwitch(p,val,silent){const w=SWITCHES.find(x=>x.p===p);if(!C.on||!link.connected()){toast('Turn Control on to use the machine switches');return}
+async function sendSwitch(p,val,silent){const w=SWITCHES.find(x=>x.p===p);if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
   if(p==='standby'&&S.sw.standby==null){const m=await link.ask({[cfg.nodes.command]:'getControlParams'},2500);const d=m&&(cfg.nodes.data?getPath(m,cfg.nodes.data):m);if(d&&typeof d.standby==='boolean'){S.sw.standby=d.standby;val=!d.standby}}
   if(!silent&&w.confirm&&cfg.confirmMachine&&!await ask(`Turn ${w.label} ${val?'ON':'OFF'}?`,'This is sent to the roaster now.',`Turn ${val?'on':'off'}`,!val))return;
   link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[p]:val}});S.sw[p]=val;S.swSentAt=performance.now();log('ctl',`${w.label} ${val?'ON':'OFF'}`);renderCtl();renderHeader()}
@@ -1053,15 +1052,14 @@ function buildCtl(){
     <div class="d"></div></div>`};$('#sps').innerHTML=CTL.filter(c=>c.key!=='drum').map(spx).join('');$('#spsL').innerHTML=spx(CTL.find(c=>c.key==='drum')).replace('class="spx"','class="spx" style="border-bottom:0"');
   const swb=w=>{const k=cfg.swKeys[w.p];return `<button data-sw="${w.p}"><i></i>${w.label}${k?`<kbd class="swk">${esc(keyName(k))}</kbd>`:''}<b>—</b></button>`};$('#sw').innerHTML=SWITCHES.filter(w=>!w.confirm).map(swb).join('');$('#swL').innerHTML=SWITCHES.filter(w=>w.confirm).map(swb).join('')}
 function renderCtl(){const live=C.on&&link.connected();
-  $('#ctlOff').hidden=C.on;
   $$('.spx').forEach(el=>{const k=el.dataset.k,cur=S.latest[k],t=C.target[k];let shown=ok(cur)?Math.round(cur):null,pend=false;
     if(t){if(t.pending||(!(ok(cur)&&Math.abs(cur-t.v)<1)&&performance.now()-t.at<6000)){shown=t.v;pend=true}else if(ok(cur)&&Math.abs(cur-t.v)<1)C.target[k]=null}
     const v=$('.v',el);v.textContent=shown==null?'—':shown;v.classList.toggle('pend',pend);
-    $$('button',el).forEach(b=>{b.disabled=!live;if(b.dataset.p)b.classList.toggle('on',ok(cur)&&Math.round(cur)===Number(b.dataset.p))});
+    el.classList.toggle('locked',!live);$$('button',el).forEach(b=>{b.disabled=false;if(b.dataset.p)b.classList.toggle('on',ok(cur)&&Math.round(cur)===Number(b.dataset.p))});
     let d='';if(t&&!t.pending&&performance.now()-t.at>=6000&&ok(cur)&&Math.abs(cur-t.v)>=1)d=`<span class="dangerTxt">Roaster still at ${Math.round(cur)}%</span>`;
     else{const nx=k!=='drum'?bgNext(k):null;if(nx){const rc=S.bg.events.CHARGE??0,x=bgTimeNow();d=`BKG next ${Math.round(nx.to)}${x!=null?` · in ${mmss(nx.t-rc-x)}`:` · at ${mmss(nx.t-rc)}`}`}}
     $('.d',el).innerHTML=d});
-  $$('[data-sw]').forEach(b=>{const v=S.sw[b.dataset.sw],lf=v===true?autoOffLeft(b.dataset.sw):null;b.classList.toggle('on',v===true);$('b',b).textContent=v===true?(lf!=null&&lf>0?'ON · off in '+mmss(Math.ceil(lf)):'ON'):v===false?'OFF':'—';b.disabled=!live})}
+  $$('[data-sw]').forEach(b=>{const v=S.sw[b.dataset.sw],lf=v===true?autoOffLeft(b.dataset.sw):null;b.classList.toggle('locked',!live);b.classList.toggle('on',v===true);$('b',b).textContent=v===true?(lf!=null&&lf>0?'ON · off in '+mmss(Math.ceil(lf)):'ON'):v===false?'OFF':'—';b.disabled=false})}
 
 /* ================================================================
    Reminders & notes
@@ -2656,7 +2654,7 @@ async function init(){
   $('#nav').onclick=e=>{const b=e.target.closest('button');if(b)showScreen(b.dataset.s)};
   $('#snav').onclick=e=>{const b=e.target.closest('button');if(b){curPane=b.dataset.p;renderSettings()}};
   $('#btnConnect').onclick=()=>{if(!link.manual)link.disconnect();else link.connect(false)};
-  $('#btnControl').onclick=()=>setControl(!C.on);$('#btnCtlOn').onclick=()=>setControl(true);
+  $('#btnControl').onclick=()=>setControl(!C.on);
   $('#chartTitle').onclick=()=>openDrawer();
   $('#roBT').onclick=()=>{if(S.alarm.active){S.alarm.muted=true;checkBtAlarm()}};
   $('#btnDetails').onclick=()=>{$('#drawer').classList.contains('open')?closeDrawer():(showScreen('roast'),openDrawer())};$('#drawerX').onclick=closeDrawer;
