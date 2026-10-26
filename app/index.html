@@ -136,8 +136,8 @@ canvas{display:block;width:100%;height:100%}
 .spx .v{flex:1;text-align:center;font-variant-numeric:tabular-nums;font-weight:var(--bigW,400);font-size:calc(40px*var(--bs,1));line-height:1.1}
 .spx .v.pend{color:var(--accent)}
 .spx .ab{width:46px;height:46px;border-radius:50%;padding:0;font-size:calc(15px*var(--ts,1))}
-.pre{display:flex;gap:6px;margin-top:6px}
-.pre button{flex:1;font-variant-numeric:tabular-nums;font-weight:var(--smallW,500);font-size:calc(17px*var(--ss,1));padding:9px 0;border-radius:8px}
+.pre{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:6px}
+.pre button{min-width:0;font-variant-numeric:tabular-nums;font-weight:var(--smallW,500);font-size:calc(17px*var(--ss,1));padding:9px 0;border-radius:8px}
 .pre button.on{background:var(--text);border-color:var(--text);color:var(--panel)}
 .spx .d{font-size:calc(12px*var(--ts,1));color:var(--text2);padding-top:6px;min-height:20px}
 .sw{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px 16px 16px;border-top:1px solid var(--line2)}
@@ -1048,7 +1048,7 @@ async function setControl(on){
 function buildCtl(){
   const spx=c=>{const pre=cfg.presets[c.key]||[];return `<div class="spx" data-k="${c.key}"><div class="l"><span>${c.label}</span><span>%</span></div>
     <div class="rowv"><button class="ab" data-d="-1" aria-label="${c.label} down">▼</button><div class="v" title="Click to type an exact value">—</div><button class="ab" data-d="1" aria-label="${c.label} up">▲</button></div>
-    ${pre.length?`<div class="pre">${pre.map(v=>`<button data-p="${v}">${v}</button>`).join('')}</div>`:''}
+    ${pre.length?`<div class="pre" style="grid-template-columns:repeat(${Math.min(pre.length,4)},minmax(0,1fr))">${pre.map(v=>`<button data-p="${v}">${v}</button>`).join('')}</div>`:''}
     <div class="d"></div></div>`};$('#sps').innerHTML=CTL.filter(c=>c.key!=='drum').map(spx).join('');$('#spsL').innerHTML=spx(CTL.find(c=>c.key==='drum')).replace('class="spx"','class="spx" style="border-bottom:0"');
   const swb=w=>{const k=cfg.swKeys[w.p];return `<button data-sw="${w.p}"><i></i>${w.label}${k?`<kbd class="swk">${esc(keyName(k))}</kbd>`:''}<b>—</b></button>`};$('#sw').innerHTML=SWITCHES.filter(w=>!w.confirm).map(swb).join('');$('#swL').innerHTML=SWITCHES.filter(w=>w.confirm).map(swb).join('')}
 function renderCtl(){const live=C.on&&link.connected();
