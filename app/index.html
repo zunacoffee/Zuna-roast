@@ -345,6 +345,11 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .taste button.fc{border-style:dashed}.taste .cupt{font-size:.72em;text-transform:uppercase;letter-spacing:.06em;opacity:.75;margin-left:4px}
 .pl{margin-top:4px}.pl.y{color:var(--good)}.pl.n{color:var(--text2)}
 .tgtline{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline;font-size:calc(13.5px*var(--ts,1));border:1px dashed color-mix(in srgb,var(--good) 55%,var(--panel));background:color-mix(in srgb,var(--good) 6%,var(--panel));border-radius:8px;padding:9px 13px}
+.chk2.cd{color:var(--danger)}.btok{color:var(--good);font-weight:600}.btdip{color:var(--danger);font-weight:600}.btflat{color:var(--warn);font-weight:600}
+.flatsw{background:color-mix(in srgb,var(--warn) 35%,var(--panel));border:1px solid var(--warn)}.rortg{display:flex;align-items:center;gap:6px;margin-left:auto;cursor:pointer}.rortg input{width:auto}
+#roBT.falling{animation:btFall .6s infinite alternate;border-radius:8px}#roBT.falling #vBT,#roBT.falling #btLabel{color:var(--warn)!important;font-weight:700}
+@keyframes btFall{from{background:color-mix(in srgb,var(--warn) 6%,var(--panel))}to{background:color-mix(in srgb,var(--warn) 32%,var(--panel))}}
+@media (prefers-reduced-motion:reduce){#roBT.falling{animation:none;background:color-mix(in srgb,var(--warn) 22%,var(--panel))}}
 .tgtline b{color:var(--good)}.tgtline small{color:var(--text2);font-size:.88em}
 /* ---------- settings ---------- */
 #scr-settings .wrap{flex:1;display:grid;grid-template-columns:230px minmax(0,1fr);gap:14px;padding:16px 20px;min-height:0}
@@ -372,7 +377,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .crow input[type=color]{width:38px;height:30px;padding:2px;border-radius:6px}
 .crow input[type=text]{font-family:var(--mono);font-size:calc(13px*var(--ts,1));padding:6px 8px}
 .cupbands{max-width:620px}.spx.locked .ab,.spx.locked .pre button,button.locked[data-sw]{opacity:.45}.sech{font-size:calc(16px*var(--ts,1));font-weight:700;margin-top:14px;padding-top:16px;border-top:1px solid var(--border)}.rlbox{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:10px}.rlgrid{display:grid;grid-template-columns:200px 260px minmax(0,460px);gap:18px;align-items:start}
-.evcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}.ptag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:calc(12.5px*var(--ts,1));font-weight:500;white-space:nowrap}.flag{font-size:1.15em;margin-right:8px;vertical-align:-1px;font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif}.cupbands input[data-cupl],.cupbands input[data-procw]{font-family:var(--font)}
+.evcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}.ptag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:calc(12.5px*var(--ts,1));font-weight:500;white-space:nowrap}.flag{font-size:1.15em;margin-right:8px;vertical-align:-1px;font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif}.cupbands input[data-cupl],.cupbands input[data-spl],.cupbands input[data-procw]{font-family:var(--font)}
 .warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--panel));border-radius:8px;padding:9px 12px;font-size:calc(13px*var(--ts,1))}
 .evtbl td{padding:6px 10px}
 .evtbl input{padding:5px 8px;font-size:calc(13px*var(--ts,1))}
@@ -733,7 +738,7 @@ tr.sel .ipCard .n{color:var(--accent)}
   <div class="page">
     <div class="ph"><h1>Analyze</h1><input type="search" id="aSearch" placeholder="Search roasts, profiles…"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Pick a roast, say how it tasted, build the next profile</span></div>
     <div class="ansplit">
-      <div class="card scroll"><table><thead><tr><th>#</th><th>Date</th><th>Profile</th><th class="n">Batch</th><th class="n">Dev</th><th class="n">Cup</th><th>Taste</th></tr></thead><tbody id="aRows"></tbody></table><div id="aEmpty"></div></div>
+      <div class="card scroll"><table><thead><tr><th>#</th><th>Date</th><th>Profile</th><th class="n">Batch</th><th>Bean temp</th><th class="n">Dev</th><th class="n">Cup</th><th>Taste</th></tr></thead><tbody id="aRows"></tbody></table><div id="aEmpty"></div></div>
       <div class="card detail" id="aDetail"></div>
     </div>
   </div>
@@ -848,9 +853,10 @@ const DEF={
   pUnit:'Pa',
   anDtrLow:17,anDtrHigh:24,anRorFC:10.5,anLong:12,anShort:8,anSpread:5,
   // Brewed Behavior targets (stored °C, °C/min, seconds)
-  bbTp:90,bbTpTol:20,bbDryMin:210,bbDryMax:300,bbDryC:(300-32)*5/9,bbDryTol:10/1.8,bb6Slow:12/1.8,bb6Ideal:15/1.8,bb6Fast:20/1.8,bbFcC:(396-32)*5/9,bbFcTol:8/1.8,bbDevMin:120,bbDevMax:240,anBurnerStep:5,anAirStep:5,anCupLow:7.25,
+  bbTp:90,bbTpTol:20,bbDryMin:210,bbDryMax:300,bbDryC:(300-32)*5/9,bbDryTol:10/1.8,bb6Slow:12/1.8,bb6Ideal:15/1.8,bb6Fast:20/1.8,bbFcC:(396-32)*5/9,bbFcTol:8/1.8,bbDevMin:120,bbDevMax:240,anBurnerStep:5,anAirStep:5,anCupLow:7.25,anBtDip:1/1.8,anBtFlat:30,anBtLive:true,
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[],
+  spColorsOn:true,spBands:[{max:5,label:'On target',col:'#1E8E3E'},{max:8,label:'Watch',col:'#C99A06'},{max:10,label:'High',col:'#E8710A'},{max:null,label:'Too wide',col:'#D93025'}],
   cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}],
   rorLineOn:true,rorLineC:12/1.8,rorZoneAlpha:10,rorLine2On:false,rorLine2C:20/1.8,rorZone2Alpha:6,
   procColorsOn:true,procColors:[{words:'decaf',col:'#6B7280'},{words:'anaerobic, carbonic, ferment',col:'#7B4FB0'},{words:'wet-hulled, wet hulled, giling',col:'#5F7A36'},{words:'honey, pulped',col:'#B7791F'},{words:'natural, dry',col:'#B0452B'},{words:'washed, wet',col:'#2B6CB0'}]
@@ -868,6 +874,7 @@ function loadCfg(){const s=store.get(LS.cfg,{})||{},c=JSON.parse(JSON.stringify(
   if(s.bbV!==1){if(s.anLong===12.5)c.anLong=12;if(s.anShort===8.5)c.anShort=8;if(s.anSpread===10)c.anSpread=5;c.bbV=1}   // Brewed Behavior defaults (1.0.19)
   if(!Array.isArray(c.procColors))c.procColors=JSON.parse(JSON.stringify(DEF.procColors));
   if(!Array.isArray(c.cupBands)||c.cupBands.length!==4)c.cupBands=JSON.parse(JSON.stringify(DEF.cupBands));
+  if(!Array.isArray(c.spBands)||c.spBands.length<2)c.spBands=JSON.parse(JSON.stringify(DEF.spBands));
   if(!Array.isArray(c.events)||!c.events.length)c.events=JSON.parse(JSON.stringify(DEF.events));
   if(s.keyV!==2&&Array.isArray(s.events)){const oldK={UNDO:'F8',CHARGE:'F1',DRY:'F2',FCs:'F3',FCe:'F4',SCs:'F5',COOL:'F7',DROP:'F6'},newK={UNDO:'0',CHARGE:'1',DRY:'2',FCs:'3',FCe:'4',SCs:'5',COOL:'7',DROP:'6'};
     const used=new Set(c.events.map(e=>e.key).filter(Boolean));for(const e of c.events)if(e.key===oldK[e.k]&&!used.has(newK[e.k])){used.delete(e.key);e.key=newK[e.k];used.add(e.key)}c.keyV=2}
@@ -997,6 +1004,10 @@ function interp(arr,key,t){if(!arr||!arr.length)return null;let lo=0,hi=arr.leng
 function summarize(r){const ev=r.events||{},c=ev.CHARGE??0,at=k=>ev[k]==null?null:sampleAt(r.samples,ev[k]);const g=num(r.meta.green),w=num(r.meta.roasted);
   return {charge:at('CHARGE')?.bt??null,tp:ev.TP!=null?ev.TP-c:null,tpBT:at('TP')?.bt??null,dry:ev.DRY!=null?ev.DRY-c:null,fcs:ev.FCs!=null?ev.FCs-c:null,fcsBT:at('FCs')?.bt??null,
     drop:ev.DROP!=null?ev.DROP-c:null,dropBT:at('DROP')?.bt??null,dev:ev.FCs!=null&&ev.DROP!=null?ev.DROP-ev.FCs:null,loss:g&&w?(g-w)/g*100:null}}
+// color spread colors: bands run low → high, each "up to" a value; the last band is everything above
+function spBand(v){const B=cfg.spBands;for(let i=0;i<B.length-1;i++)if(v<=Number(B[i].max)+1e-9)return B[i];return B[B.length-1]}
+function spSt(v){return cfg.spColorsOn&&ok(Number(v))?`color:${spBand(Number(v)).col};font-weight:600`:''}
+function spTxt(v,plus){if(!ok(v))return '—';const t=(plus&&v>0?'+':'')+v;return cfg.spColorsOn?`<span style="${spSt(v)}" title="${esc(spBand(v).label)}">${t}</span>`:String(t)}
 function spreadOf(m){const a=num(m.colorWhole),b=num(m.colorGround);return ok(a)&&ok(b)?+(b-a).toFixed(1):null} /* rounded: 68.6 − 57.4 would otherwise show 11.199999999999996 */
 const ADJ=[['burner','Burner'],['fan','Air'],['drum','Drum']];
 function adjustments(r){const out=[],ev=r.events||{},c=ev.CHARGE,d=ev.DROP;
@@ -1016,7 +1027,7 @@ function onData(data){const vals={};
   S.mon.push({t:now,bt:vals.bt});while(S.mon.length&&S.mon[0].t<now-120)S.mon.shift();S.liveRor=slope(S.mon,'bt',now,cfg.rorWindow);
   if(S.recording){const r=S.roast,lastS=r.samples.at(-1);if(lastS&&now-r.t0<=lastS.t){r.t0=now-(lastS.t+(Number(cfg.interval)||1));log('sys','Roast clock kept continuous after the data source restarted')}
     const t=now-r.t0,s={t:+t.toFixed(2)};for(const k of Object.keys(cfg.channels))s[k]=vals[k]==null?null:+vals[k].toFixed(2);
-    r.samples.push(s);const ror=slope(r.samples,'bt',t,cfg.rorWindow);s.ror=ror==null?null:+ror.toFixed(2);detectTP(s);checkAutoCool(s);S.dirty=true;checkReminders()}
+    r.samples.push(s);const ror=slope(r.samples,'bt',t,cfg.rorWindow);s.ror=ror==null?null:+ror.toFixed(2);detectTP(s);checkBtFall();checkAutoCool(s);S.dirty=true;checkReminders()}
   renderLive();scheduleDraw()}
 function checkAutoCool(s){const r=S.roast;if(!cfg.autoCoolOn||r.autoCooled||r.events.CHARGE==null||r.events.TP==null||!ok(s.bt)||s.bt<cfg.autoCoolC)return;
   const tpS=sampleAt(r.samples,r.events.TP);if(s.t-r.events.CHARGE<120||!tpS||!ok(tpS.bt)||s.bt<tpS.bt+25||!(ok(s.ror)&&s.ror>0))return;
@@ -1152,7 +1163,7 @@ function readMeta(){const m=blankMeta();for(const [k,s] of Object.entries(FORM))
 function fillForm(m){renderInvSelect(m.invId);for(const [k,s] of Object.entries(FORM))$(s).value=m[k]??'';renderFormCalc()}
 function renderFormCalc(){const m=readMeta(),g=num(m.green),w=num(m.roasted);
   $('#oLoss').textContent=g&&w?((g-w)/g*100).toFixed(1)+' %':'—';
-  const sp=spreadOf(m);$('#oSpread').textContent=ok(sp)?(sp>0?'+':'')+sp:'—';
+  const sp=spreadOf(m);$('#oSpread').innerHTML=ok(sp)?spTxt(sp,true)+(cfg.spColorsOn?` <span class="muted" style="font-weight:400;font-size:.8em">${esc(spBand(sp).label)}</span>`:''):'—';
   const p=priceOf(m.invId);$('#oPrice').textContent=ok(p)?`(${money(p)} / lb green)`:'(set a price on the Green coffee screen)';
   $('#oCost').textContent=ok(p)&&g?money(p*g)+(w?` · ${money(p*g/w)} / lb roasted`:''):'—';
   const l=INV.find(x=>x.id===m.invId),saved=HIST.find(r=>r.id===S.roast.id);
@@ -1528,11 +1539,20 @@ function renderNext(){const el=$('#nextbar');el.hidden=!cfg.showNextBar;if(!cfg.
 /* ---------- high bean temp alarm ---------- */
 S.alarm={};
 function alarmSound(){if(!cfg.sound)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();[0,.18,.36].forEach((d,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type='square';o.frequency.value=i%2?740:1046;o.connect(g);g.connect(actx.destination);const t=actx.currentTime+d;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.16);o.start(t);o.stop(t+.17)})}catch(e){}}
+// live: after the turning point, flag bean temp dropping below its last high (3-sample average, so probe noise doesn't trip it)
+function checkBtFall(){const r=S.roast,ev=r.events,F=S.fall||(S.fall={}),was=!!F.active;
+  if(!cfg.anBtLive||!S.recording||ev.TP==null||ev.DROP!=null){F.active=false;F.pk=null;if(was)checkBtAlarm();return}
+  const last=r.samples.slice(-3).filter(p=>ok(p.bt)),t=r.samples.at(-1)?.t;if(!last.length||t<ev.TP+15)return;
+  const bt=last.reduce((a,p)=>a+p.bt,0)/last.length,dip=Number(cfg.anBtDip)||1/1.8;if(F.pk==null||bt>F.pk)F.pk=bt;F.fall=F.pk-bt;
+  if(!F.active&&F.fall>=dip){F.active=true;log('evt',`Bean temp falling: ${btDiff(F.fall)} below its high at ${mmss(t-(ev.CHARGE??0))}`);beep(2)}
+  else if(F.active&&F.fall<dip*.3)F.active=false;
+  if(was!==F.active||F.active)checkBtAlarm()}
 function checkBtAlarm(){const bt=S.latest.bt,live=link.connected()&&performance.now()-S.lastDataAt<3000,A=S.alarm;
   if(!cfg.btAlarmOn||!live||!ok(bt)){A.active=false}
   else if(bt>=cfg.btAlarmC){if(!A.active){A.active=true;A.muted=false;A.last=0;log('err',`High bean temp alarm: ${fT(bt)}°${cfg.unit}`)}}
   else if(bt<cfg.btAlarmC-5/(isF()?1.8:1)){A.active=false;A.muted=false}
-  const el=$('#roBT');el.classList.toggle('alarm',!!A.active);$('#btLabel').textContent=A.active?(A.muted?`HIGH TEMP · over ${Math.round(toD(cfg.btAlarmC))}°`:'HIGH TEMP — click to silence'):'Bean temp';
+  const el=$('#roBT'),F=S.fall||{};el.classList.toggle('alarm',!!A.active);el.classList.toggle('falling',!A.active&&!!F.active);
+  $('#btLabel').textContent=A.active?(A.muted?`HIGH TEMP · over ${Math.round(toD(cfg.btAlarmC))}°`:'HIGH TEMP — click to silence'):F.active?`FALLING −${btDiff(F.fall)}`:'Bean temp';
   if(A.active&&!A.muted&&performance.now()-(A.last||0)>1400){A.last=performance.now();alarmSound()}}
 function autoOffLeft(p){const A=S.autoOff;if(p!=='coolingFanState'&&p!=='stirrerState')return null;if(!A||!cfg.autoOffOn)return null;const done=p==='coolingFanState'?A.cool:A.stir;if(done)return null;
   const el=link.clock()-A.at;if(el<0){S.autoOff=null;log('ctl','Auto off cancelled (clock reset)');return null}return (p==='coolingFanState'?cfg.coolOffMin:cfg.stirOffMin)*60-el}
@@ -1764,7 +1784,7 @@ function renderProfileDetail(){const el=$('#pDetail'),r=findAny(selProfile);if(!
   <div class="minic"><canvas id="pBig"></canvas></div>
   <div class="stats"><div class="stat"><div class="l">Charge</div><div class="v">${fT(s.charge)}<small>°${cfg.unit}</small></div></div><div class="stat"><div class="l">First crack</div><div class="v">${mmss(s.fcs)}</div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(s.drop)}</div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(s.dev)}</div></div></div>
   <div class="grid2" style="gap:22px"><div><div class="h3" style="margin-bottom:8px">Burner &amp; air plan</div><div class="plan">${first?`<span>0:00</span><b>Burner ${f0(first.burner)} · Air ${f0(first.fan)} · Drum ${f0(first.drum)}</b>`:''}${Object.entries(groups).map(([t,v])=>`<span>${t}</span><b>${v.join(' · ')}</b>`).join('')}</div></div>
-    <div><div class="h3" style="margin-bottom:6px">Setup</div><div class="kv"><span>Green</span><b>${esc(r.meta.coffee||'—')}</b></div><div class="kv"><span>Batch</span><b class="tnum">${esc(r.meta.green||'—')} lb → ${esc(r.meta.roasted||'—')} lb</b></div><div class="kv"><span>Color W / G</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · spread '+spreadOf(r.meta):''}</b></div>${cost&&ok(cost.perLb)?`<div class="kv"><span>Cost</span><b class="tnum">${money(cost.perLb)} / lb roasted</b></div>`:''}</div></div>
+    <div><div class="h3" style="margin-bottom:6px">Setup</div><div class="kv"><span>Green</span><b>${esc(r.meta.coffee||'—')}</b></div><div class="kv"><span>Batch</span><b class="tnum">${esc(r.meta.green||'—')} lb → ${esc(r.meta.roasted||'—')} lb</b></div><div class="kv"><span>Color W / G</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · spread '+spTxt(spreadOf(r.meta)):''}</b></div>${cost&&ok(cost.perLb)?`<div class="kv"><span>Cost</span><b class="tnum">${money(cost.perLb)} / lb roasted</b></div>`:''}</div></div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}</div></div>
   <div><div class="h3" style="margin-bottom:6px">Reminders during the roast</div><div class="remlist">${(r.reminders||[]).map((m,i)=>`<div class="kv"><span>${esc(remWhen(m))}</span><b>${esc(m.text)} <button class="sm" data-delrem="${i}" title="Remove">✕</button></b></div>`).join('')||'<div class="muted" style="font-size:calc(13px*var(--ts,1));margin-bottom:6px">No reminders yet — e.g. “At first crack → open damper”.</div>'}</div>
     <div class="remadd" style="margin-top:8px"><select id="remType"><option value="event">At event</option><option value="time">At time</option><option value="temp">At temperature</option></select><span id="remAtWrap"></span><input id="remText" placeholder="Open damper"><button class="pri sm" id="remAdd">Add</button></div></div>
@@ -2183,7 +2203,7 @@ function renderRoasts(){const list=roastList();if(!list.find(r=>r.id===selRoast)
   $('#rRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),sp=spreadOf(r.meta),c=costOf(r),dt=r.chargedAt||r.created;
     if(IPAD)return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><span class="n">#${r.num}</span><div class="m"><b>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</b><div class="s">${esc(r.meta.coffee||'—')} · ${fmtDate(dt)}</div></div><span class="r">W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span></div></td></tr>`;
     return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(dt)}</td><td class="tnum">${ageOf(dt)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?'<span class="badge">Profile</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td>
-    <td class="n">${esc(r.meta.green||'—')}</td><td class="n">${esc(r.meta.roasted||'—')}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':'—'}</td><td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${ok(sp)?sp:'—'}</td>
+    <td class="n">${esc(r.meta.green||'—')}</td><td class="n">${esc(r.meta.roasted||'—')}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':'—'}</td><td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${spTxt(sp)}</td>
     <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):'—'}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
   $('#rEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.length?'No roasts match.':'No saved roasts yet. Record a roast and press Save in Roast details.'}</div>`;renderRoastDetail()}
 function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoast);if(!r){el.innerHTML='<div class="empty">Select a roast.</div>';return}
@@ -2194,7 +2214,7 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   <div><div class="kv"><span>Green coffee</span><b>${esc(r.meta.coffee||'—')}${r.meta.lot?' · '+esc(r.meta.lot):''}</b></div>
   <div class="kv"><span>Green → roasted</span><b class="tnum">${esc(r.meta.green||'—')} → ${esc(r.meta.roasted||'—')} lb${ok(s.loss)?' · '+s.loss.toFixed(1)+' %':''}</b></div>
   <div class="kv"><span>Batch cost</span><b class="tnum">${c&&ok(c.batch)?money(c.batch)+' green'+(ok(c.perLb)?' · '+money(c.perLb)+' / lb roasted':''):'—'}</b></div>
-  <div class="kv"><span>Color whole / ground · spread</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · '+spreadOf(r.meta):''}</b></div>
+  <div class="kv"><span>Color whole / ground · spread</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · '+spTxt(spreadOf(r.meta)):''}</b></div>
   <div class="kv"><span>Adjustments</span><b>${adj.map(a=>`${a.label} ${Math.round(a.from)}→${Math.round(a.to)} at ${mmss(a.t-rc)}`).join(' · ')||'—'}</b></div>
   <div class="kv"><span>Cupping score</span><b class="tnum" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div></div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}${(r.tnotes||[]).length?'\n\n'+r.tnotes.map(n=>mmss(n.t-rc)+'  '+esc(n.text)).join('\n'):''}</div></div>
@@ -2371,7 +2391,7 @@ function renderCupDetail(){const el=$('#cDetail');
   const scored=ATTRS.reduce((a,k)=>a+Number(x.scores[k[0]]),0),cups=CUPK.reduce((a,k)=>a+x.cups[k[0]].filter(Boolean).length*2,0);
   el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} samples${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · SCA 100-point form</div></div><button class="sm dangerTxt" id="csDel">Delete session</button></div>
   <div class="samples">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===selSample?'on':''}" data-i="${i}">#${rr?rr.num:'?'} ${esc(rr?rr.meta.name||'Untitled':'(roast removed)')}</button>`}).join('')}</div>
-  ${r?`<div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Roast #${r.num} · ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · drop ${mmss(sm.drop)} @ ${fT(sm.dropBT)}°${cfg.unit} · dev ${mmss(sm.dev)} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' (spread '+spreadOf(r.meta)+')':''}${ok(sm.loss)?' · '+sm.loss.toFixed(1)+'% loss':''}</div>`:''}
+  ${r?`<div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Roast #${r.num} · ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · drop ${mmss(sm.drop)} @ ${fT(sm.dropBT)}°${cfg.unit} · dev ${mmss(sm.dev)} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' (spread '+spTxt(spreadOf(r.meta))+')':''}${ok(sm.loss)?' · '+sm.loss.toFixed(1)+'% loss':''}</div>`:''}
   <div class="attrs">${ATTRS.map(a=>`<div class="at"><span class="nm">${a[1]}</span><div class="st"><button data-a="${a[0]}" data-d="-0.25">−</button><b>${Number(x.scores[a[0]]).toFixed(2)}</b><button data-a="${a[0]}" data-d="0.25">+</button></div></div>`).join('')}
     <div class="at"><span class="nm">Defects</span><div class="st"><button data-def="-2">−</button><b>${x.defects}</b><button data-def="2">+</button></div></div>
     ${CUPK.map(c=>`<div class="at"><span class="nm">${c[1]}</span><div class="cups">${x.cups[c[0]].map((v,i)=>`<button class="${v?'':'x'}" data-c="${c[0]}" data-ci="${i}" title="Cup ${i+1}"></button>`).join('')}</div></div>`).join('')}</div>
@@ -2426,29 +2446,51 @@ function anMetrics(r){const ev=r.events||{},c=ev.CHARGE??0,S0=r.samples||[],s=r.
   m.dryPct=ok(m.dry)&&ok(m.drop)?m.dry/m.drop*100:null;
   m.mail=ok(m.dry)&&ok(m.fcs)?m.fcs-m.dry:null;m.mailPct=ok(m.mail)&&ok(m.drop)?m.mail/m.drop*100:null;
   if(ev.FCs!=null){const F=ev.FCs;m.rorFC=rorAvg(F-20,F);const after=S0.filter(x=>x.t>=F&&x.t<=Math.min(F+100,ev.DROP??F+100)&&ok(x.ror));
-    if(after.length&&ok(m.rorFC)){const lo=after.reduce((a,b)=>b.ror<a.ror?b:a);m.rorMin=lo.ror;m.rorMinT=lo.t-c;
-      m.crash=m.rorFC>3&&(lo.ror<m.rorFC*.45||lo.ror<1.5);
-      const later=S0.filter(x=>x.t>lo.t&&x.t<=(ev.DROP??lo.t+120)&&ok(x.ror));const hi=later.length?Math.max(...later.map(x=>x.ror)):null;
-      m.flick=hi!=null&&hi-lo.ror>1.6&&hi>lo.ror*1.35;m.flickBy=hi!=null?hi-lo.ror:null;if(m.flick)m.crash=false}}
+  }
   if(ev.DROP!=null)m.rorDrop=rorAvg(ev.DROP-20,ev.DROP);
-  // stall: RoR climbing for a minute in the middle of the roast
-  m.stall=false;const a0=(ev.TP??c+60)+60,a1=(ev.FCs??ev.DROP??a0)-40;for(let t=a0;t+60<=a1;t+=15){const x=rorAvg(t-10,t+10),y=rorAvg(t+50,t+70);if(ok(x)&&ok(y)&&y-x>1.2){m.stall=true;m.stallT=t-c;break}}
   const ctlAt=(k,t)=>{const p=sampleAt(S0,t);return p&&ok(p[k])?Math.round(p[k]):null};
   m.b0=ctlAt('burner',c+5);m.f0=ctlAt('fan',c+5);m.bFC=ev.FCs!=null?ctlAt('burner',ev.FCs-5):null;m.fFC=ev.FCs!=null?ctlAt('fan',ev.FCs-5):null;
   m.bDry=ok(m.dry)?ctlAt('burner',c+m.dry):null;m.fDry=ok(m.dry)?ctlAt('fan',c+m.dry-30):null;m.fDev=ev.DROP!=null?ctlAt('fan',ev.DROP-10):null;
   m.adj=adjustments(r).map(a=>({...a,rt:a.t-c}));
+  // bean temp dips and flat spots (times from charge), each with the burner/air move just before it
+  m.btc=btOfRoast(r);const mk=x=>{const cz=btCause(m.adj,x.t0);return {...x,r0:x.t0-c,r1:x.t1-c,rLow:x.tLow!=null?x.tLow-c:null,cause:cz}};
+  m.dips=m.btc?m.btc.dips.map(mk):[];m.flats=m.btc?m.btc.flats.map(mk):[];
+  const late=x=>ok(m.fcs)&&x.r0>=m.fcs-150;m.btLate=[...m.dips,...m.flats].filter(late).sort((a,b)=>a.r0-b.r0)[0]||null;   // around first crack
+  m.btMid=[...m.dips,...m.flats].filter(x=>!late(x)).sort((a,b)=>a.r0-b.r0)[0]||null;                                     // during drying / Maillard
   m.spread=spreadOf(r.meta);m.colorWhole=r.meta.colorWhole;
   // weight loss vs other roasts of the same green at about the same color (inner development, per the manual)
   const w0=num(r.meta.colorWhole);if(ok(m.loss)&&ok(w0)){const same=HIST.filter(x=>x.id!==r.id&&!x.planned&&coffeeKey(x)===coffeeKey(r)&&(!r.meta.invId||x.meta.invId===r.meta.invId)&&ok(num(x.meta.colorWhole))&&Math.abs(num(x.meta.colorWhole)-w0)<=2).map(x=>({n:x.num,l:(x.summary||summarize(x)).loss})).filter(x=>ok(x.l));
     if(same.length)m.lossCmp={avg:same.reduce((a,x)=>a+x.l,0)/same.length,nums:same.map(x=>x.n)}}
   return m}
 
+/* ---------- bean temp: did it keep rising from the turning point to drop? ---------- */
+// dips = bean temp fell at least cfg.anBtDip below its last high; flats = it rose less than half that over cfg.anBtFlat seconds
+function btSteady(S0,from,to){const pts=S0.filter(p=>p.t>=from-3&&p.t<=to&&ok(p.bt));if(pts.length<10||to-from<30)return null;
+  const sm=pts.map((p,i)=>{let a=0,n=0;for(let j=Math.max(0,i-2);j<=Math.min(pts.length-1,i+2);j++){a+=pts[j].bt;n++}return {t:p.t,bt:a/n}}).filter(p=>p.t>=from&&p.t<=to);if(sm.length<5)return null;
+  const dipMin=Number(cfg.anBtDip)||1/1.8,flatSec=Number(cfg.anBtFlat)||30,dips=[],flats=[];let pk=sm[0],cur=null;
+  for(const p of sm){if(cur){if(p.bt<cur.low.bt)cur.low=p;if(p.bt>=cur.peak.bt-.05){dips.push({t0:cur.peak.t,tLow:cur.low.t,t1:p.t,fall:cur.peak.bt-cur.low.bt,rec:true});cur=null;pk=p}continue}
+    if(p.bt>=pk.bt){pk=p;continue}if(pk.bt-p.bt>=dipMin)cur={peak:pk,low:p}}
+  if(cur)dips.push({t0:cur.peak.t,tLow:cur.low.t,t1:sm.at(-1).t,fall:cur.peak.bt-cur.low.bt,rec:false});
+  const inDip=(a,b)=>dips.some(d=>a<d.t1&&b>d.t0);let j=0;
+  for(let i=0;i<sm.length;i++){while(j<sm.length&&sm[j].t<sm[i].t+flatSec)j++;if(j>=sm.length)break;const a=sm[i],b=sm[j];
+    if(b.bt-a.bt<dipMin*.5&&!inDip(a.t,b.t)){const l=flats.at(-1);if(l&&a.t<=l.t1)l.t1=b.t;else flats.push({t0:a.t,t1:b.t})}}
+  for(const f of flats){const a=interp(sm,'bt',f.t0),b=interp(sm,'bt',f.t1);f.rise=ok(a)&&ok(b)?b-a:0}
+  return {dips,flats,from,to}}
+// the burner cut or air opening just before a dip / flat spot — the likely cause
+function btCause(adj,t0){const a=adj.filter(x=>x.t>=t0-90&&x.t<=t0+5&&((x.key==='burner'&&x.to<x.from)||(x.key==='fan'&&x.to>x.from))).at(-1);if(!a)return null;
+  const dt=Math.round(t0-a.t);return {a,txt:`${dt>3?dt+' s after':'right as'} ${a.key==='burner'?'burner':'air'} went ${Math.round(a.from)} → ${Math.round(a.to)}%`}}
+const btDiff=v=>(v*(isF()?1.8:1)).toFixed(1)+'°'+cfg.unit;
+function btSummary(b){if(!b)return null;const d=b.dips.length,f=b.flats.length;return !d&&!f?'Steady':[d?d+' dip'+(d>1?'s':''):'',f?f+' flat spot'+(f>1?'s':''):''].filter(Boolean).join(' · ')}
+function btOfRoast(r){const ev=r.events||{},c=ev.CHARGE??0,S0=r.samples||[];if(ev.CHARGE==null||!S0.length)return null;const tp=ev.TP??(()=>{const w=S0.filter(p=>p.t>c+20&&p.t<c+180&&ok(p.bt));return w.length?w.reduce((a,b)=>b.bt<a.bt?b:a).t:c+75})();
+  return btSteady(S0,tp+15,(ev.DROP??S0.at(-1).t)-5)}   // stop 5 s before drop: the probe starts falling as the beans leave the drum
+
 /* ---------- curve check: plain observations, no taste needed ---------- */
-function anChecks(m){const out=[],R=v=>toDR(v).toFixed(1)+'°'+cfg.unit+'/min';
+function anChecks(m){const out=[];
+  if(m.btc){if(!m.dips.length&&!m.flats.length)out.push(['good','Bean temp rose steadily from the turning point to drop — it never fell or held flat.']);
+    for(const d of m.dips)out.push(['warn',`Bean temp fell ${btDiff(d.fall)} from ${mmss(d.r0)} to ${mmss(d.rLow)}${d.cause?' — '+d.cause.txt:''}. ${d.rec?'Back up to where it was by '+mmss(d.r1)+'.':'It never got back up before drop.'}`,'dip']);
+    for(const f of m.flats)out.push(['warn',`Bean temp held flat for ${Math.round(f.t1-f.t0)} s, ${mmss(f.r0)}–${mmss(f.r1)} (rose only ${btDiff(Math.max(0,f.rise))})${f.cause?' — '+f.cause.txt:''}.`,'flat']);
+    out.sort((a,b)=>0)}
   out.push(...bbChecks({tp:m.tp,dry:m.dry,dryBT:m.dryBT,ror6:m.ror6,fc:m.fcs,fcBT:m.fcsBT,dev:m.dev,drop:m.drop,spread:m.spread,colorWhole:m.colorWhole}));
-  if(m.crash)out.push(['warn',`RoR crashed after first crack — fell from ${R(m.rorFC)} to ${R(m.rorMin)} at ${mmss(m.rorMinT)}. The manual's rule is a steady, straight RoR; a crash often tastes baked or flat.`]);
-  if(m.flick)out.push(['warn',`RoR flicked back up by ${toDR(m.flickBy).toFixed(1)}° after the dip — can push roasty or smoky notes.`]);
-  if(m.stall)out.push(['warn',`RoR stalled (climbed again) around ${mmss(m.stallT)} — momentum loss in Maillard can bake the cup.`]);
   if(m.lossCmp){const d=m.loss-m.lossCmp.avg,ref=m.lossCmp.nums.map(n=>'#'+n).join(', ');
     out.push(Math.abs(d)<.2?['good',`Weight loss ${m.loss.toFixed(1)}% — same as ${ref} at a similar color.`]:d>0?['good',`Weight loss ${m.loss.toFixed(1)}% vs ${m.lossCmp.avg.toFixed(1)}% on ${ref} at a similar color — more inner development.`]:['warn',`Weight loss ${m.loss.toFixed(1)}% vs ${m.lossCmp.avg.toFixed(1)}% on ${ref} at a similar color — less inner development.`])}
   return out}
@@ -2461,16 +2503,15 @@ const RULES=[
   make(m,k){const add=Math.round(clamp(15*k,8,40)),drop=m.drop+add,dev=m.dev+add;return {title:`Drop ${add} s later — about ${mmss(drop)}`,detail:`Development ${mmss(m.dev)} → ${mmss(dev)} after first crack (target ${mmss(cfg.bbDevMin)}–${mmss(cfg.bbDevMax)}). Keep burner and air where they were after first crack.`,rem:[{type:'time',at:Math.max(0,drop-20),text:`Drop in ~20 s (target ${mmss(drop)})`,dropRem:true}],tgt:{dev},exp:[{kind:'dev',base:m.dev,v:dev}]}}},
  {id:'dev_shorter',faults:{roasty:1,dark:.8,ashy:.4},when:m=>ok(m.dev)&&ok(m.fcs)&&m.dev>cfg.bbDevMin+10,
   make(m,k){const cut=Math.round(clamp(12*k,6,35)),drop=m.drop-cut,dev=m.dev-cut;return {title:`Drop ${cut} s earlier — about ${mmss(drop)}`,detail:`Development ${mmss(m.dev)} → ${mmss(dev)} after first crack (target ${mmss(cfg.bbDevMin)}–${mmss(cfg.bbDevMax)}).`,rem:[{type:'time',at:Math.max(0,drop-20),text:`Drop in ~20 s (target ${mmss(drop)})`,dropRem:true}],tgt:{dev},exp:[{kind:'dev',base:m.dev,v:dev}]}}},
- {id:'soften_cut',faults:{baked:1,flat:.9,thin:.4},when:m=>m.crash,
-  make(m,k){const cut=m.adj.filter(a=>a.key==='burner'&&a.to<a.from&&ok(m.fcs)&&a.rt>=m.fcs-150&&a.rt<=m.fcs+45).at(-1);
-   if(cut){const keep=Math.round(cut.from-(cut.from-cut.to)*clamp(.5/k,.2,.8));return {title:`At ${mmss(cut.rt)}: burner to ${keep}% instead of ${Math.round(cut.to)}%`,detail:`That cut (${Math.round(cut.from)} → ${Math.round(cut.to)}%) let RoR crash after first crack. A smaller cut keeps momentum.`,rem:[{type:'time',at:cut.rt,text:`Burner ${keep}% (not ${Math.round(cut.to)}%)`}],exp:[{key:'burner',t:cut.rt,v:keep,base:Math.round(cut.to)}]}}
-   const air=m.adj.filter(a=>a.key==='fan'&&a.to>a.from&&ok(m.fcs)&&a.rt>=m.fcs-90&&a.rt<=m.fcs+45).at(-1);
-   if(air){const v=Math.round(air.from+(air.to-air.from)*clamp(.5/k,.2,.8));return {title:`At ${mmss(air.rt)}: air to ${v}% instead of ${Math.round(air.to)}%`,detail:`Opening air that much near first crack pulled heat out and RoR crashed.`,rem:[{type:'time',at:air.rt,text:`Air ${v}% (not ${Math.round(air.to)}%)`}],exp:[{key:'fan',t:air.rt,v,base:Math.round(air.to)}]}}
-   const up=Math.round(cfg.anBurnerStep*k);return {title:`Keep ${up}% more burner through first crack`,detail:`RoR crashed with no big burner or air move — add a little heat from ${mmss(m.fcs-60)} so it eases down instead.`,rem:[{type:'time',at:Math.max(0,m.fcs-60),text:`Burner ${ok(m.bFC)?m.bFC+up+'%':'+'+up+'%'}`}],exp:ok(m.bFC)?[{key:'burner',t:Math.max(0,m.fcs-60),v:m.bFC+up,base:m.bFC}]:[]}}},
- {id:'earlier_cut',faults:{roasty:.8,ashy:1,baked:.5},when:m=>m.flick&&ok(m.fcs),
-  make(m,k){const step=Math.round(cfg.anBurnerStep*k),t=Math.max(0,m.fcs-45),b=ok(m.bFC)?m.bFC:null;return {title:`Cut burner ${step}% at ${mmss(t)} (45 s before crack)`,detail:`RoR rebounded after the dip. An earlier, smaller cut stops the flick${b!=null?` — ${b}% → ${b-step}%`:''}.`,rem:[{type:'time',at:t,text:b!=null?`Burner ${b-step}%`:`Burner −${step}%`}],exp:b!=null?[{key:'burner',ev:'FCs',dt:-45,v:b-step,base:b}]:[]}}},
- {id:'more_early_heat',faults:{baked:1,flat:.8,thin:.3,underdev:.3},when:m=>m.stall||(ok(m.drop)&&m.drop>(cfg.anLong-1)*60)||(ok(m.ror6)&&m.ror6<cfg.bb6Slow+.3)||(ok(m.dry)&&m.dry>cfg.bbDryMax),
-  make(m,k){const step=Math.round(cfg.anBurnerStep*k),b=m.b0;return {title:`Start with ${step}% more burner, until dry end`,detail:`${m.stall?'RoR stalled around '+mmss(m.stallT)+'. ':ok(m.ror6)&&m.ror6<cfg.bb6Slow+.3?'At 6:00 it was rising 1° every '+secPerDeg(m.ror6)+' s — slow for the 6-minute rule. ':ok(m.dry)&&m.dry>cfg.bbDryMax?'Color change came late ('+mmss(m.dry)+'). ':''}More heat early keeps momentum and shortens the middle of the roast${b!=null?` (${b}% → ${b+step}%)`:''}.`,rem:[{type:'event',at:'CHARGE',text:b!=null?`Burner ${b+step}% until dry end`:`Burner +${step}% until dry end`},...(m.bDry!=null?[{type:'event',at:'DRY',text:`Burner back to ${m.bDry}%`}]:[])],exp:b!=null?[{key:'burner',ev:'CHARGE',dt:40,v:b+step,base:b}]:[]}}},
+ {id:'soften_cut',faults:{baked:1,flat:.9,thin:.4,roasty:.3},when:m=>!!m.btLate,
+  make(m,k){const B=m.btLate,what=B.fall!=null?`bean temp fall ${btDiff(B.fall)} at ${mmss(B.r0)}`:`bean temp hold flat at ${mmss(B.r0)}`,cz=B.cause&&B.cause.a;
+   const cut=cz&&cz.key==='burner'?{...cz,rt:cz.t-(S_an.r.events.CHARGE??0)}:null;
+   if(cut){const keep=Math.round(cut.from-(cut.from-cut.to)*clamp(.5/k,.2,.8));return {title:`At ${mmss(cut.rt)}: burner to ${keep}% instead of ${Math.round(cut.to)}%`,detail:`That cut (${Math.round(cut.from)} → ${Math.round(cut.to)}%) let ${what}. A smaller cut keeps it rising.`,rem:[{type:'time',at:cut.rt,text:`Burner ${keep}% (not ${Math.round(cut.to)}%)`}],exp:[{key:'burner',t:cut.rt,v:keep,base:Math.round(cut.to)}]}}
+   const air=cz&&cz.key==='fan'?{...cz,rt:cz.t-(S_an.r.events.CHARGE??0)}:null;
+   if(air){const v=Math.round(air.from+(air.to-air.from)*clamp(.5/k,.2,.8));return {title:`At ${mmss(air.rt)}: air to ${v}% instead of ${Math.round(air.to)}%`,detail:`Opening air that much pulled heat out and let ${what}.`,rem:[{type:'time',at:air.rt,text:`Air ${v}% (not ${Math.round(air.to)}%)`}],exp:[{key:'fan',t:air.rt,v,base:Math.round(air.to)}]}}
+   const up=Math.round(cfg.anBurnerStep*k);return {title:`Keep ${up}% more burner through first crack`,detail:`No burner or air move explains the ${what} — add a little heat from ${mmss(m.fcs-60)} so it keeps rising.`,rem:[{type:'time',at:Math.max(0,m.fcs-60),text:`Burner ${ok(m.bFC)?m.bFC+up+'%':'+'+up+'%'}`}],exp:ok(m.bFC)?[{key:'burner',t:Math.max(0,m.fcs-60),v:m.bFC+up,base:m.bFC}]:[]}}},
+ {id:'more_early_heat',faults:{baked:1,flat:.8,thin:.3,underdev:.3},when:m=>!!m.btMid||(ok(m.drop)&&m.drop>(cfg.anLong-1)*60)||(ok(m.ror6)&&m.ror6<cfg.bb6Slow+.3)||(ok(m.dry)&&m.dry>cfg.bbDryMax),
+  make(m,k){const step=Math.round(cfg.anBurnerStep*k),b=m.b0;return {title:`Start with ${step}% more burner, until dry end`,detail:`${m.btMid?(m.btMid.fall!=null?'Bean temp fell '+btDiff(m.btMid.fall)+' at '+mmss(m.btMid.r0)+'. ':'Bean temp held flat at '+mmss(m.btMid.r0)+'. '):ok(m.ror6)&&m.ror6<cfg.bb6Slow+.3?'At 6:00 it was rising 1° every '+secPerDeg(m.ror6)+' s — slow for the 6-minute rule. ':ok(m.dry)&&m.dry>cfg.bbDryMax?'Color change came late ('+mmss(m.dry)+'). ':''}More heat early keeps momentum and shortens the middle of the roast${b!=null?` (${b}% → ${b+step}%)`:''}.`,rem:[{type:'event',at:'CHARGE',text:b!=null?`Burner ${b+step}% until dry end`:`Burner +${step}% until dry end`},...(m.bDry!=null?[{type:'event',at:'DRY',text:`Burner back to ${m.bDry}%`}]:[])],exp:b!=null?[{key:'burner',ev:'CHARGE',dt:40,v:b+step,base:b}]:[]}}},
  {id:'gentler_start',faults:{ashy:1,roasty:.5,underdev:.4,sour:.3},when:m=>(ok(m.ror6)&&m.ror6>=cfg.bb6Fast-.3)||(ok(m.spread)&&m.spread>cfg.anSpread)||(ok(m.drop)&&m.drop<cfg.anShort*60),
   make(m,k){const step=Math.round(cfg.anBurnerStep*k),t=ok(m.fcs)?Math.max(0,m.fcs-120):null,b=t!=null?sampleAt(S_an.r.samples,(S_an.r.events.CHARGE??0)+t)?.burner:null;
    return {title:`Lower burner ${step}% two minutes before crack${t!=null?' ('+mmss(t)+')':''}`,detail:`${ok(m.ror6)&&m.ror6>=cfg.bb6Fast-.3?'At 6:00 it was rising 1° every '+secPerDeg(m.ror6)+' s — fast for the 6-minute rule ('+secPerDeg(cfg.bb6Ideal)+' s is the aim)':ok(m.spread)&&m.spread>cfg.anSpread?'A big color spread ('+m.spread+')':'A short roast ('+mmss(m.drop)+')'} means the outside is roasting ahead of the inside.`,rem:t!=null?[{type:'time',at:t,text:ok(b)?`Burner ${Math.round(b)-step}%`:`Burner −${step}%`}]:[],exp:t!=null&&ok(b)?[{key:'burner',t,v:Math.round(b)-step,base:Math.round(b)}]:[]}}},
@@ -2535,11 +2576,11 @@ function tasteEditor(el,r,onChange){if(!el||!r)return;const t=tasteEff(r),mine=t
   let nt;$('.tNote',el).oninput=()=>{clearTimeout(nt);nt=setTimeout(()=>{r.taste={...(r.taste||{tags:{}}),note:$('.tNote',el).value};commitRoast(r,true)},700)}}
 
 /* ---------- Analyze screen ---------- */
-let selAn=null,anOff={};
+let selAn=null,anOff={};const anRor=()=>!!store.get('zr2.anRor',false);   // RoR line on the Analyze chart is off unless you turn it on
 function renderAnalyze(){const q=normName($('#aSearch').value),list=HIST.filter(r=>r.samples&&r.samples.length&&(!q||normName(['#'+r.num,r.meta.name,r.meta.coffee].join(' ')).includes(q)));
   if(!list.find(r=>r.id===selAn))selAn=list[0]?.id||null;
   $('#aRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r);
-    return `<tr class="${r.id===selAn?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(r.chargedAt||r.created,false)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span class="muted">★</span>':''}</td><td class="n tnum">${lbTxt(batchOf(r))}</td><td class="n">${mmss(s.dev)}</td><td class="n">${ok(r.cup)?`<span class="cup" style="${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span>`:'<span class="muted">—</span>'}</td><td class="muted ttxt">${hasTaste(r)?esc(tasteText(r)):'<span class="dim">not tasted</span>'}</td></tr>`}).join('');
+    return `<tr class="${r.id===selAn?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(r.chargedAt||r.created,false)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span class="muted">★</span>':''}</td><td class="n tnum">${lbTxt(batchOf(r))}</td><td>${(b=>!b?'<span class="muted">—</span>':!b.dips.length&&!b.flats.length?'<span class="btok">✓ Steady</span>':`<span class="${b.dips.length?'btdip':'btflat'}">⚠ ${btSummary(b)}</span>`)(btOfRoast(r))}</td><td class="n">${mmss(s.dev)}</td><td class="n">${ok(r.cup)?`<span class="cup" style="${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span>`:'<span class="muted">—</span>'}</td><td class="muted ttxt">${hasTaste(r)?esc(tasteText(r)):'<span class="dim">not tasted</span>'}</td></tr>`}).join('');
   $('#aEmpty').innerHTML=list.length?'':'<div class="empty">No roasts with curve data yet.</div>';
   $$('#aRows tr').forEach(tr=>tr.onclick=()=>{selAn=tr.dataset.id;renderAnalyze()});renderAnDetail()}
 function anPrev(r){return HIST.filter(x=>x.id!==r.id&&(x.num||0)<(r.num||0)&&sameSlot(x,r)&&x.samples&&x.samples.length).sort((a,b)=>(b.num||0)-(a.num||0))[0]||null}
@@ -2548,18 +2589,19 @@ function renderAnDetail(){const el=$('#aDetail'),r=HIST.find(x=>x.id===selAn);if
   const pj=anProject(r,m,keep?[]:recs.filter(x=>x.on));
   const src=HIST.find(x=>x.id===r.bgId),srcPlan=src&&src.plan&&anNextOf(src)?.id===r.id?src.plan.recs:null;
   const stat=(l,v,flag)=>`<div class="stat${flag?' flag-'+flag:''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;const devBad=ok(m.dev)&&(m.dev<cfg.bbDevMin||m.dev>cfg.bbDevMax),r6Bad=ok(m.ror6)&&(m.ror6>=cfg.bb6Fast||m.ror6<=cfg.bb6Slow);
-  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">#${r.num} · ${esc(r.meta.name||'Untitled')}</div><div class="muted" style="margin-top:3px">${fmtLong(r.chargedAt||r.created)} · ${esc(r.meta.coffee||'')}${r.meta.green?' · <b>'+esc(r.meta.green)+' lb batch</b>':''} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:calc(14px*var(--ts,1));padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin-top:4px">cupping score</div></div>`:''}</div>
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">#${r.num} · ${esc(r.meta.name||'Untitled')}</div><div class="muted" style="margin-top:3px">${fmtLong(r.chargedAt||r.created)} · ${esc(r.meta.coffee||'')}${r.meta.green?' · <b>'+esc(r.meta.green)+' lb batch</b>':''} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(m.spread)?' · spread '+spTxt(m.spread)+(cfg.spColorsOn?` <span class="muted">(${esc(spBand(m.spread).label)})</span>`:''):''}</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:calc(14px*var(--ts,1));padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin-top:4px">cupping score</div></div>`:''}</div>
   <div class="anchart"><canvas id="aCv"></canvas></div>
-  <div class="legend"><span><i style="background:${COL.bt}"></i>Bean temp</span><span><i style="background:${COL.ror}"></i>RoR</span>${prev?`<span><i style="background:${COL.bkg||COL.axis}"></i>#${prev.num} (last time)</span>`:''}<span><i style="background:var(--warn)"></i>Burner / air changes</span>${recs.some(x=>x.on)?`<span><i style="background:var(--good)"></i>Recommended changes${pj?' &amp; target curve':''}</span>`:''}</div>
+  <div class="legend"><span><i style="background:${COL.bt}"></i>Bean temp</span>${m.dips.length?'<span><i style="background:var(--danger)"></i>Bean temp fell</span>':''}${m.flats.length?'<span><i class="flatsw"></i>Held flat</span>':''}${anRor()?`<span><i style="background:${COL.ror}"></i>RoR</span>`:''}${prev?`<span><i style="background:${COL.bkg||COL.axis}"></i>#${prev.num} (last time)</span>`:''}<span><i style="background:var(--warn)"></i>Burner / air changes</span><label class="rortg"><input type="checkbox" id="aRorTg" ${anRor()?'checked':''}> Show RoR</label>${recs.some(x=>x.on)?`<span><i style="background:var(--good)"></i>Recommended changes${pj?' &amp; target curve':''}</span>`:''}</div>
   ${pj?`<div class="tgtline"><b>Target for next roast</b><span>First crack ${mmss(pj.fcs)} <small>(was ${mmss(m.fcs)})</small></span><span>Drop ${mmss(pj.drop)} @ ${fT(pj.dropBT)}°${cfg.unit} <small>(was ${mmss(m.drop)} @ ${fT(m.dropBT)}°)</small></span><span>Development ${mmss(pj.dev)} <small>(was ${mmss(m.dev)})</small></span></div>`:''}
-  <div class="stats stats6">${stat('Color change',ok(m.dry)?mmss(m.dry)+`<small>${ok(m.dryBT)?fT(m.dryBT)+'°':''}${m.dryEst?' est.':''}</small>`:'—')}${stat('RoR at 6:00',ok(m.ror6)?toDR(m.ror6).toFixed(1)+`<small>1°/${secPerDeg(m.ror6)} s</small>`:'—',r6Bad?'w':'')}${stat('Development',ok(m.dev)?mmss(m.dev)+'<small>after FC</small>':'—',devBad?'w':'')}${stat('RoR at FC',ok(m.rorFC)?toDR(m.rorFC).toFixed(1)+'<small>°/min</small>':'—',m.crash||m.flick?'w':'')}${stat('Drop',ok(m.drop)?mmss(m.drop)+`<small>${fT(m.dropBT)}°</small>`:'—')}${stat('Loss',ok(m.loss)?m.loss.toFixed(1)+'<small>%</small>':'—')}</div>
-  <div><div class="h3" style="margin-bottom:6px">Curve check</div>${checks.map(([k,t])=>`<div class="chk2 ${k==='good'?'cg':'cw'}">${k==='good'?'✓':'!'}<span>${esc(t)}</span></div>`).join('')}</div>
+  <div class="stats stats6">${stat('Color change',ok(m.dry)?mmss(m.dry)+`<small>${ok(m.dryBT)?fT(m.dryBT)+'°':''}${m.dryEst?' est.':''}</small>`:'—')}${stat('RoR at 6:00',ok(m.ror6)?toDR(m.ror6).toFixed(1)+`<small>1°/${secPerDeg(m.ror6)} s</small>`:'—',r6Bad?'w':'')}${stat('Development',ok(m.dev)?mmss(m.dev)+'<small>after FC</small>':'—',devBad?'w':'')}${stat('Bean temp',m.btc?btSummary(m.btc):'—',m.btc&&(m.dips.length||m.flats.length)?'w':'')}${stat('Drop',ok(m.drop)?mmss(m.drop)+`<small>${fT(m.dropBT)}°</small>`:'—')}${stat('Loss',ok(m.loss)?m.loss.toFixed(1)+'<small>%</small>':'—')}</div>
+  <div><div class="h3" style="margin-bottom:6px">Curve check</div>${checks.map(([k,t,x])=>`<div class="chk2 ${k==='good'?'cg':x==='dip'?'cd':'cw'}">${k==='good'?'✓':x==='dip'?'↓':'!'}<span>${esc(t)}</span></div>`).join('')}</div>
   ${srcPlan?`<div class="note"><b>This roast used the plan from #${src.num}:</b>${!sameBatch(batchOf(src),batchOf(r))?`<div class="pl n">Batch size changed (${lbTxt(batchOf(src))} → ${lbTxt(batchOf(r))}), so none of these are counted.</div>`:''}${srcPlan.map(x=>{const f=anFollowed(x.exp,r)&&sameBatch(batchOf(src),batchOf(r));return `<div class="pl ${f?'y':'n'}">${f?'✓':'✗'} ${esc(x.title)}${f||!sameBatch(batchOf(src),batchOf(r))?'':' <span class="muted">— not made, so it isn\'t counted</span>'}</div>`}).join('')}${hasTaste(src)&&hasTaste(r)?`<br><span class="muted">Then: ${esc(tasteText(src))} → now: ${esc(tasteText(r))}</span>`:''}</div>`:''}
   <div><div class="h3" style="margin-bottom:8px">How did it taste?</div><div id="aTaste"></div></div>
   <div><div class="h3" style="margin-bottom:8px">For the next roast</div>${!hasTaste(r)?'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Tell it how this roast tasted and the changes appear here.</div>':keep?'<div class="note">Tasted good — repeat it as is. Build the profile to use this roast as the background next time.</div>':recs.length?recs.map(x=>`<label class="rec ${x.on?'on':''}"><input type="checkbox" data-rec="${x.id}" ${x.on?'checked':''}><div><b>${esc(x.title)}</b><div class="muted">${esc(x.detail)}</div><div class="lrn">${x.L.tries?`${x.L.bad?'⚠ ':''}Helped ${x.L.helped} of ${x.L.tries} time${x.L.tries>1?'s':''} on this coffee at ${lbTxt(batchOf(r))}${x.mag!==1?` · step sized ${x.mag>1?'up':'down'} from what happened before`:''}`:`Not tried on this coffee at ${lbTxt(batchOf(r))} yet — starting rule`}</div></div></label>`).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">The curve doesn\'t point to a burner or air change for that taste. Note it in the comments and see how the next roast goes.</div>'}</div>
   <div class="row" style="margin-top:auto"><button class="pri" id="aBuild" ${!hasTaste(r)?'disabled':''}>Build next profile ★</button><button id="aOpen">Open roast #${r.num}</button><span class="sp"></span><span class="muted" style="font-size:calc(12px*var(--ts,1))">${(n=>n?`Learned from ${n} follow-up roast${n>1?'s':''} of this coffee at ${lbTxt(batchOf(r))}`:`Nothing learned for this coffee at ${lbTxt(batchOf(r))} yet`)(new Set(anOutcomes().filter(o=>o.coffee===coffeeKey(r)&&o.followed&&o.sameBatch&&sameBatch(o.batch,batchOf(r))).map(o=>o.to)).size)}</span></div>`;
   tasteEditor($('#aTaste'),r,()=>{renderAnalyze()});
   $$('[data-rec]',el).forEach(b=>b.onchange=()=>{off[b.dataset.rec]=b.checked;renderAnDetail()});
+  $('#aRorTg').onchange=e=>{store.set('zr2.anRor',e.target.checked);renderAnDetail()};
   $('#aOpen').onclick=()=>openRoast(r.id);$('#aBuild').onclick=()=>anBuild(r,keep?[]:recs.filter(x=>x.on));
   requestAnimationFrame(()=>anDraw($('#aCv'),r,prev,m,recs.filter(x=>x.on),pj))}
 /* ---------- projected target curve: last roast's RoR with the changes applied, re-integrated ---------- */
@@ -2600,12 +2642,16 @@ function anDraw(cv,r,prev,m,recs,pj){if(!cv)return;const b=cv.getBoundingClientR
   const font=n=>n*TS()+'px '+getComputedStyle(document.body).fontFamily;c.font=font(11);c.strokeStyle=COL.grid;c.fillStyle=COL.axis;c.lineWidth=1;c.textAlign='center';
   for(let mm=0;mm*60<end;mm++){const x=X(mm*60);c.beginPath();c.moveTo(x,T);c.lineTo(x,H-B);c.stroke();if(mm%2===0)c.fillText(mm,x,H-B+13)}
   c.textAlign='right';for(let v=Math.ceil(TS0.min/TS0.step)*TS0.step;v<=TS0.max;v+=TS0.step){const y=T+(1-(v-TS0.min)/(TS0.max-TS0.min))*(H-T-B);c.fillText(v,L-6,y+4)}
-  c.textAlign='left';for(let v=sc.rMin;v<=sc.rMax;v+=Math.max(1,Math.round((sc.rMax-sc.rMin)/5))){const y=T+(1-(v-sc.rMin)/(sc.rMax-sc.rMin))*(H-T-B);c.fillText(v,W-Rr+6,y+4)}
+  c.textAlign='left';if(anRor())for(let v=sc.rMin;v<=sc.rMax;v+=Math.max(1,Math.round((sc.rMax-sc.rMin)/5))){const y=T+(1-(v-sc.rMin)/(sc.rMax-sc.rMin))*(H-T-B);c.fillText(v,W-Rr+6,y+4)}
   c.save();c.beginPath();c.rect(L,T,W-L-Rr,H-T-B);c.clip();
   const ln=(rr,off,k,col,lw,Yf,from,to,dash)=>{c.strokeStyle=col;c.lineWidth=lw;c.setLineDash(dash||[]);c.beginPath();let p=false;for(const s of rr.samples){const t=s.t-off;if(t<-15||(from!=null&&s.t<from)||(to!=null&&s.t>to)||!ok(s[k])){p=false;continue}const x=X(t),y=Yf(s[k]);p?c.lineTo(x,y):c.moveTo(x,y);p=true}c.stroke();c.setLineDash([])};
-  if(prev){ln(prev,po,'bt',COL.bkg||COL.axis,1.4,Y,null,prev.events.DROP,[5,4]);ln(prev,po,'ror',COL.bkg||COL.axis,1.1,YR,rorStart(prev.events)??po,prev.events.DROP,[5,4])}
-  ln(r,o,'ror',COL.ror,1.6,YR,rorStart(r.events)??o,r.events.DROP);ln(r,o,'bt',COL.bt,2.2,Y,null,r.events.DROP!=null?r.events.DROP+20:null);
-  if(pj){const g=getComputedStyle(document.body).getPropertyValue('--good').trim()||'#2a8',tg={samples:pj.samples};ln(tg,0,'bt',g,2,Y,null,null,[3,3]);ln(tg,0,'ror',g,1.4,YR,null,pj.drop,[3,3])}
+  const showR=anRor(),cs=getComputedStyle(document.body),red=cs.getPropertyValue('--danger').trim()||'#d33',amb=cs.getPropertyValue('--warn').trim()||'#c80';
+  for(const f of m.flats){c.fillStyle=rgba(amb,.13);c.fillRect(X(f.r0),T,X(f.r1)-X(f.r0),H-T-B)}
+  for(const d of m.dips){c.fillStyle=rgba(red,.13);c.fillRect(X(d.r0),T,Math.max(4,X(d.rLow)-X(d.r0)),H-T-B)}
+  if(prev){ln(prev,po,'bt',COL.bkg||COL.axis,1.4,Y,null,prev.events.DROP,[5,4]);if(showR)ln(prev,po,'ror',COL.bkg||COL.axis,1.1,YR,rorStart(prev.events)??po,prev.events.DROP,[5,4])}
+  if(showR)ln(r,o,'ror',COL.ror,1.6,YR,rorStart(r.events)??o,r.events.DROP);ln(r,o,'bt',COL.bt,2.2,Y,null,r.events.DROP!=null?r.events.DROP+20:null);
+  for(const d of m.dips)ln(r,o,'bt',red,4,Y,d.t0,d.tLow);for(const f of m.flats)ln(r,o,'bt',amb,3.5,Y,f.t0,f.t1);
+  if(pj){const g=cs.getPropertyValue('--good').trim()||'#2a8',tg={samples:pj.samples};ln(tg,0,'bt',g,2,Y,null,null,[3,3]);if(showR)ln(tg,0,'ror',g,1.4,YR,null,pj.drop,[3,3])}
   c.restore();
   c.font='600 '+font(10.5);c.textAlign='center';for(const [k,l] of [['TP','TP'],['DRY','DRY'],['FCs','FC'],['DROP','DROP']]){const t=r.events[k];if(t==null)continue;const s=sampleAt(r.samples,t);if(!s||!ok(s.bt))continue;c.fillStyle=COL.bt;c.beginPath();c.arc(X(t-o),Y(s.bt),3,0,7);c.fill();c.fillText(l,X(t-o),Y(s.bt)-9)}
   // burner/air changes lane
@@ -2706,6 +2752,10 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <label class="chk"><input type="checkbox" id="cupOn" ${cfg.cupColorsOn?'checked':''}> Color cupping scores by grade (Cupping, History, Profiles and roast details)</label>
     <div class="cupbands">${cfg.cupBands.map((b,i)=>{const last=i===cfg.cupBands.length-1;return `<div class="crow" style="grid-template-columns:150px 1fr 44px 96px">${last?`<span class="muted">Below ${esc(String(cfg.cupBands[i-1].min))}</span>`:`<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="muted">From</span><input type="number" step="0.25" data-cupm="${i}" value="${esc(String(b.min))}" style="width:80px"></label>`}<input type="text" data-cupl="${i}" value="${esc(b.label)}" placeholder="Grade name"><input type="color" data-cupc="${i}" value="${b.col}"><input type="text" data-cuph="${i}" value="${b.col.toUpperCase()}" maxlength="7"></div>`}).join('')}</div>
     <div class="row"><span style="font-size:calc(22px*var(--ss,1));font-family:var(--numFont);font-weight:var(--smallW);display:flex;gap:22px">${cfg.cupBands.map((b,i)=>{const v=i===cfg.cupBands.length-1?Number(cfg.cupBands[i-1].min)-2:Number(b.min)+1.5;return `<span style="${cupSt(v)}">${v.toFixed(2)}</span>`}).join('')}</span><span class="sp"></span><button id="cupReset">Reset score colors</button></div>
+    <div class="sech">Color spread</div>
+    <label class="chk"><input type="checkbox" id="spOn" ${cfg.spColorsOn?'checked':''}> Color the spread (ground − whole) by how wide it is (History, Profiles, Roast details, Analyze and Cupping)</label>
+    <div class="cupbands">${cfg.spBands.map((b,i)=>{const last=i===cfg.spBands.length-1;return `<div class="crow" style="grid-template-columns:150px 1fr 44px 96px 30px">${last?`<span class="muted">Over ${esc(String(cfg.spBands[i-1].max))}</span>`:`<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="muted">Up to</span><input type="number" step="0.5" data-spm="${i}" value="${esc(String(b.max))}" style="width:80px"></label>`}<input type="text" data-spl="${i}" value="${esc(b.label)}" placeholder="Name"><input type="color" data-spc="${i}" value="${b.col}"><input type="text" data-sph="${i}" value="${b.col.toUpperCase()}" maxlength="7">${!last&&cfg.spBands.length>2?`<button class="sm" data-spdel="${i}" title="Remove this band">✕</button>`:'<span></span>'}</div>`}).join('')}</div>
+    <div class="row"><span style="font-size:calc(22px*var(--ss,1));font-family:var(--numFont);font-weight:var(--smallW);display:flex;gap:22px">${cfg.spBands.map((b,i)=>{const v=i===cfg.spBands.length-1?Number(cfg.spBands[i-1].max)+2:Math.max(0,Number(b.max)-1);return `<span style="${spSt(v)}">${v}</span>`}).join('')}</span><span class="sp"></span><button id="spAdd">+ Add band</button><button id="spReset">Reset spread colors</button></div>
     ${warns.length?`<div class="warn">${warns.join(' ')}</div>`:''}
     <div class="row" style="margin-top:8px;padding-top:14px;border-top:1px solid var(--border)"><button id="thSave">Save as my look…</button><span class="sp"></span><button id="thReset">Reset to White</button></div>`},
   scale:()=>{const s=cfg.scales;return `<h2>Chart scales</h2><div class="sub">The numbers along the sides and bottom of the roast chart.</div>
@@ -2745,6 +2795,10 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
       <label class="field">Long roast — over (minutes)<input data-cfg="anLong" value="${esc(cfg.anLong)}"></label><label class="field">Short roast — under (minutes)<input data-cfg="anShort" value="${esc(cfg.anShort)}"></label>
       <label class="field">Color spread target — at or under (Agtron)<input data-cfg="anSpread" value="${esc(cfg.anSpread)}"></label></div>
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">6-minute rule: 15°F/min is 1° every 4 s; 20 (1° every 3 s) is too fast, 12 (1° every 5 s) too slow.</div>
+    <div class="h3">Bean temp — steady rise</div>
+    <div class="sgrid"><label class="field">Counts as a fall when it drops by (°${cfg.unit})<input data-cfgr="anBtDip" value="${toDR(cfg.anBtDip).toFixed(1)}"></label><label class="field">Counts as flat after (seconds)<input data-cfg="anBtFlat" value="${esc(cfg.anBtFlat)}"></label></div>
+    <label class="chk"><input type="checkbox" data-cfgb="anBtLive" ${cfg.anBtLive?'checked':''}> Flash bean temp amber on the Roast screen if it starts falling after the turning point</label>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Smaller wobbles are treated as probe noise. Flat means it rose less than half the fall amount over that many seconds.</div>
     <div class="h3">Size of each suggested change</div>
     <div class="sgrid"><label class="field">Burner step (%)<input data-cfg="anBurnerStep" value="${esc(cfg.anBurnerStep)}"></label><label class="field">Air step (%)<input data-cfg="anAirStep" value="${esc(cfg.anAirStep)}"></label></div>
     <div class="h3">Cupping form</div>
@@ -2817,6 +2871,16 @@ function wireSettings(){const el=$('#scont');
   $$('[data-procdel]',el).forEach(b=>b.onclick=()=>{cfg.procColors.splice(+b.dataset.procdel,1);saveCfg();renderSettings()});
   const pa=$('#procAdd');if(pa)pa.onclick=()=>{cfg.procColors.push({words:'',col:'#8A929B'});saveCfg();renderSettings();const w=$$('[data-procw]',el).at(-1);if(w)w.focus()};
   const pr=$('#procReset');if(pr)pr.onclick=()=>{cfg.procColors=JSON.parse(JSON.stringify(DEF.procColors));cfg.procColorsOn=true;saveCfg();renderSettings()};
+  const spSet=()=>{saveCfg();renderAll()};
+  const spo=$('#spOn');if(spo)spo.onchange=()=>{cfg.spColorsOn=spo.checked;spSet();renderSettings()};
+  $$('[data-spc]',el).forEach(i=>{i.oninput=()=>{cfg.spBands[+i.dataset.spc].col=i.value;$(`[data-sph="${i.dataset.spc}"]`,el).value=i.value.toUpperCase();spSet()};i.onchange=()=>renderSettings()});
+  $$('[data-sph]',el).forEach(i=>i.onchange=()=>{let v=i.value.trim();if(!v.startsWith('#'))v='#'+v;const b=cfg.spBands[+i.dataset.sph];if(/^#[0-9a-f]{6}$/i.test(v)){b.col=v.toLowerCase();spSet();renderSettings()}else{toast('Use a 6-digit hex code like #1E8E3E');i.value=b.col.toUpperCase()}});
+  $$('[data-spl]',el).forEach(i=>i.onchange=()=>{const t=i.value.trim();if(!t){i.value=cfg.spBands[+i.dataset.spl].label;return}cfg.spBands[+i.dataset.spl].label=t;spSet()});
+  $$('[data-spm]',el).forEach(i=>i.onchange=()=>{const k=+i.dataset.spm,v=Number(i.value),B=cfg.spBands,lo=k>0?Number(B[k-1].max):-Infinity,hi=k<B.length-2?Number(B[k+1].max):Infinity;
+    if(!isFinite(v)||v<=lo||v>=hi||v<0||v>60){toast('Each band must end higher than the one before it and lower than the one after it');i.value=B[k].max;return}B[k].max=v;spSet();renderSettings()});
+  $$('[data-spdel]',el).forEach(b=>b.onclick=()=>{cfg.spBands.splice(+b.dataset.spdel,1);spSet();renderSettings()});
+  const spa=$('#spAdd');if(spa)spa.onclick=()=>{const B=cfg.spBands,prev=B[B.length-2];B.splice(B.length-1,0,{max:Number(prev.max)+2,label:'New band',col:prev.col});spSet();renderSettings()};
+  const spr=$('#spReset');if(spr)spr.onclick=()=>{cfg.spBands=JSON.parse(JSON.stringify(DEF.spBands));cfg.spColorsOn=true;spSet();renderSettings()};
   const cr=$('#cupReset');if(cr)cr.onclick=()=>{cfg.cupBands=JSON.parse(JSON.stringify(DEF.cupBands));cfg.cupColorsOn=true;cupSet();renderSettings()};
   const tr=$('#thReset');if(tr)tr.onclick=()=>{cfg.theme={name:'White',colors:{...WHITE}};saveCfg();applyTheme();renderSettings();renderAll()};
   $$('[data-rlon]',el).forEach(i=>i.onchange=()=>{cfg['rorLine'+i.dataset.rlon+'On']=i.checked;saveCfg();scheduleDraw()});
