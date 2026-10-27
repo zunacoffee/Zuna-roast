@@ -32,10 +32,11 @@
   const wrapErr = e => (String(e).startsWith('NotFound') ? notFound(String(e)) : new Error(String(e)));
 
   class FileH {
-    constructor(rel, name) { this.kind = 'file'; this.rel = rel; this.name = name; }
+    constructor(rel, name, mtime, size) { this.kind = 'file'; this.rel = rel; this.name = name; this.mtime = mtime || 0; this.size = size || 0; }
     async getFile() {
       const rel = this.rel;
-      return { text: async () => { try { return await invoke('fs_read', { rel }); } catch (e) { throw wrapErr(e); } } };
+      return { lastModified: this.mtime, size: this.size,
+        text: async () => { try { return await invoke('fs_read', { rel }); } catch (e) { throw wrapErr(e); } } };
     }
     async createWritable() {
       const rel = this.rel; let buf = '';
@@ -60,7 +61,7 @@
       try { list = await invoke('fs_list', { rel: this.rel || '.' }); } catch (e) { throw wrapErr(e); }
       for (const e of list) {
         const rel = join(this.rel, e.name);
-        yield [e.name, e.dir ? new DirH(rel, e.name) : new FileH(rel, e.name)];
+        yield [e.name, e.dir ? new DirH(rel, e.name) : new FileH(rel, e.name, e.mtime, e.size)];
       }
     }
     async queryPermission() { return 'granted'; }
@@ -94,6 +95,11 @@
     const r = await invoke('set_data_folder', { path: String(p) });
     N.folder = r; return new DirH('', lastPart(r));
   };
+  /* fingerprint of the whole folder — changes when another device saves something */
+  N.stamp = () => invoke('fs_stamp');
+  /* iPad: ask iCloud for files another device just saved, before re-reading the folder */
+  N.refreshCloud = IOS ? () => ios('download_folder').catch(() => null) : null;
+  N.deviceName = () => invoke('device_name').catch(() => 'This Mac');
   N.reveal = () => IOS ? (window.toast && toast('Open the Files app › ' + N.folder)) : invoke('reveal_data_folder').catch(e => window.toast && toast('Could not open Finder: ' + e));
   N.saveExport = async (name, text) => {
     if (IOS) { const r = await ios('share_file', { name: String(name), text: String(text) }); return !!(r && r.done); }

@@ -7,7 +7,10 @@ Older HTML files in the claude.ai project (zuna_roast.html, _p12, _focus, _conso
 - `app/index.html` — the whole app screen (single file). Started from Ty's build 33.
 - `app/native.js` — Mac-app bridge: data folder, roaster WebSocket, keep-awake, Save dialogs, updates. Inert in a browser.
 - `src-tauri/` — Tauri 2 Mac shell. `files.rs` = atomic writes inside the data folder; `roaster.rs` = native WebSocket (tries browser-style → lowercase path → plain handshakes; the P12 returned 400 to the plain one).
-- Data is NOT here: it lives in `Desktop/ZUNA COFFEE/Zuna Roast` (iCloud Desktop) on Ty’s Macs (Roasts/, Profiles/, Green coffee/, Cupping/, Settings/).
+- Data is NOT here: it lives in `Desktop/ZUNA COFFEE/Zuna Roast` (iCloud Desktop) — Roasts/, Profiles/, Green coffee/, Cupping/, Settings/.
+- Several devices share that folder (iMac at the roaster, MacBook, iPad). Since 1.0.22 the app watches it (`fs_stamp` fingerprint every 8 s, on focus; never mid-roast or while typing),
+  merges inventory/cupping/planned profiles/today's plan/settings item-by-item (3-way, `BASE` = last seen), re-checks the next roast number against the folder at save,
+  and keeps one device with Control via `Settings/control.json` (heartbeat 15 s; a newer claim wins and the other device drops to watching). Test: two app copies on one folder.
 
 ## Shipping a change
 1. Edit, then `npm run check` (JS syntax). Test in a browser with the built-in Simulator.

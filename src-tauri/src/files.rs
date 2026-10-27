@@ -70,6 +70,68 @@ fn not_found(p: &Path) -> String {
 pub struct Entry {
     name: String,
     dir: bool,
+    /// last change (ms since 1970) and size — lets the app skip re-reading roast files that haven't changed
+    mtime: u64,
+    size: u64,
+}
+
+fn mtime_ms(m: &fs::Metadata) -> u64 {
+    m.modified()
+        .ok()
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
+}
+
+#[derive(Serialize)]
+pub struct Stamp {
+    files: u64,
+    newest: u64,
+    /// fingerprint of every file's path, time and size: changes whenever another device adds, edits or removes something
+    sig: String,
+}
+
+/// Files that change all the time and must not count as "the folder changed":
+/// the roast-in-progress backup (saved every few seconds while recording) and the Control hand-off note.
+const STAMP_SKIP: [&str; 2] = ["Settings/roast-in-progress.json", "Settings/control.json"];
+
+#[tauri::command]
+pub fn fs_stamp(app: AppHandle, state: State<DataFolder>) -> Result<Stamp, String> {
+    let base = root(&app, &state)?;
+    let mut list: Vec<(String, u64, u64)> = Vec::new();
+    fn walk(dir: &Path, rel: &str, depth: u32, out: &mut Vec<(String, u64, u64)>) {
+        if depth > 5 {
+            return;
+        }
+        let Ok(rd) = fs::read_dir(dir) else { return };
+        for e in rd.flatten() {
+            let name = e.file_name().to_string_lossy().into_owned();
+            // hidden files are skipped, except iCloud's ".name.icloud" stand-ins for files not downloaded yet
+            if name.starts_with('.') && !name.ends_with(".icloud") {
+                continue;
+            }
+            let r = if rel.is_empty() { name.clone() } else { format!("{}/{}", rel, name) };
+            let Ok(m) = e.metadata() else { continue };
+            if m.is_dir() {
+                walk(&e.path(), &r, depth + 1, out);
+            } else if !STAMP_SKIP.contains(&r.as_str()) {
+                out.push((r, mtime_ms(&m), m.len()));
+            }
+        }
+    }
+    walk(&base, "", 0, &mut list);
+    list.sort();
+    // FNV-1a over "path|mtime|size" lines
+    let mut h: u64 = 0xcbf29ce484222325;
+    let mut newest = 0;
+    for (r, t, n) in &list {
+        newest = newest.max(*t);
+        for b in format!("{}|{}|{}\n", r, t, n).bytes() {
+            h ^= b as u64;
+            h = h.wrapping_mul(0x100000001b3);
+        }
+    }
+    Ok(Stamp { files: list.len() as u64, newest, sig: format!("{:016x}", h) })
 }
 
 #[tauri::command]
@@ -130,8 +192,10 @@ pub fn fs_list(app: AppHandle, state: State<DataFolder>, rel: String) -> Result<
         if name.starts_with('.') {
             continue; // skip hidden files and unfinished saves
         }
-        let dir = e.file_type().map(|t| t.is_dir()).unwrap_or(false);
-        out.push(Entry { name, dir });
+        let meta = e.metadata().ok();
+        let dir = meta.as_ref().map(|m| m.is_dir()).unwrap_or(false);
+        let (mtime, size) = meta.as_ref().map(|m| (mtime_ms(m), m.len())).unwrap_or((0, 0));
+        out.push(Entry { name, dir, mtime, size });
     }
     out.sort_by(|a, b| a.name.cmp(&b.name));
     Ok(out)
