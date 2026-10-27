@@ -545,6 +545,11 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipc #scr-analyze .stats6{grid-template-columns:repeat(3,1fr)}
 .ipc #scr-analyze th,.ipc #scr-analyze td{padding-left:7px;padding-right:7px}
 .ipc .ipCard .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Today › Add batches on iPads narrower than the 13" — by screen width too, so it never depends on the ipc check */
+@media (max-width:1250px){
+html.ipad .grid2:has(#tCount){grid-template-columns:1fr}
+html.ipad .stepper button{width:64px}
+html.ipad .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;padding:0!important;-webkit-appearance:none;appearance:none;color:var(--text);-webkit-text-fill-color:var(--text);opacity:1}}
 .ipc .grid2:has(#tCount){grid-template-columns:1fr}
 .ipc .stepper button{width:64px}
 .ipc .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;padding:0!important;-webkit-appearance:none;appearance:none;color:var(--text);-webkit-text-fill-color:var(--text);opacity:1}
