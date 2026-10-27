@@ -902,10 +902,10 @@ async function dirAt(parts,create=true){let d=FS.dir;for(const p of parts)d=awai
 async function writeAt(parts,name,text){const d=await dirAt(parts);const fh=await d.getFileHandle(name,{create:true});const w=await fh.createWritable();await w.write(text);await w.close()}
 async function removeAt(parts,name){try{const d=await dirAt(parts,false);await d.removeEntry(name)}catch(e){}}
 async function persistHist(){if(idb.db)await idb.set('hist',HIST)}
-async function persistInv(){INVsavedAt=new Date().toISOString();const p={savedAt:INVsavedAt,items:INV};if(idb.db)await idb.set('inv',p);
-  if(FS.state==='granted')try{await writeAt(['Green coffee'],'inventory.json',JSON.stringify(p,null,1));await writeAt(['Green coffee'],'inventory.csv',invCSV())}catch(e){log('err','Inventory write failed: '+e.message)}}
-async function persistCup(){CUPsavedAt=new Date().toISOString();const p={savedAt:CUPsavedAt,sessions:CUP};if(idb.db)await idb.set('cup',p);
-  if(FS.state==='granted')try{await writeAt(['Cupping'],'cupping.json',JSON.stringify(p,null,1));await writeAt(['Cupping'],'cupping.csv',cupCSV())}catch(e){log('err','Cupping write failed: '+e.message)}}
+async function persistInv(){INVsavedAt=new Date().toISOString();if(idb.db)await idb.set('inv',{savedAt:INVsavedAt,items:INV});
+  if(FS.state==='granted')try{await writeKind('inv')}catch(e){log('err','Inventory write failed: '+e.message)}}
+async function persistCup(){CUPsavedAt=new Date().toISOString();if(idb.db)await idb.set('cup',{savedAt:CUPsavedAt,sessions:CUP});
+  if(FS.state==='granted')try{await writeKind('cup')}catch(e){log('err','Cupping write failed: '+e.message)}}
 async function writeRoastFiles(r){
   if(FS.state!=='granted'||!r.samples||!r.samples.length)return false;
   try{const parts=roastPath(r),base=roastBase(r),rel=parts.join('/')+'/'+base;
@@ -924,6 +924,8 @@ async function saveRoast(auto,asProfile){
   const r=S.roast;if(!r.samples.length){toast('Nothing recorded yet');return false}
   if(S.recording&&!auto){toast('Stop recording first');return false}
   r.meta=readMeta();if(!r.id)r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);if(!r.num)r.num=nextNum();if(!r.created)r.created=new Date().toISOString();
+  let renum=null;if(FS.state==='granted'&&!HIST.some(x=>x.id===r.id)){const mx=await folderMaxNum();
+    if(mx>=r.num){renum=r.num;r.num=Math.max(mx,...HIST.map(x=>x.num||0))+1;log('sys',`Roast #${renum} was already used on another device — this roast is #${r.num}`)}}
   store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,r.num));
   if(asProfile){if(!normName(r.meta.name)){toast('Enter a profile name first');$('#fName').focus();return false}
     await unprofileSlot(r);
@@ -931,42 +933,148 @@ async function saveRoast(auto,asProfile){
   const wasNew=!HIST.some(x=>x.id===r.id);if(wasNew&&!r.bgId&&S.bg&&S.bg.id!==r.id)r.bgId=S.bg.id;
   const copy=JSON.parse(JSON.stringify(r));await commitRoast(copy,true);S.roast=copy;S.dirty=false;S.viewingId=copy.id;clearDraft();
   const doneIt=wasNew?planMarkDone(copy):null,nx=doneIt?planNext():null;
-  toast(`Roast #${copy.num} saved${asProfile?' as the profile':''}${FS.state==='granted'?' to your roasts folder':''}${nx?` — next batch loaded: ${nx.name||nx.coffee} · ${nx.green} lb`:doneIt?' — that was the last batch today':''}`);
+  toast(`Roast #${copy.num} saved${renum?` (#${renum} was taken on another device)`:''}${asProfile?' as the profile':''}${FS.state==='granted'?' to your roasts folder':''}${nx?` — next batch loaded: ${nx.name||nx.coffee} · ${nx.green} lb`:doneIt?' — that was the last batch today':''}`);
   if(nx){closeDrawer();loadBatch(nx.id,true)}else if(doneIt){S.planCur=null}
   resolveBg();renderAll();renderTodayMini();return true}
 
 /* ---------- folder ---------- */
 /* ---------- settings, today's plan and the roast in progress also live in the folder ---------- */
 let setT;function persistSettingsSoon(){clearTimeout(setT);setT=setTimeout(persistSettings,800)}
-async function persistSettings(){if(FS.state!=='granted')return;try{await writeAt(['Settings'],'settings.json',JSON.stringify({savedAt:cfg.savedAt||'',settings:cfg},null,1));
-  await writeAt(['Settings'],'today-plan.json',JSON.stringify(PLAN,null,1))}catch(e){log('err','Settings write failed: '+e.message)}}
+async function persistSettings(){if(FS.state!=='granted')return;try{await writeKind('cfg');await writeKind('plan')}catch(e){log('err','Settings write failed: '+e.message)}}
 function saveDraft(){const d={roast:S.roast,at:new Date().toISOString()};store.set(LS.draft,d);if(FS.state==='granted')writeAt(['Settings'],'roast-in-progress.json',JSON.stringify(d)).catch(()=>{})}
 function clearDraft(){store.del(LS.draft);if(FS.state==='granted')removeAt(['Settings'],'roast-in-progress.json')}
 async function readFolderJSON(parts,name){try{return JSON.parse(await (await (await (await dirAt(parts,false)).getFileHandle(name)).getFile()).text())}catch(e){return null}}
 function applySettings(o){const keepTheme=cfg.theme;localStorage.setItem(LS.cfg,JSON.stringify(o));cfg=loadCfg();if(!o.theme)cfg.theme=keepTheme;applyTheme();buildCtl();renderCtl();renderFkeys()}
-async function syncFolder(){
-  if(FS.state!=='granted')return;const found=[];let invFile=null,cupFile=null;
-  async function walk(d,depth){for await(const [name,h] of d.entries()){if(h.kind==='directory'&&depth<3)await walk(h,depth+1);else if(h.kind==='file'&&name.endsWith('.json')){try{const r=JSON.parse(await (await h.getFile()).text());if(r&&r.id&&Array.isArray(r.samples)){if((cfg.deletedRoasts||[]).includes(r.id)){for(const x of [name,name.replace(/\.json$/,'.csv')])try{await d.removeEntry(x)}catch(e){}}else found.push(r)}}catch(e){}}}}
-  try{try{await walk(await dirAt(['Roasts'],false),0)}catch(e){}
-    try{invFile=JSON.parse(await (await (await (await dirAt(['Green coffee'],false)).getFileHandle('inventory.json')).getFile()).text())}catch(e){}
-    try{cupFile=JSON.parse(await (await (await (await dirAt(['Cupping'],false)).getFileHandle('cupping.json')).getFile()).text())}catch(e){}
-  }catch(e){log('err','Could not read the roasts folder: '+e.message);return}
-  const byId=new Map(HIST.map(r=>[r.id,r]));let added=0;
-  for(const r of found){const ex=byId.get(r.id);if(!ex){HIST.push(r);byId.set(r.id,r);added++}else if(String(r.savedAt||'')>String(ex.savedAt||''))Object.assign(ex,r)}
-  const inFolder=new Set(found.map(r=>r.id));for(const r of HIST)if(!inFolder.has(r.id))await writeRoastFiles(r);
-  if(invFile&&Array.isArray(invFile.items)&&String(invFile.savedAt||'')>String(INVsavedAt||'')){INV=invFile.items;INVsavedAt=invFile.savedAt}else if(INV.length)await persistInv();
-  if(cupFile&&Array.isArray(cupFile.sessions)&&String(cupFile.savedAt||'')>String(CUPsavedAt||'')){CUP=cupFile.sessions;CUPsavedAt=cupFile.savedAt}else if(CUP.length)await persistCup();
-  const ppf=await readFolderJSON(['Profiles'],'planned-profiles.json');
-  if(ppf&&Array.isArray(ppf.items)&&String(ppf.savedAt||'')>String(PLANNEDsavedAt||'')){PLANNED=ppf.items;PLANNEDsavedAt=ppf.savedAt;if(idb.db)await idb.set('planned',ppf)}else if(PLANNED.length)await savePlanned();
-  const sf=await readFolderJSON(['Settings'],'settings.json');
-  if(sf&&sf.settings&&String(sf.savedAt||'')>String(cfg.savedAt||'')){applySettings(sf.settings);log('sys','Settings loaded from the folder')}
-  const pf=await readFolderJSON(['Settings'],'today-plan.json');
-  if(pf&&Array.isArray(pf.items)&&String(pf.savedAt||'')>String(PLAN.savedAt||'')){PLAN=pf;store.set('zr2.plan',PLAN)}
-  await persistSettings();
-  sortHist();await persistHist();if(idb.db){await idb.set('inv',{savedAt:INVsavedAt,items:INV});await idb.set('cup',{savedAt:CUPsavedAt,sessions:CUP})}
-  log('sys',`Folder synced: ${found.length} roast files, ${added} new`);resolveBg();renderAll()}
-async function chooseFolder(){if(window.ZR_NATIVE){try{const h=await ZR_NATIVE.chooseFolder();if(h){FS.dir=h;FS.state='granted';await syncFolder();toast(`Saving to ${ZR_NATIVE.folder}`)}}catch(e){toast('Could not use that folder: '+e)}renderStorageStatus();return}
-  try{const h=await window.showDirectoryPicker({id:'zuna-roasts',mode:'readwrite',startIn:'documents'});FS.dir=h;FS.state='granted';await idb.set('dir',h);await syncFolder();toast(`Saving to the “${h.name}” folder`)}catch(e){if(e.name!=='AbortError')toast('Could not use that folder: '+e.message)}renderStorageStatus()}
+/* ================================================================
+   One folder, several devices (iMac at the roaster, MacBook, iPad).
+   • Every few seconds the app checks whether another device saved something and pulls it in.
+   • Green coffee, cupping, planned profiles, today's plan and settings are merged item by item:
+     what this device changed is kept, what the other device changed is taken — nothing is
+     silently overwritten. (Roasts are one file each, so they never collide.)
+   • A new roast gets a number nobody else has used yet.
+   • Only one device has Control: Settings/control.json says which one.
+   File names and the folder layout are unchanged.
+   ================================================================ */
+const jstr=o=>JSON.stringify(o===undefined?null:o);
+let fsq=Promise.resolve();const fsLock=f=>{const p=fsq.then(f,f);fsq=p.catch(()=>{});return p};
+const BASE={};            /* what each shared file held when this device last read or wrote it */
+const RCACHE=new Map();   /* roast file path → time|size, so unchanged roast files aren't re-read */
+const KINDS={
+  inv:{parts:['Green coffee'],name:'inventory.json',list:'items',get:()=>INV,set:(v,at)=>{INV=v;INVsavedAt=at||INVsavedAt},at:()=>INVsavedAt,
+    keep:async()=>{if(idb.db)await idb.set('inv',{savedAt:INVsavedAt,items:INV})},csv:async()=>writeAt(['Green coffee'],'inventory.csv',invCSV())},
+  cup:{parts:['Cupping'],name:'cupping.json',list:'sessions',get:()=>CUP,set:(v,at)=>{CUP=v;CUPsavedAt=at||CUPsavedAt},at:()=>CUPsavedAt,
+    keep:async()=>{if(idb.db)await idb.set('cup',{savedAt:CUPsavedAt,sessions:CUP})},csv:async()=>writeAt(['Cupping'],'cupping.csv',cupCSV())},
+  planned:{parts:['Profiles'],name:'planned-profiles.json',list:'items',get:()=>PLANNED,set:(v,at)=>{PLANNED=v;PLANNEDsavedAt=at||PLANNEDsavedAt},at:()=>PLANNEDsavedAt,
+    keep:async()=>{if(idb.db)await idb.set('planned',{savedAt:PLANNEDsavedAt,items:PLANNED})}},
+  plan:{parts:['Settings'],name:'today-plan.json',list:'items',get:()=>PLAN.items,set:(v,at)=>{PLAN.items=v;if(at)PLAN.savedAt=at},at:()=>PLAN.savedAt||'',
+    keep:async()=>store.set('zr2.plan',PLAN)},
+  cfg:{parts:['Settings'],name:'settings.json',obj:'settings',get:()=>cfg,at:()=>cfg.savedAt||''}
+};
+const kindData=(K,f)=>!f?null:K.obj?(f[K.obj]&&typeof f[K.obj]==='object'?f[K.obj]:null):(Array.isArray(f[K.list])?f[K.list]:null);
+function merge3List(base,mine,theirs){
+  if([...base,...mine,...theirs].some(x=>!x||x.id==null))return {v:mine,conflicts:1};
+  const B=new Map(base.map(x=>[x.id,jstr(x)])),M=new Map(mine.map(x=>[x.id,x])),T=new Map(theirs.map(x=>[x.id,x]));let conflicts=0;
+  const pick=id=>{const b=B.get(id),m=M.get(id),t=T.get(id),ms=m&&jstr(m),ts=t&&jstr(t);
+    if(ms===ts)return m;if(ms===b)return t;if(ts===b)return m;conflicts++;return m||t};
+  const ids=a=>a.map(x=>x.id).join('|'),order=ids(theirs)===ids(base)?[...mine,...theirs]:[...theirs,...mine],out=[],seen=new Set();
+  for(const x of order){if(seen.has(x.id))continue;seen.add(x.id);const v=pick(x.id);if(v)out.push(v)}
+  return {v:out,conflicts}}
+function merge3Obj(base,mine,theirs){const out={},keys=new Set([...Object.keys(base),...Object.keys(mine),...Object.keys(theirs)]);let conflicts=0;
+  for(const k of keys){if(k==='savedAt')continue;const b=jstr(base[k]),m=jstr(mine[k]),t=jstr(theirs[k]);
+    if(k==='deletedRoasts'){out[k]=[...new Set([...(mine[k]||[]),...(theirs[k]||[])])];continue}
+    const v=m===t?mine[k]:m===b?theirs[k]:t===b?mine[k]:(conflicts++,mine[k]);if(v!==undefined)out[k]=v}
+  return {v:out,conflicts}}
+const mergeKind=(K,b,m,t)=>K.obj?merge3Obj(b||{},m||{},t||{}):merge3List(b||[],m||[],t||[]);
+const sameCfg=(a,b)=>{const x={...a},y={...b};delete x.savedAt;delete y.savedAt;return jstr(x)===jstr(y)};
+function adoptKind(k,f,v){const K=KINDS[k];
+  if(k==='cfg'){applySettings({...v,savedAt:f&&f.savedAt||v.savedAt||cfg.savedAt});return}
+  if(k==='plan'&&f&&f.date&&f.date!==PLAN.date){PLAN=f;store.set('zr2.plan',PLAN);return}
+  K.set(v,f&&f.savedAt);K.keep&&K.keep()}
+/* write this device's copy, first folding in anything another device saved since we last looked */
+async function writeKindRaw(k){const K=KINDS[k];if(FS.state!=='granted')return;
+  const f=await readFolderJSON(K.parts,K.name),theirs=kindData(K,f);let mine=K.get();
+  const sameDay=!(k==='plan'&&f&&f.date&&f.date!==PLAN.date);
+  if(theirs&&BASE[k]!==undefined&&jstr(theirs)!==BASE[k]&&sameDay){const m=mergeKind(K,JSON.parse(BASE[k]),mine,theirs);
+    if(k==='cfg'?!sameCfg(m.v,mine):jstr(m.v)!==jstr(mine)){mine=m.v;adoptKind(k,null,mine);mine=K.get()}
+    if(m.conflicts)log('sys',`${K.name}: the same item was changed on two devices — kept this device's version`)}
+  const at=new Date().toISOString();
+  if(k==='cfg'){cfg.savedAt=at;store.set(LS.cfg,cfg);await writeAt(K.parts,K.name,JSON.stringify({savedAt:at,settings:cfg},null,1));BASE[k]=jstr(cfg);return}
+  K.set(mine,at);const body=k==='plan'?PLAN:{savedAt:at,[K.list]:mine};
+  await writeAt(K.parts,K.name,JSON.stringify(body,null,1));BASE[k]=jstr(mine);K.keep&&await K.keep();if(K.csv)try{await K.csv()}catch(e){}}
+const writeKind=k=>fsLock(()=>writeKindRaw(k));
+/* read another device's copy; returns true if anything here changed */
+async function readKind(k){const K=KINDS[k];const f=await readFolderJSON(K.parts,K.name),theirs=kindData(K,f),mine=K.get();
+  if(!theirs){if(k==='cfg'||(mine&&mine.length))await writeKindRaw(k);return false}
+  if(k==='plan'&&f.date&&f.date!==PLAN.date){if(String(f.date)>String(PLAN.date||'')){adoptKind(k,f,theirs);BASE[k]=jstr(theirs);return true}await writeKindRaw(k);return false}
+  const ts=jstr(theirs);
+  if(k==='cfg'?sameCfg(theirs,mine):ts===jstr(mine)){BASE[k]=ts;return false}
+  if(BASE[k]===undefined){/* first look since the app opened: the newer file wins, as before */
+    BASE[k]=ts;if(String(f.savedAt||'')>=String(K.at()||'')){adoptKind(k,f,theirs);return true}await writeKindRaw(k);return false}
+  if(ts===BASE[k]){await writeKindRaw(k);return false}            /* only this device changed it */
+  const m=mergeKind(K,JSON.parse(BASE[k]),mine,theirs);
+  if(k==='cfg'?sameCfg(m.v,theirs):jstr(m.v)===ts){adoptKind(k,f,theirs);BASE[k]=ts;return true}   /* only the other device changed it */
+  adoptKind(k,null,m.v);BASE[k]=ts;await writeKindRaw(k);return true}                               /* both did: keep both */
+const syncFolder=quiet=>fsLock(()=>syncFolderRaw(quiet));
+async function syncFolderRaw(quiet){
+  if(FS.state!=='granted')return null;const found=[],seen=new Set(),chg=[];
+  if(await readKind('cfg'))chg.push('settings');             /* settings first: they carry roasts deleted on another device */
+  const del=new Set(cfg.deletedRoasts||[]);
+  async function walk(d,depth,path){for await(const [name,h] of d.entries()){const fp=path+'/'+name;
+    if(h.kind==='directory'&&depth<3)await walk(h,depth+1,fp);
+    else if(h.kind==='file'&&name.endsWith('.json')){try{const fl=await h.getFile(),key=(fl.lastModified||0)+'|'+(fl.size||0),c=RCACHE.get(fp);
+      let id=c&&c.k===key&&key!=='0|0'?c.id:null,r=null;
+      if(!id){r=JSON.parse(await fl.text());if(!(r&&r.id&&Array.isArray(r.samples)))continue;id=r.id;RCACHE.set(fp,{k:key,id})}
+      if(del.has(id)){RCACHE.delete(fp);for(const x of [name,name.replace(/\.json$/,'.csv')])try{await d.removeEntry(x)}catch(e){}continue}
+      seen.add(id);if(r)found.push(r)}catch(e){}}}}
+  try{try{await walk(await dirAt(['Roasts'],false),0,'Roasts')}catch(e){}}catch(e){log('err','Could not read the roasts folder: '+e.message);return null}
+  const before=HIST.length;HIST=HIST.filter(r=>!del.has(r.id));const removed=before-HIST.length;
+  const byId=new Map(HIST.map(r=>[r.id,r]));let added=0,updated=0;
+  for(const r of found){const ex=byId.get(r.id);if(!ex){HIST.push(r);byId.set(r.id,r);added++}else if(String(r.savedAt||'')>String(ex.savedAt||'')){Object.assign(ex,r);updated++}}
+  for(const r of HIST)if(!seen.has(r.id))await writeRoastFiles(r);
+  for(const [k,label] of [['inv','green coffee'],['cup','cupping'],['planned','planned profiles'],['plan',"today's plan"]])if(await readKind(k))chg.push(label);
+  if(added||updated||removed)chg.unshift([added&&`${added} new roast${added>1?'s':''}`,updated&&`${updated} roast${updated>1?'s':''} updated`,removed&&`${removed} removed`].filter(Boolean).join(', '));
+  sortHist();await persistHist();
+  log('sys',`Folder synced: ${found.length} roast files read, ${added} new${chg.length?' — '+chg.join(' · '):''}`);
+  if(!quiet||chg.length){resolveBg();renderAll();if(quiet&&typeof curScreen!=='undefined'&&curScreen!=='roast')showScreen(curScreen)}
+  return chg}
+/* biggest roast number already in the folder (from the file names: R0042_…) */
+async function folderMaxNum(){let mx=0;async function walk(d,depth){for await(const [name,h] of d.entries()){if(h.kind==='directory'&&depth<3)await walk(h,depth+1);else{const m=/^R(\d+)_/.exec(name);if(m)mx=Math.max(mx,+m[1])}}}
+  try{await walk(await dirAt(['Roasts'],false),0)}catch(e){}return mx}
+/* ---------- watching for changes from other devices ---------- */
+const DEV={id:store.get('zr2.devId',null),name:window.ZR_NATIVE?'This Mac':'This browser'};
+if(!DEV.id){DEV.id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);store.set('zr2.devId',DEV.id)}
+if(window.ZR_NATIVE&&ZR_NATIVE.deviceName)ZR_NATIVE.deviceName().then(n=>{if(n)DEV.name=n}).catch(()=>{});
+async function folderStamp(){if(window.ZR_NATIVE&&ZR_NATIVE.stamp){try{return (await ZR_NATIVE.stamp()).sig}catch(e){return null}}
+  /* browser version: build the same kind of fingerprint from the folder handles */
+  let sig='';async function walk(d,depth,path){for await(const [name,h] of d.entries()){const fp=path+'/'+name;if(h.kind==='directory'){if(depth<5)await walk(h,depth+1,fp)}
+    else if(!/^\/Settings\/(roast-in-progress|control)\.json$/.test(fp)){const f=await h.getFile();sig+=fp+'|'+f.lastModified+'|'+f.size+';'}}}
+  try{await walk(FS.dir,0,'')}catch(e){return null}return sig}
+let watchSig=null,watchBusy=false;
+const userBusy=()=>{const a=document.activeElement;return !!($('#modalRoot').firstChild||$('#drawer').classList.contains('open')||(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))||
+  (typeof gMode!=='undefined'&&gMode!=='view')||(typeof cupMode!=='undefined'&&cupMode!=='view'))};
+async function watchTick(force){if(watchBusy||FS.state!=='granted')return;watchBusy=true;
+  try{await checkControlLock();
+    if(S.recording||(!force&&(document.hidden||userBusy())))return;      /* never re-read the folder mid-roast or while you're typing */
+    const sig=await folderStamp();if(!sig)return;
+    if(watchSig===null){watchSig=sig;return}
+    if(force||sig!==watchSig){const chg=await syncFolder(true);watchSig=await folderStamp();
+      if(chg&&chg.length)toast('Updated from another device: '+chg.join(' · '))}}
+  catch(e){}finally{watchBusy=false}}
+setInterval(()=>watchTick(),8000);
+window.addEventListener('focus',()=>watchTick());document.addEventListener('visibilitychange',()=>{if(!document.hidden)watchTick()});
+/* ---------- one device with Control at a time ---------- */
+const CTLK={since:'',beat:0};
+const lockActive=L=>L&&!L.released&&Date.now()-Date.parse(L.beat||0)<60000;
+async function readLock(){return FS.state==='granted'?await readFolderJSON(['Settings'],'control.json'):null}
+async function writeLock(on){if(FS.state!=='granted')return;const now=new Date().toISOString();
+  if(on){CTLK.since=now;CTLK.beat=Date.now();await writeAt(['Settings'],'control.json',JSON.stringify({id:DEV.id,device:DEV.name,since:now,beat:now}))}
+  else{const L=await readLock();if(L&&L.id===DEV.id)await writeAt(['Settings'],'control.json',JSON.stringify({id:DEV.id,device:DEV.name,since:L.since,released:now}))}}
+async function checkControlLock(){if(!C.on||FS.state!=='granted')return;const L=await readLock();
+  if(L&&L.id!==DEV.id&&!L.released&&String(L.since||'')>String(CTLK.since||'')){await setControl(false,'moved');
+    $('#banners').insertAdjacentHTML('beforeend',`<div class="banner info" id="bnMoved">Control moved to ${esc(L.device||'another device')} — this one is watching only. <button class="sm" onclick="this.parentNode.remove()">OK</button></div>`);return}
+  if(Date.now()-CTLK.beat>15000){CTLK.beat=Date.now();const now=new Date().toISOString();await writeAt(['Settings'],'control.json',JSON.stringify({id:DEV.id,device:DEV.name,since:CTLK.since||now,beat:now}))}}
+async function chooseFolder(){if(window.ZR_NATIVE){try{const h=await ZR_NATIVE.chooseFolder();if(h){FS.dir=h;FS.state='granted';for(const k in BASE)delete BASE[k];RCACHE.clear();watchSig=null;await syncFolder();toast(`Saving to ${ZR_NATIVE.folder}`)}}catch(e){toast('Could not use that folder: '+e)}renderStorageStatus();return}
+  try{const h=await window.showDirectoryPicker({id:'zuna-roasts',mode:'readwrite',startIn:'documents'});FS.dir=h;FS.state='granted';await idb.set('dir',h);for(const k in BASE)delete BASE[k];RCACHE.clear();watchSig=null;await syncFolder();toast(`Saving to the “${h.name}” folder`)}catch(e){if(e.name!=='AbortError')toast('Could not use that folder: '+e.message)}renderStorageStatus()}
 async function reconnectFolder(){if(!FS.dir)return chooseFolder();try{FS.state=(await FS.dir.requestPermission({mode:'readwrite'}))==='granted'?'granted':'prompt'}catch(e){FS.state='prompt'}if(FS.state==='granted'){await syncFolder();toast('Roasts folder reconnected')}renderStorageStatus()}
 async function initStorage(){await idb.open();
   const h=idb.db?await idb.get('hist'):null;HIST=Array.isArray(h)?h:[];sortHist();
@@ -1042,9 +1150,12 @@ function sendEventToRoaster(k){if(!C.on||!cfg.sendEvents||!link.connected())retu
   if(k==='DROP'){link.sendCommand({[cfg.nodes.command]:'stopRoasting'});log('ctl','Sent stop roast (Drop) to the roaster');return}
   const type={DRY:cfg.evDRY,FCs:cfg.evFCs,FCe:cfg.evFCe,SCs:cfg.evSCs,SCe:cfg.evSCe}[k];if(!type||!C.on||!cfg.sendEvents||!link.connected())return;link.sendCommand({[cfg.nodes.command]:cfg.eventMsg,params:{type}})}
 async function wakeLock(on){try{if(on&&'wakeLock' in navigator&&!C.wake){C.wake=await navigator.wakeLock.request('screen');C.wake.addEventListener('release',()=>{C.wake=null})}else if(!on&&C.wake){await C.wake.release();C.wake=null}}catch(e){}}
-async function setControl(on){
+async function setControl(on,why){
+  if(on&&!C.on&&FS.state==='granted'){const L=await readLock();
+    if(lockActive(L)&&L.id!==DEV.id&&!await ask(`Control is on at ${L.device||'another device'}`,`Only one device should control the roaster at a time. Take over Control here? ${L.device||'The other device'} will switch to watching only.`,'Take over'))return}
   if(on&&!C.on&&!store.get('zr2.ctlOk',false)){if(!await ask('Turn on Control?','The app will send burner, air and drum settings and the machine switches to the roaster. Stay at the roaster — its own panel and safety systems always come first. Keep this window in front and the Mac awake while roasting.','Turn on Control'))return;store.set('zr2.ctlOk',true)}
-  C.on=on;C.target={};wakeLock(on||link.connected());log('ctl',on?'Control ON':'Control released');renderAll()}
+  C.on=on;C.target={};wakeLock(on||link.connected());log('ctl',on?'Control ON':why==='moved'?'Control moved to another device':'Control released');renderAll();
+  if(why!=='moved')writeLock(on).catch(()=>{});if(on){const b=$('#bnMoved');if(b)b.remove()}}
 function buildCtl(){
   const spx=c=>{const pre=cfg.presets[c.key]||[];return `<div class="spx" data-k="${c.key}"><div class="l"><span>${c.label}</span><span>%</span></div>
     <div class="rowv"><button class="ab" data-d="-1" aria-label="${c.label} down">▼</button><div class="v" title="Click to type an exact value">—</div><button class="ab" data-d="1" aria-label="${c.label} up">▲</button></div>
@@ -1386,8 +1497,8 @@ let PLANNED=[],PLANNEDsavedAt='',BLD=null;
 const rTag=r=>r&&r.planned?'Planned':'#'+(r&&r.num||'—');
 const allProfiles=()=>[...HIST.filter(r=>r.isProfile&&!r.archived),...PLANNED];
 const findAny=id=>HIST.find(x=>x.id===id)||PLANNED.find(x=>x.id===id)||null;
-async function savePlanned(){PLANNEDsavedAt=new Date().toISOString();const p={savedAt:PLANNEDsavedAt,items:PLANNED};if(idb.db)await idb.set('planned',p);
-  if(FS.state==='granted')try{await writeAt(['Profiles'],'planned-profiles.json',JSON.stringify(p,null,1))}catch(e){log('err','Planned profiles write failed: '+e.message)}}
+async function savePlanned(){PLANNEDsavedAt=new Date().toISOString();if(idb.db)await idb.set('planned',{savedAt:PLANNEDsavedAt,items:PLANNED});
+  if(FS.state==='granted')try{await writeKind('planned')}catch(e){log('err','Planned profiles write failed: '+e.message)}}
 async function dropPlannedSlot(r,keepId){const n=PLANNED.length;PLANNED=PLANNED.filter(x=>x.id===keepId||!sameSlot(x,r));if(PLANNED.length!==n)await savePlanned()}
 
 const BLD_EV=[['CHARGE','Charge'],['TP','Turning point'],['DRY','Dry end'],['FCs','FC start']];

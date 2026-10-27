@@ -28,6 +28,25 @@ fn keep_awake(state: State<Awake>, on: bool) -> Result<(), String> {
     Ok(())
 }
 
+/// A friendly name for this device, shown when another device asks to take over Control
+/// ("Control is on at Ty's iMac"). On a Mac it's the Computer Name from System Settings › General › Sharing.
+#[tauri::command]
+fn device_name() -> String {
+    #[cfg(target_os = "macos")]
+    let name = Command::new("scutil")
+        .args(["--get", "ComputerName"])
+        .output()
+        .ok()
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "Mac".into());
+    #[cfg(target_os = "ios")]
+    let name = String::from("iPad");
+    #[cfg(not(any(target_os = "macos", target_os = "ios")))]
+    let name = String::from("This computer");
+    name
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -48,6 +67,8 @@ pub fn run() {
             files::fs_remove,
             files::save_export,
             files::reveal_data_folder,
+            files::fs_stamp,
+            device_name,
             roaster::ws_open,
             roaster::ws_send,
             roaster::ws_close,
