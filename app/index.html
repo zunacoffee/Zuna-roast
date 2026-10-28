@@ -3444,11 +3444,13 @@ function phNeeds(){const wk=Date.now()-14*864e5;return HIST.filter(r=>!r.archive
 const phMissTxt=r=>{const a=phMissing(r);return a.length===2?'Roasted weight and colors aren’t in yet.':a[0]==='colors'?'Colors aren’t in yet.':'Roasted weight isn’t in yet.'};
 const phCupTxt=v=>ok(Number(v))?`<span style="${cupSt(v)}">${Number(v).toFixed(2)}</span>`:'—';
 
-/* ---------- live roast: the iMac's roast-in-progress file in iCloud, plus the roaster itself when this phone is connected ---------- */
+/* the device that's roasting: whoever holds Control (iMac or iPad), from Settings/control.json */
+const phWho=()=>PH.lock&&lockActive(PH.lock)?esc(PH.lock.device||'another device'):'the iMac or iPad';
+/* ---------- live roast: the roasting device's roast-in-progress file in iCloud, plus the roaster itself when this phone is connected ---------- */
 async function phPollDraft(){if(!IPHONE||PH.polling||FS.state!=='granted')return;PH.polling=true;
   try{if(PH.tab==='live'&&window.ZR_NATIVE&&ZR_NATIVE.refreshCloud)await ZR_NATIVE.refreshCloud();
     const d=await readFolderJSON(['Settings'],'roast-in-progress.json'),okd=d&&d.roast&&Array.isArray(d.roast.samples)&&d.roast.samples.length;
-    if(okd){PH.draft=d}else{if(PH.draft){const r=PH.draft.roast;PH.lastLive={num:r.num,name:r.meta&&r.meta.name,at:Date.now()}}PH.draft=null}
+    if(okd){PH.draft=d}else{if(PH.draft){const r=PH.draft.roast;PH.lastLive={num:r.num,name:r.meta&&r.meta.name,at:Date.now(),who:phWho()}}PH.draft=null}
     PH.draftAt=Date.now();PH.lock=await readLock()}catch(e){}finally{PH.polling=false}
   if(PH.tab==='live'&&phCur().v==='live')phRender(true);else if(PH.tab==='today'&&phCur().v==='today'&&!phBusy())phRender(true);else phTabDots()}
 function phData(v){if(!IPHONE)return;const w=phW();PH.ws={at:Date.now(),v};
@@ -3529,7 +3531,7 @@ PHV.today=()=>{planRoll();const items=PLAN.items,done=items.filter(x=>x.status==
     ${n0?`<div class="p-ban"><div class="m"><b>#${n0.num} needs details${need.length>1?` <span style="font-weight:500;color:var(--text2)">· and ${need.length-1} more</span>`:''}</b>${phMissTxt(n0)}</div><button class="p-btn sm pri" data-det="${n0.id}">Add</button></div>`:''}
     ${items.length?`<div class="p-card">${rows}</div>`:`<div class="p-card"><div class="p-empty">No batches planned for today.<br>Plan them on the iMac or iPad (Today screen).</div></div>`}
     ${need.length>1?`<div class="p-sec"><span class="p-h3">Still need details</span><div class="p-card">${need.slice(1,8).map(r=>`<button class="p-row" data-det="${r.id}"><div class="m"><b><span style="color:var(--text2);font-weight:500">#${r.num}</span> ${esc(r.meta.name||'Untitled')}</b><small>${phDay(r.chargedAt||r.created)} · ${esc(phMissing(r).join(' and '))}</small></div><span class="gt">›</span></button>`).join('')}</div></div>`:''}
-    ${!L&&PH.lastLive&&Date.now()-PH.lastLive.at<30*60e3?`<p class="p-note">Roast #${PH.lastLive.num} finished on the iMac. It shows up in History once it’s saved.</p>`:''}`;
+    ${!L&&PH.lastLive&&Date.now()-PH.lastLive.at<30*60e3?`<p class="p-note">Roast #${PH.lastLive.num} finished on ${PH.lastLive.who||'the iMac or iPad'}. It shows up in History once it’s saved.</p>`:''}`;
   return {nav:phNavBig('Today',esc(date)),body,wire:el=>{
     $$('[data-det]',el).forEach(b=>b.onclick=()=>phGo({v:'details',id:b.dataset.det}));
     $$('[data-open]',el).forEach(b=>b.onclick=()=>{if(b.dataset.open)phGo({v:'roast',id:b.dataset.open})});
@@ -3598,7 +3600,7 @@ PHV.details=v=>{const r=HIST.find(x=>x.id===v.id);if(!r)return {nav:phNavSmall(p
     wire:(el,nav)=>{$('.nl .p-lnk',nav).textContent='Cancel';calc();['#phDR','#phDW','#phDG'].forEach(q=>$(q).oninput=calc);$('#phDSave').onclick=save;$('#phDSave2',nav).onclick=save}}};
 
 PHV.live=()=>{const L=phLiveRoast(),now=Date.now(),wsOn=link.connected(),wsFresh=PH.ws&&now-PH.ws.at<5000;
-  const who=PH.lock&&lockActive(PH.lock)?esc(PH.lock.device||'another device'):'the iMac';
+  const who=phWho();
   let st,dot;if(wsFresh){st='Live from the roaster';dot='on'}else if(L&&L.src==='draft'){const a=Math.max(0,Math.round((now-L.at)/1000));st=`From iCloud · updated ${a<60?a+' s':Math.round(a/60)+' min'} ago`;dot='cl'}
     else if(wsOn){st='Connected to the roaster';dot='on'}else if(link.state==='connecting'||link.state==='reconnecting'){st='Connecting to the roaster…';dot=''}else{st='Not connected to the roaster';dot=''}
   const nav={cls:'small',html:`<div class="p-status"><i class="${dot}"></i><span>${st}</span></div>${L&&L.num?`<span class="p-pill a" style="margin-bottom:4px">#${L.num}</span>`:''}`};
@@ -3620,7 +3622,7 @@ PHV.live=()=>{const L=phLiveRoast(),now=Date.now(),wsOn=link.connected(),wsFresh
     <div class="p-sp">${phSp(v)}</div>
     <div class="p-chart"><canvas id="phCv" style="height:230px"></canvas>${phLegend(bgOk)}</div>
     ${phEvents(L,bgOk)}
-    ${L.src==='draft'&&!wsFresh?`<p class="p-note">iCloud brings the iMac’s roast over every few seconds, so these numbers can lag a little. Connect on the roastery Wi-Fi for live values.</p>`:''}
+    ${L.src==='draft'&&!wsFresh?`<p class="p-note">iCloud brings the roast over from ${who} every few seconds, so these numbers can lag a little. Connect on the roastery Wi-Fi for live values.</p>`:''}
     ${conn}<div class="p-ban p-info"><div class="m" style="font-size:13.5px">View only. Burner, air, drum and switches are controlled from ${who}.</div></div>`;
   return {nav,body,wire:el=>{phLiveWire(el);phChart($('#phCv'),L,bgOk,{live:true,now:L.tNow})}}};
 function phSp(v){return `<div><small><i style="background:var(--c-burner)"></i>Burner</small><b>${ok(v.burner)?Math.round(v.burner)+'%':'—'}</b></div><div><small><i style="background:var(--c-air)"></i>Air</small><b>${ok(v.fan)?Math.round(v.fan)+'%':'—'}</b></div>
