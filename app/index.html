@@ -347,6 +347,29 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .taste button.fc{border-style:dashed}.taste .cupt{font-size:.72em;text-transform:uppercase;letter-spacing:.06em;opacity:.75;margin-left:4px}
 .pl{margin-top:4px}.pl.y{color:var(--good)}.pl.n{color:var(--text2)}
 .tgtline{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline;font-size:calc(13.5px*var(--ts,1));border:1px dashed color-mix(in srgb,var(--good) 55%,var(--panel));background:color-mix(in srgb,var(--good) 6%,var(--panel));border-radius:8px;padding:9px 13px}
+.cupsplit{grid-template-columns:minmax(300px,24%) minmax(0,1fr)}
+.cctbl{overflow:auto;border:1px solid var(--line2);border-radius:10px;min-height:0}
+.cctbl table td,.cctbl table th{vertical-align:top}.cctbl thead th{min-width:250px;text-transform:none;letter-spacing:0;font-weight:400;font-size:calc(12px*var(--ts,1));color:var(--text)}
+.cctbl th.ccl,.cctbl td.ccl{min-width:118px;width:118px;font-size:calc(11.5px*var(--ts,1));font-weight:700;letter-spacing:.04em;color:var(--text2);white-space:nowrap;vertical-align:middle;position:sticky;left:0;background:var(--panel);z-index:1}
+.cctbl thead th.ccl{background:var(--soft);z-index:2}
+.cch{display:flex;align-items:center;gap:6px}.cch b{font-size:calc(14px*var(--ts,1));font-weight:600;flex:1}.ccx{padding:1px 7px;color:var(--text2)}
+.ccs{color:var(--text2);font-size:calc(11.5px*var(--ts,1));margin-top:2px}
+.cctbl tr.sec td{background:var(--soft);font-size:calc(10.5px*var(--ts,1));font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;padding:5px 12px}
+.mini{display:flex;gap:4px}.mt{width:36px;height:28px;border-radius:6px;padding:0;font-size:calc(10.5px*var(--ts,1));font-weight:700;color:var(--text2)}
+.mt.on{background:var(--text);border-color:var(--text);color:var(--panel)}.mt.carbon.on{background:var(--danger);border-color:var(--danger);color:#fff}
+.cseg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}.cseg button{border:0;border-radius:0;padding:5px 11px;font-size:calc(12.5px*var(--ts,1));border-right:1px solid var(--border)}.cseg button:last-child{border-right:0}
+.cseg button.on{background:var(--text);color:var(--panel)}.cseg.yn button.on.y{background:var(--good);color:#fff}.cseg.yn button.on.n{background:var(--danger);color:#fff}
+.ccoff{gap:4px}.ccoff .chip{padding:3px 9px;font-size:calc(12px*var(--ts,1))}.ccoff .sev{font-size:.75em;letter-spacing:1px}
+.chip{border-radius:999px}.chip.bad.on{background:color-mix(in srgb,var(--danger) 10%,var(--panel));border-color:color-mix(in srgb,var(--danger) 40%,var(--panel));color:var(--danger)}
+.ccask{font-size:calc(12px*var(--ts,1));color:var(--warn);margin-bottom:5px}
+.ccn{width:100%;min-height:52px;font-size:calc(12.5px*var(--ts,1))}
+.ccan td{background:color-mix(in srgb,var(--accent) 3%,var(--panel))}.ccan .p{display:inline-block;border-radius:999px;padding:2px 9px;font-size:calc(12px*var(--ts,1));font-weight:600;margin:0 4px 4px 0}
+.p.r{background:color-mix(in srgb,var(--danger) 12%,var(--panel));color:var(--danger)}.p.w{background:color-mix(in srgb,var(--warn) 15%,var(--panel));color:#a86f00}.p.g{background:color-mix(in srgb,var(--good) 12%,var(--panel));color:var(--good)}
+.cvseg{margin-right:6px}
+.cot{overflow:auto;border:1px solid var(--line2);border-radius:8px}.cot table td,.cot table th{padding:5px 10px;text-align:center}.cot td.ccl{text-align:left;position:static;width:auto;min-width:110px;font-size:calc(11.5px*var(--ts,1))}
+.cot th.cur,.cot td.cur{background:var(--accentSoft)}
+.cdot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)}.cdot.half{opacity:.35}.cdot.no{background:transparent;border:1.5px solid var(--border)}.cdot.carbon{background:var(--danger)}
+.ins{border-left:3px solid var(--warn);padding:3px 0 3px 11px;font-size:calc(13px*var(--ts,1));margin-top:6px}.ins.g{border-color:var(--good)}.ins.r{border-color:var(--danger)}.ins small{display:block;color:var(--text2);font-size:calc(11.5px*var(--ts,1));margin-top:1px}
 .chk2.cd{color:var(--danger)}.btok{color:var(--good);font-weight:600}.btdip{color:var(--danger);font-weight:600}.btflat{color:var(--warn);font-weight:600}
 .flatsw{background:color-mix(in srgb,var(--warn) 35%,var(--panel));border:1px solid var(--warn)}.rortg{display:flex;align-items:center;gap:6px;margin-left:auto;cursor:pointer}.rortg input{width:auto}
 #roBT.falling{animation:btFall .6s infinite alternate;border-radius:8px}#roBT.falling #vBT,#roBT.falling #btLabel{color:var(--warn)!important;font-weight:700}
@@ -518,8 +541,8 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 <div class="screen" id="scr-cupping" hidden>
   <div class="page">
     <div class="ph"><h1>Cupping</h1><div class="sp"></div><button id="btnCupCsv">Export CSV</button><button class="pri" id="btnNewSession">+ New session</button></div>
-    <div class="split">
-      <div class="card scroll"><table><thead><tr><th>Date</th><th>Session</th><th>Samples</th><th>Cuppers</th><th class="n">Best</th><th class="n">Avg</th></tr></thead><tbody id="cRows"></tbody></table><div id="cEmpty"></div></div>
+    <div class="split cupsplit">
+      <div class="card scroll"><table><thead><tr id="cHead"></tr></thead><tbody id="cRows"></tbody></table><div id="cEmpty"></div></div>
       <div class="card detail" id="cDetail"></div>
     </div>
   </div>
@@ -641,6 +664,7 @@ const DEF={
   bbTp:90,bbTpTol:20,bbDryMin:210,bbDryMax:300,bbDryC:(300-32)*5/9,bbDryTol:10/1.8,bb6Slow:12/1.8,bb6Ideal:15/1.8,bb6Fast:20/1.8,bbFcC:(396-32)*5/9,bbFcTol:8/1.8,bbDevMin:120,bbDevMax:240,anBurnerStep:5,anAirStep:5,anCupLow:7.25,anBtDip:1/1.8,anBtFlat:30,anBtLive:true,
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[],
+  cupScoring:false,
   spColorsOn:true,spBands:[{max:5,label:'On target',col:'#1E8E3E'},{max:8,label:'Watch',col:'#C99A06'},{max:10,label:'High',col:'#E8710A'},{max:null,label:'Too wide',col:'#D93025'}],
   cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}],
   rorLineOn:true,rorLineC:12/1.8,rorZoneAlpha:10,rorLine2On:false,rorLine2C:20/1.8,rorZone2Alpha:6,
@@ -1117,8 +1141,8 @@ function csvText(r){const u=isF()?'F':'C',c=r.events.CHARGE??0,evAt={};for(const
 function invCSV(){const head=['coffee','origin','process','lot','supplier','arrived','price_per_lb','start_lb','adjust_lb','used_lb','left_lb','value_on_hand','notes'];
   const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;return [head.join(',')].concat(INV.map(l=>{const adj=(l.adj||[]).reduce((a,x)=>a+(num(x.lb)||0),0),left=invLeft(l),p=num(l.price);
     return [l.name,l.origin,l.process,l.lot,l.supplier,l.arrived,ok(p)?p.toFixed(2):'',num(l.startLb)||0,adj.toFixed(2),invUsed(l.id).toFixed(2),left.toFixed(2),ok(p)?(p*left).toFixed(2):'',l.notes].map(q).join(',')})).join('\n')}
-function cupCSV(){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;const head=['date','session','cuppers','roast','profile','fragrance','flavor','aftertaste','acidity','body','balance','overall','uniformity','clean_cup','sweetness','defects','final','notes','comments'];const rows=[];
-  for(const s of CUP)for(const x of s.samples){const r=HIST.find(h=>h.id===x.roastId),sc=x.scores;rows.push([s.date,s.name,s.cuppers,r?'#'+r.num:'',r?r.meta.name:'',...ATTRS.map(a=>sc[a[0]]),...CUPK.map(c=>x.cups[c[0]].filter(Boolean).length*2),x.defects,cupScore(x).toFixed(2),(x.tags||[]).join('; '),x.comments].map(q).join(','))}
+function cupCSV(){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;const head=['date','session','cuppers','roast','profile','fragrance','flavor','aftertaste','acidity','body','balance','overall','uniformity','clean_cup','sweetness','defects','final','notes','comments',...FAMS.map(f=>'card_'+f[0]),'card_body','card_acidity','card_balance','card_overall'];const rows=[];
+  for(const s of CUP)for(const x of s.samples){const r=HIST.find(h=>h.id===x.roastId),sc=x.scores;rows.push([s.date,s.name,s.cuppers,r?'#'+r.num:'',r?r.meta.name:'',...ATTRS.map(a=>sc[a[0]]),...CUPK.map(c=>x.cups[c[0]].filter(Boolean).length*2),x.defects,cupScore(x).toFixed(2),(x.tags||[]).join('; '),x.comments,...FAMS.map(f=>((x.card&&x.card.fam&&x.card.fam[f[0]])||[]).join(' ')),x.card?.body||'',x.card?.acid||'',x.card?.bal||'',x.card?.ov||''].map(q).join(','))}
   return [head.join(',')].concat(rows).join('\n')}
 function download(name,text,type='text/csv'){if(window.ZR_NATIVE){ZR_NATIVE.saveExport(name,text).then(ok=>{if(ok)toast('Saved '+name)}).catch(e=>toast('Could not save: '+e));return}
   const b=new Blob([text],{type}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
@@ -2019,7 +2043,7 @@ function renderGreen(){const q=normName($('#gSearch').value);const list=INV.filt
     return `<tr class="${l.id===selGreen&&gMode!=='add'?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b></td><td><span class="flag">${flagOf(l.origin)}</span>${esc(l.origin||'')}</td><td>${procTag(l.process)}</td><td class="tnum">${esc(l.lot||'')}</td><td class="muted">${esc(l.supplier||'')}</td><td class="muted tnum">${esc(l.arrived||'')}</td>
     <td class="n">${ok(num(l.price))?money(num(l.price)):'—'}</td><td class="n">${start.toFixed(1)}</td><td class="n">${invUsed(l.id).toFixed(1)}</td><td><div class="row tnum" style="justify-content:space-between;flex-wrap:nowrap"><b style="${lw?'color:var(--g-low)':''}">${left.toFixed(1)} lb</b>${lw?'<span class="badge glow">Low</span>':''}</div><div class="bar ${lw?'low':''}"><i style="width:${pct}%"></i></div></td></tr>`}).join('');
   $('#gEmpty').innerHTML=list.length?'':`<div class="empty">${INV.length?'Nothing here.':'No green coffee yet. Press <b>+ Add coffee</b> to add your first lot.'}</div>`;renderGreenDetail()}
-const GFIELDS=[['name','Coffee name','e.g. Brazil Cerrado Natural',1],['origin','Origin / region','Brazil · Cerrado Mineiro'],['process','Process / variety','Natural · Yellow Catuaí'],['lot','Lot',''],['supplier','Supplier',''],['arrived','Arrived','','date'],['startLb','Starting weight (lb)','132'],['price','Price per lb, green ($)','4.85'],['freight','Freight & fees per lb ($)','0.45'],['moisture','Moisture / density','10.8 % · 720 g/L'],['notes','Notes','',1]];
+const GFIELDS=[['name','Coffee name','e.g. Brazil Cerrado Natural',1],['origin','Origin / region','Brazil · Cerrado Mineiro'],['process','Process / variety','Natural · Yellow Catuaí'],['lot','Lot',''],['supplier','Supplier',''],['arrived','Arrived','','date'],['startLb','Starting weight (lb)','132'],['price','Price per lb, green ($)','4.85'],['freight','Freight & fees per lb ($)','0.45'],['moisture','Moisture / density','10.8 % · 720 g/L'],['screen','Screen size','16–18'],['wa','Water activity','0.55'],['notes','Notes','',1]];
 function renderGreenDetail(){const el=$('#gDetail');
   if(gMode==='add'||gMode==='edit'){const l=gMode==='edit'?INV.find(x=>x.id===selGreen):{};
     el.innerHTML=`<div class="dtitle">${gMode==='add'?'Add green coffee':'Edit '+esc(l.name)}</div><div class="grid2">${GFIELDS.filter(f=>!(gMode==='edit'&&f[0]==='startLb')).map(f=>`<label class="field" style="${f[3]===1?'grid-column:1/-1':''}">${f[1]}<input id="g_${f[0]}" ${f[3]==='date'?'type="date"':''} placeholder="${esc(f[2])}" value="${esc(l[f[0]]??'')}" ${['startLb','price'].includes(f[0])?'inputmode="decimal"':''}></label>`).join('')}</div>
@@ -2040,7 +2064,7 @@ function renderGreenDetail(){const el=$('#gDetail');
   const hist=[...rs.map(r=>({d:r.chargedAt||r.created,t:`Roast #${r.num} · ${esc(r.meta.name||'')}${r.isProfile?' ★':''}`,lb:-(num(r.meta.green)||0)})),...(l.adj||[]).map(a=>({d:a.date,t:(a.lb>0?'Received':'Adjusted')+(ok(num(a.price))?` · ${money(num(a.price))} / lb`:'')+(a.note?' · '+esc(a.note):''),lb:num(a.lb)})),{d:l.arrived||l.created,t:'Starting stock'+(ok(p)&&!(l.adj||[]).some(a=>a.price)?` · ${money(p)} / lb · ${money(p*(num(l.startLb)||0))}`:''),lb:num(l.startLb)||0}].sort((a,b)=>String(b.d).localeCompare(String(a.d)));
   el.innerHTML=`<div><div class="dtitle">${esc(l.name)}</div><div class="muted" style="margin-top:3px">${[l.lot&&'Lot '+esc(l.lot),esc(l.supplier||''),l.arrived&&'arrived '+esc(l.arrived)].filter(Boolean).join(' · ')}</div></div>
   <div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="l">On hand</div><div class="v">${left.toFixed(1)}<small>lb</small></div></div><div class="stat"><div class="l">Used</div><div class="v">${invUsed(l.id).toFixed(1)}<small>lb</small></div></div><div class="stat"><div class="l">Value on hand</div><div class="v">${ok(p)?money0(p*Math.max(0,left)):'—'}${ok(p)?`<small>@ ${money(p)}/lb</small>`:''}</div></div></div>
-  <div><div class="kv"><span>Origin / region</span><b>${esc(l.origin||'—')}</b></div><div class="kv"><span>Process / variety</span><b>${esc(l.process||'—')}</b></div><div class="kv"><span>Moisture / density</span><b>${esc(l.moisture||'—')}</b></div>
+  <div><div class="kv"><span>Origin / region</span><b>${esc(l.origin||'—')}</b></div><div class="kv"><span>Process / variety</span><b>${esc(l.process||'—')}</b></div><div class="kv"><span>Moisture / density</span><b>${esc(l.moisture||'—')}</b></div><div class="kv"><span>Screen size · water activity</span><b>${esc(l.screen||'—')} · ${esc(l.wa||'—')}</b></div>
   <div class="kv"><span>Price per lb (green)</span><b class="tnum">${ok(p)?money(p):'<span class="muted">not set</span>'}</b></div>
   <div class="kv"><span>Roasted cost${ok(loss)?` at ${loss.toFixed(1)} % loss`:''}</span><b class="tnum">${ok(p)&&ok(loss)?money(p/(1-loss/100))+' / lb':'—'}</b></div>${l.notes?`<div class="kv"><span>Notes</span><b>${esc(l.notes)}</b></div>`:''}</div>
   <div id="adjBox"></div>
@@ -2112,7 +2136,7 @@ function yearCSV(){const Y=yearStats(gYear),q=v=>`"${String(v??'').replace(/"/g,
 const ATTRS=[['fragrance','Fragrance / Aroma'],['flavor','Flavor'],['aftertaste','Aftertaste'],['acidity','Acidity'],['body','Body'],['balance','Balance'],['overall','Overall']];
 const CUPK=[['uniformity','Uniformity'],['clean','Clean cup'],['sweetness','Sweetness']];
 const TAGS=['Milk chocolate','Dark chocolate','Caramel','Brown sugar','Nutty','Cherry','Berry','Citrus','Stone fruit','Floral','Tea-like','Spice','Winey','Earthy','Roasty','Grassy'];
-let selSession=null,selSample=0,cupMode='view';
+let selSession=null,selSample=0,cupMode='view',cupView='card';
 function newSample(roastId){return {roastId,scores:Object.fromEntries(ATTRS.map(a=>[a[0],7.5])),cups:Object.fromEntries(CUPK.map(c=>[c[0],[true,true,true,true,true]])),defects:0,tags:[],comments:''}}
 const cupScore=x=>ATTRS.reduce((a,k)=>a+(Number(x.scores[k[0]])||0),0)+CUPK.reduce((a,k)=>a+x.cups[k[0]].filter(Boolean).length*2,0)-(Number(x.defects)||0);
 function cupBand(v){const b=cfg.cupBands;for(let i=0;i<b.length-1;i++)if(v>=Number(b[i].min))return b[i];return b[b.length-1]}
@@ -2120,8 +2144,10 @@ function cupClass(v){return cupBand(v).label}
 function cupSt(v){return cfg.cupColorsOn&&ok(Number(v))?`color:${cupBand(Number(v)).col}`:''}
 function cupPillSt(v){return cfg.cupColorsOn&&ok(Number(v))?`color:${cupBand(Number(v)).col};background:${rgba(cupBand(Number(v)).col,.12)}`:''}
 function renderCupping(){const list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date)));if(cupMode==='view'&&!list.find(s=>s.id===selSession))selSession=list[0]?.id||null;
-  $('#cRows').innerHTML=list.map(s=>{const sc=s.samples.map(cupScore),best=sc.length?Math.max(...sc):null,avg=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null;
-    return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b></td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td><td>${esc(s.cuppers||'')}</td><td class="n"><span class="cup" style="${cupPillSt(best)}">${ok(best)?best.toFixed(2):'—'}</span></td><td class="n" style="${cupSt(avg)}">${ok(avg)?avg.toFixed(2):'—'}</td></tr>`}).join('');
+  const SC=cfg.cupScoring;$('#cHead').innerHTML=`<th>Date</th><th>Session</th><th>Samples</th>${SC?'<th class="n">Best</th>':'<th>Flags</th>'}`;
+  $('#cRows').innerHTML=list.map(s=>{const sc=s.samples.map(cupScore),best=sc.length?Math.max(...sc):null;
+    const flags=s.samples.reduce((a,x)=>{const r=HIST.find(h=>h.id===x.roastId);return a+(r&&Object.keys(cupFaults(r).t).filter(k=>k!=='good').length?1:0)},0);
+    return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b>${s.cuppers?`<div class="muted" style="font-size:calc(11.5px*var(--ts,1))">${esc(s.cuppers)}</div>`:''}</td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td>${SC?`<td class="n"><span class="cup" style="${cupPillSt(best)}">${ok(best)?best.toFixed(2):'—'}</span></td>`:`<td>${flags?`<span class="btflat">⚠ ${flags}</span>`:'<span class="muted">—</span>'}</td>`}</tr>`}).join('');
   $('#cEmpty').innerHTML=list.length?'':'<div class="empty">No cupping sessions yet. Press <b>+ New session</b> and pick the roasts on the table.</div>';renderCupDetail()}
 function renderCupDetail(){const el=$('#cDetail');
   if(cupMode==='new'){const recent=HIST.filter(r=>!r.archived).slice(0,40);
@@ -2132,9 +2158,10 @@ function renderCupDetail(){const el=$('#cDetail');
     $('#csCreate').onclick=async()=>{const ids=$$('.picklist input:checked').map(i=>i.value);if(!ids.length){toast('Tick at least one roast');return}
       const s={id:'c'+Date.now().toString(36),date:new Date().toISOString(),name:$('#csName').value.trim()||'Cupping',cuppers:$('#csCuppers').value.trim(),samples:ids.map(newSample)};CUP.push(s);selSession=s.id;selSample=0;cupMode='view';await persistCup();renderCupping()};return}
   const s=CUP.find(x=>x.id===selSession);if(!s){el.innerHTML='<div class="empty">Select a session, or start a new one.</div>';return}
+  if(!cfg.cupScoring||cupView!=='score')return renderCupCard(el,s);
   selSample=clamp(selSample,0,s.samples.length-1);const x=s.samples[selSample],r=HIST.find(h=>h.id===x.roastId),sm=r?(r.summary||summarize(r)):null,total=cupScore(x);
   const scored=ATTRS.reduce((a,k)=>a+Number(x.scores[k[0]]),0),cups=CUPK.reduce((a,k)=>a+x.cups[k[0]].filter(Boolean).length*2,0);
-  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} samples${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · SCA 100-point form</div></div><button class="sm dangerTxt" id="csDel">Delete session</button></div>
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} samples${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · SCA 100-point form</div></div><div class="seg cvseg"><button data-cv="card">Card</button><button class="on" data-cv="score">100-point</button></div><button class="sm dangerTxt" id="csDel">Delete session</button></div>
   <div class="samples">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===selSample?'on':''}" data-i="${i}">#${rr?rr.num:'?'} ${esc(rr?rr.meta.name||'Untitled':'(roast removed)')}</button>`}).join('')}</div>
   ${r?`<div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Roast #${r.num} · ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · drop ${mmss(sm.drop)} @ ${fT(sm.dropBT)}°${cfg.unit} · dev ${mmss(sm.dev)} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' (spread '+spTxt(spreadOf(r.meta))+')':''}${ok(sm.loss)?' · '+sm.loss.toFixed(1)+'% loss':''}</div>`:''}
   <div class="attrs">${ATTRS.map(a=>`<div class="at"><span class="nm">${a[1]}</span><div class="st"><button data-a="${a[0]}" data-d="-0.25">−</button><b>${Number(x.scores[a[0]]).toFixed(2)}</b><button data-a="${a[0]}" data-d="0.25">+</button></div></div>`).join('')}
@@ -2145,6 +2172,7 @@ function renderCupDetail(){const el=$('#cDetail');
   ${r?`<div><div class="h3" style="margin-bottom:8px">How did it taste? <span style="text-transform:none;letter-spacing:0;font-weight:400">— used by Analyze</span></div><div id="cTaste"></div></div>`:''}
   <label class="field">Comments<textarea id="cComm">${esc(x.comments||'')}</textarea></label>
   <div class="row" style="margin-top:auto"><button class="pri" id="cSave">Save score</button>${r?`<button id="cOpen">Open roast #${r.num}</button><button id="cAn">Analyze #${r.num} →</button>`:''}<span class="sp"></span><button id="cPrev" ${selSample===0?'disabled':''}>Previous sample</button><button id="cNext" ${selSample>=s.samples.length-1?'disabled':''}>Next sample</button></div>`;
+  $$('[data-cv]',el).forEach(b=>b.onclick=()=>{x.comments=$('#cComm').value;cupView=b.dataset.cv;renderCupDetail()});
   $$('.samples button',el).forEach(b=>b.onclick=()=>{x.comments=$('#cComm').value;selSample=Number(b.dataset.i);renderCupDetail()});
   $$('[data-a]',el).forEach(b=>b.onclick=()=>{x.scores[b.dataset.a]=clamp(Number(x.scores[b.dataset.a])+Number(b.dataset.d),6,10);x.comments=$('#cComm').value;renderCupDetail()});
   $$('[data-def]',el).forEach(b=>b.onclick=()=>{x.defects=Math.max(0,x.defects+Number(b.dataset.def));x.comments=$('#cComm').value;renderCupDetail()});
@@ -2157,6 +2185,59 @@ function renderCupDetail(){const el=$('#cDetail');
   const o=$('#cOpen');if(o)o.onclick=()=>openRoast(r.id);
   if(r){tasteEditor($('#cTaste'),r,()=>{});$('#cAn').onclick=async()=>{await save(true);selAn=r.id;showScreen('analyze')}}
   $('#csDel').onclick=async()=>{if(!await ask('Delete this cupping session?','Scores already saved to roasts stay on those roasts.','Delete',true))return;CUP=CUP.filter(z=>z.id!==s.id);await persistCup();renderCupping()}}
+
+
+/* ---------- cupping card (Ty's paper card, samples side by side) ----------
+   Saved on each cupping sample as an optional field: card {fam:{floral:['F','FL'],…}, body, acid, bal, ov}.
+   F = fragrance (dry), A = aroma (break), FL = flavor, AT = aftertaste. Notes stay in sample.comments. */
+const FAMS=[['floral','Floral'],['fruity','Fruity'],['herbal','Herbal'],['nutty','Nutty'],['caramel','Caramel'],['chocolate','Chocolate'],['resin','Resin'],['spice','Spice'],['carbon','Carbon']];
+const CCOLS=['F','A','FL','AT'],CCOLN={F:'Fragrance (dry)',A:'Aroma (break)',FL:'Flavor',AT:'Aftertaste'};
+const cardOf=x=>{x.card=x.card||{fam:{},body:'',acid:'',bal:'',ov:''};x.card.fam=x.card.fam||{};return x.card};
+const hasCard=x=>!!(x&&x.card&&(Object.values(x.card.fam||{}).some(a=>a&&a.length)||x.card.body||x.card.acid||x.card.bal||x.card.ov));
+const famIn=(c,f,cols)=>((c.fam||{})[f]||[]).some(k=>cols.includes(k));
+// what the card says about the roast (used by cupFaults → Analyze)
+function cardFaults(c){const out=[];if(!c)return out;const cup=['FL','AT'];
+  if(famIn(c,'carbon',CCOLS))out.push(['roasty',famIn(c,'carbon',cup)?2:1,'Carbon '+(famIn(c,'carbon',cup)?'in the cup':'on the dry/break')]);
+  if(famIn(c,'resin',cup))out.push(['roasty',1,'Resin in the cup']);
+  if(famIn(c,'herbal',cup))out.push(['underdev',1,'Herbal in the cup']);
+  if(c.body==='Light')out.push(['thin',1,'Body light']);
+  if(c.acid==='Heavy')out.push(['sharp',1,'Acidity heavy']);
+  return out}
+let cupSaveT;function cupSaveSoon(){clearTimeout(cupSaveT);cupSaveT=setTimeout(()=>persistCup(),600)}
+function renderCupCard(el,s){const cols=s.samples.map(x=>({x,r:HIST.find(h=>h.id===x.roastId)})),old=$('.cctbl',el),keep=old&&old.dataset.sid===s.id?[old.scrollTop,old.scrollLeft,el.scrollTop]:null;
+  const inv=r=>r&&INV.find(l=>l.id===r.meta.invId),seg=(cls,opts,cur,attr)=>`<div class="cseg ${cls}">${opts.map(([v,l,c])=>`<button class="${c||''} ${cur===v?'on':''}" ${attr} data-v="${v}">${l}</button>`).join('')}</div>`;
+  const td=fn=>cols.map((c,i)=>`<td>${fn(c,i)}</td>`).join('');
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} sample${s.samples.length>1?'s':''}${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · tap F, A, FL or AT like the paper card — it saves as you go</div></div>
+    ${cfg.cupScoring?`<div class="seg cvseg"><button class="on" data-cv="card">Card</button><button data-cv="score">100-point</button></div>`:''}<button class="sm" id="ccAdd">+ Add sample</button><button class="sm dangerTxt" id="csDel">Delete session</button></div>
+  <div class="cctbl" data-sid="${s.id}"><table><thead><tr><th class="ccl"></th>${cols.map(({x,r},i)=>{const l=inv(r),sp=r?spreadOf(r.meta):null;return `<th><div class="cch"><b>#${r?r.num:'?'} · ${esc(r?(r.meta.coffee||r.meta.name||'Untitled'):'(roast removed)')}</b>${s.samples.length>1?`<button class="sm ccx" data-ccdel="${i}" title="Take this sample off the table">✕</button>`:''}</div>
+      ${r?`<div class="ccs">${esc(r.meta.name||'')} · roasted ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · ${lbTxt(batchOf(r))}</div><div class="ccs">WB / GB ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(sp)?' · spread '+spTxt(sp):''}</div>`:''}
+      ${l?`<div class="ccs">Moisture ${esc(l.moisture||'—')} · screen ${esc(l.screen||'—')} · aw ${esc(l.wa||'—')}</div>`:''}</th>`}).join('')}</tr></thead><tbody>
+    <tr class="sec"><td colspan="${cols.length+1}"><span title="${CCOLS.map(k=>k+' = '+CCOLN[k]).join(' · ')}">Fragrance (F) · Aroma (A) · Flavor (FL) · Aftertaste (AT)</span></td></tr>
+    ${FAMS.map(([f,l])=>`<tr><td class="ccl">${l.toUpperCase()}</td>${td(({x})=>{const c=cardOf(x);return `<div class="mini">${CCOLS.map(k=>`<button class="mt ${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-cf="${s.samples.indexOf(x)}:${f}:${k}" title="${l} — ${CCOLN[k]}">${k}</button>`).join('')}</div>`})}</tr>`).join('')}
+    <tr class="sec"><td colspan="${cols.length+1}">Body · Acidity · Balance · Overall</td></tr>
+    <tr><td class="ccl">BODY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).body,`data-cb="${i}:body"`))}</tr>
+    <tr><td class="ccl">ACIDITY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).acid,`data-cb="${i}:acid"`))}</tr>
+    <tr><td class="ccl">BALANCE</td>${td(({x},i)=>seg('yn',[['Y','Yes','y'],['N','No','n']],cardOf(x).bal,`data-cb="${i}:bal"`))}</tr>
+    <tr><td class="ccl">OVERALL</td>${td(({x},i)=>seg('yn',[['Y','Yes','y'],['N','No','n']],cardOf(x).ov,`data-cb="${i}:ov"`))}</tr>
+    <tr><td class="ccl">ANYTHING OFF?</td>${td(({x,r},i)=>{if(!r)return '';const t=tasteOf(r),c=cardOf(x);return `${(c.bal==='N'||c.ov==='N')&&!TASTE.some(([k])=>k!=='good'&&t[k]>0)?'<div class="ccask">Balance or overall was No — what was off?</div>':''}<div class="chips ccoff">${TASTE.filter(([k])=>k!=='good').map(([k,l])=>`<button class="chip bad ${t[k]>0?'on':''}" data-co="${i}:${k}" title="Tap again for more">${esc(l.split(' / ')[0])}${t[k]>0?` <span class="sev">${'●'.repeat(t[k])}</span>`:''}</button>`).join('')}</div>`})}</tr>
+    <tr><td class="ccl">NOTES</td>${td(({x},i)=>`<textarea class="ccn" data-cn="${i}" placeholder="Notes">${esc(x.comments||'')}</textarea>`)}</tr>
+    <tr class="ccan"><td class="ccl">TO ANALYZE</td>${td(({x,r})=>{if(!r)return '';const t=tasteEff(r),cf=cupFaults(r).why,items=TASTE.filter(([k])=>t[k]>0);
+      return (items.length?items.map(([k,l])=>`<span class="p ${k==='good'?'g':t[k]>=2?'r':'w'}" title="${esc(cf[k]&&!(k in tasteOf(r))?'from the card: '+cf[k]:'you marked it')}">${esc(l.split(' / ')[0])}</span>`).join(''):'<span class="muted">nothing to fix yet</span>')+` <button class="sm" data-can="${r.id}">Analyze #${r.num} →</button>`})}</tr>
+  </tbody></table></div>`;
+  if(keep){const t=$('.cctbl',el);t.scrollTop=keep[0];t.scrollLeft=keep[1];el.scrollTop=keep[2]}
+  const save=()=>{cupSaveSoon()},rer=()=>renderCupping();   // re-draws the list too, so the ⚠ count stays right
+  $$('[data-cf]',el).forEach(b=>b.onclick=()=>{const [i,f,k]=b.dataset.cf.split(':'),c=cardOf(s.samples[+i]),a=c.fam[f]||[];c.fam[f]=a.includes(k)?a.filter(z=>z!==k):[...a,k];save();rer()});
+  $$('[data-cb]',el).forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.cb.split(':'),c=cardOf(s.samples[+i]),val=b.dataset.v;c[k]=c[k]===val?'':val;save();rer()});
+  $$('[data-co]',el).forEach(b=>b.onclick=async()=>{const [i,k]=b.dataset.co.split(':'),r=cols[+i].r;if(!r)return;const tags={...tasteOf(r)};tags[k]=((tags[k]||0)+1)%4;if(tags[k])tags.good=0;r.taste={...(r.taste||{}),tags,at:new Date().toISOString()};await commitRoast(r,true);rer()});
+  $$('[data-cn]',el).forEach(t=>t.oninput=()=>{s.samples[+t.dataset.cn].comments=t.value;save()});
+  $$('[data-can]',el).forEach(b=>b.onclick=async()=>{clearTimeout(cupSaveT);await persistCup();selAn=b.dataset.can;showScreen('analyze')});
+  $$('[data-ccdel]',el).forEach(b=>b.onclick=async()=>{const i=+b.dataset.ccdel,r=cols[i].r;if(!await ask('Take this sample off the table?',`${r?'Roast #'+r.num:'This sample'} is removed from this cupping session. The roast itself is not touched.`,'Remove',true))return;s.samples.splice(i,1);await persistCup();renderCupping()});
+  $$('[data-cv]',el).forEach(b=>b.onclick=()=>{cupView=b.dataset.cv;renderCupDetail()});
+  $('#ccAdd').onclick=async()=>{const have=new Set(s.samples.map(x=>x.roastId)),pick=HIST.filter(r=>!r.archived&&!have.has(r.id)).slice(0,30);if(!pick.length){toast('No other roasts to add');return}
+    const v=await askPick('Add a sample','Roast',pick.map(r=>[r.id,`#${r.num} ${r.meta.name||'Untitled'} · ${fmtDate(r.chargedAt||r.created,false)}`]));if(!v)return;s.samples.push(newSample(v));await persistCup();rer()};
+  $('#csDel').onclick=async()=>{if(!await ask('Delete this cupping session?','Taste marks already saved on the roasts stay on those roasts.','Delete',true))return;CUP=CUP.filter(z=>z.id!==s.id);await persistCup();renderCupping()}}
+function askPick(title,label,opts){return new Promise(res=>{const root=$('#modalRoot');root.innerHTML=`<div class="modalbg"><div class="modal"><h3>${esc(title)}</h3><label class="field">${esc(label)}<select id="mSel">${opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select></label><div class="row" style="justify-content:flex-end"><button id="mNo">Cancel</button><button id="mYes" class="pri">Add</button></div></div></div>`;
+  const done=v=>{root.innerHTML='';res(v)};$('#mNo').onclick=()=>done(null);$('#mYes').onclick=()=>done($('#mSel').value)})}
 
 /* ================================================================
    Settings
@@ -2173,11 +2254,12 @@ const SEV=['','a little','some','a lot'];
 const tasteOf=r=>(r&&r.taste&&r.taste.tags)||{};
 function cupSampleOf(r){let x=null,d='';for(const s of CUP)for(const y of s.samples)if(y.roastId===r.id&&String(s.date)>=d){x=y;d=String(s.date)}return x}
 // the cupping form feeds the analyzer too: low Body → thin, low Acidity or few sweet cups → muted, Roasty / Grassy notes
-function cupFaults(r){const t={},why={},x=r&&cupSampleOf(r);if(!x)return {t,why};const sc=x.scores||{},L=Number(cfg.anCupLow)||7.25;
+function cupFaults(r){const t={},why={},x=r&&cupSampleOf(r);if(!x)return {t,why};const sc=cfg.cupScoring?(x.scores||{}):{},L=Number(cfg.anCupLow)||7.25;
   const sev=v=>{v=Number(v);return !ok(v)?0:v<=L-.5?3:v<=L-.25?2:v<=L?1:0},put=(k,n,w)=>{if(n>(t[k]||0)){t[k]=n;why[k]=w}};
   put('thin',sev(sc.body),'Body '+Number(sc.body).toFixed(2));put('flat',sev(sc.acidity),'Acidity '+Number(sc.acidity).toFixed(2));
-  const sw=((x.cups&&x.cups.sweetness)||[]).filter(Boolean).length;if(sw<=3)put('flat',sw<=1?2:1,'Sweetness '+sw+' of 5 cups');
+  const sw=cfg.cupScoring?((x.cups&&x.cups.sweetness)||[]).filter(Boolean).length:5;if(sw<=3)put('flat',sw<=1?2:1,'Sweetness '+sw+' of 5 cups');
   const tg=(x.tags||[]).map(z=>String(z).toLowerCase());if(tg.includes('roasty'))put('roasty',1,'Roasty flavor note');if(tg.includes('grassy'))put('underdev',1,'Grassy flavor note');
+  if(x.card){for(const [k,n,w] of cardFaults(x.card))put(k,n,w);const c=x.card;if(c.bal==='Y'&&c.ov==='Y'&&!Object.keys(t).length)put('good',1,'Balance and overall Yes')}
   return {t,why}}
 const tasteEff=r=>({...cupFaults(r).t,...tasteOf(r)});   // what you tapped wins over what the cupping form suggests
 const hasTaste=r=>Object.values(tasteEff(r)).some(v=>v>0);
@@ -2328,6 +2410,19 @@ function renderAnalyze(){const q=normName($('#aSearch').value),list=HIST.filter(
     return `<tr class="${r.id===selAn?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(r.chargedAt||r.created,false)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span class="muted">★</span>':''}</td><td class="n tnum">${lbTxt(batchOf(r))}</td><td>${(b=>!b?'<span class="muted">—</span>':!b.dips.length&&!b.flats.length?'<span class="btok">✓ Steady</span>':`<span class="${b.dips.length?'btdip':'btflat'}">⚠ ${btSummary(b)}</span>`)(btOfRoast(r))}</td><td class="n">${mmss(s.dev)}</td><td class="n">${ok(r.cup)?`<span class="cup" style="${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span>`:'<span class="muted">—</span>'}</td><td class="muted ttxt">${hasTaste(r)?esc(tasteText(r)):'<span class="dim">not tasted</span>'}</td></tr>`}).join('');
   $('#aEmpty').innerHTML=list.length?'':'<div class="empty">No roasts with curve data yet.</div>';
   $$('#aRows tr').forEach(tr=>tr.onclick=()=>{selAn=tr.dataset.id;renderAnalyze()});renderAnDetail()}
+// cupping cards over time — same coffee and batch size only
+function cardHistory(r){const ck=coffeeKey(r);return HIST.filter(x=>coffeeKey(x)===ck&&sameBatch(batchOf(x),batchOf(r))&&hasCard(cupSampleOf(x))).sort((a,b)=>(a.num||0)-(b.num||0)).slice(-6)}
+function cardTimeHTML(r){const H=cardHistory(r);if(!H.length)return '';const C=H.map(x=>({x,c:cupSampleOf(x).card,s:x.summary||summarize(x)}));
+  const lvl=(c,f)=>famIn(c,f,['FL','AT'])?2:famIn(c,f,['F','A'])?1:0,dot=(v,f)=>v?`<span class="cdot ${v===1?'half':''} ${f==='carbon'?'carbon':''}"></span>`:'<span class="cdot no"></span>';
+  const notes=[];for(let i=1;i<C.length;i++){const a=C[i-1],b=C[i],lost=FAMS.filter(([f])=>lvl(a.c,f)&&!lvl(b.c,f)).map(f=>f[1]),got=FAMS.filter(([f])=>!lvl(a.c,f)&&lvl(b.c,f)).map(f=>f[1]);
+    if(lost.length||got.length)notes.push(`<div class="ins ${got.includes('Carbon')||got.includes('Herbal')?'r':lost.length&&!got.length?'':'g'}">#${b.x.num} vs #${a.x.num}: ${got.length?'new — '+got.join(', '):''}${got.length&&lost.length?'; ':''}${lost.length?'gone — '+lost.join(', '):''}<small>Development ${mmss(a.s.dev)} → ${mmss(b.s.dev)} · drop ${mmss(a.s.drop)} → ${mmss(b.s.drop)} · WB/GB ${esc(a.x.meta.colorWhole||'—')}/${esc(a.x.meta.colorGround||'—')} → ${esc(b.x.meta.colorWhole||'—')}/${esc(b.x.meta.colorGround||'—')}</small></div>`)}
+  return `<div><div class="h3" style="margin-bottom:6px">Cupping cards over time — ${esc(r.meta.coffee||r.meta.name||'')} · ${lbTxt(batchOf(r))}</div>
+   <div class="cot"><table><thead><tr><th></th>${C.map(({x})=>`<th class="${x.id===r.id?'cur':''}">#${x.num}<div class="muted" style="font-weight:400">${fmtDate(x.chargedAt||x.created,false)}</div></th>`).join('')}</tr></thead><tbody>
+   ${FAMS.map(([f,l])=>`<tr><td class="ccl">${l}</td>${C.map(({x,c})=>`<td class="${x.id===r.id?'cur':''}">${dot(lvl(c,f),f)}</td>`).join('')}</tr>`).join('')}
+   <tr><td class="ccl">Body / acidity</td>${C.map(({x,c})=>`<td class="${x.id===r.id?'cur':''}">${(c.body||'—')[0]}/${(c.acid||'—')[0]}</td>`).join('')}</tr>
+   <tr><td class="ccl">Development</td>${C.map(({x,s})=>`<td class="${x.id===r.id?'cur':''}">${mmss(s.dev)}</td>`).join('')}</tr>
+   <tr><td class="ccl">WB / GB</td>${C.map(({x})=>`<td class="${x.id===r.id?'cur':''}">${esc(x.meta.colorWhole||'—')}/${esc(x.meta.colorGround||'—')}</td>`).join('')}</tr></tbody></table></div>
+   <div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin:4px 0 6px">Full dot = in the cup (flavor or aftertaste) · faint = only on the dry or break</div>${notes.slice(-3).reverse().join('')}</div>`}
 function anPrev(r){return HIST.filter(x=>x.id!==r.id&&(x.num||0)<(r.num||0)&&sameSlot(x,r)&&x.samples&&x.samples.length).sort((a,b)=>(b.num||0)-(a.num||0))[0]||null}
 function renderAnDetail(){const el=$('#aDetail'),r=HIST.find(x=>x.id===selAn);if(!r){el.innerHTML='<div class="empty">Select a roast.</div>';return}
   const {m,recs,keep}=anRecommend(r),prev=anPrev(r),checks=anChecks(m),off=anOff[r.id]||(anOff[r.id]={});recs.forEach(x=>{if(off[x.id]!=null)x.on=off[x.id]});
@@ -2341,6 +2436,7 @@ function renderAnDetail(){const el=$('#aDetail'),r=HIST.find(x=>x.id===selAn);if
   <div class="stats stats6">${stat('Color change',ok(m.dry)?mmss(m.dry)+`<small>${ok(m.dryBT)?fT(m.dryBT)+'°':''}${m.dryEst?' est.':''}</small>`:'—')}${stat('RoR at 6:00',ok(m.ror6)?toDR(m.ror6).toFixed(1)+`<small>1°/${secPerDeg(m.ror6)} s</small>`:'—',r6Bad?'w':'')}${stat('Development',ok(m.dev)?mmss(m.dev)+'<small>after FC</small>':'—',devBad?'w':'')}${stat('Bean temp',m.btc?btSummary(m.btc):'—',m.btc&&(m.dips.length||m.flats.length)?'w':'')}${stat('Drop',ok(m.drop)?mmss(m.drop)+`<small>${fT(m.dropBT)}°</small>`:'—')}${stat('Loss',ok(m.loss)?m.loss.toFixed(1)+'<small>%</small>':'—')}</div>
   <div><div class="h3" style="margin-bottom:6px">Curve check</div>${checks.map(([k,t,x])=>`<div class="chk2 ${k==='good'?'cg':x==='dip'?'cd':'cw'}">${k==='good'?'✓':x==='dip'?'↓':'!'}<span>${esc(t)}</span></div>`).join('')}</div>
   ${srcPlan?`<div class="note"><b>This roast used the plan from #${src.num}:</b>${!sameBatch(batchOf(src),batchOf(r))?`<div class="pl n">Batch size changed (${lbTxt(batchOf(src))} → ${lbTxt(batchOf(r))}), so none of these are counted.</div>`:''}${srcPlan.map(x=>{const f=anFollowed(x.exp,r)&&sameBatch(batchOf(src),batchOf(r));return `<div class="pl ${f?'y':'n'}">${f?'✓':'✗'} ${esc(x.title)}${f||!sameBatch(batchOf(src),batchOf(r))?'':' <span class="muted">— not made, so it isn\'t counted</span>'}</div>`}).join('')}${hasTaste(src)&&hasTaste(r)?`<br><span class="muted">Then: ${esc(tasteText(src))} → now: ${esc(tasteText(r))}</span>`:''}</div>`:''}
+  ${cardTimeHTML(r)}
   <div><div class="h3" style="margin-bottom:8px">How did it taste?</div><div id="aTaste"></div></div>
   <div><div class="h3" style="margin-bottom:8px">For the next roast</div>${!hasTaste(r)?'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Tell it how this roast tasted and the changes appear here.</div>':keep?'<div class="note">Tasted good — repeat it as is. Build the profile to use this roast as the background next time.</div>':recs.length?recs.map(x=>`<label class="rec ${x.on?'on':''}"><input type="checkbox" data-rec="${x.id}" ${x.on?'checked':''}><div><b>${esc(x.title)}</b><div class="muted">${esc(x.detail)}</div><div class="lrn">${x.L.tries?`${x.L.bad?'⚠ ':''}Helped ${x.L.helped} of ${x.L.tries} time${x.L.tries>1?'s':''} on this coffee at ${lbTxt(batchOf(r))}${x.mag!==1?` · step sized ${x.mag>1?'up':'down'} from what happened before`:''}`:`Not tried on this coffee at ${lbTxt(batchOf(r))} yet — starting rule`}</div></div></label>`).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">The curve doesn\'t point to a burner or air change for that taste. Note it in the comments and see how the next roast goes.</div>'}</div>
   <div class="row" style="margin-top:auto"><button class="pri" id="aBuild" ${!hasTaste(r)?'disabled':''}>Build next profile ★</button><button id="aOpen">Open roast #${r.num}</button><span class="sp"></span><span class="muted" style="font-size:calc(12px*var(--ts,1))">${(n=>n?`Learned from ${n} follow-up roast${n>1?'s':''} of this coffee at ${lbTxt(batchOf(r))}`:`Nothing learned for this coffee at ${lbTxt(batchOf(r))} yet`)(new Set(anOutcomes().filter(o=>o.coffee===coffeeKey(r)&&o.followed&&o.sameBatch&&sameBatch(o.batch,batchOf(r))).map(o=>o.to)).size)}</span></div>`;
