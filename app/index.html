@@ -601,10 +601,209 @@ html.ipad .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;paddi
 .ipad #scont .chk input[type=checkbox]::after{content:'';position:absolute;left:3px;top:3px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
 .ipad #scont .chk input[type=checkbox]:checked{background:var(--good)}
 .ipad #scont .chk input[type=checkbox]:checked::after{left:25px}
+/* ---------- iPhone: html.iphone — the phone has its own shell (#phApp); the iMac and iPad never show it ---------- */
+#phApp{display:none}
+html.iphone body>*:not(#phApp):not(#toast):not(#modalRoot):not(script){display:none!important}
+html.iphone,html.iphone body{background:var(--bg);overscroll-behavior:none}
+html.iphone #phApp{display:flex;flex-direction:column;position:fixed;inset:0;background:var(--bg);color:var(--text);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+html.iphone #toast{bottom:calc(96px + env(safe-area-inset-bottom,0px));max-width:calc(100vw - 32px);text-align:center;font-size:15px}
+html.iphone .modal{width:calc(100vw - 32px);padding:20px}
+html.iphone .modal button{min-height:46px;padding:0 16px;font-size:16px}
+html.iphone .modal input,html.iphone .modal textarea{font-size:17px}
+html.iphone .modal .row{flex-wrap:wrap}
+#phApp input,#phApp textarea,#phApp select{-webkit-user-select:text;user-select:text;font-size:17px}
+#phApp button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none}
+#phNav{flex:none;padding:calc(env(safe-area-inset-top,0px) + 6px) max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));background:var(--bg);display:flex;align-items:flex-end;gap:10px;min-height:calc(env(safe-area-inset-top,0px) + 52px)}
+#phNav h1{flex:1;margin:0;font-size:30px;font-weight:700;letter-spacing:-.015em;line-height:1.15;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#phNav .sub{font-size:13.5px;color:var(--text2);font-weight:500;padding-bottom:6px;white-space:nowrap}
+#phNav.small{align-items:center}
+#phNav.small h2{flex:1;text-align:center;margin:0;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#phNav .nl,#phNav .nr{flex:none;min-width:76px;display:flex}
+#phNav .nr{justify-content:flex-end}
+.p-lnk{border:0!important;background:none!important;padding:8px 0!important;color:var(--accent)!important;font-size:17px!important;font-weight:500;white-space:nowrap;min-height:40px}
+.p-lnk.b{font-weight:600}
+.p-lnk:disabled{opacity:.4}
+#phNav h1+.p-lnk,#phNav .sub+.p-lnk{padding-bottom:6px!important}
+#phView{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+html.iphone.kbOpen #phView{padding-bottom:calc(var(--kb,0px) + 24px)}
+html.iphone.kbOpen #phTabs{display:none}
+#phTabs{flex:none;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);background:var(--panel);padding:6px max(4px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 4px) max(4px,env(safe-area-inset-left,0px))}
+#phTabs button{border:0;background:none!important;box-shadow:none!important;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:500;color:var(--text2);padding:4px 0;min-height:48px;position:relative}
+#phTabs button svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#phTabs button.on{color:var(--accent)}
+#phTabs button i{position:absolute;top:3px;left:calc(50% + 7px);width:9px;height:9px;border-radius:50%;background:var(--danger);border:1.5px solid var(--panel)}
+#phTabs button i.live{background:var(--good)}
+/* parts */
+.p-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;flex:none}
+.p-h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
+.p-sec{display:flex;flex-direction:column;gap:7px}
+.p-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border:0;border-top:1px solid var(--line2);min-height:58px;width:100%;background:transparent;border-radius:0;text-align:left;white-space:normal}
+.p-row:first-child{border-top:0}
+button.p-row:active{background:var(--soft)}
+.p-row .m{flex:1;min-width:0}
+.p-row .m b{display:block;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-row .m small{display:block;font-size:13.5px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-row .r{text-align:right;font-variant-numeric:tabular-nums;font-size:14.5px;font-weight:500;flex:none}
+.p-row .r small{display:block;color:var(--text2);font-size:12.5px;font-weight:500}
+.p-row .gt{color:var(--border);font-size:22px;line-height:1;flex:none}
+.p-row.now{background:var(--accentSoft)}
+.p-row.now .r{color:var(--accent)}
+.p-row .fl{font-size:22px;flex:none;width:28px;text-align:center}
+.p-circ{flex:none;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--text2)}
+.p-circ.d{background:var(--good);border-color:var(--good);color:#fff}
+.p-circ.c{background:var(--accent);border-color:var(--accent);color:#fff}
+.p-pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:3px 7px;background:var(--soft);color:var(--text2);white-space:nowrap}
+.p-pill.a{background:var(--accentSoft);color:var(--accent)}
+.p-pill.g{background:color-mix(in srgb,var(--good) 13%,var(--panel));color:var(--good)}
+.p-pill.w{background:color-mix(in srgb,var(--warn) 14%,var(--panel));color:var(--warn)}
+.p-ban{display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 14px;background:color-mix(in srgb,var(--warn) 11%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 30%,var(--panel));flex:none}
+.p-ban .m{flex:1;font-size:14px;line-height:1.35;min-width:0}
+.p-ban .m b{display:block;font-size:15px}
+.p-ban.p-info{background:var(--accentSoft);border-color:color-mix(in srgb,var(--accent) 22%,var(--panel))}
+.p-ban.plain{background:var(--panel);border-color:var(--border)}
+.p-btn{font-size:16px;font-weight:600;border-radius:11px;border:1px solid var(--border);background:var(--panel);color:var(--text);padding:0 16px;min-height:44px;white-space:nowrap}
+.p-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.p-btn.sm{min-height:36px;font-size:14px;padding:0 12px;border-radius:9px}
+.p-btn.full{width:100%;min-height:52px;font-size:17px;flex:none}
+.p-btn:disabled{opacity:.45}
+.p-prog{display:flex;gap:3px}
+.p-prog i{flex:1;height:6px;border-radius:3px;background:var(--border)}
+.p-prog i.d{background:var(--good)}.p-prog i.c{background:var(--accent)}
+.p-seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--soft);border:1px solid var(--line2);border-radius:10px;padding:2px;flex:none}
+.p-seg button{border:0;background:transparent;text-align:center;font-size:14px;font-weight:500;padding:7px 0;border-radius:8px;color:var(--text2);min-height:34px}
+.p-seg button.on{background:var(--panel);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+.p-search{display:block;width:100%;background:var(--soft);border:1px solid var(--line2);border-radius:11px;padding:10px 12px;font-size:17px;color:var(--text);flex:none}
+.p-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.p-chips span{font-size:12.5px;font-variant-numeric:tabular-nums;background:var(--soft);border-radius:6px;padding:2px 7px;color:var(--text2);font-weight:500;white-space:nowrap}
+.p-chips span b{display:inline!important;font-size:inherit!important;color:var(--text);font-weight:600}
+.p-kv{display:grid;grid-template-columns:auto 1fr;font-size:15px}
+.p-kv>*{padding:10px 14px;border-top:1px solid var(--line2);font-variant-numeric:tabular-nums}
+.p-kv>:nth-child(-n+2){border-top:0}
+.p-kv>span{color:var(--text2);padding-right:4px}
+.p-kv>b{font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere}
+.p-kv small{color:var(--text2);font-weight:500;margin-left:6px}
+.p-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:none}
+.p-tile{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:0}
+.p-tile small{display:block;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-tile b{font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
+.p-tile b em{font-style:normal;font-size:13px;color:var(--text2);font-weight:500;margin-left:2px}
+.p-bar{height:5px;border-radius:3px;background:var(--soft);margin-top:6px;overflow:hidden;width:84px;margin-left:auto}
+.p-bar i{display:block;height:100%;background:var(--g-stock,var(--good));border-radius:3px}
+.p-bar.low i{background:var(--g-low,var(--warn))}
+.p-chart{background:var(--chartBg,var(--panel));border:1px solid var(--border);border-radius:14px;padding:8px 6px 6px;flex:none}
+.p-chart canvas{display:block;width:100%;height:250px}
+.p-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text2);padding:4px 6px 0}
+.p-legend i{display:inline-block;width:14px;border-top:2px solid;vertical-align:3px;margin-right:4px}
+.p-ev{display:flex;gap:6px;flex:none}
+.p-ev span{flex:1;min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:6px 8px;font-size:12px;color:var(--text2);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-ev span b{display:block;font-size:15px;color:var(--text)}
+.p-ev span.next{border-style:dashed}
+.p-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.p-field>label,.p-field>span{font-size:13.5px;color:var(--text2);font-weight:500}
+.p-inp{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--panel);border-radius:11px;padding:0 13px;min-height:52px}
+.p-inp:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accentSoft)}
+.p-inp input{flex:1;min-width:0;border:0!important;background:transparent!important;padding:0!important;font-size:21px!important;font-weight:600;font-variant-numeric:tabular-nums;outline:none;box-shadow:none!important}
+.p-inp input.t{font-size:17px!important;font-weight:500}
+.p-inp em{font-style:normal;font-size:15px;color:var(--text2);font-weight:500}
+.p-ta{width:100%;border:1px solid var(--border);background:var(--panel);border-radius:11px;padding:11px 13px;font-size:16px!important;line-height:1.45;min-height:110px;resize:none;color:var(--text)}
+.p-ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accentSoft);outline:none}
+.p-g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.p-calc{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;color:var(--text2);padding:0 2px}
+.p-calc b{color:var(--text);font-variant-numeric:tabular-nums}
+.p-note{margin:0;font-size:13px;color:var(--text2);line-height:1.45}
+.p-empty{padding:28px 18px;text-align:center;color:var(--text2);font-size:15px;line-height:1.5}
+.p-text{font-size:15.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.p-cmt{white-space:pre-wrap;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.p-cmt small{display:block;color:var(--text2);font-size:13.5px;margin-top:6px}
+/* sheet */
+#phSheet{position:absolute;inset:0;z-index:40;display:none}
+#phSheet.open{display:block}
+#phSheet .bg{position:absolute;inset:0;background:rgba(0,0,0,.34)}
+#phSheet .sh{position:absolute;left:0;right:0;bottom:0;max-height:88%;overflow-y:auto;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.22);padding:8px max(18px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 18px) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(--kb,0px) - 40px)}
+#phSheet .grab{width:38px;height:5px;border-radius:3px;background:var(--border);margin:0 auto;flex:none}
+.p-step{display:flex;align-items:center;gap:10px}
+.p-step>button{width:48px;height:48px;border-radius:50%;border:1px solid var(--border);display:grid;place-items:center;font-size:26px;line-height:1;background:var(--panel);color:var(--text);flex:none;padding:0}
+.p-step .p-inp{flex:1;justify-content:center}
+.p-step .p-inp input{text-align:center;font-size:30px!important}
+.p-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.p-quick button{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:10px 0;font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums;min-height:44px}
+/* cupping */
+.p-att{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 14px;border-top:1px solid var(--line2);min-height:52px}
+.p-att:first-child{border-top:0}
+.p-att>span{flex:1;font-size:15px;min-width:0}
+.p-att>button{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;color:var(--text);background:var(--panel);flex:none;padding:0;line-height:1}
+.p-att>b{width:54px;text-align:center;font-size:18px;font-variant-numeric:tabular-nums}
+.p-cups{display:flex;gap:7px}
+.p-cups button{width:30px;height:30px;border-radius:50%;background:var(--good);border:1.5px solid var(--good);padding:0}
+.p-cups button.x{background:var(--soft);border-color:var(--border)}
+.p-tags{display:flex;flex-wrap:wrap;gap:7px}
+.p-tags button{border:1px solid var(--border);background:var(--panel);border-radius:18px;padding:7px 12px;font-size:14px;font-weight:500;min-height:36px}
+.p-tags button.on{background:var(--accentSoft);border-color:color-mix(in srgb,var(--accent) 40%,var(--panel));color:var(--accent)}
+.p-samples{display:flex;gap:6px;overflow-x:auto;flex:none;padding:2px}
+.p-samples button{flex:1 0 64px;text-align:center;border:1px solid var(--border);border-radius:11px;padding:6px 4px;font-size:12.5px;color:var(--text2);background:var(--panel);min-height:48px}
+.p-samples button b{display:block;font-size:17px;color:var(--text)}
+.p-samples button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentSoft)}
+.p-total{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.p-total b{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+#phView .tags.taste{gap:7px}
+#phView .tags.taste button{min-height:36px;font-size:14px;padding:6px 11px}
+#phView .field{font-size:13.5px}
+#phView textarea.tNote{font-size:16px;min-height:80px}
+.p-pick{display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid var(--line2);min-height:54px}
+.p-pick:first-child{border-top:0}
+.p-pick input{width:24px;height:24px;flex:none;accent-color:var(--accent)}
+/* live */
+.p-status{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text2);flex:1;min-width:0;padding-bottom:4px}
+.p-status i{width:9px;height:9px;border-radius:50%;background:var(--text2);flex:none}
+.p-status i.on{background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 18%,transparent)}
+.p-status i.cl{background:var(--accent)}
+.p-status span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-big{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:none}
+.p-big>div{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 14px;min-width:0}
+.p-big small{display:flex;justify-content:space-between;font-size:13px;color:var(--text2);font-weight:500}
+.p-big b{display:block;font-size:42px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.12;font-family:var(--numFont)}
+.p-big .w{grid-column:1/-1}
+.p-big .w b{font-size:58px}
+.p-big .d{font-size:13px;color:var(--text2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.p-big .fall{color:var(--warn);font-weight:600}
+.p-sp{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;flex:none}
+.p-sp>div{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 9px;min-width:0}
+.p-sp small{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text2);font-weight:500;white-space:nowrap;overflow:hidden}
+.p-sp small i{width:8px;height:8px;border-radius:50%;flex:none}
+.p-sp b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* pricing */
+.p-pt{display:grid;grid-template-columns:minmax(0,1fr) 64px 64px 64px;font-variant-numeric:tabular-nums}
+.p-pt>*{padding:11px 0;border-top:1px solid var(--line2);font-size:15px;text-align:right;display:flex;align-items:center;justify-content:flex-end}
+.p-pt>.c{text-align:left;padding-left:14px;min-width:0;display:block}
+.p-pt>.e{padding-right:14px}
+.p-pt>.hd{border-top:0;font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--text2);text-transform:uppercase;padding-block:9px}
+.p-pt .c b{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-pt .c small{display:block;font-size:12.5px;color:var(--text2)}
+.p-pt .lo{color:var(--p-low,var(--warn));font-weight:600}
+.p-pt .ns{color:var(--text2)}
+.p-pg{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px 10px;align-items:start;font-variant-numeric:tabular-nums}
+.p-pg .hd{font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--text2);text-transform:uppercase}
+.p-pg .sz{font-size:16px;font-weight:600;padding-top:13px}
+.p-pg .sz small{display:block;font-size:12px;color:var(--text2);font-weight:500;margin-top:2px}
+.p-pg .p-inp{min-height:48px;padding:0 10px}
+.p-pg .p-inp input{font-size:18px!important}
+.p-pg .p-inp em{font-size:16px}
+.p-pg .mg{display:block;font-size:12px;font-weight:600;margin-top:4px;color:var(--good)}
+.p-pg .mg.lo{color:var(--p-low,var(--warn))}
+.p-pg .mg.ns{color:var(--text2);font-weight:500}
+.p-menu .p-row{min-height:52px}
+.p-menu .p-row .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--accentSoft);color:var(--accent)}
+.p-menu .p-row .ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.p-welcome{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:24px 4px}
+.p-welcome h2{margin:0;font-size:26px;font-weight:700}
+.p-welcome p{margin:0;font-size:16px;line-height:1.5;color:var(--text2)}
+.p-welcome code{font-family:inherit;font-weight:600;color:var(--text)}
 </style>
 </head>
 <body>
-<script>/* iPad layout: on an iPad (touch + iPad/"Macintosh" Safari), or ?ipad=1 for testing; ?ipad=0 forces it off */(function(){var q=location.search,on=/[?&]ipad=1/.test(q)||(!/[?&]ipad=0/.test(q)&&navigator.maxTouchPoints>1&&/iPad|Macintosh/.test(navigator.userAgent));if(on)document.documentElement.classList.add("ipad")})()</script>
+<script>/* iPhone layout: on an iPhone, or ?iphone=1 for testing (?iphone=0 forces it off). Never on an iPad or the iMac. */(function(){var q=location.search,d=document.documentElement;if(/[?&]iphone=1/.test(q)||(!/[?&]iphone=0/.test(q)&&/iPhone/.test(navigator.userAgent))){d.classList.add("iphone");var m=document.querySelector("meta[name=viewport]");if(m)m.setAttribute("content","width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover")}})()</script>
+<script>/* iPad layout: on an iPad (touch + iPad/"Macintosh" Safari), or ?ipad=1 for testing; ?ipad=0 forces it off */(function(){var q=location.search;if(document.documentElement.classList.contains("iphone"))return;var on=/[?&]ipad=1/.test(q)||(!/[?&]ipad=0/.test(q)&&navigator.maxTouchPoints>1&&/iPad|Macintosh/.test(navigator.userAgent));if(on)document.documentElement.classList.add("ipad")})()</script>
 
 <header>
   <div class="brand" id="brand"></div>
@@ -797,6 +996,7 @@ html.ipad .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;paddi
 <div id="ipBackdrop" class="ipOnly"></div>
 <div id="moreMenu" class="ipOnly" hidden><button data-s="pricing">Pricing</button><button data-s="cupping">Cupping</button><button data-s="analyze">Analyze</button><button data-s="settings">Settings</button></div>
 <div id="modalRoot"></div>
+<div id="phApp"></div>
 
 <script src="native.js"></script>
 <script>
@@ -808,6 +1008,7 @@ html.ipad .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;paddi
    ===================================================================== */
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const IPAD=document.documentElement.classList.contains('ipad');
+const IPHONE=document.documentElement.classList.contains('iphone');/* iPhone: look things up and quick entries — never roasts or controls (see the iPhone section) */
 let IPC=false;/* compact iPad layout: only on iPads shorter than the 13" (e.g. 10.5" = 834pt) */
 function ipcCheck(){if(!IPAD)return;const on=Math.min(innerHeight,screen.height||innerHeight)<930||/[?&]ipc=1/.test(location.search);if(on===IPC)return;IPC=on;document.documentElement.classList.toggle('ipc',on);if(typeof renderAll==='function'&&document.readyState!=='loading'){renderFkeys();renderIpToday();renderCtl();scheduleDraw()}}
 if(IPAD){ipcCheck();addEventListener('resize',ipcCheck)}
@@ -906,7 +1107,7 @@ let COL={};
 function applyTheme(){const c=cfg.theme.colors,r=document.documentElement.style;
   const map={ctlOn:'--c-ctl',bg:'--bg',panel:'--panel',text:'--text',text2:'--text2',border:'--border',accent:'--accent',chartBg:'--chartBg',grid:'--grid',axis:'--axis',bt:'--c-bt',ror:'--c-ror',exhaust:'--c-exhaust',bkg:'--c-bkg',burner:'--c-burner',air:'--c-air',drum:'--c-drum',pressure:'--c-pressure',phase:'--c-phase',tTime:'--t-time',tBT:'--t-bt',tRoR:'--t-ror',tSpB:'--t-spb',tSpA:'--t-spa',tSpD:'--t-spd',gStock:'--g-stock',gLow:'--g-low',gAdd:'--g-add',pWhole:'--p-whole',pRetail:'--p-retail',pLow:'--p-low',pCoffee:'--p-coffee',pOver:'--p-over',pLabor:'--p-labor',pBag:'--p-bag'};
   for(const [k,v] of Object.entries(map))r.setProperty(v,c[k]);
-  const lum=hexLum(c.panel);document.documentElement.style.colorScheme=lum<.35?'dark':'light';if(IPAD&&window.ZR_NATIVE&&ZR_NATIVE.chrome)ZR_NATIVE.chrome(c.bg,hexLum(c.bg)<.35);
+  const lum=hexLum(c.panel);document.documentElement.style.colorScheme=lum<.35?'dark':'light';if((IPAD||IPHONE)&&window.ZR_NATIVE&&ZR_NATIVE.chrome)ZR_NATIVE.chrome(c.bg,hexLum(c.bg)<.35);
   r.setProperty('--bigW',String(cfg.bigWeight||400));r.setProperty('--smallW',String(cfg.smallWeight||500));r.setProperty('--ts',String(TS()));r.setProperty('--bs',String((Number(cfg.bigScale)||100)/100));r.setProperty('--ss',String((Number(cfg.smallScale)||100)/100));r.setProperty('--font',fontStack(cfg.fontText,cfg.fontTextCustom));r.setProperty('--numFont',fontStack(cfg.fontNum,cfg.fontNumCustom));COL={...c};if($('#brand'))renderBrand();scheduleDraw()}
 function hexToRgb(h){h=String(h).replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');const n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255]}
 function hexLum(h){const [r,g,b]=hexToRgb(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*r+.7152*g+.0722*b}
@@ -1038,7 +1239,7 @@ function onData(data){const vals={};
   if(S.recording){const r=S.roast,lastS=r.samples.at(-1);if(lastS&&now-r.t0<=lastS.t){r.t0=now-(lastS.t+(Number(cfg.interval)||1));log('sys','Roast clock kept continuous after the data source restarted')}
     const t=now-r.t0,s={t:+t.toFixed(2)};for(const k of Object.keys(cfg.channels))s[k]=vals[k]==null?null:+vals[k].toFixed(2);
     r.samples.push(s);const ror=slope(r.samples,'bt',t,cfg.rorWindow);s.ror=ror==null?null:+ror.toFixed(2);detectTP(s);checkBtFall();checkAutoCool(s);S.dirty=true;checkReminders()}
-  renderLive();scheduleDraw()}
+  if(IPHONE)phData(vals);renderLive();scheduleDraw()}
 function checkAutoCool(s){const r=S.roast;if(!cfg.autoCoolOn||r.autoCooled||r.events.CHARGE==null||r.events.TP==null||!ok(s.bt)||s.bt<cfg.autoCoolC)return;
   const tpS=sampleAt(r.samples,r.events.TP);if(s.t-r.events.CHARGE<120||!tpS||!ok(tpS.bt)||s.bt<tpS.bt+25||!(ok(s.ror)&&s.ror>0))return;
   r.autoCooled=true;const at=`${fT(s.bt)}°${cfg.unit}`;
@@ -1048,7 +1249,7 @@ function checkAutoCool(s){const r=S.roast;if(!cfg.autoCoolOn||r.autoCooled||r.ev
   clearTimeout(S.autoStirT);S.autoStirT=setTimeout(()=>{if(!C.on||!link.connected()||(S.roast.id||S.roast.created)!==id)return;sendSwitch('stirrerState',true,true);if(S.recording)S.roast.tnotes.push({t:+(link.clock()-S.roast.t0).toFixed(1),text:'Stirrer on (auto)'});log('ctl','Auto stirrer ON');renderNotes();scheduleDraw()},d);renderNotes()}
 function detectTP(s){const ev=S.roast.events;if(ev.CHARGE==null||ev.TP!=null||!ok(s.bt)||s.t-ev.CHARGE<5)return;
   if(!S.tpMin||s.bt<S.tpMin.bt)S.tpMin={t:s.t,bt:s.bt};else if(s.bt-S.tpMin.bt>=1.5&&s.t-S.tpMin.t>=8){ev.TP=S.tpMin.t;log('evt','Turning point '+mmss(ev.TP-ev.CHARGE))}}
-function onPush(p,m){log('push',JSON.stringify(m));
+function onPush(p,m){log('push',JSON.stringify(m));if(IPHONE){phPush(p,m);return}
   if(p===cfg.msgCharge){if(!S.recording){if(cfg.startOnCharge){if(!startRoast(true))return}else{toast('Roaster charged — press START to record');return}}markEvent('CHARGE','machine')}
   else if(p===cfg.msgDrop){if(S.recording)markEvent('DROP','machine')}
   else if(p===cfg.eventMsg){const d=cfg.nodes.data?getPath(m,cfg.nodes.data):m,e=(d&&d[cfg.eventNode]!=null)?d[cfg.eventNode]:m[cfg.eventNode];
@@ -1058,6 +1259,7 @@ function onPush(p,m){log('push',JSON.stringify(m));
    Roast flow
    ================================================================ */
 async function startRoast(fromMachine){
+  if(IPHONE)return false;   /* the phone never records a roast */
   if(S.recording)return true;
   if(!link.connected()){toast('Not connected — press Connect first (or start the simulator in Settings → Connection)');return false}
   if(S.dirty&&S.roast.samples.length&&!S.viewingId){
@@ -1356,7 +1558,7 @@ async function syncFolderRaw(quiet){
   if(added||updated||removed)chg.unshift([added&&`${added} new roast${added>1?'s':''}`,updated&&`${updated} roast${updated>1?'s':''} updated`,removed&&`${removed} removed`].filter(Boolean).join(', '));
   sortHist();await persistHist();
   log('sys',`Folder synced: ${found.length} roast files read, ${added} new${chg.length?' — '+chg.join(' · '):''}`);
-  if(!quiet||chg.length){resolveBg();renderAll();if(quiet&&typeof curScreen!=='undefined'&&curScreen!=='roast')showScreen(curScreen)}
+  if(!quiet||chg.length){resolveBg();renderAll();if(IPHONE)phRefresh();if(quiet&&typeof curScreen!=='undefined'&&curScreen!=='roast')showScreen(curScreen)}
   return chg}
 /* biggest roast number already in the folder (from the file names: R0042_…) */
 async function folderMaxNum(){let mx=0;async function walk(d,depth){for await(const [name,h] of d.entries()){if(h.kind==='directory'&&depth<3)await walk(h,depth+1);else{const m=/^R(\d+)_/.exec(name);if(m)mx=Math.max(mx,+m[1])}}}
@@ -1372,7 +1574,7 @@ async function folderStamp(){if(window.ZR_NATIVE&&ZR_NATIVE.stamp){try{return (a
   try{await walk(FS.dir,0,'')}catch(e){return null}return sig}
 let watchSig=null,watchBusy=false;
 const userBusy=()=>{const a=document.activeElement;return !!($('#modalRoot').firstChild||$('#drawer').classList.contains('open')||(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))||
-  (typeof gMode!=='undefined'&&gMode!=='view')||(typeof cupMode!=='undefined'&&cupMode!=='view'))};
+  (typeof gMode!=='undefined'&&gMode!=='view')||(typeof cupMode!=='undefined'&&cupMode!=='view')||phBusy())};
 async function watchTick(force){if(watchBusy||FS.state!=='granted')return;watchBusy=true;
   try{await checkControlLock();
     if(S.recording||(!force&&(document.hidden||userBusy())))return;      /* never re-read the folder mid-roast or while you're typing */
@@ -1471,25 +1673,26 @@ const SWITCHES=[{p:'drivesState',label:'Drives',confirm:true},{p:'coolingFanStat
 const C={on:false,target:{},deb:{},wake:null};
 const ctlMax=k=>k==='burner'?clamp(Number(cfg.burnerMax)||100,0,100):100;
 function ctlBase(k){const t=C.target[k];return t&&performance.now()-t.at<6000?t.v:(ok(S.latest[k])?S.latest[k]:0)}
-function sendControl(k,v,auto){const c=CTL.find(x=>x.key===k);if(!auto)followTookOver(k);v=Math.round(clamp(v,0,ctlMax(k)));
+function sendControl(k,v,auto){if(IPHONE)return;const c=CTL.find(x=>x.key===k);if(!auto)followTookOver(k);v=Math.round(clamp(v,0,ctlMax(k)));
   if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
   if(link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[c.param]:v}})==null)return;
   C.target[k]={v,at:performance.now()};if(S.recording){S.roast.controlLog.push({t:+(link.clock()-S.roast.t0).toFixed(2),key:k,value:v,...(auto?{auto:true}:{})});S.dirty=true}
   log('ctl',`${c.label} → ${v}%${auto?' (auto, from background)':''}`);renderCtl()}
-function nudge(k,d){if(!C.on||!link.connected())return;followTookOver(k);const v=Math.round(clamp(ctlBase(k)+d,0,ctlMax(k)));C.target[k]={v,at:performance.now(),pending:true};renderCtl();clearTimeout(C.deb[k]);C.deb[k]=setTimeout(()=>sendControl(k,v),350)}
-async function sendSwitch(p,val,silent){const w=SWITCHES.find(x=>x.p===p);if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
+function nudge(k,d){if(IPHONE)return;if(!C.on||!link.connected())return;followTookOver(k);const v=Math.round(clamp(ctlBase(k)+d,0,ctlMax(k)));C.target[k]={v,at:performance.now(),pending:true};renderCtl();clearTimeout(C.deb[k]);C.deb[k]=setTimeout(()=>sendControl(k,v),350)}
+async function sendSwitch(p,val,silent){if(IPHONE)return;const w=SWITCHES.find(x=>x.p===p);if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
   if(p==='standby'&&S.sw.standby==null){const m=await link.ask({[cfg.nodes.command]:'getControlParams'},2500);const d=m&&(cfg.nodes.data?getPath(m,cfg.nodes.data):m);if(d&&typeof d.standby==='boolean'){S.sw.standby=d.standby;val=!d.standby}}
   if(!silent&&w.confirm&&cfg.confirmMachine&&!await ask(`Turn ${w.label} ${val?'ON':'OFF'}?`,'This is sent to the roaster now.',`Turn ${val?'on':'off'}`,!val))return;
   link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[p]:val}});S.sw[p]=val;S.swSentAt=performance.now();log('ctl',`${w.label} ${val?'ON':'OFF'}`);renderCtl();renderHeader()}
 async function pollSwitches(){if(!link.connected())return;const m=await link.ask({[cfg.nodes.command]:'getControlParams'},2500);if(!m)return;const d=cfg.nodes.data?getPath(m,cfg.nodes.data):m;if(!d||typeof d!=='object')return;
   if(S.swSentAt&&performance.now()-S.swSentAt<2500)return;
   for(const w of SWITCHES)if(typeof d[w.p]==='boolean')S.sw[w.p]=d[w.p];renderCtl();renderHeader()}
-function sendEventToRoaster(k){if(!C.on||!cfg.sendEvents||!link.connected())return;
+function sendEventToRoaster(k){if(IPHONE)return;if(!C.on||!cfg.sendEvents||!link.connected())return;
   if(k==='CHARGE'){link.sendCommand({[cfg.nodes.command]:'startRoasting',params:{mode:'manual'}});log('ctl','Sent start roast (Charge) to the roaster');return}
   if(k==='DROP'){link.sendCommand({[cfg.nodes.command]:'stopRoasting'});log('ctl','Sent stop roast (Drop) to the roaster');return}
   const type={DRY:cfg.evDRY,FCs:cfg.evFCs,FCe:cfg.evFCe,SCs:cfg.evSCs,SCe:cfg.evSCe}[k];if(!type||!C.on||!cfg.sendEvents||!link.connected())return;link.sendCommand({[cfg.nodes.command]:cfg.eventMsg,params:{type}})}
 async function wakeLock(on){try{if(on&&'wakeLock' in navigator&&!C.wake){C.wake=await navigator.wakeLock.request('screen');C.wake.addEventListener('release',()=>{C.wake=null})}else if(!on&&C.wake){await C.wake.release();C.wake=null}}catch(e){}}
 async function setControl(on,why){
+  if(IPHONE&&on)return;   /* never from the phone */
   if(on&&!C.on&&FS.state==='granted'){const L=await readLock();
     if(lockActive(L)&&L.id!==DEV.id&&!await ask(`Control is on at ${L.device||'another device'}`,`Only one device should control the roaster at a time. Take over Control here? ${L.device||'The other device'} will switch to watching only.`,'Take over'))return}
   if(on&&!C.on&&!store.get('zr2.ctlOk',false)){if(!await ask('Turn on Control?','The app will send burner, air and drum settings and the machine switches to the roaster. Stay at the roaster — its own panel and safety systems always come first. Keep this window in front and the Mac awake while roasting.','Turn on Control'))return;store.set('zr2.ctlOk',true)}
@@ -3184,6 +3387,391 @@ ${rows.map(({l,c})=>`<tr><td><b>${esc(l.name)}</b><small>${esc([l.origin,l.proce
   toast('Price sheet saved — open it in Safari and choose File › Export as PDF')}
 
 /* ================================================================
+   iPhone — for looking things up and quick entries, never for roasting.
+   Runs only when <html> has class "iphone" (an iPhone, or ?iphone=1 in a browser).
+   The phone never claims Control, never sends burner/air/drum/switch commands,
+   never records or numbers a roast (startRoast / setControl refuse on the phone).
+   It edits the same files the iMac and iPad use, through the same save and merge code.
+   ================================================================ */
+const PH={tab:'today',stacks:null,scroll:{},q:'',hf:'all',gf:'stock',side:'w',sheet:null,
+  draft:null,draftAt:0,lastLive:null,lock:null,polling:false,buf:[],wev:{},chargeW:null,ws:null,cupT:null,liveT:null};
+/* socket times: wall clock, or the simulator's own clock so a sped-up practice roast reads right */
+const phW=()=>link.sim&&link.simRef?link.simRef.simNow()*1000:Date.now();
+const PH_IC={
+  today:'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  hist:'<svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+  live:'<svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 4-7 5 5"/></svg>',
+  green:'<svg viewBox="0 0 24 24"><path d="M12 3c4.5 2 7 5.5 7 9.5S15.9 20 12 21c-3.9-1-7-4.5-7-8.5S7.5 5 12 3z"/><path d="M12 4.5c-1.5 3-1.5 12 0 15"/></svg>',
+  more:'<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg>',
+  cup:'<svg viewBox="0 0 24 24"><path d="M4 9h13v4a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6V9z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 3v3M12 3v3"/></svg>',
+  price:'<svg viewBox="0 0 24 24"><path d="M3.5 12.5l8-8H20v8.5l-8 8z"/><circle cx="15.5" cy="8.5" r="1.4"/></svg>',
+  folder:'<svg viewBox="0 0 24 24"><path d="M3.5 7a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>'};
+const PH_TABS=[['today','Today'],['hist','History'],['live','Live'],['green','Green'],['more','More']];
+const phRoot=t=>({today:{v:'today'},hist:{v:'hist'},live:{v:'live'},green:{v:'green'},more:{v:'more'}})[t];
+const phCur=()=>{const s=PH.stacks[PH.tab];return s[s.length-1]};
+const phKey=()=>PH.tab+':'+PH.stacks[PH.tab].length;
+/* screens where you're typing or scoring: the folder isn't re-read under you (see userBusy) */
+function phBusy(){if(!IPHONE||!PH.stacks)return false;return !!PH.sheet||['details','cup','cupNew','priceEdit','gAdd'].includes(phCur().v)}
+function phGo(v){PH.scroll[phKey()]=$('#phView').scrollTop;PH.stacks[PH.tab].push(v);phRender()}
+function phBack(){const s=PH.stacks[PH.tab];if(s.length>1){s.pop();delete PH.scroll[PH.tab+':'+(s.length+1)];phRender(false,true)}}
+function phTab(t){if(t===PH.tab){if(PH.stacks[t].length>1){PH.stacks[t]=[phRoot(t)];phRender()}else{$('#phView').scrollTo({top:0,behavior:'smooth'})}return}
+  PH.scroll[phKey()]=$('#phView').scrollTop;phSheetClose();if(PH.tab==='live'&&!link.manual)link.disconnect();   /* the phone reads the roaster only while you watch */
+  PH.tab=t;phRender(false,true);if(t==='live'||t==='today')phPollDraft()}
+function phRefresh(){if(IPHONE&&PH.stacks&&!phBusy())phRender(true)}
+const phNavBig=(title,sub,right)=>({cls:'',html:`<h1>${esc(title)}</h1>${sub?`<span class="sub">${sub}</span>`:''}${right||''}`});
+const phNavSmall=(back,title,right)=>({cls:'small',html:`<div class="nl">${back?`<button class="p-lnk" data-back>‹ ${esc(back)}</button>`:''}</div><h2>${esc(title)}</h2><div class="nr">${right||''}</div>`});
+const phBackLabel=()=>{const s=PH.stacks[PH.tab];const p=s[s.length-2];return p?({today:'Today',hist:'History',live:'Live',green:'Green',more:'More',roast:'Roast',cups:'Cupping',price:'Pricing',cup:'Session'})[p.v]||'Back':''};
+function phRender(keep,restore){if(!PH.stacks)return;const el=$('#phView'),st=keep?el.scrollTop:restore?(PH.scroll[phKey()]||0):0;
+  let out;try{out=(PHV[phCur().v]||PHV.today)(phCur())}catch(e){console.error(e);out={nav:phNavBig('Zuna Roast'),body:`<div class="p-empty">Something went wrong showing this screen.<br>${esc(e.message)}</div>`}}
+  const nav=$('#phNav');nav.className=out.nav.cls;nav.innerHTML=out.nav.html;el.innerHTML=out.body;el.scrollTop=st;
+  $$('[data-back]',nav).forEach(b=>b.onclick=()=>{if(out.onBack)out.onBack();else phBack()});
+  $$('#phTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===PH.tab));phTabDots();
+  if(out.wire)out.wire(el,nav)}
+function phTabDots(){const need=phNeeds().length,L=phLiveRoast();
+  $$('#phTabs button').forEach(b=>{let i=b.querySelector('i');const want=b.dataset.t==='today'&&need?'':b.dataset.t==='live'&&L&&!L.ended?'live':null;
+    if(want==null){if(i)i.remove();return}if(!i){i=document.createElement('i');b.appendChild(i)}i.className=want})}
+function phSheet(html,wire){const s=$('#phSheet');PH.sheet=true;s.innerHTML=`<div class="bg"></div><div class="sh" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;s.classList.add('open');
+  $('.bg',s).onclick=phSheetClose;if(wire)wire($('.sh',s))}
+function phSheetClose(){const s=$('#phSheet');if(!s)return;PH.sheet=null;s.classList.remove('open');s.innerHTML=''}
+
+/* ---------- small helpers ---------- */
+const phDay=iso=>{if(!iso)return '—';const a=ageOf(iso),t=new Date(iso).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+  if(a==='today')return 'Today '+t;if(a==='1 day')return 'Yesterday '+t;const d=new Date(iso),n=(Date.now()-d)/864e5;
+  return (n<6?d.toLocaleDateString([], {weekday:'short'}):d.toLocaleDateString([], {month:'short',day:'numeric'}))+' '+t};
+const phLb=v=>{const n=num(v);return ok(n)?(+n.toFixed(2))+' lb':'—'};
+const phMissing=r=>{const m=r.meta||{},a=[];if(!ok(num(m.roasted)))a.push('roasted weight');if(!ok(num(m.colorWhole))||!ok(num(m.colorGround)))a.push('colors');return a};
+function phNeeds(){const wk=Date.now()-14*864e5;return HIST.filter(r=>!r.archived&&r.source!=='simulator'&&r.samples&&r.samples.length&&new Date(r.chargedAt||r.created).getTime()>=wk&&phMissing(r).length)}
+const phMissTxt=r=>{const a=phMissing(r);return a.length===2?'Roasted weight and colors aren’t in yet.':a[0]==='colors'?'Colors aren’t in yet.':'Roasted weight isn’t in yet.'};
+const phCupTxt=v=>ok(Number(v))?`<span style="${cupSt(v)}">${Number(v).toFixed(2)}</span>`:'—';
+
+/* ---------- live roast: the iMac's roast-in-progress file in iCloud, plus the roaster itself when this phone is connected ---------- */
+async function phPollDraft(){if(!IPHONE||PH.polling||FS.state!=='granted')return;PH.polling=true;
+  try{if(PH.tab==='live'&&window.ZR_NATIVE&&ZR_NATIVE.refreshCloud)await ZR_NATIVE.refreshCloud();
+    const d=await readFolderJSON(['Settings'],'roast-in-progress.json'),okd=d&&d.roast&&Array.isArray(d.roast.samples)&&d.roast.samples.length;
+    if(okd){PH.draft=d}else{if(PH.draft){const r=PH.draft.roast;PH.lastLive={num:r.num,name:r.meta&&r.meta.name,at:Date.now()}}PH.draft=null}
+    PH.draftAt=Date.now();PH.lock=await readLock()}catch(e){}finally{PH.polling=false}
+  if(PH.tab==='live'&&phCur().v==='live')phRender(true);else if(PH.tab==='today'&&phCur().v==='today'&&!phBusy())phRender(true);else phTabDots()}
+function phData(v){if(!IPHONE)return;const w=phW();PH.ws={at:Date.now(),v};
+  PH.buf.push({w,bt:v.bt,burner:v.burner,fan:v.fan,drum:v.drum,exhaust:v.exhaust,pressure:v.pressure});while(PH.buf.length&&(PH.buf[0].w<w-25*60e3||PH.buf[0].w>w+1e3))PH.buf.shift();
+  if(PH.tab==='live'&&phCur().v==='live'&&!PH.liveT)PH.liveT=setTimeout(()=>{PH.liveT=null;if(PH.tab==='live'&&phCur().v==='live')phLiveUpdate()},400)}
+function phPush(p,m){if(!IPHONE)return;const w=phW();
+  if(p===cfg.msgCharge){PH.chargeW=w;PH.wev={CHARGE:w};PH.lastLive=null;return}
+  if(p===cfg.msgDrop){PH.wev.DROP=w;return}
+  if(p===cfg.eventMsg){const d=cfg.nodes.data?getPath(m,cfg.nodes.data):m,e=(d&&d[cfg.eventNode]!=null)?d[cfg.eventNode]:m[cfg.eventNode];
+    const k={[cfg.evDRY]:'DRY',[cfg.evFCs]:'FCs',[cfg.evFCe]:'FCe',[cfg.evSCs]:'SCs',[cfg.evSCe]:'SCe'}[e];if(k&&PH.wev[k]==null)PH.wev[k]=w}}
+/* one roast object for the chart and readouts: samples in seconds on the roast's own clock */
+function phLiveRoast(){const d=PH.draft,now=Date.now();
+  const withRor=arr=>{for(let i=0;i<arr.length;i++){const s=arr[i];if(!ok(s.ror)){const v=slope(arr.slice(Math.max(0,i-40),i+1),'bt',s.t,cfg.rorWindow);s.ror=v==null?null:v}}return arr};
+  if(d&&now-Date.parse(d.at)<5*60e3){const r=d.roast,last=r.samples[r.samples.length-1],lt=last?last.t:0,aw=Date.parse(d.at),wt=w=>lt+(w-aw)/1000;
+    const extra=withRor([...r.samples.slice(-60).map(s=>({...s})),...PH.buf.filter(s=>s.w>aw).map(s=>({...s,t:wt(s.w)}))]).filter(s=>s.t>lt);
+    const ev={...r.events};for(const [k,w] of Object.entries(PH.wev))if(ev[k]==null&&w>aw&&k!=='CHARGE')ev[k]=wt(w);
+    const live=PH.ws&&now-PH.ws.at<5000,tNow=live?wt(now):lt+(now-aw)/1000;
+    return {src:'draft',num:r.num,meta:r.meta||{},samples:[...r.samples,...extra],events:ev,tNow,at:aw,ended:ev.DROP!=null,live}}
+  if(PH.chargeW&&PH.ws&&now-PH.ws.at<5*60e3){const c=PH.chargeW,wn=phW(),ev={};for(const [k,w] of Object.entries(PH.wev))ev[k]=(w-c)/1000;
+    const samples=withRor(PH.buf.filter(s=>s.w>=c-30e3).map(s=>({...s,t:(s.w-c)/1000})));
+    if(ev.TP==null){let mn=null;for(const s of samples){if(s.t<5||!ok(s.bt))continue;if(!mn||s.bt<mn.bt)mn=s;else if(s.bt-mn.bt>=1.5&&s.t-mn.t>=8){ev.TP=mn.t;break}}}
+    return {src:'ws',num:null,meta:{},samples,events:ev,tNow:(wn-c)/1000,at:now,ended:ev.DROP!=null,live:now-PH.ws.at<5000}}
+  return null}
+
+/* ---------- the roast chart (bean temp, RoR, background, burner and air) ---------- */
+function phChart(cv,r,bg,opt={}){if(!cv||!r)return;const b=cv.getBoundingClientRect();if(b.width<50)return;const dp=devicePixelRatio||1;cv.width=b.width*dp;cv.height=b.height*dp;
+  const c=cv.getContext('2d');c.scale(dp,dp);const W=b.width,H=b.height,font=getComputedStyle(document.body).fontFamily,ev=r.events||{},o=ev.CHARGE??0;
+  const strip=46,L=34,R=26,T=10,B=18+strip,ph=H-T-B;
+  const endR=(ev.DROP!=null?ev.DROP:(opt.now??(r.samples.length?r.samples[r.samples.length-1].t:o)))-o+30;
+  const bo=bg?(bg.events.CHARGE??0):0,endB=bg&&bg.events.DROP!=null?bg.events.DROP-bo+30:0;
+  const tmax=Math.max(120,Math.ceil(Math.max(endR,endB,opt.live?600:0)/120)*120),X=t=>L+(t+30)/(tmax+30)*(W-L-R);
+  let lo=Infinity,hi=-Infinity;for(const [arr,oo] of [[r.samples,o],[bg?bg.samples:[],bo]])for(const s of arr){if(s.t<oo-5)continue;const v=toD(s.bt);if(ok(v)){lo=Math.min(lo,v);hi=Math.max(hi,v)}}
+  if(!isFinite(lo)){lo=isF()?150:65;hi=isF()?450:230}const st=isF()?50:25;lo=Math.floor((lo-5)/st)*st;hi=Math.ceil((hi+5)/st)*st;if(hi-lo<st*2)hi=lo+st*2;
+  const Y=v=>T+(1-(toD(v)-lo)/(hi-lo))*ph,rMin=Number(cfg.scales.rMin)||0,rMax=Number(cfg.scales.rMax)||(isF()?40:22),YR=v=>T+(1-(toDR(v)-rMin)/(rMax-rMin))*ph;
+  c.fillStyle=COL.chartBg||COL.panel;c.fillRect(0,0,W,H);c.font=`10.5px ${font}`;c.lineWidth=1;
+  c.strokeStyle=COL.grid;c.fillStyle=COL.axis;c.textAlign='right';
+  for(let v=lo;v<=hi+1e-6;v+=st){const y=T+(1-(v-lo)/(hi-lo))*ph;c.beginPath();c.moveTo(L,y);c.lineTo(W-R,y);c.stroke();c.fillText(String(v),L-5,y+3.5)}
+  c.textAlign='center';const ms=tmax>900?4:2;for(let m=0;m*60<=tmax;m+=ms){const x=X(m*60);c.fillText(String(m),x,T+ph+13)}
+  c.textAlign='left';c.fillStyle=COL.ror;const rs=rMax-rMin>30?10:5;for(let v=Math.ceil(rMin/rs)*rs;v<=rMax;v+=rs){c.fillText(String(v),W-R+5,T+(1-(v-rMin)/(rMax-rMin))*ph+3.5)}
+  const ln=(arr,oo,k,col,lw,Yf,from,to,dash)=>{c.strokeStyle=col;c.lineWidth=lw;c.setLineDash(dash||[]);c.beginPath();let p=false;
+    for(const s of arr){if(s.t<oo-30||(from!=null&&s.t<from)||(to!=null&&s.t>to)||!ok(s[k])){p=false;continue}const x=X(s.t-oo),y=Yf(s[k]);p?c.lineTo(x,y):c.moveTo(x,y);p=true}c.stroke();c.setLineDash([])};
+  c.save();c.beginPath();c.rect(L,T-2,W-L-R,ph+4);c.clip();
+  if(bg)ln(bg.samples,bo,'bt',COL.bkg,1.6,Y,null,bg.events.DROP!=null?bg.events.DROP+20:null,[5,4]);
+  ln(r.samples,o,'ror',COL.ror,1.6,YR,rorStart(ev)??o,ev.DROP);
+  ln(r.samples,o,'bt',COL.bt,2.2,Y,null,ev.DROP!=null?ev.DROP+30:null);c.restore();
+  c.font=`600 10px ${font}`;c.textAlign='center';
+  for(const [k,l] of [['TP','TP'],['DRY','DE'],['FCs','FC'],['DROP','Drop']]){const t=ev[k];if(t==null)continue;const s=sampleAt(r.samples,t);if(!s||!ok(s.bt))continue;const x=X(t-o),y=Y(s.bt);
+    c.fillStyle=COL.chartBg||COL.panel;c.strokeStyle=COL.bt;c.lineWidth=1.6;c.beginPath();c.arc(x,y,3.2,0,7);c.fill();c.stroke();c.fillStyle=COL.text2||COL.axis;c.fillText(l,x,y-8)}
+  if(opt.live&&ok(opt.now)&&ev.DROP==null){const x=X(opt.now-o),s=r.samples[r.samples.length-1];c.strokeStyle=COL.accent;c.setLineDash([2,3]);c.beginPath();c.moveTo(x,T);c.lineTo(x,T+ph);c.stroke();c.setLineDash([]);
+    if(s&&ok(s.bt)){c.fillStyle=COL.accent;c.beginPath();c.arc(X(s.t-o),Y(s.bt),4,0,7);c.fill()}}
+  // burner and air, as steps, under the chart
+  const y0=T+ph+22,lane=(strip-8)/2;c.font=`10px ${font}`;c.textAlign='right';c.fillStyle=COL.axis;c.fillText('Burner',L-4,y0+lane/2+3);c.fillText('Air',L-4,y0+lane+6+lane/2+3);
+  const step=(k,col,top)=>{c.strokeStyle=col;c.lineWidth=1.8;c.beginPath();let p=false,last=null,lx=-99;const mx=ctlMax(k)||100,Ys=v=>top+lane-clamp(v/mx,0,1)*lane;c.fillStyle=col;c.textAlign='left';c.font=`600 9.5px ${font}`;
+    const marks=[];for(const s of r.samples){if(s.t<o-30||(ev.DROP!=null&&s.t>ev.DROP+10)||!ok(s[k]))continue;const x=X(s.t-o),y=Ys(s[k]);if(!p){c.moveTo(x,y);p=true}else{c.lineTo(x,Ys(last))}c.lineTo(x,y);
+      if(last==null||Math.abs(s[k]-last)>=1)marks.push({x,y,v:s[k]});last=s[k]}c.stroke();
+    /* label each setting where it settled: a quick follow-up change shows only the value it ended on */
+    marks.forEach((m,i)=>{const n=marks[i+1];if(n&&n.x-m.x<22)return;if(m.x-lx<20)return;c.fillText(String(Math.round(m.v)),m.x+2,Math.max(top+7,m.y-3));lx=m.x})};
+  step('burner',COL.burner,y0);step('fan',COL.air,y0+lane+6)}
+const phLegend=bg=>`<div class="p-legend"><span><i style="border-color:var(--c-bt)"></i>Bean temp</span><span><i style="border-color:var(--c-ror)"></i>RoR</span>${bg?'<span><i style="border-color:var(--c-bkg);border-top-style:dashed"></i>Background</span>':''}<span><i style="border-color:var(--c-burner)"></i>Burner</span><span><i style="border-color:var(--c-air)"></i>Air</span></div>`;
+function phEvents(r,plan){const ev=r.events||{},o=ev.CHARGE??0,box=(k,l)=>{const t=ev[k];if(t==null)return '';const s=sampleAt(r.samples,t);return `<span>${l}<b>${mmss(t-o)}</b>${s&&ok(s.bt)?fT(s.bt)+'°':''}</span>`};
+  let h=box('TP','TP')+box('DRY','Dry end')+box('FCs','FC')+box('DROP','Drop');
+  if(plan&&ev.FCs==null&&plan.events&&plan.events.FCs!=null){const po=plan.events.CHARGE??0,s=sampleAt(plan.samples,plan.events.FCs);h+=`<span class="next">FC plan<b>~${mmss(plan.events.FCs-po)}</b>${s&&ok(s.bt)?fT(s.bt)+'°':''}</span>`}
+  return h?`<div class="p-ev">${h}</div>`:''}
+
+/* ================================================================ phone screens ================================================================ */
+const PHV={};
+PHV.today=()=>{planRoll();const items=PLAN.items,done=items.filter(x=>x.status==='done'),need=phNeeds(),L=phLiveRoast();
+  const lbAll=items.reduce((a,x)=>a+(num(x.green)||0),0),lbDone=done.reduce((a,x)=>a+(num(x.green)||0),0);
+  let curId=null;if(L&&!L.ended){const nd=items.filter(x=>x.status!=='done'),nm=normName(L.meta.name);const m=(nm&&nd.find(x=>normName(x.name)===nm))||nd[0];curId=m?m.id:null}
+  const nextId=(items.find(x=>x.status!=='done'&&x.id!==curId)||{}).id;
+  const rows=items.map((x,i)=>{const r=x.roastId&&HIST.find(h=>h.id===x.roastId),nm=esc(x.name||x.coffee||'Batch'),lot=x.lot?' · Lot '+esc(x.lot):'';
+    if(x.status==='done'){const miss=r?phMissing(r):[],right=!r?'':miss.includes('roasted weight')?'<span class="p-pill w">Details</span>':`${phLb(r.meta.roasted)}<small>${miss.length?'<span class="p-pill w">Colors</span>':`W ${esc(r.meta.colorWhole)} / G ${esc(r.meta.colorGround)}`}</small>`;
+      return `<button class="p-row" data-open="${r?r.id:''}"><span class="p-circ d">✓</span><div class="m"><b>${nm}</b><small>#${x.roastNum||'—'} · ${phLb(x.green)}${r?' · '+new Date(r.chargedAt||r.created).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):''}</small></div><span class="r">${right}</span></button>`}
+    if(x.id===curId)return `<button class="p-row now" data-live="1"><span class="p-circ c">${i+1}</span><div class="m"><b>${nm}</b><small>Roasting now${L.num?' · #'+L.num:''} · ${phLb(x.green)}</small></div><span class="r">${mmss(L.tNow-(L.events.CHARGE??0))}<small>Watch ›</small></span></button>`;
+    return `<div class="p-row"><span class="p-circ">${i+1}</span><div class="m"><b>${nm}</b><small>${x.id===nextId?'Next · ':''}${phLb(x.green)}${lot}</small></div></div>`}).join('');
+  const n0=need[0],date=new Date().toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'});
+  const body=`${items.length?`<div class="p-sec"><div class="p-calc" style="font-size:15px"><b>${done.length} of ${items.length} done</b><span>${+lbDone.toFixed(1)} lb of ${+lbAll.toFixed(1)} lb green</span></div><div class="p-prog">${items.map(x=>`<i class="${x.status==='done'?'d':x.id===curId?'c':''}"></i>`).join('')}</div></div>`:''}
+    ${n0?`<div class="p-ban"><div class="m"><b>#${n0.num} needs details${need.length>1?` <span style="font-weight:500;color:var(--text2)">· and ${need.length-1} more</span>`:''}</b>${phMissTxt(n0)}</div><button class="p-btn sm pri" data-det="${n0.id}">Add</button></div>`:''}
+    ${items.length?`<div class="p-card">${rows}</div>`:`<div class="p-card"><div class="p-empty">No batches planned for today.<br>Plan them on the iMac or iPad (Today screen).</div></div>`}
+    ${need.length>1?`<div class="p-sec"><span class="p-h3">Still need details</span><div class="p-card">${need.slice(1,8).map(r=>`<button class="p-row" data-det="${r.id}"><div class="m"><b><span style="color:var(--text2);font-weight:500">#${r.num}</span> ${esc(r.meta.name||'Untitled')}</b><small>${phDay(r.chargedAt||r.created)} · ${esc(phMissing(r).join(' and '))}</small></div><span class="gt">›</span></button>`).join('')}</div></div>`:''}
+    ${!L&&PH.lastLive&&Date.now()-PH.lastLive.at<30*60e3?`<p class="p-note">Roast #${PH.lastLive.num} finished on the iMac. It shows up in History once it’s saved.</p>`:''}`;
+  return {nav:phNavBig('Today',esc(date)),body,wire:el=>{
+    $$('[data-det]',el).forEach(b=>b.onclick=()=>phGo({v:'details',id:b.dataset.det}));
+    $$('[data-open]',el).forEach(b=>b.onclick=()=>{if(b.dataset.open)phGo({v:'roast',id:b.dataset.open})});
+    $$('[data-live]',el).forEach(b=>b.onclick=()=>phTab('live'))}}};
+
+const phHistList=()=>{const q=normName(PH.q),wk=Date.now()-7*864e5;
+  return HIST.filter(r=>{if(PH.hf==='prof'&&!r.isProfile)return false;if(PH.hf==='week'&&new Date(r.chargedAt||r.created).getTime()<wk)return false;
+    return !q||normName(['#'+r.num,r.num,r.meta.name,r.meta.coffee,r.meta.lot,r.meta.notes].join(' ')).includes(q)})};
+function phHistRows(){const list=phHistList(),shown=list.slice(0,PH.hn||60);
+  if(!list.length)return `<div class="p-card"><div class="p-empty">${HIST.length?'No roasts match.':'No saved roasts yet.'}</div></div>`;
+  return `<div class="p-card">${shown.map(r=>{const s=r.summary||summarize(r),m=r.meta;
+    return `<button class="p-row" data-r="${r.id}" style="align-items:flex-start"><div class="m"><b><span style="color:var(--text2);font-weight:500">#${r.num}</span> ${esc(m.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</b><small>${esc(m.coffee||'—')} · ${phDay(r.chargedAt||r.created)}</small>
+      <div class="p-chips"><span><b>${phLb(m.green).replace(' lb','')} → ${phLb(m.roasted)}</b></span>${ok(s.loss)?`<span>Loss <b>${s.loss.toFixed(1)}%</b></span>`:''}<span>W/G <b>${esc(m.colorWhole||'—')} / ${esc(m.colorGround||'—')}</b></span>${ok(s.dev)?`<span>Dev <b>${mmss(s.dev)}</b></span>`:''}${ok(r.cup)?`<span>Cup <b>${phCupTxt(r.cup)}</b></span>`:''}</div></div><span class="gt" style="margin-top:12px">›</span></button>`}).join('')}</div>
+    ${list.length>shown.length?`<button class="p-btn full" id="phMore">Show more (${list.length-shown.length})</button>`:''}`}
+PHV.hist=()=>({nav:phNavBig('History',HIST.length?HIST.length+' roasts':''),
+  body:`<input class="p-search" id="phQ" type="search" placeholder="Search name, coffee, lot, #…" value="${esc(PH.q)}" autocomplete="off" enterkeyhint="search">
+    <div class="p-seg" id="phHf">${[['all','All'],['prof','Profiles ★'],['week','This week']].map(([k,l])=>`<button data-f="${k}" class="${PH.hf===k?'on':''}">${l}</button>`).join('')}</div><div id="phHl" style="display:contents">${phHistRows()}</div>`,
+  wire:el=>{const wireRows=()=>{$$('[data-r]',el).forEach(b=>b.onclick=()=>phGo({v:'roast',id:b.dataset.r}));const m=$('#phMore');if(m)m.onclick=()=>{PH.hn=(PH.hn||60)+100;$('#phHl').innerHTML=phHistRows();wireRows()}};
+    $('#phQ').oninput=e=>{PH.q=e.target.value;PH.hn=60;$('#phHl').innerHTML=phHistRows();wireRows()};
+    $('#phQ').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});
+    $$('#phHf button').forEach(b=>b.onclick=()=>{PH.hf=b.dataset.f;PH.hn=60;phRender(true)});wireRows()}});
+
+PHV.roast=v=>{const r=HIST.find(x=>x.id===v.id);if(!r)return {nav:phNavSmall(phBackLabel(),'Roast'),body:'<div class="p-empty">This roast isn’t here anymore.</div>'};
+  const s=r.summary||summarize(r),m=r.meta,c=costOf(r),adj=adjustments(r),o=r.events.CHARGE??0,sp=spreadOf(m),bg=r.bgId?findAny(r.bgId):null,bgOk=bg&&bg.id!==r.id&&bg.samples&&bg.samples.length?bg:null;
+  const notes=(r.tnotes||[]).map(n=>mmss(n.t-o)+'  '+n.text).join('\n');
+  const body=`<div><div style="font-size:21px;font-weight:700;line-height:1.25">${esc(m.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</div><div style="font-size:14px;color:var(--text2);margin-top:3px">${fmtLong(r.chargedAt||r.created)} · ${phLb(m.green)}${m.lot?' · Lot '+esc(m.lot):''}</div></div>
+    <div class="p-chart"><canvas id="phCv"></canvas>${phLegend(bgOk)}</div>
+    ${phEvents(r)}
+    <div class="p-card"><div class="p-kv">
+      <span>Development</span><b>${mmss(s.dev)}</b>
+      <span>Drop</span><b>${mmss(s.drop)}${ok(s.dropBT)?`<small>${fT(s.dropBT)}°${cfg.unit}</small>`:''}</b>
+      <span>Green → roasted</span><b>${phLb(m.green).replace(' lb','')} → ${phLb(m.roasted)}${ok(s.loss)?`<small>${s.loss.toFixed(1)}%</small>`:''}</b>
+      <span>Color whole / ground</span><b>${esc(m.colorWhole||'—')} / ${esc(m.colorGround||'—')}${ok(sp)?`<small>spread ${spTxt(sp)}</small>`:''}</b>
+      <span>Green coffee</span><b>${esc(m.coffee||'—')}</b>
+      ${c&&ok(c.batch)?`<span>Batch cost</span><b>${money(c.batch)}${ok(c.perLb)?`<small>${money(c.perLb)}/lb</small>`:''}</b>`:''}
+      <span>Cup score</span><b>${phCupTxt(r.cup)}</b>
+      ${bgOk?`<span>Background</span><b>${esc(rTag(bgOk))} ${esc(bgOk.meta.name||'')}</b>`:''}
+    </div></div>
+    ${adj.length?`<div class="p-sec"><span class="p-h3">Burner &amp; air changes</span><div class="p-card"><div class="p-kv">${adj.map(a=>`<span>${mmss(a.t-o)}</span><b>${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}%</b>`).join('')}</div></div></div>`:''}
+    <div class="p-sec"><span class="p-h3">Comments</span><div class="p-cmt">${m.notes?esc(m.notes):'<span style="color:var(--text2)">No comments.</span>'}${notes?`<small>${esc(notes)}</small>`:''}</div></div>
+    ${phMissing(r).length?`<button class="p-btn full pri" id="phDet">Add roast details</button>`:''}`;
+  return {nav:phNavSmall(phBackLabel(),'#'+r.num,`<button class="p-lnk" id="phEdit">Edit</button>`),body,wire:(el,nav)=>{
+    $('#phEdit',nav).onclick=()=>phGo({v:'details',id:r.id});const d=$('#phDet');if(d)d.onclick=()=>phGo({v:'details',id:r.id});
+    phChart($('#phCv'),r,bgOk)}}};
+
+PHV.details=v=>{const r=HIST.find(x=>x.id===v.id);if(!r)return {nav:phNavSmall(phBackLabel(),'Roast details'),body:'<div class="p-empty">This roast isn’t here anymore.</div>'};
+  const m=r.meta,s=r.summary||summarize(r);
+  const body=`<div class="p-card"><div class="p-row"><div class="m"><b>#${r.num} ${esc(m.name||'Untitled')}</b><small>${phDay(r.chargedAt||r.created)}${ok(s.drop)?' · Drop '+mmss(s.drop):''}${m.lot?' · Lot '+esc(m.lot):''}</small></div></div></div>
+    <div class="p-field"><label for="phDR">Roasted weight</label><div class="p-inp"><input id="phDR" inputmode="decimal" enterkeyhint="next" value="${esc(m.roasted||'')}" placeholder="0.00" autocomplete="off"><em>lb</em></div></div>
+    <div class="p-calc"><span>Green ${phLb(m.green)}</span><span>Weight loss <b id="phDLoss">—</b></span></div>
+    <div class="p-g2"><div class="p-field"><label for="phDW">Whole bean (Agtron)</label><div class="p-inp"><input id="phDW" inputmode="decimal" enterkeyhint="next" value="${esc(m.colorWhole||'')}" autocomplete="off"></div></div>
+      <div class="p-field"><label for="phDG">Ground (Agtron)</label><div class="p-inp"><input id="phDG" inputmode="decimal" enterkeyhint="next" value="${esc(m.colorGround||'')}" autocomplete="off"></div></div></div>
+    <div class="p-calc"><span>Color spread</span><span id="phDSp">—</span></div>
+    <div class="p-field"><label for="phDN">Comments</label><textarea class="p-ta" id="phDN" placeholder="Aroma, appearance, how it went…">${esc(m.notes||'')}</textarea></div>
+    <button class="p-btn full pri" id="phDSave">Save roast details</button>
+    <p class="p-note" style="text-align:center">Saves to this roast’s file in the shared folder. The iMac and iPad pick it up on their next check.</p>`;
+  const calc=()=>{const g=num(m.green),w=num($('#phDR').value),sp=spreadOf({colorWhole:$('#phDW').value,colorGround:$('#phDG').value});
+    $('#phDLoss').innerHTML=g&&w?`<span style="${w>g?'color:var(--danger)':''}">${((g-w)/g*100).toFixed(1)}%</span>`:'—';
+    $('#phDSp').innerHTML=ok(sp)?`<b>${spTxt(sp,true)}</b>${cfg.spColorsOn?` <span>${esc(spBand(sp).label)}</span>`:''}`:'—'};
+  const save=async()=>{const vals={roasted:$('#phDR').value.trim(),colorWhole:$('#phDW').value.trim(),colorGround:$('#phDG').value.trim()};
+    for(const [k,l] of [['roasted','Roasted weight'],['colorWhole','Whole bean color'],['colorGround','Ground color']])if(vals[k]&&!ok(num(vals[k]))){toast(l+' must be a number');return}
+    const g=num(m.green),w=num(vals.roasted);if(g&&w&&w>g){toast('Roasted weight is more than the green weight — check it');return}
+    const cur=HIST.find(x=>x.id===r.id)||r;cur.meta={...cur.meta,...vals,notes:$('#phDN').value};$('#phDSave').disabled=true;
+    try{await commitRoast(cur,true);toast(`Roast #${cur.num} saved`);phBack()}catch(e){toast('Could not save: '+e.message);$('#phDSave').disabled=false}};
+  return {nav:phNavSmall('Cancel','Roast details','<button class="p-lnk b" id="phDSave2">Save</button>'),body,onBack:phBack,
+    wire:(el,nav)=>{$('.nl .p-lnk',nav).textContent='Cancel';calc();['#phDR','#phDW','#phDG'].forEach(q=>$(q).oninput=calc);$('#phDSave').onclick=save;$('#phDSave2',nav).onclick=save}}};
+
+PHV.live=()=>{const L=phLiveRoast(),now=Date.now(),wsOn=link.connected(),wsFresh=PH.ws&&now-PH.ws.at<5000;
+  const who=PH.lock&&lockActive(PH.lock)?esc(PH.lock.device||'another device'):'the iMac';
+  let st,dot;if(wsFresh){st='Live from the roaster';dot='on'}else if(L&&L.src==='draft'){const a=Math.max(0,Math.round((now-L.at)/1000));st=`From iCloud · updated ${a<60?a+' s':Math.round(a/60)+' min'} ago`;dot='cl'}
+    else if(wsOn){st='Connected to the roaster';dot='on'}else if(link.state==='connecting'||link.state==='reconnecting'){st='Connecting to the roaster…';dot=''}else{st='Not connected to the roaster';dot=''}
+  const nav={cls:'small',html:`<div class="p-status"><i class="${dot}"></i><span>${st}</span></div>${L&&L.num?`<span class="p-pill a" style="margin-bottom:4px">#${L.num}</span>`:''}`};
+  const conn=`<div class="p-ban plain"><div class="m"><b>${wsOn?'Watching the roaster':'Second-by-second values'}</b>${wsOn?'This phone only reads values. It never changes anything on the machine.':`Connect on the roastery Wi-Fi to read the roaster directly (${esc(cfg.host)}). Read only.`}</div><button class="p-btn sm ${wsOn?'':'pri'}" id="phConn">${wsOn?'Disconnect':link.manual?'Connect':'Stop'}</button></div>`;
+  if(!L){const v=wsFresh?PH.ws.v:null;
+    return {nav,body:`${v?`<div class="p-big"><div class="w"><small><span>Bean temp</span><span>°${cfg.unit}</span></small><b>${fT(v.bt)}</b><span class="d">Waiting for Charge</span></div></div>
+      <div class="p-sp">${phSp(v)}</div>`:`<div class="p-card"><div class="p-empty">No roast in progress right now.<br>When ${who} starts a roast, it shows up here.</div></div>`}
+      ${!L&&PH.lastLive&&now-PH.lastLive.at<30*60e3?`<p class="p-note">Roast #${PH.lastLive.num}${PH.lastLive.name?' · '+esc(PH.lastLive.name):''} finished. It shows up in History once it’s saved.</p>`:''}
+      ${conn}<div class="p-ban p-info"><div class="m" style="font-size:13.5px">View only. Burner, air, drum and switches are controlled from ${who}.</div></div>`,wire:phLiveWire}}
+  const ev=L.events,o=ev.CHARGE??null,last=L.samples[L.samples.length-1]||{},v=wsFresh?PH.ws.v:last,bg=profileByName(L.meta.name,num(L.meta.green)),bgOk=bg&&bg.samples&&bg.samples.length?bg:null;
+  const t=o==null?null:(ev.DROP!=null?ev.DROP:L.tNow)-o,rorOn=o!=null&&ev.DROP==null&&L.tNow>=(rorStart(ev)??o),ror=!rorOn?null:wsFresh&&ok(S.liveRor)?S.liveRor:last.ror;
+  const phase=o==null?'Waiting for Charge':ev.DROP!=null?'Dropped':ev.FCs!=null?`Dev ${mmss(L.tNow-ev.FCs)} since FC`:ev.DRY!=null?`${mmss(L.tNow-ev.DRY)} since dry end`:'Drying';
+  const at6=o!=null?sampleAt(L.samples,o+360):null,six=at6&&Math.abs(at6.t-(o+360))<5&&ok(at6.ror)?`At 6:00 · ${toDR(at6.ror).toFixed(1)}`:'';
+  let fall='';if(ev.TP!=null&&ev.DROP==null&&L.samples.length>8){let hi=-Infinity;for(const s of L.samples){if(s.t>ev.TP+15&&ok(s.bt))hi=Math.max(hi,s.bt)}if(ok(last.bt)&&hi-last.bt>=0.55)fall=`Falling −${(toDR(hi-last.bt)).toFixed(1)}°`}
+  const body=`<div style="font-size:17px;font-weight:600">${esc(L.meta.name||'Roast in progress')}${ok(num(L.meta.green))?` <span style="color:var(--text2);font-weight:500">· ${phLb(L.meta.green)}</span>`:''}</div>
+    <div class="p-big"><div class="w"><small><span>Bean temp</span><span>°${cfg.unit}</span></small><b>${fT(v.bt)}</b>${fall?`<span class="d fall">${fall}</span>`:''}</div>
+      <div><small><span>${ev.DROP!=null?'Roast time':'Roast time'}</span></small><b>${t==null?'—':mmss(t)}</b><span class="d">${phase}</span></div>
+      <div><small><span>Rate of rise</span><span>°${cfg.unit}/min</span></small><b style="color:var(--t-ror,var(--c-ror))">${ok(ror)?toDR(ror).toFixed(1):'—'}</b><span class="d">${six}</span></div></div>
+    <div class="p-sp">${phSp(v)}</div>
+    <div class="p-chart"><canvas id="phCv" style="height:230px"></canvas>${phLegend(bgOk)}</div>
+    ${phEvents(L,bgOk)}
+    ${L.src==='draft'&&!wsFresh?`<p class="p-note">iCloud brings the iMac’s roast over every few seconds, so these numbers can lag a little. Connect on the roastery Wi-Fi for live values.</p>`:''}
+    ${conn}<div class="p-ban p-info"><div class="m" style="font-size:13.5px">View only. Burner, air, drum and switches are controlled from ${who}.</div></div>`;
+  return {nav,body,wire:el=>{phLiveWire(el);phChart($('#phCv'),L,bgOk,{live:true,now:L.tNow})}}};
+function phSp(v){return `<div><small><i style="background:var(--c-burner)"></i>Burner</small><b>${ok(v.burner)?Math.round(v.burner)+'%':'—'}</b></div><div><small><i style="background:var(--c-air)"></i>Air</small><b>${ok(v.fan)?Math.round(v.fan)+'%':'—'}</b></div>
+  <div><small>Exhaust</small><b>${ok(v.exhaust)?Math.round(toD(v.exhaust))+'°':'—'}</b></div><div><small>Air press.</small><b>${ok(v.pressure)?fP(v.pressure)+' '+pU():'—'}</b></div>`}
+function phLiveWire(el){const b=$('#phConn',el);if(b)b.onclick=()=>{if(!link.manual)link.disconnect();else link.connect(false);setTimeout(()=>phRender(true),150)}}
+function phLiveUpdate(){if(PH.sheet||document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))return;phRender(true)}
+
+PHV.green=()=>{const list=INV.filter(l=>PH.gf==='stock'?invLeft(l)>0.001:invLeft(l)<=0.001),inStock=INV.filter(l=>invLeft(l)>0.001),onHand=inStock.reduce((a,l)=>a+invLeft(l),0),low=inStock.filter(l=>invLeft(l)<LOW);
+  list.sort((a,b)=>PH.gf==='stock'?((invLeft(a)<LOW)-(invLeft(b)<LOW))*-1||String(a.name).localeCompare(String(b.name)):String(b.created||'').localeCompare(String(a.created||'')));
+  const rows=list.map(l=>{const left=invLeft(l),start=(num(l.startLb)||0)+(l.adj||[]).filter(x=>num(x.lb)>0).reduce((a,x)=>a+num(x.lb),0),pct=start?clamp(left/start*100,0,100):0,lw=left<LOW&&left>0.001,p=num(l.price);
+    return `<button class="p-row" data-g="${l.id}"><span class="fl">${flagOf(l.origin)||'·'}</span><div class="m"><b>${esc(l.name)}</b><small>${esc([l.process,l.lot&&'Lot '+l.lot,ok(p)&&money(p)+'/lb'].filter(Boolean).join(' · ')||l.origin||'')}</small></div><div class="r"><span style="${lw?'color:var(--g-low,var(--warn));font-weight:600':''}">${left.toFixed(1)} lb</span><div class="p-bar ${lw?'low':''}"><i style="width:${pct}%"></i></div></div></button>`}).join('');
+  return {nav:phNavBig('Green','',`<button class="p-lnk" id="phGAdd">+ Coffee</button>`),
+    body:`<div class="p-tiles"><div class="p-tile"><small>On hand</small><b>${Math.round(onHand)}<em>lb</em></b></div><div class="p-tile"><small>Coffees</small><b>${inStock.length}</b></div><div class="p-tile"><small>Low</small><b style="${low.length?'color:var(--g-low,var(--warn))':''}">${low.length}</b></div></div>
+      ${low.length?`<div class="p-ban"><div class="m"><b>${low.length} running low</b>${esc(low.map(l=>l.name+' '+invLeft(l).toFixed(0)+' lb').join(' · '))} — under ${LOW} lb.</div></div>`:''}
+      <div class="p-seg" id="phGf"><button data-f="stock" class="${PH.gf==='stock'?'on':''}">In stock</button><button data-f="used" class="${PH.gf==='used'?'on':''}">Used up</button></div>
+      ${list.length?`<div class="p-card">${rows}</div>`:`<div class="p-card"><div class="p-empty">${INV.length?'Nothing here.':'No green coffee yet. Tap + Coffee to add your first lot.'}</div></div>`}
+      <p class="p-note">Tap a coffee to add pounds when a delivery comes in.</p>`,
+    wire:(el,nav)=>{$('#phGAdd',nav).onclick=()=>phGo({v:'gAdd'});$$('#phGf button').forEach(b=>b.onclick=()=>{PH.gf=b.dataset.f;phRender()});$$('[data-g]',el).forEach(b=>b.onclick=()=>phAddLb(b.dataset.g))}}};
+function phAddLb(id){const l=INV.find(x=>x.id===id);if(!l)return;const left=invLeft(l),p=num(l.price),lw=left<LOW&&left>0.001;
+  phSheet(`<div style="display:flex;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div style="font-size:19px;font-weight:700">Add pounds</div><div style="font-size:14px;color:var(--text2);margin-top:2px">${flagOf(l.origin)} ${esc(l.name)}${l.lot?' · Lot '+esc(l.lot):''} · ${left.toFixed(1)} lb on hand</div></div>${lw?'<span class="p-pill w">Low</span>':''}</div>
+    <div class="p-step"><button id="phAm" aria-label="Less">−</button><div class="p-inp"><input id="phAl" inputmode="decimal" value="" placeholder="0" autocomplete="off"><em>lb</em></div><button id="phAp" aria-label="More">+</button></div>
+    <div class="p-quick">${[['60 kg',132.28],['69 kg',152.12],['50 lb',50],['100 lb',100]].map(([t,v])=>`<button data-q="${v}">+ ${t}</button>`).join('')}</div>
+    <div class="p-g2"><div class="p-field"><span>Price per lb (optional)</span><div class="p-inp"><em>$</em><input id="phApr" class="t" inputmode="decimal" placeholder="${ok(p)?p.toFixed(2):'same as now'}" autocomplete="off"></div></div>
+      <div class="p-field"><span>Note</span><div class="p-inp"><input id="phAn" class="t" value="Delivery" autocomplete="off"></div></div></div>
+    <div class="p-calc"><span>${ok(p)?`Now ${money(p)}/lb`:'No price set yet'}</span><span>New total <b id="phAt">${left.toFixed(1)} lb</b></span></div>
+    <button class="p-btn full pri" id="phAgo" disabled>Add pounds</button>
+    <button class="p-btn full" id="phAx" style="border:0;background:transparent;color:var(--accent)">Cancel</button>`,sh=>{
+    const inp=$('#phAl',sh),upd=()=>{const v=num(inp.value)||0;$('#phAt',sh).textContent=(left+v).toFixed(1)+' lb';const go=$('#phAgo',sh);go.disabled=!(v>0);go.textContent=v>0?`Add ${+v.toFixed(2)} lb`:'Add pounds'};
+    const set=v=>{inp.value=v>0?String(+v.toFixed(2)):'';upd()};
+    $('#phAm',sh).onclick=()=>set(Math.max(0,(num(inp.value)||0)-1));$('#phAp',sh).onclick=()=>set((num(inp.value)||0)+1);
+    $$('[data-q]',sh).forEach(b=>b.onclick=()=>set((num(inp.value)||0)+Number(b.dataset.q)));inp.oninput=upd;$('#phAx',sh).onclick=phSheetClose;
+    $('#phAgo',sh).onclick=async()=>{const lb=num(inp.value),ap=num($('#phApr',sh).value);if(!(lb>0)){toast('Enter the pounds that came in');return}
+      if($('#phApr',sh).value.trim()&&!ok(ap)){toast('Enter the price as a number, e.g. 6.85');return}
+      const cur=INV.find(x=>x.id===id);if(!cur){phSheetClose();return}
+      if(ok(ap)){const c0=Math.max(0,invLeft(cur)),old=num(cur.price);cur.price=ok(old)&&c0>0?+((old*c0+ap*lb)/(c0+lb)).toFixed(4):ap}
+      (cur.adj=cur.adj||[]).push({date:new Date().toISOString(),lb,price:ok(ap)?ap:null,note:$('#phAn',sh).value.trim()});
+      phSheetClose();await persistInv();renderInvSelect();toast(`Added ${+lb.toFixed(2)} lb to ${cur.name}`);phRender(true)}})}
+PHV.gAdd=()=>{const F=GFIELDS.filter(f=>f[0]!=='moisture');
+  return {nav:phNavSmall('Cancel','Add green coffee','<button class="p-lnk b" id="phGS2">Add</button>'),
+    body:`${F.map(f=>`<div class="p-field"><label for="phg_${f[0]}">${f[1]}</label>${f[0]==='notes'?`<textarea class="p-ta" id="phg_notes" style="min-height:80px"></textarea>`:`<div class="p-inp"><input id="phg_${f[0]}" class="t" ${f[3]==='date'?`type="date" value="${dayKey()}"`:''} placeholder="${esc(f[2])}" ${['startLb','price','freight'].includes(f[0])?'inputmode="decimal"':''} autocomplete="off"></div>`}</div>`).join('')}
+      <button class="p-btn full pri" id="phGS">Add to inventory</button>`,
+    wire:(el,nav)=>{const save=async()=>{const o={};for(const f of F){const i=$('#phg_'+f[0]);if(i)o[f[0]]=i.value.trim()}
+      if(!o.name){toast('Give the coffee a name');return}if(num(o.startLb)==null){toast('Enter the starting weight in lb');return}
+      if(o.price!==''&&num(o.price)==null){toast('Enter the price as a number, e.g. 4.85');return}if(o.freight&&num(o.freight)==null){toast('Enter freight as a number, e.g. 0.45');return}
+      o.startLb=num(o.startLb);o.price=num(o.price);o.freight=num(o.freight);INV.unshift({id:'g'+Date.now().toString(36),adj:[],created:new Date().toISOString(),...o});
+      await persistInv();renderInvSelect();toast(`${o.name} added — ${o.startLb} lb`);phBack()};
+      $('#phGS').onclick=save;$('#phGS2',nav).onclick=save}}};
+
+PHV.more=()=>{const fold=window.ZR_NATIVE&&ZR_NATIVE.folder?ZR_NATIVE.folder:FS.dir?FS.dir.name:'';
+  return {nav:phNavBig('More'),body:`<div class="p-card p-menu"><button class="p-row" data-m="cups"><span class="ic">${PH_IC.cup}</span><div class="m"><b>Cupping</b><small>${CUP.length} session${CUP.length===1?'':'s'}</small></div><span class="gt">›</span></button>
+      <button class="p-row" data-m="price"><span class="ic">${PH_IC.price}</span><div class="m"><b>Pricing</b><small>12 oz, 2 lb and 5 lb, wholesale and retail</small></div><span class="gt">›</span></button></div>
+    <div class="p-sec"><span class="p-h3">Data</span><div class="p-card p-menu"><div class="p-row"><span class="ic">${PH_IC.folder}</span><div class="m"><b>${FS.state==='granted'?'Shared folder':'No folder yet'}</b><small>${esc(fold||(FS.supported?'Pick the Zuna Roast folder':'Not available in this browser'))}</small></div>${FS.supported?`<button class="p-btn sm" id="phFold">${FS.state==='granted'?'Change':'Choose'}</button>`:''}</div>
+      <div class="p-row"><div class="m"><b>${HIST.length} roasts · ${INV.length} green lots</b><small>Synced with the iMac and iPad through the folder</small></div><button class="p-btn sm" id="phSync">Check now</button></div></div></div>
+    <p class="p-note">Analyze, the profile builder and Settings are on the iMac and iPad.${window.ZR_NATIVE&&ZR_NATIVE.version?` Zuna Roast ${esc(ZR_NATIVE.version)}.`:''}</p>`,
+    wire:el=>{$$('[data-m]',el).forEach(b=>b.onclick=()=>phGo({v:b.dataset.m}));const f=$('#phFold');if(f)f.onclick=async()=>{await chooseFolder();phRender(true)};
+      $('#phSync').onclick=async()=>{const b=$('#phSync');b.disabled=true;b.textContent='Checking…';await watchTick(true);phPollDraft();phRender(true);toast('Up to date')}}}};
+
+/* ---------- cupping ---------- */
+PHV.cups=()=>{const list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  return {nav:phNavSmall(phBackLabel(),'Cupping','<button class="p-lnk" id="phCN">+ New</button>'),
+    body:list.length?`<div class="p-card">${list.map(s=>{const sc=s.samples.map(cupScore),best=sc.length?Math.max(...sc):null,avg=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null;
+      return `<button class="p-row" data-s="${s.id}"><div class="m"><b>${esc(s.name)}</b><small>${fmtDate(s.date,false)} · ${s.samples.length} sample${s.samples.length===1?'':'s'}${s.cuppers?' · '+esc(s.cuppers):''}</small></div><span class="r">${phCupTxt(best)}<small>avg ${ok(avg)?avg.toFixed(2):'—'}</small></span><span class="gt">›</span></button>`}).join('')}</div>`
+      :`<div class="p-card"><div class="p-empty">No cupping sessions yet.<br>Tap + New and pick the roasts on the table.</div></div>`,
+    wire:(el,nav)=>{$('#phCN',nav).onclick=()=>phGo({v:'cupNew'});$$('[data-s]',el).forEach(b=>b.onclick=()=>phGo({v:'cup',id:b.dataset.s,i:0}))}}};
+PHV.cupNew=()=>{const recent=HIST.filter(r=>!r.archived).slice(0,40);
+  return {nav:phNavSmall('Cancel','New session','<button class="p-lnk b" id="phCC2">Create</button>'),
+    body:`<div class="p-g2"><div class="p-field"><label for="phCsN">Session name</label><div class="p-inp"><input id="phCsN" class="t" value="QC ${esc(new Date().toLocaleDateString([], {month:'short',day:'numeric'}))}"></div></div>
+      <div class="p-field"><label for="phCsC">Cuppers</label><div class="p-inp"><input id="phCsC" class="t" placeholder="Ty, Sam"></div></div></div>
+      <div class="p-sec"><span class="p-h3">Roasts on the table</span><div class="p-card">${recent.map(r=>`<label class="p-pick"><input type="checkbox" value="${r.id}"><div class="m" style="flex:1;min-width:0"><b style="display:block;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">#${r.num} ${esc(r.meta.name||'Untitled')}</b><small style="display:block;color:var(--text2);font-size:13px">${fmtDate(r.chargedAt||r.created,false)} · ${ageOf(r.chargedAt||r.created)}</small></div></label>`).join('')||'<div class="p-empty">No roasts saved yet.</div>'}</div></div>
+      <button class="p-btn full pri" id="phCC">Create session</button>`,
+    wire:(el,nav)=>{const go=async()=>{const ids=$$('.p-pick input:checked',el).map(i=>i.value);if(!ids.length){toast('Tick at least one roast');return}
+      const s={id:'c'+Date.now().toString(36),date:new Date().toISOString(),name:$('#phCsN').value.trim()||'Cupping',cuppers:$('#phCsC').value.trim(),samples:ids.map(newSample)};
+      CUP.push(s);await persistCup();PH.stacks[PH.tab].pop();phGo({v:'cup',id:s.id,i:0})};$('#phCC').onclick=go;$('#phCC2',nav).onclick=go}}};
+function phCupSaveSoon(s,x){clearTimeout(PH.cupT);PH.cupT=setTimeout(()=>phCupSave(s,x,true),900)}
+async function phCupSave(s,x,quiet){clearTimeout(PH.cupT);const c=$('#phCm');if(c&&x)x.comments=c.value;await persistCup();
+  for(const y of s.samples){const r=HIST.find(h=>h.id===y.roastId),v=+cupScore(y).toFixed(2);if(r&&r.cup!==v&&(y===x||!quiet)){r.cup=v;await commitRoast(r,true)}}
+  if(!quiet)toast('Scores saved')}
+PHV.cup=v=>{const s=CUP.find(x=>x.id===v.id);if(!s)return {nav:phNavSmall(phBackLabel(),'Cupping'),body:'<div class="p-empty">This session isn’t here anymore.</div>'};
+  v.i=clamp(v.i||0,0,s.samples.length-1);const x=s.samples[v.i],r=HIST.find(h=>h.id===x.roastId),total=cupScore(x),L='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const body=`<div class="p-samples">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===v.i?'on':''}" data-i="${i}"><b>${L[i]||i+1}</b>#${rr?rr.num:'?'}</button>`}).join('')}</div>
+    <div class="p-total"><div style="min-width:0"><div style="font-size:17px;font-weight:600">${esc(r?r.meta.name||'Untitled':'(roast removed)')}</div><div style="font-size:13px;color:var(--text2);margin-top:2px">Sample ${L[v.i]||v.i+1}${r?` · #${r.num} · ${ageOf(r.chargedAt||r.created)}`:''}${s.cuppers?' · '+esc(s.cuppers):''}</div></div>
+      <div style="text-align:right;flex:none"><b style="${cupSt(total)}">${total.toFixed(2)}</b><div style="font-size:12px;font-weight:600;margin-top:3px;${cupSt(total)}">${esc(cupClass(total))}</div></div></div>
+    <div class="p-card">${ATTRS.map(a=>`<div class="p-att"><span>${a[1]}</span><button data-a="${a[0]}" data-d="-0.25" aria-label="${a[1]} down">−</button><b>${Number(x.scores[a[0]]).toFixed(2)}</b><button data-a="${a[0]}" data-d="0.25" aria-label="${a[1]} up">+</button></div>`).join('')}
+      <div class="p-att"><span>Defects</span><button data-def="-2" aria-label="Defects down">−</button><b>${x.defects}</b><button data-def="2" aria-label="Defects up">+</button></div></div>
+    <div class="p-card">${CUPK.map(c=>`<div class="p-att"><span>${c[1]}</span><div class="p-cups">${x.cups[c[0]].map((on,i)=>`<button class="${on?'':'x'}" data-c="${c[0]}" data-ci="${i}" aria-label="${c[1]} cup ${i+1}"></button>`).join('')}</div></div>`).join('')}</div>
+    <div class="p-sec"><span class="p-h3">Flavor notes</span><div class="p-tags">${[...new Set([...TAGS,...(x.tags||[])])].map(t=>`<button class="${x.tags.includes(t)?'on':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button id="phTagAdd">+ Add</button></div></div>
+    ${r?`<div class="p-sec"><span class="p-h3">How did it taste?</span><div id="phTaste"></div></div>`:''}
+    <div class="p-field"><label for="phCm">Comments</label><textarea class="p-ta" id="phCm" style="min-height:80px" placeholder="What you tasted…">${esc(x.comments||'')}</textarea></div>
+    <div class="p-g2"><button class="p-btn" id="phCp" ${v.i===0?'disabled':''}>‹ Previous</button><button class="p-btn" id="phCx" ${v.i>=s.samples.length-1?'disabled':''}>Next ›</button></div>`;
+  return {nav:phNavSmall(phBackLabel(),s.name,'<button class="p-lnk b" id="phCD">Done</button>'),body,
+    onBack:async()=>{await phCupSave(s,x,false);phBack()},
+    wire:(el,nav)=>{const re=()=>{x.comments=$('#phCm').value;phCupSaveSoon(s,x);phRender(true)};
+      $$('[data-i]',el).forEach(b=>b.onclick=async()=>{await phCupSave(s,x,true);v.i=Number(b.dataset.i);phRender()});
+      $$('[data-a]',el).forEach(b=>b.onclick=()=>{x.scores[b.dataset.a]=clamp(Number(x.scores[b.dataset.a])+Number(b.dataset.d),6,10);re()});
+      $$('[data-def]',el).forEach(b=>b.onclick=()=>{x.defects=Math.max(0,x.defects+Number(b.dataset.def));re()});
+      $$('[data-c]',el).forEach(b=>b.onclick=()=>{const k=b.dataset.c,i=Number(b.dataset.ci);x.cups[k][i]=!x.cups[k][i];re()});
+      $$('[data-t]',el).forEach(b=>b.onclick=()=>{const t=b.dataset.t;x.tags=x.tags.includes(t)?x.tags.filter(z=>z!==t):[...x.tags,t];re()});
+      $('#phTagAdd').onclick=async()=>{const t=await askText('Add flavor note','Flavor note');if(t&&t.trim()){x.tags.push(t.trim());re()}};
+      $('#phCm').oninput=()=>{x.comments=$('#phCm').value;phCupSaveSoon(s,x)};
+      if(r)tasteEditor($('#phTaste'),r,()=>{});
+      $('#phCp').onclick=async()=>{await phCupSave(s,x,true);v.i--;phRender()};$('#phCx').onclick=async()=>{await phCupSave(s,x,true);v.i++;phRender()};
+      $('#phCD',nav).onclick=async()=>{await phCupSave(s,x,false);phBack()}}}};
+
+/* ---------- pricing ---------- */
+PHV.price=()=>{const o=PRC(),ctx=prContext(o),T=prT(o),list=INV.filter(l=>invLeft(l)>0.001),k=PH.side;
+  const cell=(b,e)=>{const a=b['a'+k];if(!ok(a))return `<span class="ns${e?' e':''}">—</span>`;const lo=b['m'+k]<(k==='w'?T.w:T.r)-0.05;return `<span class="${lo?'lo':''}${e?' e':''}">${a.toFixed(2)}</span>`};
+  const rows=list.map(l=>{const c=prCalc(l,o,ctx);if(!c.hasPrice)return `<button class="c" data-p="${l.id}" style="grid-column:1/-1;border:0;border-top:1px solid var(--line2);background:none;text-align:left;padding:11px 14px"><b>${esc(l.name)}</b><small>No green price yet — add it on the Green screen</small></button>`;
+    return `<button class="c" data-p="${l.id}" style="border:0;border-top:1px solid var(--line2);background:none;text-align:left;border-radius:0"><b>${esc(l.name)}</b><small>${money(c.perLb)}/lb cost</small></button>${c.bags.map((b,i)=>cell(b,i===2)).join('')}`}).join('');
+  return {nav:phNavSmall(phBackLabel(),'Pricing'),body:`<div class="p-seg" id="phPs"><button data-k="w" class="${k==='w'?'on':''}">Wholesale</button><button data-k="r" class="${k==='r'?'on':''}">Retail</button></div>
+    <p class="p-note">Targets ${num(T.w)}% wholesale · ${num(T.r)}% retail (${o.basis==='net'?'after overhead':'gross, before rent'}). Prices in color are under the target.</p>
+    ${list.length?`<div class="p-card"><div class="p-pt"><span class="c hd">Coffee</span><span class="hd">12 oz</span><span class="hd">2 lb</span><span class="hd e">5 lb</span>${rows}</div></div><p class="p-note" style="text-align:center">Tap a coffee to see costs and edit prices. — means not set yet.</p>`
+      :`<div class="p-card"><div class="p-empty">No green coffee in stock.<br>Add coffee on the Green screen with its price per lb.</div></div>`}`,
+    wire:el=>{$$('#phPs button').forEach(b=>b.onclick=()=>{PH.side=b.dataset.k;phRender(true)});$$('[data-p]',el).forEach(b=>b.onclick=()=>phGo({v:'priceEdit',id:b.dataset.p}))}}};
+PHV.priceEdit=v=>{const l=INV.find(x=>x.id===v.id);if(!l)return {nav:phNavSmall(phBackLabel(),'Pricing'),body:'<div class="p-empty">This coffee isn’t here anymore.</div>'};
+  const o=PRC(),ctx=prContext(o),c=prCalc(l,o,ctx),T=prT(o),key=prKey(l);
+  if(!c.hasPrice)return {nav:phNavSmall(phBackLabel(),l.name),body:'<div class="p-card"><div class="p-empty">This lot has no green price yet.<br>Add its price per lb on the iMac or iPad (Green coffee).</div></div>'};
+  const mg=(b,k)=>{const a=b['a'+k],m=b['m'+k],t=k==='w'?T.w:T.r;if(!ok(a))return `<span class="mg ns">Suggested ${money(b['s'+k])}</span>`;const lo=m<t-0.05;return `<span class="mg ${lo?'lo':''}">${ok(m)?m.toFixed(0)+'%':'—'}${lo?` · under ${num(t)}%`:''}</span>`};
+  let hint=null;for(const b of c.bags)for(const k of ['w','r'])if(!hint&&(k==='w'?b.lowW:b.lowR))hint={b,k};
+  const body=`<div style="font-size:14px;color:var(--text2)">${esc([l.origin,l.process,l.lot&&'Lot '+l.lot].filter(Boolean).join(' · '))}</div>
+    <div class="p-card"><div class="p-kv"><span>Green, landed</span><b>${money(c.landed)}/lb</b><span>Weight loss</span><b>${c.loss.toFixed(1)}%<small>${c.lossN?'avg of '+c.lossN:'default'}</small></b>
+      <span>Coffee per lb roasted</span><b>${money(c.coffee)}</b><span>Overhead per lb</span><b>${money(ctx.ohPerLb)}</b><span>Labor per lb</span><b>${money(ctx.labPerLb)}</b><span>True cost per lb</span><b>${money(c.perLb)}</b></div></div>
+    <div class="p-pg"><span class="hd">Bag</span><span class="hd">Wholesale</span><span class="hd">Retail</span>
+      ${c.bags.map(b=>`<span class="sz">${b.label}<small>cost ${money(o.basis==='net'?b.cost:b.gcost)}</small></span>${['w','r'].map(k=>`<div><div class="p-inp"><em>$</em><input data-act="${b.k}:${k}" inputmode="decimal" enterkeyhint="next" value="${ok(b['a'+k])?b['a'+k].toFixed(2):''}" placeholder="${b['s'+k].toFixed(2)}" autocomplete="off"></div>${mg(b,k)}</div>`).join('')}`).join('')}</div>
+    ${hint?`<div class="p-ban p-info"><div class="m">Price for ${num(hint.k==='w'?T.w:T.r)}% ${hint.k==='w'?'wholesale':'retail'} at ${hint.b.label}: <b style="display:inline">${money(hint.b['s'+hint.k])}</b></div><button class="p-btn sm" id="phUse">Use</button></div>`:''}
+    <p class="p-note">Margins are ${o.basis==='net'?'after overhead':'gross (before rent and overhead)'}. Prices save to the shared folder, so the iMac’s price list and wholesale sheet show them too. Leave a box empty until you’ve decided.</p>`;
+  const put=(bk,t,val)=>{const p=PRC(),a=p.actual[key]=p.actual[key]||{},b=a[bk]=a[bk]||{};if(ok(val))b[t]=val;else delete b[t];savePR(p)};
+  return {nav:phNavSmall(phBackLabel(),l.name,'<button class="p-lnk b" id="phPD">Done</button>'),body,
+    wire:(el,nav)=>{$$('[data-act]',el).forEach(i=>i.onchange=()=>{const [bk,t]=i.dataset.act.split(':'),val=num(i.value);if(i.value.trim()&&!ok(val)){toast('Enter the price as a number, e.g. 12.50');return}
+        put(bk,t,ok(val)?+val.toFixed(2):null);phRender(true)});
+      const u=$('#phUse');if(u)u.onclick=()=>{put(hint.b.k,hint.k,+hint.b['s'+hint.k].toFixed(2));toast('Price set');phRender(true)};
+      $('#phPD',nav).onclick=()=>{if(document.activeElement&&document.activeElement.dataset.act)document.activeElement.blur();setTimeout(phBack,50)}}}};
+
+/* ---------- first launch on the phone: pick the shared iCloud folder ---------- */
+PHV.welcome=()=>({nav:phNavBig('Zuna Roast'),body:`<div class="p-welcome"><h2>Pick your roast folder</h2><p>The phone uses the same folder as the iMac and iPad: <code>iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast</code>. Pick it once and the phone remembers it.</p><button class="p-btn full pri" id="phPick">Choose folder</button></div>`,
+  wire:el=>{$('#phPick').onclick=async()=>{await chooseFolder();if(FS.state==='granted'&&(!window.ZR_NATIVE||ZR_NATIVE.folderPicked)){PH.stacks=phStacks();phRender()}}}});
+const phStacks=()=>Object.fromEntries(PH_TABS.map(([t])=>[t,[phRoot(t)]]));
+function phInit(){const app=$('#phApp');
+  app.innerHTML=`<div id="phNav"></div><div id="phView"></div><nav id="phTabs">${PH_TABS.map(([t,l])=>`<button data-t="${t}">${PH_IC[t]}<span>${l}</span></button>`).join('')}</nav><div id="phSheet"></div>`;
+  ipKeyboardInit();
+  $('#phTabs').onclick=e=>{const b=e.target.closest('button');if(b)phTab(b.dataset.t)};
+  PH.stacks=phStacks();
+  if(window.ZR_NATIVE&&ZR_NATIVE.ios&&!ZR_NATIVE.folderPicked){PH.stacks.today=[{v:'welcome'}]}
+  phRender();
+  setInterval(()=>{if(document.hidden)return;const live=PH.tab==='live';if(live||PH.tab==='today'){if(Date.now()-PH.draftAt>(live?4000:20000))phPollDraft()}
+    if(live&&phCur().v==='live'&&!PH.liveT)phLiveUpdate();
+    if(live&&phCur().v==='live')wakeLock(true);else if(!link.connected())wakeLock(false)},1000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)phPollDraft();else if(!link.manual)link.disconnect()});
+  window.addEventListener('resize',()=>{if(['roast','live'].includes(phCur().v))phRender(true)});
+  phPollDraft()}
+
+/* ================================================================
    Screens & wiring
    ================================================================ */
 function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));if(IPAD)ipadNavSync(n);$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
@@ -3250,6 +3838,7 @@ async function init(){
   document.addEventListener('visibilitychange',()=>{if((C.on||link.connected())&&document.visibilityState==='visible')wakeLock(true);if(document.visibilityState==='hidden'&&link.connected())log('err','App window hidden — the browser may slow it down; keep it in front while roasting')});
   await initStorage();
   planRoll();S.planCur=store.get('zr2.planCur',null);if(!PLAN.items.some(x=>x.id===S.planCur&&x.status!=='done'))S.planCur=null;
+  if(IPHONE)phInit();
   $('#tGo').onclick=()=>{const nx=PLAN.items.find(x=>x.id===S.planCur&&x.status!=='done')||planNext();if(!nx){toast('No batches left to roast');return}if(nx.id!==S.planCur){if(S.dirty&&S.roast.samples.length&&!S.viewingId){toast('Save or discard the roast on screen first');return}loadBatch(nx.id,true)}showScreen('roast')};
   $('#tClearDone').onclick=()=>{PLAN.items=PLAN.items.filter(x=>x.status!=='done');savePlan();renderToday();renderTodayMini()};
   $('#tClearAll').onclick=async()=>{if(!PLAN.items.length)return;if(!await ask('Clear today’s plan?','Roasts you already saved stay in your roast history.','Clear all',true))return;PLAN.items=[];S.planCur=null;savePlan();renderToday();renderTodayMini()};
@@ -3260,7 +3849,7 @@ async function init(){
   setInterval(()=>{if(S.recording)saveDraft()},5000);
   let draft=store.get(LS.draft,null);
   if(FS.state==='granted'){const fd=await readFolderJSON(['Settings'],'roast-in-progress.json');if(fd&&fd.roast&&(!draft||String(fd.at)>String(draft.at)))draft=fd}
-  if(draft&&draft.roast&&draft.roast.samples&&draft.roast.samples.length){
+  if(!IPHONE&&draft&&draft.roast&&draft.roast.samples&&draft.roast.samples.length){  /* on the phone that file is the iMac's live roast, not something to recover */
     $('#banners').insertAdjacentHTML('beforeend',`<div class="banner info" id="bnRecover">Roast #${draft.roast.num} was still recording when the app closed (${new Date(draft.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}).<button class="pri" id="rcYes">Recover it</button><button id="rcNo">Discard</button></div>`);
     $('#rcYes').onclick=()=>{S.roast=draft.roast;S.dirty=true;S.viewingId=null;fillForm(S.roast.meta);clearDraft();$('#bnRecover').remove();resolveBg();renderAll();openDrawer();toast('Recovered — add the details and Save')};
     $('#rcNo').onclick=()=>{clearDraft();$('#bnRecover').remove()}}

@@ -25,6 +25,13 @@ Older HTML files in the claude.ai project (zuna_roast.html, _p12, _focus, _conso
 - `src-tauri/plugins/zuna-ios` is iPad-only (folder picker that remembers iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast, iCloud download, keep screen on, share sheet). The Mac build never includes it; updater/process plugins are `cfg(desktop)`.
 - `Release iPad app` workflow: unsigned simulator build on every `ipad` push; signed TestFlight upload when run by hand and on the 1st of every other month (TestFlight builds expire after 90 days; schedules only fire once the file is on `main`). Secrets: APPLE_TEAM_ID, APPLE_API_KEY_ID, APPLE_API_ISSUER, APPLE_API_KEY_P8.
 
+## iPhone version (branch `preview/iphone`, made from `ipad`)
+- Same `app/index.html` and the same TestFlight app as the iPad (device family is already iPhone + iPad). Phone layout only when `<html>` has class `iphone` (an iPhone, or `?iphone=1` in a browser; never on an iPad or the iMac).
+- The phone has its own shell, `#phApp`, built by the iPhone section of the script (`PH`, `PHV.*` screens, `phInit`). Everything else on the page is hidden on the phone; the iMac and iPad never show `#phApp`. Compare iMac/iPad screenshots before and after any phone change.
+- For looking things up and quick entries, never roasting: `startRoast`, `setControl(true)`, `sendControl`, `nudge`, `sendSwitch` and `sendEventToRoaster` all refuse on the phone. Roast pushes from the roaster go to `phPush`, not the recorder.
+- Screens: Today, History (roast chart, times, colors, weights, comments), Roast details (roasted weight, Agtron whole/ground, comments — edits the saved roast file), Live (view only: the iMac's `Settings/roast-in-progress.json` from iCloud, plus a read-only roaster connection on the roastery Wi-Fi), Green (add pounds, add a coffee), Cupping, Pricing. Analyze, profile builder and Settings stay on the iMac/iPad.
+- `Info.ios.plist`: iPhone is portrait (`UISupportedInterfaceOrientations` / `~iphone`), iPad stays landscape (`~ipad`).
+
 ## Rules Ty cares about
 - Never change the data folder layout or file names; new roast fields must be optional so old roasts still open.
 - Pressure is stored in Pa; the Pa/mbar setting only changes display.

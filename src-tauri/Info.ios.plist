@@ -15,10 +15,14 @@
     <string>UIInterfaceOrientationLandscapeLeft</string>
     <string>UIInterfaceOrientationLandscapeRight</string>
   </array>
+  <!-- iPhone: portrait (the iPad uses the ~ipad list above and stays landscape) -->
   <key>UISupportedInterfaceOrientations</key>
   <array>
-    <string>UIInterfaceOrientationLandscapeLeft</string>
-    <string>UIInterfaceOrientationLandscapeRight</string>
+    <string>UIInterfaceOrientationPortrait</string>
+  </array>
+  <key>UISupportedInterfaceOrientations~iphone</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
   </array>
 </dict>
 </plist>
