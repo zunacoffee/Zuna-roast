@@ -589,7 +589,7 @@ const ok=v=>v!=null&&isFinite(v);
 const num=v=>{const n=parseFloat(String(v??'').replace(',','.'));return isFinite(n)?n:null};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
-const LS={cfg:'zr2.cfg',draft:'zr2.inprogress',num:'zr2.lastNum',bg:'zr2.bgMode'};
+const LS={cfg:'zr2.cfg',draft:'zr2.inprogress',num:'zr2.lastNum',numAt:'zr2.lastNumAt',bg:'zr2.bgMode'};
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3200)}
 function mmss(s){if(!ok(s))return '—';const n=s<0;s=Math.abs(Math.round(s));return (n?'-':'')+Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -888,7 +888,10 @@ function onFormInput(e){if(S.viewingId||S.recording||S.roast.samples.length)S.di
 /* ================================================================
    Roast numbers, saving, folder storage
    ================================================================ */
-function nextNum(){return Math.max(Number(store.get(LS.num,0))||0,...HIST.map(r=>r.num||0))+1}
+/* last roast number used on this device — ignored if Start fresh ran (on any device) after it was set */
+function localNum(){const at=cfg.numResetAt;if(at&&String(store.get(LS.numAt,''))<at)return 0;return Number(store.get(LS.num,0))||0}
+function numSet(n){store.set(LS.num,n);store.set(LS.numAt,new Date().toISOString())}
+function nextNum(){return Math.max(localNum(),...HIST.map(r=>r.num||0))+1}
 const normName=n=>String(n||'').trim().toLowerCase().replace(/\s+/g,' ');
 // batch size matters on the P12 (13 vs 25 lb behave differently): batches within 12% count as the same size
 const batchOf=r=>r&&r.meta?num(r.meta.green):null;
@@ -937,7 +940,7 @@ async function saveRoast(auto,asProfile){
   r.meta=readMeta();if(!r.id)r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);if(!r.num)r.num=nextNum();if(!r.created)r.created=new Date().toISOString();
   let renum=null;if(FS.state==='granted'&&!HIST.some(x=>x.id===r.id)){const mx=await folderMaxNum();
     if(mx>=r.num){renum=r.num;r.num=Math.max(mx,...HIST.map(x=>x.num||0))+1;log('sys',`Roast #${renum} was already used on another device — this roast is #${r.num}`)}}
-  store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,r.num));
+  numSet(Math.max(localNum(),r.num));
   if(asProfile){if(!normName(r.meta.name)){toast('Enter a profile name first');$('#fName').focus();return false}
     await unprofileSlot(r);
     r.isProfile=true;if(S.bg&&S.bg.reminders&&S.bg.reminders.length&&normName(S.bg.meta.name)===normName(r.meta.name)&&!r.reminders.length)r.reminders=JSON.parse(JSON.stringify(S.bg.reminders))}
@@ -1918,6 +1921,32 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   $('#rRoast').onclick=()=>roastThis(r.id);$('#rOpen').onclick=()=>openRoast(r.id);$('#rCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
   $('#rProf').onclick=async()=>{if(!r.isProfile){if(!normName(r.meta.name)){toast('This roast has no profile name — open it and add one first');return}await unprofileSlot(r);r.isProfile=true}else r.isProfile=false;await commitRoast(r,true);resolveBg();renderRoasts();toast(r.isProfile?`#${r.num} is now the profile for “${r.meta.name}”`:'Profile mark removed')};
   const del=$('#rDel');if(del)del.onclick=()=>deleteRoastForever(r.id)}
+/* Start fresh: back everything up, then clear roasts, profiles, planned profiles, green, cupping and today's plan
+   on every device (roast ids go into settings.deletedRoasts; lists are written empty and merge as deletions),
+   and restart numbering at #1 (settings.numResetAt makes every device ignore its remembered last number). Settings stay. */
+async function startFresh(){
+  if(S.recording){toast('Stop the roast first');return}
+  const n=HIST.length,pf=HIST.filter(r=>r.isProfile).length,g=INV.length,c=CUP.length,pl=PLANNED.length,t=PLAN.items.length;
+  if(!await ask('Start fresh?',`This clears ${n} roast${n===1?'':'s'} (${pf} of them profile${pf===1?'':'s'}), ${pl} planned profile${pl===1?'':'s'}, ${g} green coffee${g===1?'':'s'}, ${c} cupping session${c===1?'':'s'} and today’s plan (${t} batch${t===1?'':'es'}) — on every device that uses this folder. Your settings stay. A backup is saved first.`,'Continue',true))return;
+  if(!await ask('Clear everything?','Last check: the iMac, MacBook and iPad will all start empty, and the next roast will be #1.','Clear everything',true))return;
+  const stamp=new Date().toISOString(),name='start-fresh-backup-'+stamp.slice(0,16).replace('T','_').replace(':','')+'.json';
+  const backup=JSON.stringify({app:'Zuna Roast',exported:stamp,startFresh:true,roasts:HIST,green:INV,cupping:CUP,settings:cfg,plan:PLAN,planned:PLANNED});
+  if(FS.state==='granted'){try{await writeAt(['Settings'],name,backup)}catch(e){toast('Could not save the backup — nothing was cleared');log('err','Start fresh backup failed: '+e.message);return}}
+  else download(name,backup,'application/json');
+  const gone=[...HIST];
+  await fsLock(async()=>{
+    cfg.deletedRoasts=[...new Set([...(cfg.deletedRoasts||[]),...gone.map(r=>r.id)])];cfg.numResetAt=stamp;cfg.savedAt=stamp;store.set(LS.cfg,cfg);
+    try{await writeKindRaw('cfg')}catch(e){}                    /* other devices learn about the deletions before the files go */
+    if(FS.state==='granted')for(const r of gone){if(r.file){const parts=r.file.split('/'),nm=parts.pop();for(const x of ['.json','.csv'])await removeAt(parts,nm+x)}
+      if(r.pfile)for(const x of ['.json','.csv'])await removeAt(['Profiles'],r.pfile+x)}
+    HIST=[];RCACHE.clear();await persistHist();numSet(0)});
+  INV=[];CUP=[];PLANNED=[];PLAN.items=[];S.planCur=null;
+  await persistInv();await persistCup();await savePlanned();savePlan();clearDraft();
+  if(S.bgMode&&S.bgMode!=='auto'&&S.bgMode!=='none')setBgMode('auto');
+  S.roast=newRoast();S.viewingId=null;S.dirty=false;S.evStack=[];fillForm(S.roast.meta);
+  selRoast=selProfile=selAn=null;
+  log('sys',`Start fresh: cleared ${n} roasts, ${g} green coffees, ${c} cupping sessions — backup saved as ${name}`);
+  resolveBg();renderAll();renderTodayMini();renderSettings();toast(`Cleared — the next roast is #1. Backup saved${FS.state==='granted'?' in Settings':''}.`)}
 /* Permanent delete, with one confirmation. Green inventory is left unchanged:
    the green this roast used is booked as an inventory adjustment, so stock stays the same. */
 async function deleteRoastForever(id){const r=HIST.find(x=>x.id===id);if(!r)return;
@@ -1926,7 +1955,7 @@ async function deleteRoastForever(id){const r=HIST.find(x=>x.id===id);if(!r)retu
   if(!await ask(`Delete roast #${r.num}?`,`${what}. This can't be undone.${r.isProfile?` It's the profile (background) for “${r.meta.name}”.`:''} Green inventory stays the same.`,'Delete',true))return;
   const g=num(r.meta.green),lot=INV.find(l=>l.id===r.meta.invId);
   if(lot&&g){(lot.adj=lot.adj||[]).push({date:new Date().toISOString(),lb:-g,note:`Roast #${r.num} deleted — green kept as used`});await persistInv()}
-  store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,r.num||0));
+  numSet(Math.max(localNum(),r.num||0));
   cfg.deletedRoasts=[...new Set([...(cfg.deletedRoasts||[]),r.id])];saveCfg();
   if(FS.state==='granted'){if(r.file){const parts=r.file.split('/'),nm=parts.pop();for(const x of ['.json','.csv'])await removeAt(parts,nm+x)}
     if(r.pfile)for(const x of ['.json','.csv'])await removeAt(['Profiles'],r.pfile+x)}
@@ -2475,6 +2504,9 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
   Settings/           settings.json · today-plan.json · roast-in-progress.json</div>
     <div class="muted" style="font-size:calc(13px*var(--ts,1));line-height:1.5">Tip: put the folder in iCloud Drive so it’s backed up and you can open it from another Mac. ${HIST.length} roasts · ${INV.length} green lots · ${CUP.length} cupping sessions stored.</div>
     <div class="row"><button id="stExport">Export everything (JSON)</button></div>
+    <div class="h3">Start fresh</div>
+    <div class="muted" style="font-size:calc(13px*var(--ts,1));line-height:1.5;margin-top:-6px">Clears all roasts and profiles, planned profiles, green coffee, cupping sessions and today’s plan — on every device that uses this folder — and the next roast is #1. Your settings stay. A backup of everything is saved first (Settings/start-fresh-backup-….json); to bring it back, use Import on the History screen.</div>
+    <div class="row"><button id="stFresh" class="dangerTxt">Start fresh…</button></div>
     ${window.ZR_NATIVE?`<div class="box"><span>Zuna Roast for Mac · version <b>${esc(ZR_NATIVE.version||'—')}</b></span><button id="stUpd">Check for updates</button></div>`:''}`,
   an:()=>`<h2>Analyze rules</h2><div class="sub">The starting rules the Analyze screen uses. Once a coffee has history, it also learns from that coffee's own results and sizes the steps up or down on its own.</div>
     <div class="h3">What counts as a problem on the curve</div>
@@ -2601,6 +2633,7 @@ function wireSettings(){const el=$('#scont');
   const scr=$('#scReset');if(scr)scr.onclick=()=>{cfg.scales={...DEF.scales};if(!isF()){Object.assign(cfg.scales,{tMin:65,tMax:235,tStep:25,rMin:0,rMax:22,rStep:5})}saveCfg();scheduleDraw();renderSettings()};
   const b1=$('#stChoose')||$('#stChange');if(b1)b1.onclick=chooseFolder;const b2=$('#stRe');if(b2)b2.onclick=reconnectFolder;
   const srv=$('#stReveal');if(srv)srv.onclick=()=>ZR_NATIVE.reveal();const sup=$('#stUpd');if(sup)sup.onclick=()=>ZR_NATIVE.checkUpdate(true);
+  const sf=$('#stFresh');if(sf)sf.onclick=startFresh;
   const ex=$('#stExport');if(ex)ex.onclick=()=>download('zuna_roast_export_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({app:'Zuna Roast',exported:new Date().toISOString(),roasts:HIST,green:INV,cupping:CUP,settings:cfg,plan:PLAN,planned:PLANNED}),'application/json');
   const lv=$('#logV');if(lv){lv.onchange=()=>{logVerbose=lv.checked;renderLogSoon()};$('#logClear').onclick=()=>{logBuf.length=0;renderLogSoon()};renderLogSoon()}}
 
@@ -2855,13 +2888,13 @@ async function init(){
   $('#btnImport').onclick=()=>$('#fileImport').click();
   $('#fileImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=async()=>{try{let d=JSON.parse(rd.result);const full=d&&!Array.isArray(d)&&(d.roasts||d.green||d.cupping||d.settings);
     let roasts=full?(d.roasts||[]):Array.isArray(d)?d:[d],n=0,g=0,c=0,skip=0;
-    for(const r of roasts){if(!r||!Array.isArray(r.samples)||!r.events)continue;const ex=r.id&&HIST.find(x=>x.id===r.id);if(ex&&String(ex.savedAt||'')>=String(r.savedAt||'')){skip++;continue}if(!r.id)r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);r.meta={...blankMeta(),...(r.meta||{})};r.tnotes=r.tnotes||[];r.reminders=r.reminders||[];r.controlLog=r.controlLog||[];if(!r.num){r.num=nextNum();store.set(LS.num,r.num)}await commitRoast(r,true);n++}
+    for(const r of roasts){if(!r||!Array.isArray(r.samples)||!r.events)continue;const ex=r.id&&HIST.find(x=>x.id===r.id);if(ex&&String(ex.savedAt||'')>=String(r.savedAt||'')){skip++;continue}if(!r.id)r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);r.meta={...blankMeta(),...(r.meta||{})};r.tnotes=r.tnotes||[];r.reminders=r.reminders||[];r.controlLog=r.controlLog||[];if((cfg.deletedRoasts||[]).includes(r.id))r.id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);if(!r.num){r.num=nextNum();numSet(r.num)}await commitRoast(r,true);n++}
     if(full&&Array.isArray(d.green)){for(const l of d.green){if(l&&l.id&&!INV.some(x=>x.id===l.id)){INV.push(l);g++}}if(g)await persistInv()}
     if(full&&Array.isArray(d.planned)){let pn=0;for(const x of d.planned){if(x&&x.id&&x.planned&&!PLANNED.some(y=>y.id===x.id)){PLANNED.push(x);pn++}}if(pn)await savePlanned()}
     if(full&&Array.isArray(d.cupping)){for(const x of d.cupping){if(x&&x.id&&!CUP.some(y=>y.id===x.id)){CUP.push(x);c++}}if(c)await persistCup()}
     let st=false;if(full&&d.settings&&await ask('Restore settings too?','Replaces the connection, presets, event keys, alarms, scales, colors and logo on this Mac with the ones in the backup.','Restore settings')){applySettings(d.settings);saveCfg();st=true}
     if(full&&d.plan&&Array.isArray(d.plan.items)&&!PLAN.items.length&&d.plan.date===dayKey()){PLAN=d.plan;savePlan()}
-    store.set(LS.num,Math.max(Number(store.get(LS.num,0))||0,...HIST.map(r=>r.num||0)));
+    numSet(Math.max(localNum(),...HIST.map(r=>r.num||0)));
     renderAll();renderRoasts();toast(`Imported ${n} roast${n===1?'':'s'}${full?`, ${g} green lot${g===1?'':'s'}, ${c} cupping session${c===1?'':'s'}${st?' and settings':''}`:''}${skip?` · ${skip} already here`:''}`)}catch(err){console.error(err);toast('That file is not a Zuna Roast export')}};rd.readAsText(f);e.target.value=''};
   $('#gSearch').oninput=renderGreen;$('#gFilter').onclick=e=>{const b=e.target.closest('button');if(!b)return;gFilter=b.dataset.f;$$('#gFilter button').forEach(x=>x.classList.toggle('on',x===b));renderGreen()};
   $('#gRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selGreen=tr.dataset.id;gMode='view';renderGreen()}};
