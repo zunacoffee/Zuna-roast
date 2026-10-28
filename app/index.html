@@ -3477,7 +3477,7 @@ function phLiveRoast(){const d=PH.draft,now=Date.now();
 
 /* ---------- the roast chart (bean temp, RoR, background, burner and air) ---------- */
 function phChart(cv,r,bg,opt={}){if(!cv||!r)return;const b=cv.getBoundingClientRect();if(b.width<50)return;const dp=devicePixelRatio||1;cv.width=b.width*dp;cv.height=b.height*dp;
-  const c=cv.getContext('2d');c.scale(dp,dp);const W=b.width,H=b.height,font=getComputedStyle(document.body).fontFamily,ev=r.events||{},o=ev.CHARGE??0;
+  const c=cv.getContext('2d');c.scale(dp,dp);const W=b.width,H=b.height,font=getComputedStyle(document.body).fontFamily,ev=r.events||{},o=ev.CHARGE??0,o0=o;
   const strip=46,L=34,R=26,T=10,B=18+strip,ph=H-T-B;
   const endR=(ev.DROP!=null?ev.DROP:(opt.now??(r.samples.length?r.samples[r.samples.length-1].t:o)))-o+30;
   const bo=bg?(bg.events.CHARGE??0):0,endB=bg&&bg.events.DROP!=null?bg.events.DROP-bo+30:0;
@@ -3503,12 +3503,13 @@ function phChart(cv,r,bg,opt={}){if(!cv||!r)return;const b=cv.getBoundingClientR
     if(s&&ok(s.bt)){c.fillStyle=COL.accent;c.beginPath();c.arc(X(s.t-o),Y(s.bt),4,0,7);c.fill()}}
   // burner and air, as steps, under the chart
   const y0=T+ph+22,lane=(strip-8)/2;c.font=`10px ${font}`;c.textAlign='right';c.fillStyle=COL.axis;c.fillText('Burner',L-4,y0+lane/2+3);c.fillText('Air',L-4,y0+lane+6+lane/2+3);
-  const step=(k,col,top)=>{c.strokeStyle=col;c.lineWidth=1.8;c.beginPath();let p=false,last=null,lx=-99;const mx=ctlMax(k)||100,Ys=v=>top+lane-clamp(v/mx,0,1)*lane;c.fillStyle=col;c.textAlign='left';c.font=`600 9.5px ${font}`;
-    const marks=[];for(const s of r.samples){if(s.t<o-30||(ev.DROP!=null&&s.t>ev.DROP+10)||!ok(s[k]))continue;const x=X(s.t-o),y=Ys(s[k]);if(!p){c.moveTo(x,y);p=true}else{c.lineTo(x,Ys(last))}c.lineTo(x,y);
+  const step=(k,col,top,src)=>{const R0=src||r,o=src?bo:o0;c.strokeStyle=col;c.lineWidth=1.8;c.beginPath();let p=false,last=null,lx=-99;const mx=ctlMax(k)||100,Ys=v=>top+lane-clamp(v/mx,0,1)*lane;c.fillStyle=col;c.textAlign='left';c.font=`600 9.5px ${font}`;
+    const marks=[];const E=R0.events||{};for(const s of R0.samples){if(s.t<o-30||(E.DROP!=null&&s.t>E.DROP+10)||!ok(s[k]))continue;const x=X(s.t-o),y=Ys(s[k]);if(!p){c.moveTo(x,y);p=true}else{c.lineTo(x,Ys(last))}c.lineTo(x,y);
       if(last==null||Math.abs(s[k]-last)>=1)marks.push({x,y,v:s[k]});last=s[k]}c.stroke();
     /* label each setting where it settled: a quick follow-up change shows only the value it ended on */
     marks.forEach((m,i)=>{const n=marks[i+1];if(n&&n.x-m.x<22)return;if(m.x-lx<20)return;c.fillText(String(Math.round(m.v)),m.x+2,Math.max(top+7,m.y-3));lx=m.x})};
-  step('burner',COL.burner,y0);step('fan',COL.air,y0+lane+6)}
+  /* no roast yet: show the background's burner and air plan, faded */
+  const src=!r.samples.length&&bg?bg:null;if(src)c.globalAlpha=.55;step('burner',COL.burner,y0,src);step('fan',COL.air,y0+lane+6,src);c.globalAlpha=1}
 const phLegend=bg=>`<div class="p-legend"><span><i style="border-color:var(--c-bt)"></i>Bean temp</span><span><i style="border-color:var(--c-ror)"></i>RoR</span>${bg?'<span><i style="border-color:var(--c-bkg);border-top-style:dashed"></i>Background</span>':''}<span><i style="border-color:var(--c-burner)"></i>Burner</span><span><i style="border-color:var(--c-air)"></i>Air</span></div>`;
 function phEvents(r,plan){const ev=r.events||{},o=ev.CHARGE??0,box=(k,l)=>{const t=ev[k];if(t==null)return '';const s=sampleAt(r.samples,t);return `<span>${l}<b>${mmss(t-o)}</b>${s&&ok(s.bt)?fT(s.bt)+'°':''}</span>`};
   let h=box('TP','TP')+box('DRY','Dry end')+box('FCs','FC')+box('DROP','Drop');
@@ -3605,11 +3606,21 @@ PHV.live=()=>{const L=phLiveRoast(),now=Date.now(),wsOn=link.connected(),wsFresh
     else if(wsOn){st='Connected to the roaster';dot='on'}else if(link.state==='connecting'||link.state==='reconnecting'){st='Connecting to the roaster…';dot=''}else{st='Not connected to the roaster';dot=''}
   const nav={cls:'small',html:`<div class="p-status"><i class="${dot}"></i><span>${st}</span></div>${L&&L.num?`<span class="p-pill a" style="margin-bottom:4px">#${L.num}</span>`:''}`};
   const conn=`<div class="p-ban plain"><div class="m"><b>${wsOn?'Watching the roaster':'Second-by-second values'}</b>${wsOn?'This phone only reads values. It never changes anything on the machine.':`Connect on the roastery Wi-Fi to read the roaster directly (${esc(cfg.host)}). Read only.`}</div><button class="p-btn sm ${wsOn?'':'pri'}" id="phConn">${wsOn?'Disconnect':link.manual?'Connect':'Stop'}</button></div>`;
-  if(!L){const v=wsFresh?PH.ws.v:null;
-    return {nav,body:`${v?`<div class="p-big"><div class="w"><small><span>Bean temp</span><span>°${cfg.unit}</span></small><b>${fT(v.bt)}</b><span class="d">Waiting for Charge</span></div></div>
-      <div class="p-sp">${phSp(v)}</div>`:`<div class="p-card"><div class="p-empty">No roast in progress right now.<br>When ${who} starts a roast, it shows up here.</div></div>`}
-      ${!L&&PH.lastLive&&now-PH.lastLive.at<30*60e3?`<p class="p-note">Roast #${PH.lastLive.num}${PH.lastLive.name?' · '+esc(PH.lastLive.name):''} finished. It shows up in History once it’s saved.</p>`:''}
-      ${conn}<div class="p-ban p-info"><div class="m" style="font-size:13.5px">View only. Burner, air, drum and switches are controlled from ${who}.</div></div>`,wire:phLiveWire}}
+  if(!L){/* no roast yet: same layout as during a roast, with the next batch and its background ready on the chart */
+    const v=wsFresh?PH.ws.v:{},nb=PLAN.items.find(x=>x.status!=='done'),bg=nb?profileByName(nb.name,num(nb.green)):null,bgOk=bg&&bg.samples&&bg.samples.length?bg:null;
+    const ror=wsFresh&&ok(S.liveRor)?S.liveRor:null,fin=PH.lastLive&&now-PH.lastLive.at<30*60e3;
+    const plan=bgOk?(()=>{const e=bgOk.events,po=e.CHARGE??0,box=(k,l)=>{if(e[k]==null)return '';const s=sampleAt(bgOk.samples,e[k]);return `<span class="next">${l}<b>~${mmss(e[k]-po)}</b>${s&&ok(s.bt)?fT(s.bt)+'°':''}</span>`};
+      const h=box('TP','TP')+box('DRY','Dry end')+box('FCs','FC')+box('DROP','Drop');return h?`<div class="p-ev">${h}</div>`:''})():'';
+    return {nav,body:`<div style="font-size:17px;font-weight:600">${nb?`<span style="color:var(--text2);font-weight:500">Next:</span> ${esc(nb.name||nb.coffee||'Batch')}${ok(num(nb.green))?` <span style="color:var(--text2);font-weight:500">· ${phLb(nb.green)}</span>`:''}`:'No roast in progress'}</div>
+      <div class="p-big"><div class="w"><small><span>Bean temp</span><span>°${cfg.unit}</span></small><b>${fT(v.bt)}</b><span class="d">${wsFresh?'Waiting for Charge':'No roast in progress'}</span></div>
+        <div><small><span>Roast time</span></small><b>0:00</b><span class="d">Starts at Charge</span></div>
+        <div><small><span>Rate of rise</span><span>°${cfg.unit}/min</span></small><b style="color:var(--t-ror,var(--c-ror))">${ok(ror)?toDR(ror).toFixed(1):'—'}</b><span class="d">${bgOk?esc(rTag(bgOk))+' background':''}</span></div></div>
+      <div class="p-sp">${phSp(v)}</div>
+      <div class="p-chart"><canvas id="phCv" style="height:230px"></canvas>${phLegend(bgOk)}</div>
+      ${plan?plan+'<p class="p-note" style="margin-top:-6px">Planned times from the background profile.</p>':''}
+      ${fin?`<p class="p-note">Roast #${PH.lastLive.num}${PH.lastLive.name?' · '+esc(PH.lastLive.name):''} finished on ${PH.lastLive.who||'the iMac or iPad'}. It shows up in History once it’s saved.</p>`:''}
+      ${conn}<div class="p-ban p-info"><div class="m" style="font-size:13.5px">View only. Burner, air, drum and switches are controlled from ${who}.</div></div>`,
+      wire:el=>{phLiveWire(el);phChart($('#phCv'),{samples:[],events:{}},bgOk,{live:true})}}}
   const ev=L.events,o=ev.CHARGE??null,last=L.samples[L.samples.length-1]||{},v=wsFresh?PH.ws.v:last,bg=profileByName(L.meta.name,num(L.meta.green)),bgOk=bg&&bg.samples&&bg.samples.length?bg:null;
   const t=o==null?null:(ev.DROP!=null?ev.DROP:L.tNow)-o,rorOn=o!=null&&ev.DROP==null&&L.tNow>=(rorStart(ev)??o),ror=!rorOn?null:wsFresh&&ok(S.liveRor)?S.liveRor:last.ror;
   const phase=o==null?'Waiting for Charge':ev.DROP!=null?'Dropped':ev.FCs!=null?`Dev ${mmss(L.tNow-ev.FCs)} since FC`:ev.DRY!=null?`${mmss(L.tNow-ev.DRY)} since dry end`:'Drying';
