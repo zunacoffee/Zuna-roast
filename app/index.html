@@ -475,6 +475,11 @@ tr.sel .ipCard .n{color:var(--accent)}
 #ipChips{display:flex;gap:6px;margin-left:auto;margin-right:10px;text-transform:none;letter-spacing:0;font-weight:500}
 #ipChips span{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:calc(13px*var(--ts,1));color:var(--text2);white-space:nowrap}
 #ipChips b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+#ipPhase{display:flex;gap:6px;margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500}
+#ipPhase:empty{display:none}#ipPhase:not(:empty)+#ipChips{margin-left:6px}
+#ipPhase span{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:calc(13px*var(--ts,1));color:var(--text2);white-space:nowrap}
+#ipPhase span.on{background:color-mix(in srgb,var(--accent) 14%,var(--panel));color:var(--accent)}
+#ipPhase b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}#ipPhase span.on b{color:var(--accent)}
 .ipad .spx .ab{width:54px;height:54px;font-size:calc(17px*var(--ts,1))}
 .ipad .pre button{padding:10px 0;min-height:46px}
 .ipad .sw button{padding:18px 14px;min-height:64px}
@@ -545,7 +550,7 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipc #scr-roast{grid-template-columns:minmax(0,1fr) 330px;gap:10px;padding:10px}
 .ipc #rightCol .ipCoolHead,.ipc #rightCol #sw{display:none}
 .ipc .ipLegend{gap:12px;font-size:11.5px}
-.ipc #ipChips span{padding:4px 8px;font-size:12.5px}
+.ipc #ipChips span,.ipc #ipPhase span{padding:4px 8px;font-size:12.5px}
 .ipc #roBT .v{font-size:50px}
 .ipc .big3 .ro:not(#roBT) .v{font-size:32px}
 .ipc .ro{padding-top:4px;padding-bottom:4px}
@@ -875,7 +880,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
   </section>
 
   <section class="panel">
-    <div class="pt"><button id="chartTitle" title="Open Roast details"></button><span id="ipChips" class="ipOnly"></span><span id="phaseTxt" class="tnum"></span></div>
+    <div class="pt"><button id="chartTitle" title="Open Roast details"></button><span id="ipPhase" class="ipOnly"></span><span id="ipChips" class="ipOnly"></span><span id="phaseTxt" class="tnum"></span></div>
     <div class="ipLegend ipOnly"><span><i style="border-color:var(--c-bt)"></i>Bean temp</span><span><i style="border-color:var(--c-ror)"></i>Rate of rise</span><span><i style="border-color:var(--c-bkg);border-top-style:dashed"></i>Background</span><span><i style="border-color:var(--c-burner)"></i>Burner</span><span><i style="border-color:var(--c-air)"></i>Air</span></div>
     <div class="chartwrap" style="position:relative">
       <canvas id="cvMain"></canvas>
@@ -1798,7 +1803,7 @@ function renderHeader(){
 const rorStart=ev=>ev.CHARGE==null?null:cfg.rorFrom==='tp'?(ev.TP??ev.CHARGE+45):ev.CHARGE;
 function curTime(){const r=S.roast;if(S.recording)return link.clock()-r.t0;return r.samples.length?r.samples.at(-1).t:null}
 function renderLive(){const v=S.latest,r=S.roast,last=S.recording?r.samples.at(-1):null;
-  $('#vBT').textContent=fT(v.bt);const rorHide=cfg.rorFrom==='tp'&&S.recording&&r.events.CHARGE!=null&&(r.events.TP==null||r.events.DROP!=null);$('#vRoR').textContent=rorHide?'—':fR(last?last.ror:S.liveRor);$('#vEx').textContent=fT(v.exhaust);$('#vPa').textContent=fP(v.pressure);if(IPAD){$('#ipLive').innerHTML=`<div>Exhaust<b>${fT(v.exhaust)}°</b></div><div>Air pressure<b>${fP(v.pressure)} <span style="font-size:13px;color:var(--text2)">${pU()}</span></b></div><div>Inlet<b>${fT(v.inlet)}°</b></div><div>Ambient<b>${fT(v.et)}°</b></div>`;const ev=r.events,now=last?last.t:null,dev=S.recording&&ev.FCs!=null&&ev.CHARGE!=null&&now!=null?(ev.DROP??now)-ev.FCs:null,tot=dev!=null?(ev.DROP??now)-ev.CHARGE:0;$('#ipChips').innerHTML=`<span>Exhaust <b>${fT(v.exhaust)}°</b></span><span>Air <b>${fP(v.pressure)} ${pU()}</b></span>`+(dev!=null?`<span>Dev <b>${mmss(dev)} · ${tot>0?Math.round(dev/tot*100):0}%</b></span>`:'')}
+  $('#vBT').textContent=fT(v.bt);const rorHide=cfg.rorFrom==='tp'&&S.recording&&r.events.CHARGE!=null&&(r.events.TP==null||r.events.DROP!=null);$('#vRoR').textContent=rorHide?'—':fR(last?last.ror:S.liveRor);$('#vEx').textContent=fT(v.exhaust);$('#vPa').textContent=fP(v.pressure);if(IPAD){$('#ipLive').innerHTML=`<div>Exhaust<b>${fT(v.exhaust)}°</b></div><div>Air pressure<b>${fP(v.pressure)} <span style="font-size:13px;color:var(--text2)">${pU()}</span></b></div><div>Inlet<b>${fT(v.inlet)}°</b></div><div>Ambient<b>${fT(v.et)}°</b></div>`;const ev=r.events,now=last?last.t:null,dev=S.recording&&ev.FCs!=null&&ev.CHARGE!=null&&now!=null?(ev.DROP??now)-ev.FCs:null,tot=dev!=null?(ev.DROP??now)-ev.CHARGE:0;$('#ipChips').innerHTML=`<span>Exhaust <b>${fT(v.exhaust)}°</b></span><span>Air <b>${fP(v.pressure)} ${pU()}</b></span>`}
   let dbt='',dror='';if(S.bg&&S.recording&&last&&r.events.CHARGE!=null){const rc=S.bg.events.CHARGE??0,x=last.t-r.events.CHARGE;
     const rb=interp(S.bg.samples,'bt',x+rc),rr=interp(S.bg.samples,'ror',x+rc);
     const f=(d,dig)=>ok(d)?`${IPAD?'Background at '+mmss(x)+' ·':'Δ BKG'} <b class="${Math.abs(d)<.05?'':d>0?'pos':'neg'}">${d>0?'+':''}${d.toFixed(dig)}</b>`:'';
@@ -1844,6 +1849,11 @@ function tick(){checkBtAlarm();checkAutoOff();followTick();if(folActive())render
   let ph='';if(c!=null&&t!=null){const end=r.events.DROP??t,d1=(r.events.DRY??(r.events.FCs==null?end:null)),seg=[];
     seg.push('Drying '+mmss(d1!=null?d1-c:null));seg.push('Maillard '+mmss(r.events.DRY!=null?(r.events.FCs??end)-r.events.DRY:null));seg.push('Development '+mmss(r.events.FCs!=null?end-r.events.FCs:null));ph=seg.join(' · ')}
   $('#phaseTxt').textContent=ph;
+  if(IPAD){let h='';if(c!=null&&t!=null){const E=r.events,end=E.DROP??t,cur=E.DROP!=null?'':E.FCs!=null?'dev':E.DRY!=null?'mai':'dry',
+      dry=E.DRY!=null?E.DRY-c:E.FCs==null?end-c:null,mai=E.DRY!=null?(E.FCs??end)-E.DRY:null,dev=E.FCs!=null?end-E.FCs:null,
+      chip=(k,l,v)=>`<span class="${cur===k?'on':''}">${l} <b>${v==null?'—':mmss(v)}</b></span>`;
+    h=chip('dry','Drying',dry)+chip('mai','Maillard',mai)+chip('dev','Dev',dev)}
+    const el=$('#ipPhase');if(el.innerHTML!==h)el.innerHTML=h}
   $('#clock').textContent=new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'});
   // lost-connection alarm while recording
   const lost=S.recording&&(!link.connected()||performance.now()-S.lastDataAt>5000);
