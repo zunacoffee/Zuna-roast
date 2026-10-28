@@ -140,6 +140,8 @@ canvas{display:block;width:100%;height:100%}
 .pre button{min-width:0;font-variant-numeric:tabular-nums;font-weight:var(--smallW,500);font-size:calc(17px*var(--ss,1));padding:9px 0;border-radius:8px}
 .pre button.on{background:var(--text);border-color:var(--text);color:var(--panel)}
 .spx .d{font-size:calc(12px*var(--ts,1));color:var(--text2);padding-top:6px;min-height:20px}
+.folbtn{text-transform:none;letter-spacing:0;font-weight:500}.folbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}.folbtn.dim{opacity:.5}
+.folsoon{color:var(--accent);font-weight:700}.folp{color:var(--warn)}.spx .d button{padding:2px 8px;margin-left:4px}
 .sw{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px 16px 16px;border-top:1px solid var(--line2)}
 .sw button{display:flex;align-items:center;gap:9px;padding:14px 12px;font-size:calc(15px*var(--ts,1));font-weight:600;border-radius:10px;text-align:left}
 #swL,#sw{grid-template-columns:1fr}.sw button{min-width:0;overflow:hidden}
@@ -655,7 +657,7 @@ html.ipad .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;paddi
       <div class="ro" id="roBT"><div class="l"><span id="btLabel">Bean temp</span><span class="u">°F</span></div><div class="v" id="vBT">—</div><div class="d" id="dBT"></div></div>
       <div class="ro" id="roRor"><div class="l"><span>Rate of rise</span><span class="ur">°F/min</span></div><div class="v" id="vRoR">—</div><div class="d" id="dRoR"></div></div>
     </div>
-    <div class="pt" style="border-top:1px solid var(--line2);padding-top:10px"><span>Setpoints</span></div>
+    <div class="pt" style="border-top:1px solid var(--line2);padding-top:10px"><span>Setpoints</span><button class="sm folbtn" id="btnFollow" title="Send the background profile's burner and air changes to the roaster at the same times after Charge">Follow background</button></div>
     <div class="sps" id="sps"></div>
     <div id="ipToday" class="ipOnly"></div>
     <div class="pt ipOnly ipCoolHead"><span>Cooling tray</span></div>
@@ -855,7 +857,7 @@ const DEF={
   startOnCharge:true,simSpeed:10,nextHighlight:false,
   channels:{bt:{node:'beanTemp',mode:'C',scale:1},et:{node:'ambientTemp',mode:'C',scale:1},burner:{node:'burner',mode:'',scale:1},pressure:{node:'airPressure',mode:'',scale:1000},drum:{node:'drum',mode:'',scale:1},fan:{node:'exhaustFan',mode:'',scale:1},inlet:{node:'intakeAirTemp',mode:'C',scale:1},exhaust:{node:'exhaustAirTemp',mode:'C',scale:1},cooling:{node:'coolingAirTemp',mode:'C',scale:1}},
   bigWeight:400,textScale:100,bigScale:100,smallScale:100,smallWeight:500,fontText:'system',fontNum:'system',fontTextCustom:'',fontNumCustom:'',bizName:'',bizLogo:'',bizLogoDark:'',bizHeader:true,unit:'F',rorWindow:30,rorFrom:'charge',
-  presets:{burner:[20,40,60,80],fan:[30,45,65]},btAlarmOn:true,btAlarmC:(460-32)*5/9,autoCoolOn:false,autoCoolC:(400-32)*5/9,autoStirDelay:5,autoOffOn:true,dropSetOn:false,dropBurner:40,dropAir:60,showNextBar:true,coolOffMin:4,stirOffMin:6,ctlStep:1,burnerMax:100,sendEvents:true,confirmMachine:true,coolOnDrop:false,sound:true,
+  presets:{burner:[20,40,60,80],fan:[30,45,65]},btAlarmOn:true,btAlarmC:(460-32)*5/9,autoCoolOn:false,autoCoolC:(400-32)*5/9,autoStirDelay:5,autoOffOn:true,dropSetOn:false,followBg:false,dropBurner:40,dropAir:60,showNextBar:true,coolOffMin:4,stirOffMin:6,ctlStep:1,burnerMax:100,sendEvents:true,confirmMachine:true,coolOnDrop:false,sound:true,
   events:[{k:'UNDO',label:'Undo',show:true,key:'0'},{k:'CHARGE',label:'Charge',show:true,key:'1'},{k:'DRY',label:'Dry end',show:true,key:'2'},{k:'FCs',label:'FC start',show:true,key:'3'},{k:'FCe',label:'FC end',show:true,key:'4'},{k:'SCs',label:'SC start',show:false,key:'5'},{k:'SCe',label:'SC end',show:false,key:''},{k:'COOL',label:'Cool end',show:false,key:'7'},{k:'DROP',label:'Drop',show:true,key:'6'}],evOrderV:2,keyV:2,
   startKey:'Escape',swKeys:{coolingFanState:'c',stirrerState:'s'},
   pUnit:'Pa',
@@ -1074,7 +1076,7 @@ function markEvent(k,src='manual'){
   if(!S.recording){if(k==='CHARGE'&&src==='manual'){startRoast(false).then(okk=>{if(okk)markEvent('CHARGE','manual')});}else if(src==='manual')toast('Press START first');return}
   const r=S.roast;if(src==='machine'&&r.events[k]!=null)return;
   const t=+(link.clock()-r.t0).toFixed(2);r.events[k]=t;
-  if(k==='CHARGE'){delete r.events.TP;S.tpMin=null;r.chargedAt=new Date().toISOString()}
+  if(k==='CHARGE'){delete r.events.TP;S.tpMin=null;r.chargedAt=new Date().toISOString();S.fol={done:{},paused:{},rid:r.id||r.created}}
   S.evStack=S.evStack.filter(x=>x!==k);S.evStack.push(k);S.dirty=true;
   log('evt',`${k} at ${mmss(t-(r.events.CHARGE??0))} (${src})`);
   if(src==='manual')sendEventToRoaster(k);
@@ -1443,6 +1445,24 @@ function bgTimeNow(){const r=S.roast,c=r.events.CHARGE,last=r.samples.at(-1);if(
 function bgNext(key){if(!S.bg)return null;const x=bgTimeNow();if(x==null&&S.recording)return null;const rc=S.bg.events.CHARGE??0,cur=x??-1;
   return S.bgAdj.find(a=>(key?a.key===key:true)&&a.t-rc>cur+0.5)}
 
+/* ---------- Follow background: replay the background's burner/air changes by time after Charge ---------- */
+const FOL_KEYS=['burner','fan'],FOL_WARN=5;
+S.fol={done:{},paused:{},rid:null};
+const folId=a=>a.key+'@'+a.t;
+function folActive(){const r=S.roast;return !!(cfg.followBg&&S.bg&&S.recording&&r.events.CHARGE!=null&&r.events.DROP==null)}
+function folNow(){const r=S.roast;return link.clock()-r.t0-r.events.CHARGE}
+function folMarkPast(key){const rc=S.bg?S.bg.events.CHARGE??0:0,x=S.recording&&S.roast.events.CHARGE!=null?folNow():-1;for(const a of S.bgAdj||[])if((!key||a.key===key)&&a.t-rc<=x+0.5)S.fol.done[folId(a)]=1}
+function folReset(){S.fol={done:{},paused:{},rid:S.roast.id||S.roast.created};folMarkPast()}
+function followTookOver(k){if(!folActive()||!FOL_KEYS.includes(k)||S.fol.paused[k])return;S.fol.paused[k]=true;const l=CTL.find(c=>c.key===k).label;toast(`Following paused for ${l} — you took over`);log('ctl',`Follow background paused for ${l} (manual change)`)}
+function followResume(k){S.fol.paused[k]=false;folMarkPast(k);log('ctl',`Follow background resumed for ${CTL.find(c=>c.key===k).label}`);renderCtl()}
+function followTick(){if(!folActive()||!C.on||!link.connected())return;const r=S.roast,rc=S.bg.events.CHARGE??0,x=folNow();
+  if(S.fol.rid!==(r.id||r.created))folReset();
+  for(const a of S.bgAdj){if(!FOL_KEYS.includes(a.key))continue;const id=folId(a),rt=a.t-rc;if(S.fol.done[id]||rt<=0||rt>x)continue;S.fol.done[id]=1;
+    if(S.fol.paused[a.key])continue;if(x-rt>FOL_WARN)continue; /* too late to send (e.g. turned on mid-roast) */
+    const v=Math.round(a.to),l=CTL.find(c=>c.key===a.key).label;sendControl(a.key,v,true);r.tnotes.push({t:+(link.clock()-r.t0).toFixed(1),text:`${l} ${v}% (auto, from background)`});S.dirty=true;renderNotes()}}
+function setFollow(on){if(on&&!S.bg){toast('Load a background profile first');return}cfg.followBg=!!on;saveCfg();if(on){folReset();if(!C.on)toast('Follow background is on — it sends changes only while Control is on')}
+  log('ctl',`Follow background ${on?'ON':'OFF'}`);renderCtl()}
+
 /* ================================================================
    Control — commands Artisan sends to the P12 III
    ================================================================ */
@@ -1451,12 +1471,12 @@ const SWITCHES=[{p:'drivesState',label:'Drives',confirm:true},{p:'coolingFanStat
 const C={on:false,target:{},deb:{},wake:null};
 const ctlMax=k=>k==='burner'?clamp(Number(cfg.burnerMax)||100,0,100):100;
 function ctlBase(k){const t=C.target[k];return t&&performance.now()-t.at<6000?t.v:(ok(S.latest[k])?S.latest[k]:0)}
-function sendControl(k,v){const c=CTL.find(x=>x.key===k);v=Math.round(clamp(v,0,ctlMax(k)));
+function sendControl(k,v,auto){const c=CTL.find(x=>x.key===k);if(!auto)followTookOver(k);v=Math.round(clamp(v,0,ctlMax(k)));
   if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
   if(link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[c.param]:v}})==null)return;
-  C.target[k]={v,at:performance.now()};if(S.recording){S.roast.controlLog.push({t:+(link.clock()-S.roast.t0).toFixed(2),key:k,value:v});S.dirty=true}
-  log('ctl',`${c.label} → ${v}%`);renderCtl()}
-function nudge(k,d){if(!C.on||!link.connected())return;const v=Math.round(clamp(ctlBase(k)+d,0,ctlMax(k)));C.target[k]={v,at:performance.now(),pending:true};renderCtl();clearTimeout(C.deb[k]);C.deb[k]=setTimeout(()=>sendControl(k,v),350)}
+  C.target[k]={v,at:performance.now()};if(S.recording){S.roast.controlLog.push({t:+(link.clock()-S.roast.t0).toFixed(2),key:k,value:v,...(auto?{auto:true}:{})});S.dirty=true}
+  log('ctl',`${c.label} → ${v}%${auto?' (auto, from background)':''}`);renderCtl()}
+function nudge(k,d){if(!C.on||!link.connected())return;followTookOver(k);const v=Math.round(clamp(ctlBase(k)+d,0,ctlMax(k)));C.target[k]={v,at:performance.now(),pending:true};renderCtl();clearTimeout(C.deb[k]);C.deb[k]=setTimeout(()=>sendControl(k,v),350)}
 async function sendSwitch(p,val,silent){const w=SWITCHES.find(x=>x.p===p);if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
   if(p==='standby'&&S.sw.standby==null){const m=await link.ask({[cfg.nodes.command]:'getControlParams'},2500);const d=m&&(cfg.nodes.data?getPath(m,cfg.nodes.data):m);if(d&&typeof d.standby==='boolean'){S.sw.standby=d.standby;val=!d.standby}}
   if(!silent&&w.confirm&&cfg.confirmMachine&&!await ask(`Turn ${w.label} ${val?'ON':'OFF'}?`,'This is sent to the roaster now.',`Turn ${val?'on':'off'}`,!val))return;
@@ -1481,13 +1501,16 @@ function buildCtl(){
     ${pre.length?`<div class="pre" style="grid-template-columns:repeat(${Math.min(pre.length,4)},minmax(0,1fr))">${pre.map(v=>`<button data-p="${v}">${v}</button>`).join('')}</div>`:''}
     <div class="d"></div></div>`};$('#sps').innerHTML=CTL.filter(c=>c.key!=='drum').map(spx).join('');$('#spsL').innerHTML=spx(CTL.find(c=>c.key==='drum')).replace('class="spx"','class="spx" style="border-bottom:0"');
   const swb=w=>{const k=cfg.swKeys[w.p];return `<button data-sw="${w.p}"><i></i>${w.label}${k?`<kbd class="swk">${esc(keyName(k))}</kbd>`:''}<b>—</b></button>`};$('#sw').innerHTML=SWITCHES.filter(w=>!w.confirm).map(swb).join('');$('#swL').innerHTML=SWITCHES.filter(w=>w.confirm).map(swb).join('')}
-function renderCtl(){const live=C.on&&link.connected();
+function renderCtl(){const live=C.on&&link.connected();const fb=$('#btnFollow');if(fb){fb.classList.toggle('on',!!cfg.followBg);fb.textContent=cfg.followBg?'Following background':'Follow background';fb.classList.toggle('dim',!S.bg)}
   $$('.spx').forEach(el=>{const k=el.dataset.k,cur=S.latest[k],t=C.target[k];let shown=ok(cur)?Math.round(cur):null,pend=false;
     if(t){if(t.pending||(!(ok(cur)&&Math.abs(cur-t.v)<1)&&performance.now()-t.at<6000)){shown=t.v;pend=true}else if(ok(cur)&&Math.abs(cur-t.v)<1)C.target[k]=null}
     const v=$('.v',el);v.textContent=shown==null?'—':shown;v.classList.toggle('pend',pend);
     el.classList.toggle('locked',!live);$$('button',el).forEach(b=>{b.disabled=false;if(b.dataset.p)b.classList.toggle('on',ok(cur)&&Math.round(cur)===Number(b.dataset.p))});
     let d='';if(t&&!t.pending&&performance.now()-t.at>=6000&&ok(cur)&&Math.abs(cur-t.v)>=1)d=`<span class="dangerTxt">Roaster still at ${Math.round(cur)}%</span>`;
-    else{const nx=k!=='drum'?bgNext(k):null;if(nx){const rc=S.bg.events.CHARGE??0,x=bgTimeNow();d=`BKG next ${Math.round(nx.to)}${x!=null?` · in ${mmss(nx.t-rc-x)}`:` · at ${mmss(nx.t-rc)}`}`}}
+    else{const nx=k!=='drum'?bgNext(k):null,fo=cfg.followBg&&S.bg&&FOL_KEYS.includes(k);
+      if(fo&&S.fol.paused[k]&&folActive())d=`<span class="folp">Following paused — you took over</span> <button class="sm" data-folres="${k}">Resume</button>`;
+      else if(nx){const rc=S.bg.events.CHARGE??0,x=folActive()?folNow():bgTimeNow(),left=x!=null?nx.t-rc-x:null,soon=fo&&folActive()&&left!=null&&left<=FOL_WARN&&left>-1;
+        d=`<span class="${soon?'folsoon':''}">${fo?'Auto':'BKG'} next ${Math.round(nx.to)}${left!=null?` · in ${mmss(Math.max(0,Math.ceil(left)))}`:` · at ${mmss(nx.t-rc)}`}</span>`}}
     $('.d',el).innerHTML=d});
   $$('[data-sw]').forEach(b=>{const v=S.sw[b.dataset.sw],lf=v===true?autoOffLeft(b.dataset.sw):null;b.classList.toggle('locked',!live);b.classList.toggle('on',v===true);$('b',b).textContent=v===true?(lf!=null&&lf>0?'ON · off in '+mmss(Math.ceil(lf)):'ON'):v===false?'OFF':'—';b.disabled=false})}
 
@@ -1572,7 +1595,7 @@ function checkAutoOff(){const A=S.autoOff;if(!A||!cfg.autoOffOn||!link.connected
     if(!C.on){if(!A.warned){A.warned=true;toast(`Auto off skipped — Control is off. Turn ${label.toLowerCase()} off at the roaster.`);beep(1)}log('ctl',`Auto off skipped for ${label} (Control off)`);continue}
     sendSwitch(p,false,true);log('ctl',`${label} OFF (auto, after Drop)`);toast(`${label} off — ${mmss((key==='cool'?cfg.coolOffMin:cfg.stirOffMin)*60)} after Drop`);
     const r=S.roast;if(r&&(r.id||r.created)===A.rid&&r.events.DROP!=null){r.tnotes.push({t:+(link.clock()-r.t0).toFixed(1),text:`${label} off (auto)`});S.dirty=S.dirty||S.recording;renderNotes()}}}
-function tick(){checkBtAlarm();checkAutoOff();if(S.autoOff)renderCtl();const r=S.roast,t=curTime(),c=r.events.CHARGE;let label='Roast time',val='0:00';
+function tick(){checkBtAlarm();checkAutoOff();followTick();if(folActive())renderCtl();if(S.autoOff)renderCtl();const r=S.roast,t=curTime(),c=r.events.CHARGE;let label='Roast time',val='0:00';
   if(t!=null){if(c!=null){val=mmss((r.events.DROP??t)-c);label=r.events.DROP!=null?'Drop time':'Roast time'}else{val=mmss(t);label='Since START (no charge yet)'}}
   $('#vTime').textContent=val;$('#timerLabel').textContent=label;
   $('#recState').innerHTML=S.recording?'<span style="color:var(--danger)">● REC</span>':S.viewingId?'saved':(r.samples.length?'not saved':'');
@@ -3188,7 +3211,8 @@ async function init(){
   const spClick=e=>{const b=e.target.closest('button'),sp=e.target.closest('.spx');if(!sp)return;const k=sp.dataset.k;
     if(b&&b.dataset.d)nudge(k,Number(b.dataset.d)*(Number(cfg.ctlStep)||1));else if(b&&b.dataset.p)sendControl(k,Number(b.dataset.p));
     else if(e.target.classList.contains('v')&&C.on&&link.connected())askText(`Set ${CTL.find(c=>c.key===k).label}`,'Percent (0–100)',String(Math.round(ctlBase(k)))).then(v=>{const n=num(v);if(n!=null)sendControl(k,n)})};
-  $('#sps').onclick=spClick;$('#spsL').onclick=spClick;
+  $('#sps').onclick=e=>{const rb=e.target.closest('[data-folres]');if(rb){followResume(rb.dataset.folres);return}spClick(e)};$('#spsL').onclick=spClick;
+  $('#btnFollow').onclick=()=>setFollow(!cfg.followBg);
   for(const id of ['#sw','#swL'])$(id).onclick=e=>{const b=e.target.closest('button');if(b)sendSwitch(b.dataset.sw,!(S.sw[b.dataset.sw]===true))};
   for(const s of Object.values(FORM))$(s).addEventListener('input',onFormInput);$('#fGreen').addEventListener('input',()=>{if(S.bgMode==='auto'&&!S.recording)resolveBg();else renderNotes()});
   $('#btnSave').onclick=()=>saveRoast(false,false);$('#btnNewRoast').onclick=()=>newRoastFromCurrent();$('#btnSaveProf').onclick=()=>saveRoast(false,true);$('#btnCsv').onclick=()=>download(roastBase(S.roast)+'.csv',csvText(S.roast));
