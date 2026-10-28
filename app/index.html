@@ -1104,7 +1104,7 @@ const f0=v=>ok(v)?String(Math.round(v)):'—';
 const isMbar=()=>cfg.pUnit==='mbar',pU=()=>isMbar()?'mbar':'Pa';            // pressure is stored in Pa
 const fP=v=>ok(v)?(isMbar()?(v/100).toFixed(2):String(Math.round(v))):'—';
 let COL={};
-function applyTheme(){const c=cfg.theme.colors,r=document.documentElement.style;
+function applyTheme(){const c=IPHONE?phThemeColors(cfg.theme.colors):cfg.theme.colors,r=document.documentElement.style;
   const map={ctlOn:'--c-ctl',bg:'--bg',panel:'--panel',text:'--text',text2:'--text2',border:'--border',accent:'--accent',chartBg:'--chartBg',grid:'--grid',axis:'--axis',bt:'--c-bt',ror:'--c-ror',exhaust:'--c-exhaust',bkg:'--c-bkg',burner:'--c-burner',air:'--c-air',drum:'--c-drum',pressure:'--c-pressure',phase:'--c-phase',tTime:'--t-time',tBT:'--t-bt',tRoR:'--t-ror',tSpB:'--t-spb',tSpA:'--t-spa',tSpD:'--t-spd',gStock:'--g-stock',gLow:'--g-low',gAdd:'--g-add',pWhole:'--p-whole',pRetail:'--p-retail',pLow:'--p-low',pCoffee:'--p-coffee',pOver:'--p-over',pLabor:'--p-labor',pBag:'--p-bag'};
   for(const [k,v] of Object.entries(map))r.setProperty(v,c[k]);
   const lum=hexLum(c.panel);document.documentElement.style.colorScheme=lum<.35?'dark':'light';if((IPAD||IPHONE)&&window.ZR_NATIVE&&ZR_NATIVE.chrome)ZR_NATIVE.chrome(c.bg,hexLum(c.bg)<.35);
@@ -3687,8 +3687,9 @@ PHV.more=()=>{const fold=window.ZR_NATIVE&&ZR_NATIVE.folder?ZR_NATIVE.folder:FS.
       <button class="p-row" data-m="price"><span class="ic">${PH_IC.price}</span><div class="m"><b>Pricing</b><small>12 oz, 2 lb and 5 lb, wholesale and retail</small></div><span class="gt">›</span></button></div>
     <div class="p-sec"><span class="p-h3">Data</span><div class="p-card p-menu"><div class="p-row"><span class="ic">${PH_IC.folder}</span><div class="m"><b>${FS.state==='granted'?'Shared folder':'No folder yet'}</b><small>${esc(fold||(FS.supported?'Pick the Zuna Roast folder':'Not available in this browser'))}</small></div>${FS.supported?`<button class="p-btn sm" id="phFold">${FS.state==='granted'?'Change':'Choose'}</button>`:''}</div>
       <div class="p-row"><div class="m"><b>${HIST.length} roasts · ${INV.length} green lots</b><small>Synced with the iMac and iPad through the folder</small></div><button class="p-btn sm" id="phSync">Check now</button></div></div></div>
+    <div class="p-sec"><span class="p-h3">Appearance on this phone</span><div class="p-card p-menu">${PH_THEMES.map(([k,l])=>`<button class="p-row" data-th="${k}"><div class="m"><b style="font-weight:500">${l}</b>${k==='app'?`<small>Now ${esc(cfg.theme.name||'Custom')} — set in Settings › Appearance</small>`:''}</div>${phThemePick()===k?'<span style="color:var(--accent);font-size:19px;font-weight:600">✓</span>':''}</button>`).join('')}</div></div>
     <p class="p-note">Analyze, the profile builder and Settings are on the iMac and iPad.${window.ZR_NATIVE&&ZR_NATIVE.version?` Zuna Roast ${esc(ZR_NATIVE.version)}.`:''}</p>`,
-    wire:el=>{$$('[data-m]',el).forEach(b=>b.onclick=()=>phGo({v:b.dataset.m}));const f=$('#phFold');if(f)f.onclick=async()=>{await chooseFolder();phRender(true)};
+    wire:el=>{$$('[data-m]',el).forEach(b=>b.onclick=()=>phGo({v:b.dataset.m}));$$('[data-th]',el).forEach(b=>b.onclick=()=>phSetTheme(b.dataset.th));const f=$('#phFold');if(f)f.onclick=async()=>{await chooseFolder();phRender(true)};
       $('#phSync').onclick=async()=>{const b=$('#phSync');b.disabled=true;b.textContent='Checking…';await watchTick(true);phPollDraft();phRender(true);toast('Up to date')}}}};
 
 /* ---------- cupping ---------- */
@@ -3769,6 +3770,12 @@ PHV.priceEdit=v=>{const l=INV.find(x=>x.id===v.id);if(!l)return {nav:phNavSmall(
 /* ---------- first launch on the phone: pick the shared iCloud folder ---------- */
 PHV.welcome=()=>({nav:phNavBig('Zuna Roast'),body:`<div class="p-welcome"><h2>Pick your roast folder</h2><p>The phone uses the same folder as the iMac and iPad: <code>iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast</code>. Pick it once and the phone remembers it.</p><button class="p-btn full pri" id="phPick">Choose folder</button></div>`,
   wire:el=>{$('#phPick').onclick=async()=>{await chooseFolder();if(FS.state==='granted'&&(!window.ZR_NATIVE||ZR_NATIVE.folderPicked)){PH.stacks=phStacks();phRender()}}}});
+/* phone-only appearance, kept on this phone (the iMac and iPad keep the theme from Settings › Appearance) */
+const PH_THEMES=[['app','Same as iMac and iPad'],['white','White'],['dark','Dark'],['auto','Match the iPhone (light or dark)']];
+const phThemePick=()=>{const v=store.get('zr2.phTheme','app');return PH_THEMES.some(t=>t[0]===v)?v:'app'};
+const phDarkOS=()=>{try{return matchMedia('(prefers-color-scheme: dark)').matches}catch(e){return false}};
+function phThemeColors(c){const p=phThemePick();if(p==='app')return c;return (p==='dark'||(p==='auto'&&phDarkOS()))?{...WHITE,...DARK}:{...WHITE}}
+function phSetTheme(v){store.set('zr2.phTheme',v);applyTheme();phRender(true)}
 const phStacks=()=>Object.fromEntries(PH_TABS.map(([t])=>[t,[phRoot(t)]]));
 function phInit(){const app=$('#phApp');
   app.innerHTML=`<div id="phNav"></div><div id="phView"></div><nav id="phTabs">${PH_TABS.map(([t,l])=>`<button data-t="${t}">${PH_IC[t]}<span>${l}</span></button>`).join('')}</nav><div id="phSheet"></div>`;
@@ -3780,6 +3787,7 @@ function phInit(){const app=$('#phApp');
   setInterval(()=>{if(document.hidden)return;const live=PH.tab==='live';if(live||PH.tab==='today'){if(Date.now()-PH.draftAt>(live?4000:20000))phPollDraft()}
     if(live&&phCur().v==='live'&&!PH.liveT)phLiveUpdate();
     if(live&&phCur().v==='live')wakeLock(true);else if(!link.connected())wakeLock(false)},1000);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(phThemePick()==='auto'){applyTheme();phRender(true)}})}catch(e){}
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)phPollDraft();else if(!link.manual)link.disconnect()});
   window.addEventListener('resize',()=>{if(['roast','live'].includes(phCur().v))phRender(true)});
   phPollDraft()}
