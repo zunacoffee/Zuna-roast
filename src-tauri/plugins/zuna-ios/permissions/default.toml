@@ -8,4 +8,5 @@ permissions = [
   "allow-download-folder",
   "allow-keep-awake",
   "allow-share-file",
+  "allow-set-chrome",
 ]

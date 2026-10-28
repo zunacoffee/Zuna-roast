@@ -6,6 +6,8 @@
   <string>Zuna Roast connects to your Probat roaster on the local network to read temperatures and send burner, air and drum settings.</string>
   <key>ITSAppUsesNonExemptEncryption</key>
   <false/>
+  <key>UIViewControllerBasedStatusBarAppearance</key>
+  <false/>
   <key>UIRequiresFullScreen</key>
   <true/>
   <key>UISupportedInterfaceOrientations~ipad</key>

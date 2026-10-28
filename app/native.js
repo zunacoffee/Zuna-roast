@@ -98,6 +98,7 @@
   /* fingerprint of the whole folder — changes when another device saves something */
   N.stamp = () => invoke('fs_stamp');
   /* iPad: ask iCloud for files another device just saved, before re-reading the folder */
+  N.chrome = IOS ? (color, dark) => ios('set_chrome', { color, dark }).catch(() => null) : null;
   N.refreshCloud = IOS ? () => ios('download_folder').catch(() => null) : null;
   N.deviceName = () => invoke('device_name').catch(() => 'This Mac');
   N.reveal = () => IOS ? (window.toast && toast('Open the Files app › ' + N.folder)) : invoke('reveal_data_folder').catch(e => window.toast && toast('Could not open Finder: ' + e));

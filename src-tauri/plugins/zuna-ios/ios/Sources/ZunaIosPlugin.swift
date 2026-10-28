@@ -7,12 +7,18 @@ import WebKit
 
 struct AwakeArgs: Decodable { let on: Bool }
 struct ShareArgs: Decodable { let name: String; let text: String }
+struct ChromeArgs: Decodable { let color: String; let dark: Bool }
 
 /// iPad-only helpers for Zuna Roast (see src/lib.rs for what each one is for).
 class ZunaIosPlugin: Plugin, UIDocumentPickerDelegate {
     private let bookmarkKey = "zunaRoastFolderBookmark"
     private var pendingPick: Invoke?
     private var folder: URL?
+    private weak var webView: WKWebView?
+
+    override func load(webview: WKWebView) {
+        webView = webview
+    }
 
     // MARK: roast folder (iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast)
 
@@ -115,6 +121,35 @@ class ZunaIosPlugin: Plugin, UIDocumentPickerDelegate {
         DispatchQueue.main.async {
             UIApplication.shared.isIdleTimerDisabled = args.on
             invoke.resolve(["on": args.on])
+        }
+    }
+
+    // MARK: screen edges and status bar follow the app theme
+
+    private func color(_ hex: String) -> UIColor {
+        var h = hex.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "#", with: "")
+        if h.count == 3 { h = h.map { "\($0)\($0)" }.joined() }
+        guard h.count == 6, let n = UInt32(h, radix: 16) else { return .systemBackground }
+        return UIColor(red: CGFloat((n >> 16) & 255) / 255, green: CGFloat((n >> 8) & 255) / 255, blue: CGFloat(n & 255) / 255, alpha: 1)
+    }
+
+    @objc public func setChrome(_ invoke: Invoke) throws {
+        let args = try invoke.parseArgs(ChromeArgs.self)
+        let c = color(args.color)
+        DispatchQueue.main.async {
+            let vc = self.manager.viewController
+            vc?.view.backgroundColor = c
+            vc?.view.window?.backgroundColor = c
+            if let wv = self.webView {
+                wv.isOpaque = false
+                wv.backgroundColor = c
+                wv.scrollView.backgroundColor = c
+                if #available(iOS 15.0, *) { wv.underPageBackgroundColor = c }
+            }
+            // Info.ios.plist sets UIViewControllerBasedStatusBarAppearance = false, so this applies app-wide.
+            UIApplication.shared.statusBarStyle = args.dark ? .lightContent : .darkContent
+            vc?.setNeedsStatusBarAppearanceUpdate()
+            invoke.resolve(["ok": true])
         }
     }
 
