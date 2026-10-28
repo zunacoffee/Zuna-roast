@@ -366,6 +366,16 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .ccan td{background:color-mix(in srgb,var(--accent) 3%,var(--panel))}.ccan .p{display:inline-block;border-radius:999px;padding:2px 9px;font-size:calc(12px*var(--ts,1));font-weight:600;margin:0 4px 4px 0}
 .p.r{background:color-mix(in srgb,var(--danger) 12%,var(--panel));color:var(--danger)}.p.w{background:color-mix(in srgb,var(--warn) 15%,var(--panel));color:#a86f00}.p.g{background:color-mix(in srgb,var(--good) 12%,var(--panel));color:var(--good)}
 .cvseg{margin-right:6px}
+.ppills{display:flex;gap:8px;flex-wrap:wrap}.ppills button{border-radius:999px;min-height:44px;padding:0 18px;font-size:calc(15px*var(--ts,1))}.ppills button.on{background:var(--text);border-color:var(--text);color:var(--panel)}
+.pstage{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:start}.psl b{display:block;font-size:calc(15px*var(--ts,1))}.psl span{font-size:calc(12px*var(--ts,1));color:var(--text2)}
+.pchips{display:flex;flex-wrap:wrap;gap:8px}.pchips button{border-radius:12px;min-height:46px;min-width:96px;padding:0 14px;font-size:calc(15px*var(--ts,1))}
+.pchips button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}.pchips button.carbon.on{background:var(--danger);border-color:var(--danger)}
+.poff button{min-width:0}.poff button.on{background:color-mix(in srgb,var(--danger) 10%,var(--panel));border-color:color-mix(in srgb,var(--danger) 45%,var(--panel));color:var(--danger)}.poff .sev{font-size:.75em;letter-spacing:1px}
+.prow4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.pbig{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:6px}
+.pbig button{flex:1;border:0;border-radius:0;min-height:48px;font-size:calc(15px*var(--ts,1));border-right:1px solid var(--border)}.pbig button:last-child{border-right:0}
+.pbig button.on{background:var(--text);color:var(--panel);font-weight:600}.pbig.yn button.on.y{background:var(--good);color:#fff}.pbig.yn button.on.n{background:var(--danger);color:#fff}
+.pan{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;border:1px solid var(--line2)}
+.ipc .prow4{grid-template-columns:repeat(2,minmax(0,1fr))}.ipc .pstage{grid-template-columns:1fr}.ipc .pchips button{min-width:84px}
 .cot{overflow:auto;border:1px solid var(--line2);border-radius:8px}.cot table td,.cot table th{padding:5px 10px;text-align:center}.cot td.ccl{text-align:left;position:static;width:auto;min-width:110px;font-size:calc(11.5px*var(--ts,1))}
 .cot th.cur,.cot td.cur{background:var(--accentSoft)}
 .cdot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)}.cdot.half{opacity:.35}.cdot.no{background:transparent;border:1.5px solid var(--border)}.cdot.carbon{background:var(--danger)}
@@ -764,6 +774,9 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 .p-tags button{border:1px solid var(--border);background:var(--panel);border-radius:18px;padding:7px 12px;font-size:14px;font-weight:500;min-height:36px}
 .p-tags button.on{background:var(--accentSoft);border-color:color-mix(in srgb,var(--accent) 40%,var(--panel));color:var(--accent)}
 .p-samples{display:flex;gap:6px;overflow-x:auto;flex:none;padding:2px}
+.p-fam button.on{background:var(--accent);border-color:var(--accent);color:#fff}.p-fam button.carbon.on{background:var(--danger);border-color:var(--danger)}
+.p-seg{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;flex:none}.p-seg button{border:0;border-right:1px solid var(--border);background:var(--panel);min-width:46px;min-height:40px;font-size:15px;padding:0 10px}.p-seg button:last-child{border-right:0}
+.p-seg button.on{background:var(--text);color:var(--panel);font-weight:600}.p-seg.yn button.on.y{background:var(--good);color:#fff}.p-seg.yn button.on.n{background:var(--danger);color:#fff}
 .p-samples button{flex:1 0 64px;text-align:center;border:1px solid var(--border);border-radius:11px;padding:6px 4px;font-size:12.5px;color:var(--text2);background:var(--panel);min-height:48px}
 .p-samples button b{display:block;font-size:17px;color:var(--text)}
 .p-samples button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentSoft)}
@@ -2674,7 +2687,7 @@ function renderCupDetail(){const el=$('#cDetail');
     <div class="row"><button class="pri" id="csCreate">Create session</button><button id="csCancel">Cancel</button></div>`;
     $('#csCancel').onclick=()=>{cupMode='view';renderCupping()};
     $('#csCreate').onclick=async()=>{const ids=$$('.picklist input:checked').map(i=>i.value);if(!ids.length){toast('Tick at least one roast');return}
-      const s={id:'c'+Date.now().toString(36),date:new Date().toISOString(),name:$('#csName').value.trim()||'Cupping',cuppers:$('#csCuppers').value.trim(),samples:ids.map(newSample)};CUP.push(s);selSession=s.id;selSample=0;cupMode='view';await persistCup();renderCupping()};return}
+      const s={id:'c'+Date.now().toString(36),date:new Date().toISOString(),name:$('#csName').value.trim()||'Cupping',cuppers:$('#csCuppers').value.trim(),samples:ids.map(newSample)};CUP.push(s);selSession=s.id;selSample=0;cupPadI=0;cupMode='view';await persistCup();renderCupping()};return}
   const s=CUP.find(x=>x.id===selSession);if(!s){el.innerHTML='<div class="empty">Select a session, or start a new one.</div>';return}
   if(!cfg.cupScoring||cupView!=='score')return renderCupCard(el,s);
   selSample=clamp(selSample,0,s.samples.length-1);const x=s.samples[selSample],r=HIST.find(h=>h.id===x.roastId),sm=r?(r.summary||summarize(r)):null,total=cupScore(x);
@@ -2691,7 +2704,7 @@ function renderCupDetail(){const el=$('#cDetail');
   <label class="field">Comments<textarea id="cComm">${esc(x.comments||'')}</textarea></label>
   <div class="row" style="margin-top:auto"><button class="pri" id="cSave">Save score</button>${r?`<button id="cOpen">Open roast #${r.num}</button><button id="cAn">Analyze #${r.num} →</button>`:''}<span class="sp"></span><button id="cPrev" ${selSample===0?'disabled':''}>Previous sample</button><button id="cNext" ${selSample>=s.samples.length-1?'disabled':''}>Next sample</button></div>`;
   $$('[data-cv]',el).forEach(b=>b.onclick=()=>{x.comments=$('#cComm').value;cupView=b.dataset.cv;renderCupDetail()});
-  $$('.samples button',el).forEach(b=>b.onclick=()=>{x.comments=$('#cComm').value;selSample=Number(b.dataset.i);renderCupDetail()});
+  $$('.samples button',el).forEach(b=>b.onclick=()=>{x.comments=$('#cComm').value;selSample=Number(b.dataset.i);cupPadI=selSample;renderCupDetail()});
   $$('[data-a]',el).forEach(b=>b.onclick=()=>{x.scores[b.dataset.a]=clamp(Number(x.scores[b.dataset.a])+Number(b.dataset.d),6,10);x.comments=$('#cComm').value;renderCupDetail()});
   $$('[data-def]',el).forEach(b=>b.onclick=()=>{x.defects=Math.max(0,x.defects+Number(b.dataset.def));x.comments=$('#cComm').value;renderCupDetail()});
   $$('[data-c]',el).forEach(b=>b.onclick=()=>{x.cups[b.dataset.c][Number(b.dataset.ci)]=!x.cups[b.dataset.c][Number(b.dataset.ci)];x.comments=$('#cComm').value;renderCupDetail()});
@@ -2722,7 +2735,36 @@ function cardFaults(c){const out=[];if(!c)return out;const cup=['FL','AT'];
   if(c.acid==='Heavy')out.push(['sharp',1,'Acidity heavy']);
   return out}
 let cupSaveT;function cupSaveSoon(){clearTimeout(cupSaveT);cupSaveT=setTimeout(()=>persistCup(),600)}
-function renderCupCard(el,s){const cols=s.samples.map(x=>({x,r:HIST.find(h=>h.id===x.roastId)})),old=$('.cctbl',el),keep=old&&old.dataset.sid===s.id?[old.scrollTop,old.scrollLeft,el.scrollTop]:null;
+let cupPadI=0;
+const CSTAGE=[['F','Fragrance','dry grounds'],['A','Aroma','at the break'],['FL','Flavor','slurp'],['AT','Aftertaste','finish']];
+function renderCupPad(el,s){cupPadI=clamp(cupPadI,0,s.samples.length-1);const x=s.samples[cupPadI],r=HIST.find(h=>h.id===x.roastId),c=cardOf(x),l=r&&INV.find(z=>z.id===r.meta.invId),t=r?tasteOf(r):{},sp=r?spreadOf(r.meta):null;
+  const big=(k,opts,yn)=>`<div class="pbig ${yn?'yn':''}">${opts.map(([v,lab,cl])=>`<button class="${cl||''} ${c[k]===v?'on':''}" data-pb="${k}" data-v="${v}">${lab}</button>`).join('')}</div>`;
+  const te=r?tasteEff(r):{},cf=r?cupFaults(r).why:{},items=TASTE.filter(([k])=>te[k]>0);
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.cuppers?'cuppers: '+esc(s.cuppers)+' · ':''}sample ${cupPadI+1} of ${s.samples.length}</div></div>
+    ${cfg.cupScoring?`<div class="seg cvseg"><button class="on" data-cv="card">Card</button><button data-cv="score">100-point</button></div>`:''}<button id="ccAdd">+ Sample</button><button class="dangerTxt" id="csDel">Delete</button></div>
+  <div class="ppills">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===cupPadI?'on':''}" data-pi="${i}">#${rr?rr.num:'?'} ${esc(rr?(rr.meta.coffee||rr.meta.name||'Untitled').split(' ').slice(0,2).join(' '):'(removed)')}</button>`}).join('')}</div>
+  ${r?`<div class="muted" style="font-size:calc(13px*var(--ts,1))"><b style="color:var(--text)">#${r.num} · ${esc(r.meta.coffee||r.meta.name||'')}</b> · ${esc(r.meta.name||'')} · roasted ${fmtDate(r.chargedAt||r.created,false)} · ${lbTxt(batchOf(r))} · WB/GB ${esc(r.meta.colorWhole||'—')}/${esc(r.meta.colorGround||'—')}${ok(sp)?' · spread '+spTxt(sp):''}${l?` · moisture ${esc(l.moisture||'—')} · screen ${esc(l.screen||'—')} · aw ${esc(l.wa||'—')}`:''}</div>`:''}
+  ${CSTAGE.map(([k,lab,sub])=>`<div class="pstage"><div class="psl"><b>${lab}</b><span>${sub}</span></div><div class="pchips">${FAMS.map(([f,fl])=>`<button class="${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-pf="${f}:${k}">${fl}</button>`).join('')}</div></div>`).join('')}
+  <div class="prow4"><div><div class="h3">Body</div>${big('body',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']])}</div><div><div class="h3">Acidity</div>${big('acid',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']])}</div>
+    <div><div class="h3">Balance</div>${big('bal',[['Y','Yes','y'],['N','No','n']],1)}</div><div><div class="h3">Overall</div>${big('ov',[['Y','Yes','y'],['N','No','n']],1)}</div></div>
+  ${r?`<div><div class="h3" style="margin-bottom:6px">Anything off?${(c.bal==='N'||c.ov==='N')&&!TASTE.some(([k])=>k!=='good'&&t[k]>0)?' <span style="color:var(--warn);text-transform:none;letter-spacing:0;font-weight:500">— balance or overall was No, what was off?</span>':''}</div><div class="pchips poff">${TASTE.filter(([k])=>k!=='good').map(([k,lab])=>`<button class="${t[k]>0?'on':''}" data-po="${k}">${esc(lab.split(' / ')[0])}${t[k]>0?` <span class="sev">${'●'.repeat(t[k])}</span>`:''}</button>`).join('')}</div></div>`:''}
+  <label class="field">Notes<textarea id="ccPn" placeholder="Notes">${esc(x.comments||'')}</textarea></label>
+  ${r?`<div class="ccan pan"><b>To Analyze:</b> ${items.length?items.map(([k,lab])=>`<span class="p ${k==='good'?'g':te[k]>=2?'r':'w'}" title="${esc(cf[k]&&!(k in t)?'from the card: '+cf[k]:'you marked it')}">${esc(lab.split(' / ')[0])}</span>`).join(''):'<span class="muted">nothing to fix yet</span>'}<span class="sp"></span><button data-can="${r.id}">Analyze #${r.num} →</button></div>`:''}
+  <div class="row"><button id="ccPp" ${cupPadI===0?'disabled':''}>‹ Previous</button><span class="sp"></span><button class="pri" id="ccPx">${cupPadI>=s.samples.length-1?'Done':'Next sample ›'}</button></div>`;
+  const rer=()=>{const st=el.scrollTop;renderCupping();el.scrollTop=st};
+  $$('[data-pi]',el).forEach(b=>b.onclick=()=>{cupPadI=+b.dataset.pi;el.scrollTop=0;renderCupping()});
+  $$('[data-pf]',el).forEach(b=>b.onclick=()=>{const [f,k]=b.dataset.pf.split(':'),a=c.fam[f]||[];c.fam[f]=a.includes(k)?a.filter(z=>z!==k):[...a,k];cupSaveSoon();rer()});
+  $$('[data-pb]',el).forEach(b=>b.onclick=()=>{const k=b.dataset.pb,v=b.dataset.v;c[k]=c[k]===v?'':v;cupSaveSoon();rer()});
+  $$('[data-po]',el).forEach(b=>b.onclick=async()=>{const k=b.dataset.po,tags={...tasteOf(r)};tags[k]=((tags[k]||0)+1)%4;if(tags[k])tags.good=0;r.taste={...(r.taste||{}),tags,at:new Date().toISOString()};await commitRoast(r,true);rer()});
+  $('#ccPn').oninput=e=>{x.comments=e.target.value;cupSaveSoon()};
+  $$('[data-can]',el).forEach(b=>b.onclick=async()=>{clearTimeout(cupSaveT);await persistCup();selAn=b.dataset.can;showScreen('analyze')});
+  $$('[data-cv]',el).forEach(b=>b.onclick=()=>{cupView=b.dataset.cv;renderCupDetail()});
+  $('#ccPp').onclick=()=>{cupPadI--;el.scrollTop=0;renderCupping()};
+  $('#ccPx').onclick=async()=>{if(cupPadI>=s.samples.length-1){clearTimeout(cupSaveT);await persistCup();toast('Card saved');return}cupPadI++;el.scrollTop=0;renderCupping()};
+  $('#ccAdd').onclick=async()=>{const have=new Set(s.samples.map(y=>y.roastId)),pick=HIST.filter(z=>!z.archived&&!have.has(z.id)).slice(0,30);if(!pick.length){toast('No other roasts to add');return}
+    const v=await askPick('Add a sample','Roast',pick.map(z=>[z.id,`#${z.num} ${z.meta.name||'Untitled'} · ${fmtDate(z.chargedAt||z.created,false)}`]));if(!v)return;s.samples.push(newSample(v));cupPadI=s.samples.length-1;await persistCup();renderCupping()};
+  $('#csDel').onclick=async()=>{if(!await ask('Delete this cupping session?','Taste marks already saved on the roasts stay on those roasts.','Delete',true))return;CUP=CUP.filter(z=>z.id!==s.id);await persistCup();renderCupping()}}
+function renderCupCard(el,s){if(IPAD)return renderCupPad(el,s);const cols=s.samples.map(x=>({x,r:HIST.find(h=>h.id===x.roastId)})),old=$('.cctbl',el),keep=old&&old.dataset.sid===s.id?[old.scrollTop,old.scrollLeft,el.scrollTop]:null;
   const inv=r=>r&&INV.find(l=>l.id===r.meta.invId),seg=(cls,opts,cur,attr)=>`<div class="cseg ${cls}">${opts.map(([v,l,c])=>`<button class="${c||''} ${cur===v?'on':''}" ${attr} data-v="${v}">${l}</button>`).join('')}</div>`;
   const td=fn=>cols.map((c,i)=>`<td>${fn(c,i)}</td>`).join('');
   el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} sample${s.samples.length>1?'s':''}${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · tap F, A, FL or AT like the paper card — it saves as you go</div></div>
@@ -3108,6 +3150,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="sech">Pricing</div>
     <div class="cols"><div>${COLOR_ROWS.pricing.slice(0,3).map(([k,l])=>crow(k,l)).join('')}</div><div>${COLOR_ROWS.pricing.slice(3).map(([k,l])=>crow(k,l)).join('')}</div></div>
     <div class="sech">Cupping</div>
+    <label class="chk"><input type="checkbox" id="cupScoreOn" ${cfg.cupScoring?'checked':''}> Also use the SCA 100-point score form (adds a Card / 100-point switch to each session; the card is always there)</label>
     <label class="chk"><input type="checkbox" id="cupOn" ${cfg.cupColorsOn?'checked':''}> Color cupping scores by grade (Cupping, History, Profiles and roast details)</label>
     <div class="cupbands">${cfg.cupBands.map((b,i)=>{const last=i===cfg.cupBands.length-1;return `<div class="crow" style="grid-template-columns:150px 1fr 44px 96px">${last?`<span class="muted">Below ${esc(String(cfg.cupBands[i-1].min))}</span>`:`<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="muted">From</span><input type="number" step="0.25" data-cupm="${i}" value="${esc(String(b.min))}" style="width:80px"></label>`}<input type="text" data-cupl="${i}" value="${esc(b.label)}" placeholder="Grade name"><input type="color" data-cupc="${i}" value="${b.col}"><input type="text" data-cuph="${i}" value="${b.col.toUpperCase()}" maxlength="7"></div>`}).join('')}</div>
     <div class="row"><span style="font-size:calc(22px*var(--ss,1));font-family:var(--numFont);font-weight:var(--smallW);display:flex;gap:22px">${cfg.cupBands.map((b,i)=>{const v=i===cfg.cupBands.length-1?Number(cfg.cupBands[i-1].min)-2:Number(b.min)+1.5;return `<span style="${cupSt(v)}">${v.toFixed(2)}</span>`}).join('')}</span><span class="sp"></span><button id="cupReset">Reset score colors</button></div>
@@ -3218,6 +3261,7 @@ function wireSettings(){const el=$('#scont');
   $$('[data-hex]',el).forEach(i=>i.onchange=()=>{let v=i.value.trim();if(!v.startsWith('#'))v='#'+v;if(setCol(i.dataset.hex,v)){renderSettings()}else{toast('Use a 6-digit hex code like #1463FF');i.value=cfg.theme.colors[i.dataset.hex].toUpperCase()}});
   $$('[data-theme]',el).forEach(b=>b.onclick=e=>{if(e.target.dataset.deltheme!=null){cfg.customThemes.splice(Number(e.target.dataset.deltheme),1);saveCfg();renderSettings();return}const all=[{name:'White',colors:WHITE},{name:'Dark',colors:DARK},...cfg.customThemes],t=all[Number(b.dataset.theme)];cfg.theme={name:t.name,colors:{...WHITE,tTime:t.colors.text||WHITE.tTime,tBT:t.colors.text||WHITE.tBT,tRoR:t.colors.ror||WHITE.tRoR,tSpB:t.colors.text||WHITE.tSpB,tSpA:t.colors.text||WHITE.tSpA,tSpD:t.colors.text||WHITE.tSpD,...t.colors}};saveCfg();applyTheme();renderSettings();renderAll()});
   const ts=$('#thSave');if(ts)ts.onclick=async()=>{const n=await askText('Save this look','Name','My roasting room');if(!n||!n.trim())return;cfg.customThemes=cfg.customThemes.filter(t=>t.name!==n.trim());cfg.customThemes.push({name:n.trim(),colors:{...cfg.theme.colors}});cfg.theme.name=n.trim();saveCfg();renderSettings()};
+  const cso=$('#cupScoreOn');if(cso)cso.onchange=()=>{cfg.cupScoring=cso.checked;cupView='card';saveCfg();renderSettings()};
   const co=$('#cupOn');if(co)co.onchange=()=>{cfg.cupColorsOn=co.checked;saveCfg();renderSettings();renderAll()};
   const cupSet=()=>{saveCfg();renderAll()};
   $$('[data-cupc]',el).forEach(i=>{i.oninput=()=>{cfg.cupBands[+i.dataset.cupc].col=i.value;$(`[data-cuph="${i.dataset.cupc}"]`,el).value=i.value.toUpperCase();cupSet()};i.onchange=()=>renderSettings()});
@@ -3792,7 +3836,7 @@ PHV.more=()=>{const fold=window.ZR_NATIVE&&ZR_NATIVE.folder?ZR_NATIVE.folder:FS.
 PHV.cups=()=>{const list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   return {nav:phNavSmall(phBackLabel(),'Cupping','<button class="p-lnk" id="phCN">+ New</button>'),
     body:list.length?`<div class="p-card">${list.map(s=>{const sc=s.samples.map(cupScore),best=sc.length?Math.max(...sc):null,avg=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null;
-      return `<button class="p-row" data-s="${s.id}"><div class="m"><b>${esc(s.name)}</b><small>${fmtDate(s.date,false)} · ${s.samples.length} sample${s.samples.length===1?'':'s'}${s.cuppers?' · '+esc(s.cuppers):''}</small></div><span class="r">${phCupTxt(best)}<small>avg ${ok(avg)?avg.toFixed(2):'—'}</small></span><span class="gt">›</span></button>`}).join('')}</div>`
+      return `<button class="p-row" data-s="${s.id}"><div class="m"><b>${esc(s.name)}</b><small>${fmtDate(s.date,false)} · ${s.samples.length} sample${s.samples.length===1?'':'s'}${s.cuppers?' · '+esc(s.cuppers):''}</small></div>${cfg.cupScoring?`<span class="r">${phCupTxt(best)}<small>avg ${ok(avg)?avg.toFixed(2):'—'}</small></span>`:(n=>`<span class="r">${n?`<span style="color:var(--warn)">⚠ ${n}</span>`:'—'}<small>to fix</small></span>`)(s.samples.filter(x=>{const r=HIST.find(h=>h.id===x.roastId);return r&&Object.keys(cupFaults(r).t).some(k=>k!=='good')}).length)}<span class="gt">›</span></button>`}).join('')}</div>`
       :`<div class="p-card"><div class="p-empty">No cupping sessions yet.<br>Tap + New and pick the roasts on the table.</div></div>`,
     wire:(el,nav)=>{$('#phCN',nav).onclick=()=>phGo({v:'cupNew'});$$('[data-s]',el).forEach(b=>b.onclick=()=>phGo({v:'cup',id:b.dataset.s,i:0}))}}};
 PHV.cupNew=()=>{const recent=HIST.filter(r=>!r.archived).slice(0,40);
@@ -3806,10 +3850,35 @@ PHV.cupNew=()=>{const recent=HIST.filter(r=>!r.archived).slice(0,40);
       CUP.push(s);await persistCup();PH.stacks[PH.tab].pop();phGo({v:'cup',id:s.id,i:0})};$('#phCC').onclick=go;$('#phCC2',nav).onclick=go}}};
 function phCupSaveSoon(s,x){clearTimeout(PH.cupT);PH.cupT=setTimeout(()=>phCupSave(s,x,true),900)}
 async function phCupSave(s,x,quiet){clearTimeout(PH.cupT);const c=$('#phCm');if(c&&x)x.comments=c.value;await persistCup();
-  for(const y of s.samples){const r=HIST.find(h=>h.id===y.roastId),v=+cupScore(y).toFixed(2);if(r&&r.cup!==v&&(y===x||!quiet)){r.cup=v;await commitRoast(r,true)}}
-  if(!quiet)toast('Scores saved')}
+  if(cfg.cupScoring&&PH.cupScoreView)for(const y of s.samples){const r=HIST.find(h=>h.id===y.roastId),v=+cupScore(y).toFixed(2);if(r&&r.cup!==v&&(y===x||!quiet)){r.cup=v;await commitRoast(r,true)}}
+  if(!quiet)toast(cfg.cupScoring&&PH.cupScoreView?'Scores saved':'Card saved')}
+function phCupCard(v,s){v.i=clamp(v.i||0,0,s.samples.length-1);PH.cupScoreView=false;const x=s.samples[v.i],r=HIST.find(h=>h.id===x.roastId),c=cardOf(x),L='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const te=r?tasteEff(r):{},items=TASTE.filter(([k])=>te[k]>0),sp=r?spreadOf(r.meta):null;
+  const seg=(k,opts,yn)=>`<div class="p-seg ${yn?'yn':''}">${opts.map(([val,lab,cl])=>`<button class="${cl||''} ${c[k]===val?'on':''}" data-pb="${k}" data-v="${val}">${lab}</button>`).join('')}</div>`;
+  const body=`<div class="p-samples">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===v.i?'on':''}" data-i="${i}"><b>${L[i]||i+1}</b>#${rr?rr.num:'?'}</button>`}).join('')}</div>
+    <div class="p-total"><div style="min-width:0"><div style="font-size:17px;font-weight:600">${esc(r?(r.meta.coffee||r.meta.name||'Untitled'):'(roast removed)')}</div><div style="font-size:13px;color:var(--text2);margin-top:2px">Sample ${L[v.i]||v.i+1}${r?` · #${r.num} · ${ageOf(r.chargedAt||r.created)} · WB/GB ${esc(r.meta.colorWhole||'—')}/${esc(r.meta.colorGround||'—')}${ok(sp)?' · '+spTxt(sp):''}`:''}</div></div></div>
+    ${CSTAGE.map(([k,lab,sub])=>`<div class="p-sec"><span class="p-h3">${lab} <span style="text-transform:none;letter-spacing:0;font-weight:400">· ${sub}</span></span><div class="p-tags p-fam">${FAMS.map(([f,fl])=>`<button class="${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-pf="${f}:${k}">${fl}</button>`).join('')}</div></div>`).join('')}
+    <div class="p-card"><div class="p-att"><span>Body</span>${seg('body',[['Light','L'],['Medium','M'],['Heavy','H']])}</div><div class="p-att"><span>Acidity</span>${seg('acid',[['Light','L'],['Medium','M'],['Heavy','H']])}</div>
+      <div class="p-att"><span>Balance</span>${seg('bal',[['Y','Yes','y'],['N','No','n']],1)}</div><div class="p-att"><span>Overall</span>${seg('ov',[['Y','Yes','y'],['N','No','n']],1)}</div></div>
+    ${r?`<div class="p-sec"><span class="p-h3">Anything off?${(c.bal==='N'||c.ov==='N')?' <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--warn)">· balance or overall was No</span>':''}</span><div id="phTaste"></div></div>`:''}
+    <div class="p-field"><label for="phCm">Notes</label><textarea class="p-ta" id="phCm" style="min-height:70px" placeholder="What you tasted…">${esc(x.comments||'')}</textarea></div>
+    ${r?`<div class="p-card" style="padding:10px 14px;font-size:14px"><b>To Analyze:</b> ${items.length?items.map(([k,lab])=>esc(lab.split(' / ')[0])).join(', '):'<span style="color:var(--text2)">nothing to fix yet</span>'}</div>`:''}
+    <div class="p-g2"><button class="p-btn" id="phCp" ${v.i===0?'disabled':''}>‹ Previous</button><button class="p-btn" id="phCx" ${v.i>=s.samples.length-1?'disabled':''}>Next ›</button></div>
+    ${cfg.cupScoring?'<button class="p-btn" id="phCs">Use the 100-point form instead</button>':''}`;
+  return {nav:phNavSmall(phBackLabel(),s.name,'<button class="p-lnk b" id="phCD">Done</button>'),body,
+    onBack:async()=>{await phCupSave(s,x,true);phBack()},
+    wire:(el,nav)=>{const re=()=>{x.comments=$('#phCm').value;phCupSaveSoon(s,x);phRender(true)};
+      $$('[data-i]',el).forEach(b=>b.onclick=async()=>{await phCupSave(s,x,true);v.i=Number(b.dataset.i);phRender()});
+      $$('[data-pf]',el).forEach(b=>b.onclick=()=>{const [f,k]=b.dataset.pf.split(':'),a=c.fam[f]||[];c.fam[f]=a.includes(k)?a.filter(z=>z!==k):[...a,k];re()});
+      $$('[data-pb]',el).forEach(b=>b.onclick=()=>{const k=b.dataset.pb;c[k]=c[k]===b.dataset.v?'':b.dataset.v;re()});
+      $('#phCm').oninput=()=>{x.comments=$('#phCm').value;phCupSaveSoon(s,x)};
+      if(r)tasteEditor($('#phTaste'),r,()=>phRender(true));
+      $('#phCp').onclick=async()=>{await phCupSave(s,x,true);v.i--;phRender()};$('#phCx').onclick=async()=>{await phCupSave(s,x,true);v.i++;phRender()};
+      const cs=$('#phCs');if(cs)cs.onclick=async()=>{await phCupSave(s,x,true);v.card=false;PH.cupScoreView=true;phRender()};
+      $('#phCD',nav).onclick=async()=>{await phCupSave(s,x,false);phBack()}}}}
 PHV.cup=v=>{const s=CUP.find(x=>x.id===v.id);if(!s)return {nav:phNavSmall(phBackLabel(),'Cupping'),body:'<div class="p-empty">This session isn’t here anymore.</div>'};
-  v.i=clamp(v.i||0,0,s.samples.length-1);const x=s.samples[v.i],r=HIST.find(h=>h.id===x.roastId),total=cupScore(x),L='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(!cfg.cupScoring||v.card!==false)return phCupCard(v,s);
+  v.i=clamp(v.i||0,0,s.samples.length-1);PH.cupScoreView=true;const x=s.samples[v.i],r=HIST.find(h=>h.id===x.roastId),total=cupScore(x),L='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const body=`<div class="p-samples">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===v.i?'on':''}" data-i="${i}"><b>${L[i]||i+1}</b>#${rr?rr.num:'?'}</button>`}).join('')}</div>
     <div class="p-total"><div style="min-width:0"><div style="font-size:17px;font-weight:600">${esc(r?r.meta.name||'Untitled':'(roast removed)')}</div><div style="font-size:13px;color:var(--text2);margin-top:2px">Sample ${L[v.i]||v.i+1}${r?` · #${r.num} · ${ageOf(r.chargedAt||r.created)}`:''}${s.cuppers?' · '+esc(s.cuppers):''}</div></div>
       <div style="text-align:right;flex:none"><b style="${cupSt(total)}">${total.toFixed(2)}</b><div style="font-size:12px;font-weight:600;margin-top:3px;${cupSt(total)}">${esc(cupClass(total))}</div></div></div>
