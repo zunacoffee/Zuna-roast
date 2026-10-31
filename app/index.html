@@ -1093,11 +1093,11 @@ function askText(title,label,val=''){return new Promise(res=>{
 /* ================================================================
    Settings
    ================================================================ */
-const WHITE={bg:'#F4F5F7',panel:'#FFFFFF',text:'#15181B',text2:'#8A929B',border:'#E3E6EA',accent:'#1463FF',chartBg:'#FFFFFF',grid:'#F0F2F4',axis:'#9AA1A9',bt:'#15181B',ror:'#1463FF',exhaust:'#C3C9CF',bkg:'#B9C0C7',burner:'#E5484D',air:'#4C8DF6',drum:'#1FA463',pressure:'#8E6CEF',phase:'#15181B',tTime:'#15181B',tBT:'#15181B',tRoR:'#1463FF',tSpB:'#15181B',tSpA:'#15181B',tSpD:'#15181B',ctlOn:'#1463FF',gUsed:'#1FA463',gRoast:'#15181B',gOrigin:'#1FA463',gStock:'#15181B',gLow:'#E5484D',gAdd:'#1FA463',pWhole:'#1463FF',pRetail:'#1FA463',pLow:'#E5484D',pCoffee:'#15181B',pOver:'#1463FF',pLabor:'#E59A00',pBag:'#8A929B',rorLine:'#D97706',rorZone:'#F59E0B',rorLine2:'#0E9F9A',rorZone2:'#14B8A6'};
-const DARK ={bg:'#141618',panel:'#1C1F22',text:'#F1F3F4',text2:'#8B939A',border:'#2E3338',accent:'#2F9BFF',chartBg:'#101214',grid:'#1F2327',axis:'#7A8188',bt:'#FFFFFF',ror:'#22D3EE',exhaust:'#4A5157',bkg:'#5E666D',burner:'#FF6B5E',air:'#5AA9FF',drum:'#4BE08A',pressure:'#B39BFF',phase:'#FFFFFF',tTime:'#F1F3F4',tBT:'#F1F3F4',tRoR:'#22D3EE',tSpB:'#F1F3F4',tSpA:'#F1F3F4',tSpD:'#F1F3F4',ctlOn:'#2F9BFF',gUsed:'#4BE08A',gRoast:'#FFFFFF',gOrigin:'#4BE08A',gStock:'#F1F3F4',gLow:'#FF6B5E',gAdd:'#4BE08A',pWhole:'#2F9BFF',pRetail:'#4BE08A',pLow:'#FF6B5E',pCoffee:'#F1F3F4',pOver:'#2F9BFF',pLabor:'#F5B841',pBag:'#8B939A',rorLine:'#F5A524',rorZone:'#F5A524',rorLine2:'#2DD4BF',rorZone2:'#2DD4BF'};
+const WHITE={bg:'#F4F5F7',panel:'#FFFFFF',text:'#15181B',text2:'#8A929B',border:'#E3E6EA',accent:'#1463FF',chartBg:'#FFFFFF',grid:'#F0F2F4',axis:'#9AA1A9',bt:'#15181B',ror:'#1463FF',exhaust:'#C3C9CF',bkg:'#B9C0C7',burner:'#E5484D',air:'#4C8DF6',drum:'#1FA463',pressure:'#8E6CEF',phase:'#15181B',tTime:'#15181B',tBT:'#15181B',tRoR:'#1463FF',tSpB:'#15181B',tSpA:'#15181B',tSpD:'#15181B',ctlOn:'#1463FF',gUsed:'#1FA463',gRoast:'#15181B',gOrigin:'#1FA463',gStock:'#15181B',gLow:'#E5484D',gAdd:'#1FA463',pWhole:'#1463FF',pRetail:'#1FA463',pLow:'#E5484D',pCoffee:'#15181B',pOver:'#1463FF',pLabor:'#E59A00',pBag:'#8A929B',rorLine:'#D97706',rorZone:'#F59E0B',rorLine2:'#0E9F9A',rorZone2:'#14B8A6',phDry:'#9CC57E',phMai:'#E7C25F',phDev:'#C08A5B'};
+const DARK ={bg:'#141618',panel:'#1C1F22',text:'#F1F3F4',text2:'#8B939A',border:'#2E3338',accent:'#2F9BFF',chartBg:'#101214',grid:'#1F2327',axis:'#7A8188',bt:'#FFFFFF',ror:'#22D3EE',exhaust:'#4A5157',bkg:'#5E666D',burner:'#FF6B5E',air:'#5AA9FF',drum:'#4BE08A',pressure:'#B39BFF',phase:'#FFFFFF',tTime:'#F1F3F4',tBT:'#F1F3F4',tRoR:'#22D3EE',tSpB:'#F1F3F4',tSpA:'#F1F3F4',tSpD:'#F1F3F4',ctlOn:'#2F9BFF',gUsed:'#4BE08A',gRoast:'#FFFFFF',gOrigin:'#4BE08A',gStock:'#F1F3F4',gLow:'#FF6B5E',gAdd:'#4BE08A',pWhole:'#2F9BFF',pRetail:'#4BE08A',pLow:'#FF6B5E',pCoffee:'#F1F3F4',pOver:'#2F9BFF',pLabor:'#F5B841',pBag:'#8B939A',rorLine:'#F5A524',rorZone:'#F5A524',rorLine2:'#2DD4BF',rorZone2:'#2DD4BF',phDry:'#6FA35A',phMai:'#C9A445',phDev:'#A8774E'};
 const COLOR_ROWS={screen:[['bg','Background'],['panel','Panels'],['text','Text'],['text2','Secondary text'],['border','Borders'],['accent','Accent'],['ctlOn','Control ON button']],
   big:[['tTime','Roast time'],['tBT','Bean temp'],['tRoR','Rate of rise'],['tSpB','Burner setpoint'],['tSpA','Air setpoint'],['tSpD','Drum setpoint']],
-  chart:[['chartBg','Chart background'],['grid','Grid lines'],['axis','Axis numbers'],['phase','Phase shading'],['bt','Bean temp'],['ror','Rate of rise'],['exhaust','Exhaust'],['bkg','Background profile'],['burner','Burner'],['air','Air'],['drum','Drum'],['pressure','Air pressure'],['rorLine','RoR line 1'],['rorZone','Below RoR line 1 shading'],['rorLine2','RoR line 2'],['rorZone2','Below RoR line 2 shading']],
+  chart:[['chartBg','Chart background'],['grid','Grid lines'],['axis','Axis numbers'],['phase','Phase shading'],['phDry','Phase bar — Drying'],['phMai','Phase bar — Maillard'],['phDev','Phase bar — Development'],['bt','Bean temp'],['ror','Rate of rise'],['exhaust','Exhaust'],['bkg','Background profile'],['burner','Burner'],['air','Air'],['drum','Drum'],['pressure','Air pressure'],['rorLine','RoR line 1'],['rorZone','Below RoR line 1 shading'],['rorLine2','RoR line 2'],['rorZone2','Below RoR line 2 shading']],
   green:[['gStock','On-hand bar'],['gLow','Low stock (bar, number, badge, tile)'],['gAdd','Stock added (lot history)'],['gUsed','Green used bars (yearly chart)'],['gRoast','Roasted bars (yearly chart)'],['gOrigin','By origin bars']],
   pricing:[['pWhole','Wholesale tag'],['pRetail','Retail tag'],['pLow','Below target price'],['pCoffee','Cost bar — coffee'],['pOver','Cost bar — overhead'],['pLabor','Cost bar — labor'],['pBag','Cost bar — bag & label']]};
 const EVENTS_ALL=[{k:'CHARGE',label:'Charge'},{k:'DRY',label:'Dry end'},{k:'FCs',label:'FC start'},{k:'FCe',label:'FC end'},{k:'SCs',label:'SC start'},{k:'SCe',label:'SC end'},{k:'DROP',label:'Drop'},{k:'COOL',label:'Cool end'},{k:'UNDO',label:'Undo'}];
@@ -1116,7 +1116,7 @@ const DEF={
   anDtrLow:17,anDtrHigh:24,anRorFC:10.5,anLong:12,anShort:8,anSpread:5,
   // Brewed Behavior targets (stored °C, °C/min, seconds)
   bbTp:90,bbTpTol:20,bbDryMin:210,bbDryMax:300,bbDryC:(300-32)*5/9,bbDryTol:10/1.8,bb6Slow:12/1.8,bb6Ideal:15/1.8,bb6Fast:20/1.8,bbFcC:(396-32)*5/9,bbFcTol:8/1.8,bbDevMin:120,bbDevMax:240,anBurnerStep:5,anAirStep:5,anCupLow:7.25,anBtDip:1/1.8,anBtFlat:30,anBtLive:true,
-  scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
+  scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,phaseBar:true,phaseBarBkg:true,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[],
   cupScoring:false,
   spColorsOn:true,spBands:[{max:5,label:'On target',col:'#1E8E3E'},{max:8,label:'Watch',col:'#C99A06'},{max:10,label:'High',col:'#E8710A'},{max:null,label:'Too wide',col:'#D93025'}],
@@ -1903,7 +1903,7 @@ function xRange(){const r=S.roast,off=r.events.CHARGE??(r.samples.length?r.sampl
 function tempScale(){const sc=cfg.scales;if(!sc.auto)return {min:sc.tMin,max:sc.tMax,step:sc.tStep};
   let lo=Infinity,hi=-Infinity;for(const arr of [S.roast.samples,S.bg?S.bg.samples:[]])for(const s of arr){for(const k of ['bt','exhaust']){const v=toD(s[k]);if(ok(v)){lo=Math.min(lo,v);hi=Math.max(hi,v)}}}
   if(!isFinite(lo))return {min:sc.tMin,max:sc.tMax,step:sc.tStep};const st=sc.tStep||50;return {min:Math.floor((lo-10)/st)*st,max:Math.ceil((hi+10)/st)*st,step:st}}
-function drawMain(){const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H-PAD.t-PAD.b;if(w<40||h<40)return;
+function drawMain(){const PB=phaseBarH();PAD.b=24+PB;const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H-PAD.t-PAD.b;if(w<40||h<40)return;
   const {off,lo,hi}=xRange();S.view={off,lo,hi,W,w};const T=tempScale(),R={min:cfg.scales.rMin,max:cfg.scales.rMax,step:cfg.scales.rStep};
   const X=x=>PAD.l+(x-lo)/(hi-lo)*w,Y=c=>PAD.t+(1-(toD(c)-T.min)/(T.max-T.min))*h,YR=v=>PAD.t+(1-(toDR(v)-R.min)/(R.max-R.min))*h;
   const r=S.roast,ev=r.events,smp=r.samples,cur=curTime();
@@ -1913,10 +1913,10 @@ function drawMain(){const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H
     const xa=clamp(X(ev[a]-off),PAD.l,PAD.l+w),xb=clamp(X(e-off),PAD.l,PAD.l+w);if(xb>xa){ctx.fillStyle=rgba(COL.phase,al);ctx.fillRect(xa,PAD.t,xb-xa,h)}});
   // grid
   ctx.strokeStyle=COL.grid;ctx.lineWidth=1;ctx.fillStyle=COL.axis;ctx.textAlign='center';ctx.textBaseline='top';
-  const step=hi-lo>1500?120:60;for(let x=Math.ceil(lo/step)*step;x<=hi;x+=step){const px=Math.round(X(x))+.5;ctx.beginPath();ctx.moveTo(px,PAD.t);ctx.lineTo(px,PAD.t+h);ctx.stroke();ctx.fillText(String(x/60),px,PAD.t+h+6)}
+  const step=hi-lo>1500?120:60;for(let x=Math.ceil(lo/step)*step;x<=hi;x+=step){const px=Math.round(X(x))+.5;ctx.beginPath();ctx.moveTo(px,PAD.t);ctx.lineTo(px,PAD.t+h);ctx.stroke();ctx.fillText(String(x/60),px,PAD.t+h+6+PB)}
   ctx.textAlign='right';ctx.textBaseline='middle';for(let d=Math.ceil(T.min/T.step)*T.step;d<=T.max+.01;d+=T.step){const y=Math.round(PAD.t+(1-(d-T.min)/(T.max-T.min))*h)+.5;ctx.strokeStyle=COL.grid;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke();ctx.fillStyle=COL.axis;ctx.fillText(String(d),PAD.l-8,y)}
   ctx.textAlign='left';ctx.fillStyle=COL.ror;for(let v=R.min;v<=R.max+.01;v+=R.step)ctx.fillText(String(v),PAD.l+w+8,PAD.t+(1-(v-R.min)/(R.max-R.min))*h);
-  ctx.fillStyle=COL.axis;ctx.textBaseline='top';ctx.fillText('°'+cfg.unit,4,2);ctx.textAlign='right';ctx.fillText('°'+cfg.unit+'/min',W-2,PAD.t+h+6);
+  ctx.fillStyle=COL.axis;ctx.textBaseline='top';ctx.fillText('°'+cfg.unit,4,2);ctx.textAlign='right';ctx.fillText('°'+cfg.unit+'/min',W-2,PAD.t+h+6+PB);if(PB)drawPhaseBar(ctx,X,off,PAD.t+h,w);
   for(const L of [['',''],['2','2']]){const [n]=L;if(!cfg['rorLine'+n+'On']||!ok(Number(cfg['rorLine'+n+'C'])))continue;const v=toDR(Number(cfg['rorLine'+n+'C']));if(!(v>R.min&&v<R.max))continue;
     const y=Math.round(PAD.t+(1-(v-R.min)/(R.max-R.min))*h)+.5,lc=COL['rorLine'+n],zc=COL['rorZone'+n],a=clamp(Number(cfg['rorZone'+n+'Alpha'])||0,0,60)/100;if(a>0){ctx.fillStyle=rgba(zc,a);ctx.fillRect(PAD.l,y,w,PAD.t+h-y)}
     ctx.strokeStyle=lc;ctx.lineWidth=1.5;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke();ctx.setLineDash([]);
@@ -1952,6 +1952,22 @@ function drawMain(){const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H
   if(S.recording&&cur!=null){const x=X(cur-off);ctx.strokeStyle=COL.axis;ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+h);ctx.stroke();ctx.setLineDash([])}
   if(S.hover!=null){const x=X(S.hover);ctx.strokeStyle=COL.axis;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+h);ctx.stroke();ctx.setLineDash([])}
   if(!smp.length&&!S.bg){ctx.fillStyle=COL.axis;ctx.textAlign='center';ctx.font=`${14*TS()}px ${getComputedStyle(document.body).fontFamily}`;ctx.fillText(link.connected()?'Press Start (or charge the roaster) to begin recording':'Press Connect to start',PAD.l+w/2,PAD.t+h/2)}}
+/* ---- phase bar under the roast chart: this roast (thick) and the background (thin, faded) ---- */
+const PH_NAMES=['Drying','Maillard','Development'],PH_KEYS=['phDry','phMai','phDev'];
+function phaseSegs(ev,end){const c=ev.CHARGE;if(c==null||end==null)return [];const out=[],d=ev.DRY,f=ev.FCs;
+  out.push([0,c,d??(f==null?end:null)]);if(d!=null)out.push([1,d,f??end]);if(f!=null)out.push([2,f,end]);return out.filter(x=>x[2]!=null&&x[2]>x[1])}
+function phaseBarH(){return cfg.scales.phaseBar?46:0}
+function drawPhaseBar(ctx,X,off,y0,w){const r=S.roast,ev=r.events,cur=S.recording?curTime():null,font=getComputedStyle(document.body).fontFamily,L=PAD.l,Rr=PAD.l+w;
+  const bar=(segs,o,y,hh,a)=>{for(const [i,a0,b0] of segs){const xa=clamp(X(a0-o),L,Rr),xb=clamp(X(b0-o),L,Rr);if(xb-xa<1)continue;ctx.globalAlpha=a;ctx.fillStyle=COL[PH_KEYS[i]]||'#999';ctx.beginPath();ctx.roundRect?ctx.roundRect(xa,y,Math.max(1,xb-xa-1),hh,hh/2):ctx.rect(xa,y,xb-xa-1,hh);ctx.fill();ctx.globalAlpha=1}};
+  const end=ev.DROP??cur??(r.samples.length?r.samples.at(-1).t:null),mine=phaseSegs(ev,end);
+  const b=cfg.scales.phaseBarBkg&&S.bg&&!S.bg.planned&&S.bg.id!==r.id?S.bg:null,bs=b?phaseSegs(b.events,b.events.DROP):[];
+  bar(mine,off,y0+12,8,1);if(bs.length)bar(bs,b.events.CHARGE,y0+23,4,.4);
+  ctx.textAlign='left';ctx.textBaseline='top';
+  for(const [i,a0,b0] of mine){const xa=clamp(X(a0-off),L,Rr),xb=clamp(X(b0-off),L,Rr);if(xb-xa<30)continue;const live=ev.DROP==null&&cur!=null&&b0===cur;
+    ctx.font=`600 ${11.5*TS()}px ${font}`;ctx.fillStyle=COL.text;const nm=PH_NAMES[i],tw=ctx.measureText(nm+'  ').width;ctx.fillText(nm,xa+2,y0+31);
+    ctx.font=`${11.5*TS()}px ${font}`;ctx.fillStyle=live?COL.accent:COL.axis;let dt=mmss(b0-a0);
+    const bi=bs.find(x=>x[0]===i);if(bi&&!live){const df=Math.round((b0-a0)-(bi[2]-bi[1]));dt+=`  (${df>=0?'+':'−'}${mmss(Math.abs(df))})`}
+    ctx.fillText(dt,xa+2+tw,y0+31)}}
 function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)return;const w=W-PAD.l-PAD.r,X=x=>PAD.l+(x-v.lo)/(v.hi-v.lo)*w;
   ctx.fillStyle=COL.chartBg;ctx.fillRect(0,0,W,H);
   const rows=[{k:'burner',label:'Burner',col:COL.burner,max:100,unit:'%'},{k:'fan',label:'Air',col:COL.air,max:100,unit:'%'}];
@@ -3194,6 +3210,9 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <label class="chk"><input type="checkbox" data-sc="auto" ${s.auto?'checked':''}> Fit the temperature scale to the roast automatically</label>
     <div class="sgrid">${[['tMin',`Temperature min (°${cfg.unit})`],['tMax',`Temperature max (°${cfg.unit})`],['tStep','Temperature label step'],['rMin',`Rate of rise min (°${cfg.unit}/min)`],['rMax','Rate of rise max'],['rStep','Rate of rise label step'],['minutes','Minutes shown before the roast fills it'],['pMax',`Air pressure strip max (${pU()}, 0 = auto)`]].map(([k,l])=>`<label class="field">${l}<input data-scv="${k}" value="${esc(k==='pMax'&&isMbar()?+(s[k]/100).toFixed(2):s[k])}" inputmode="decimal"></label>`).join('')}</div>
     <label class="chk"><input type="checkbox" data-sc="showPressure" ${s.showPressure?'checked':''}> Show air pressure in the strip under the chart</label>
+    <label class="chk"><input type="checkbox" data-sc="phaseBar" ${s.phaseBar?'checked':''}> Show the phase bar under the chart (Drying · Maillard · Development)</label>
+    <label class="chk" style="margin-left:26px"><input type="checkbox" data-sc="phaseBarBkg" ${s.phaseBarBkg?'checked':''} ${s.phaseBar?'':'disabled'}> …with the background profile’s phases under it, and the difference in each label</label>
+    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">The phase bar colors are in Appearance › Chart.</div>
     <div class="h3" style="margin-top:6px">Shade under lines</div>
     <div class="sgrid" style="grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 14px">${[['fillBt','Bean temp'],['fillRor','Rate of rise'],['fillEx','Exhaust'],['fillBkg','Background curves'],['fillBurner','Burner'],['fillAir','Air'],['fillPressure','Air pressure']].map(([k,l])=>`<label class="chk"><input type="checkbox" data-sc="${k}" ${s[k]?'checked':''}> ${l}</label>`).join('')}</div>
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">A soft fill in each line’s own color. Turn on only the ones you find helpful — too many at once gets busy.</div>
@@ -3324,7 +3343,7 @@ function wireSettings(){const el=$('#scont');
   $$('[data-rlon]',el).forEach(i=>i.onchange=()=>{cfg['rorLine'+i.dataset.rlon+'On']=i.checked;saveCfg();scheduleDraw()});
   $$('[data-rlval]',el).forEach(i=>i.onchange=()=>{const n=i.dataset.rlval,v=Number(i.value);if(!isFinite(v)||v<=0){toast('Enter a rate of rise above 0');i.value=+toDR(Number(cfg['rorLine'+n+'C'])).toFixed(1);return}cfg['rorLine'+n+'C']=isF()?v/1.8:v;saveCfg();scheduleDraw()});
   $$('[data-rlalpha]',el).forEach(i=>i.oninput=()=>{const n=i.dataset.rlalpha;cfg['rorZone'+n+'Alpha']=Number(i.value);$(`[data-rlal="${n}"]`,el).textContent=i.value+'%';saveCfg();scheduleDraw()});
-  $$('[data-sc]',el).forEach(i=>i.onchange=()=>{cfg.scales[i.dataset.sc]=i.checked;saveCfg();scheduleDraw()});
+  $$('[data-sc]',el).forEach(i=>i.onchange=()=>{cfg.scales[i.dataset.sc]=i.checked;saveCfg();scheduleDraw();if(i.dataset.sc==='phaseBar')renderSettings()});
   $$('[data-scv]',el).forEach(i=>i.onchange=()=>{const v=num(i.value);if(v==null){i.value=cfg.scales[i.dataset.scv];return}cfg.scales[i.dataset.scv]=i.dataset.scv==='pMax'&&isMbar()?v*100:v;const s=cfg.scales;if(s.tMax<=s.tMin)s.tMax=s.tMin+50;if(s.rMax<=s.rMin)s.rMax=s.rMin+10;if(s.tStep<=0)s.tStep=25;if(s.rStep<=0)s.rStep=5;saveCfg();scheduleDraw()});
   const su=$('#sUnit');if(su)su.onchange=()=>{const to=su.value;if(to===cfg.unit)return;const s=cfg.scales,cv=to==='C'?(v=>Math.round((v-32)*5/9)):(v=>Math.round(v*9/5+32)),cr=to==='C'?(v=>Math.round(v/1.8)):(v=>Math.round(v*1.8));
     s.tMin=cv(s.tMin);s.tMax=cv(s.tMax);s.tStep=to==='C'?25:50;s.rMin=cr(s.rMin);s.rMax=cr(s.rMax);s.rStep=to==='C'?5:10;cfg.unit=to;saveCfg();renderAll();renderSettings()};
