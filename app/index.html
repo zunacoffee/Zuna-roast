@@ -230,6 +230,10 @@ tr.tdone td{color:var(--text2)}
 .plan span{color:var(--text2);font-variant-numeric:tabular-nums}
 .remlist .kv{align-items:center}
 .remadd{display:grid;grid-template-columns:120px 110px 1fr auto;gap:6px}
+.cupt.nocup th:last-child,.cupt.nocup td:last-child{display:none}
+.pstar{color:var(--warn);margin-left:6px;font-size:.9em}
+.remdet>summary{cursor:pointer;color:var(--accent);font-size:calc(13px*var(--ts,1));list-style:none;margin:8px 0 4px;width:max-content}.remdet>summary::-webkit-details-marker{display:none}.remdet[open]>summary{color:var(--text2)}
+.adjl{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
 .remadd input,.remadd select{padding:6px 8px;font-size:calc(13px*var(--ts,1))}
 
 
@@ -947,7 +951,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
   <div class="page">
     <div id="pList" style="display:contents"><div class="ph"><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:calc(12.5px*var(--ts,1))"></span><button class="pri" id="btnNewProfile">+ New profile</button></div>
     <div class="split">
-      <div class="card scroll"><table><thead><tr><th>Profile</th><th>Coffee</th><th class="n">Batch</th><th class="n">Roasted</th><th>Last roasted</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">Color W / G</th><th class="n">Cup</th></tr></thead><tbody id="pRows"></tbody></table><div id="pEmpty"></div></div>
+      <div class="card scroll"><table id="pTable" class="cupt"><thead><tr><th>Profile</th><th>Coffee</th><th class="n">Batch</th><th class="n">Roasted</th><th>Last roasted</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">Color W / G</th><th class="n">Cup</th></tr></thead><tbody id="pRows"></tbody></table><div id="pEmpty"></div></div>
       <div class="card detail" id="pDetail"></div>
     </div></div>
     <div id="pBuild" hidden style="flex:1;min-height:0;display:flex;flex-direction:column;gap:14px"></div>
@@ -961,7 +965,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
       <div class="seg" id="rFilter"><button data-f="all" class="on">All</button><button data-f="prof">Profiles ★</button><button data-f="week">This week</button></div>
       <div class="sp"></div><button id="btnImport">Import</button><button id="btnExportAll">Export all</button><input type="file" id="fileImport" accept=".json" hidden></div>
     <div class="split">
-      <div class="card scroll"><table><thead><tr><th>#</th><th>Date</th><th>Age</th><th>Profile</th><th>Coffee</th><th class="n">Green</th><th class="n">Roasted</th><th class="n">Loss</th><th class="n">Color W / G</th><th class="n">Spread</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">$/lb</th><th class="n">Cup</th></tr></thead><tbody id="rRows"></tbody></table><div id="rEmpty"></div></div>
+      <div class="card scroll"><table id="rTable" class="cupt"><thead><tr><th>#</th><th>Date</th><th>Profile</th><th>Coffee</th><th class="n">Green</th><th class="n">Roasted</th><th class="n">Loss</th><th class="n">Color W / G</th><th class="n">Spread</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">$/lb</th><th class="n">Cup</th></tr></thead><tbody id="rRows"></tbody></table><div id="rEmpty"></div></div>
       <div class="card detail" id="rDetail"></div>
     </div>
   </div>
@@ -2123,6 +2127,7 @@ function renderProfiles(){if(BLD){renderBuilder();return}const q=normName($('#pS
     return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b>${r.planned?' <span class="badge g">Planned</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
     <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
+  $('#pTable').classList.toggle('nocup',!cfg.cupScoring&&!list.some(r=>ok(r.cup)));
   $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${allProfiles().length?'No profiles match.':'No profiles yet.<br>Press <b>+ New profile</b> to plan one before the first roast,<br>or after a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>.'}</div>`;
   renderProfileDetail()}
 function renderProfileDetail(){const el=$('#pDetail'),r=findAny(selProfile);if(!r){el.innerHTML='<div class="empty">Select a profile.</div>';return}if(r.planned)return renderPlannedDetail(el,r);
@@ -2136,8 +2141,8 @@ function renderProfileDetail(){const el=$('#pDetail'),r=findAny(selProfile);if(!
     <div><div class="h3" style="margin-bottom:6px">Setup</div><div class="kv"><span>Green</span><b>${esc(r.meta.coffee||'—')}</b></div><div class="kv"><span>Batch</span><b class="tnum">${esc(r.meta.green||'—')} lb → ${esc(r.meta.roasted||'—')} lb</b></div><div class="kv"><span>Color W / G</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · spread '+spTxt(spreadOf(r.meta)):''}</b></div>${cost&&ok(cost.perLb)?`<div class="kv"><span>Cost</span><b class="tnum">${money(cost.perLb)} / lb roasted</b></div>`:''}</div></div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}</div></div>
   <div><div class="h3" style="margin-bottom:6px">Reminders during the roast</div><div class="remlist">${(r.reminders||[]).map((m,i)=>`<div class="kv"><span>${esc(remWhen(m))}</span><b>${esc(m.text)} <button class="sm" data-delrem="${i}" title="Remove">✕</button></b></div>`).join('')||'<div class="muted" style="font-size:calc(13px*var(--ts,1));margin-bottom:6px">No reminders yet — e.g. “At first crack → open damper”.</div>'}</div>
-    <div class="remadd" style="margin-top:8px"><select id="remType"><option value="event">At event</option><option value="time">At time</option><option value="temp">At temperature</option></select><span id="remAtWrap"></span><input id="remText" placeholder="Open damper"><button class="pri sm" id="remAdd">Add</button></div></div>
-  <div><div class="h3" style="margin-bottom:4px">Roasted with this profile</div>${uses.length?uses.map(x=>{const ss=x.summary||summarize(x);return `<div class="kv"><span>#${x.num} · ${fmtDate(x.chargedAt||x.created,false)} (${ageOf(x.chargedAt||x.created)}) · drop ${mmss(ss.drop)} · ${esc(x.meta.colorWhole||'—')} / ${esc(x.meta.colorGround||'—')}</span><b class="tnum">${ok(x.cup)?'cup '+Number(x.cup).toFixed(2):'<span class="muted">not cupped</span>'}</b></div>`}).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Not roasted again yet.</div>'}</div>
+    <details class="remdet"><summary>+ Add reminder</summary><div class="remadd" style="margin-top:8px"><select id="remType"><option value="event">At event</option><option value="time">At time</option><option value="temp">At temperature</option></select><span id="remAtWrap"></span><input id="remText" placeholder="Open damper"><button class="pri sm" id="remAdd">Add</button></div></details></div>
+  <div><div class="h3" style="margin-bottom:4px">Roasted with this profile</div>${uses.length?uses.map(x=>{const ss=x.summary||summarize(x);return `<div class="kv"><span>#${x.num} · ${fmtDate(x.chargedAt||x.created,false)} (${ageOf(x.chargedAt||x.created)}) · drop ${mmss(ss.drop)} · ${esc(x.meta.colorWhole||'—')} / ${esc(x.meta.colorGround||'—')}</span><b class="tnum">${ok(x.cup)?'cup '+Number(x.cup).toFixed(2):''}</b></div>`}).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Not roasted again yet.</div>'}</div>
   <div class="row" style="margin-top:auto"><button class="pri" id="pRoast">Roast this ▶</button><button id="pOpen">Open roast #${r.num}</button><button id="pRename">Rename</button><button id="pPlan" title="Plan a changed version (new lot, new roast goal) or another batch size">Edit as plan</button><span class="sp"></span><button id="pCsv">CSV</button><button class="dangerTxt" id="pRemove">Remove profile</button></div>`;
   requestAnimationFrame(()=>miniCurve($('#pBig'),r,{axis:true}));
   const remAt=()=>{const t=$('#remType').value;$('#remAtWrap').innerHTML=t==='event'?`<select id="remAt">${EVENTS_ALL.filter(e=>e.k!=='UNDO').map(e=>`<option value="${e.k}">${esc(evLabel(e.k))}</option>`).join('')}</select>`:t==='time'?`<input id="remAt" placeholder="9:30">`:`<input id="remAt" placeholder="400">`};
@@ -2551,9 +2556,10 @@ function roastList(){const q=normName($('#rSearch').value),wk=Date.now()-7*864e5
 function renderRoasts(){const list=roastList();if(!list.find(r=>r.id===selRoast))selRoast=list[0]?.id||null;
   $('#rRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),sp=spreadOf(r.meta),c=costOf(r),dt=r.chargedAt||r.created;
     if(IPAD)return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><span class="n">#${r.num}</span><div class="m"><b>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</b><div class="s">${esc(r.meta.coffee||'—')} · ${fmtDate(dt)}</div></div><span class="r">W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span></div></td></tr>`;
-    return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(dt)}</td><td class="tnum">${ageOf(dt)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?'<span class="badge">Profile</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td>
+    return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(dt)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?'<span class="pstar" title="Profile">★</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td>
     <td class="n">${esc(r.meta.green||'—')}</td><td class="n">${esc(r.meta.roasted||'—')}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':'—'}</td><td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${spTxt(sp)}</td>
     <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):'—'}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
+  $('#rTable').classList.toggle('nocup',!cfg.cupScoring&&!list.some(r=>ok(r.cup)));
   $('#rEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.length?'No roasts match.':'No saved roasts yet. Record a roast and press Save in Roast details.'}</div>`;renderRoastDetail()}
 function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoast);if(!r){el.innerHTML='<div class="empty">Select a roast.</div>';return}
   const s=r.summary||summarize(r),c=costOf(r),adj=adjustments(r),rc=r.events.CHARGE??0,dt=r.chargedAt||r.created;
@@ -2564,8 +2570,8 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   <div class="kv"><span>Green → roasted</span><b class="tnum">${esc(r.meta.green||'—')} → ${esc(r.meta.roasted||'—')} lb${ok(s.loss)?' · '+s.loss.toFixed(1)+' %':''}</b></div>
   <div class="kv"><span>Batch cost</span><b class="tnum">${c&&ok(c.batch)?money(c.batch)+' green'+(ok(c.perLb)?' · '+money(c.perLb)+' / lb roasted':''):'—'}</b></div>
   <div class="kv"><span>Color whole / ground · spread</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · '+spTxt(spreadOf(r.meta)):''}</b></div>
-  <div class="kv"><span>Adjustments</span><b>${adj.map(a=>`${a.label} ${Math.round(a.from)}→${Math.round(a.to)} at ${mmss(a.t-rc)}`).join(' · ')||'—'}</b></div>
-  <div class="kv"><span>Cupping score</span><b class="tnum" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div></div>
+  <div class="kv" style="align-items:flex-start"><span>Adjustments</span><b class="tnum adjl">${adj.map(a=>`<span>${mmss(a.t-rc)} · ${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}</span>`).join('')||'—'}</b></div>
+  ${cfg.cupScoring||ok(r.cup)?`<div class="kv"><span>Cupping score</span><b class="tnum" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div>`:''}</div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}${(r.tnotes||[]).length?'\n\n'+r.tnotes.map(n=>mmss(n.t-rc)+'  '+esc(n.text)).join('\n'):''}</div></div>
   <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="dangerTxt" id="rDel">Delete</button></div>`;
   requestAnimationFrame(()=>miniCurve($('#rBig'),r,{axis:true}));
