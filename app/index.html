@@ -629,6 +629,7 @@ html.ipad .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;paddi
 .ipad.kbOpen .modalbg{align-items:flex-start;padding-top:40px;overflow:auto}
 /* iPad chart header: chips + legend instead of phase text */
 .ipad #phaseTxt{display:none}
+html:not(.ipLeg) .ipLegend{display:none!important}  /* iPad chart legend: off unless Settings › Chart scales turns it on */
 .ipLegend{display:flex;gap:16px;padding:0 16px 2px;font-size:calc(12px*var(--ts,1));color:var(--text2)}
 .ipLegend span{display:flex;align-items:center;gap:6px}
 .ipLegend i{width:16px;height:0;border-top:3px solid;border-radius:2px}
@@ -1078,6 +1079,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
    ===================================================================== */
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const IPAD=document.documentElement.classList.contains('ipad');
+function ipLegendApply(){document.documentElement.classList.toggle('ipLeg',!!(typeof cfg!=='undefined'&&cfg.scales&&cfg.scales.ipLegend))}
 const IPHONE=document.documentElement.classList.contains('iphone');/* iPhone: look things up and quick entries — never roasts or controls (see the iPhone section) */
 let IPC=false;/* compact iPad layout: only on iPads shorter than the 13" (e.g. 10.5" = 834pt) */
 function ipcCheck(){if(!IPAD)return;const on=Math.min(innerHeight,screen.height||innerHeight)<930||/[?&]ipc=1/.test(location.search);if(on===IPC)return;IPC=on;document.documentElement.classList.toggle('ipc',on);if(typeof renderAll==='function'&&document.readyState!=='loading'){renderFkeys();renderIpToday();renderCtl();scheduleDraw()}}
@@ -1177,7 +1179,7 @@ const f0=v=>ok(v)?String(Math.round(v)):'—';
 const isMbar=()=>cfg.pUnit==='mbar',pU=()=>isMbar()?'mbar':'Pa';            // pressure is stored in Pa
 const fP=v=>ok(v)?(isMbar()?(v/100).toFixed(2):String(Math.round(v))):'—';
 let COL={};
-function applyTheme(){const c=IPHONE?phThemeColors(cfg.theme.colors):cfg.theme.colors,r=document.documentElement.style;
+function applyTheme(){const c=IPHONE?phThemeColors(cfg.theme.colors):cfg.theme.colors,r=document.documentElement.style;ipLegendApply();
   const map={ctlOn:'--c-ctl',bg:'--bg',panel:'--panel',text:'--text',text2:'--text2',border:'--border',accent:'--accent',chartBg:'--chartBg',grid:'--grid',axis:'--axis',bt:'--c-bt',ror:'--c-ror',exhaust:'--c-exhaust',bkg:'--c-bkg',burner:'--c-burner',air:'--c-air',drum:'--c-drum',pressure:'--c-pressure',phase:'--c-phase',tTime:'--t-time',tBT:'--t-bt',tRoR:'--t-ror',tSpB:'--t-spb',tSpA:'--t-spa',tSpD:'--t-spd',gStock:'--g-stock',gLow:'--g-low',gAdd:'--g-add',pWhole:'--p-whole',pRetail:'--p-retail',pLow:'--p-low',pCoffee:'--p-coffee',pOver:'--p-over',pLabor:'--p-labor',pBag:'--p-bag'};
   for(const [k,v] of Object.entries(map))r.setProperty(v,c[k]);
   const lum=hexLum(c.panel);document.documentElement.style.colorScheme=lum<.35?'dark':'light';if((IPAD||IPHONE)&&window.ZR_NATIVE&&ZR_NATIVE.chrome)ZR_NATIVE.chrome(c.bg,hexLum(c.bg)<.35);
@@ -3246,6 +3248,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <label class="chk"><input type="checkbox" data-sc="auto" ${s.auto?'checked':''}> Fit the temperature scale to the roast automatically</label>
     <div class="sgrid">${[['tMin',`Temperature min (°${cfg.unit})`],['tMax',`Temperature max (°${cfg.unit})`],['tStep','Temperature label step'],['rMin',`Rate of rise min (°${cfg.unit}/min)`],['rMax','Rate of rise max'],['rStep','Rate of rise label step'],['minutes','Minutes shown before the roast fills it'],['pMax',`Air pressure strip max (${pU()}, 0 = auto)`]].map(([k,l])=>`<label class="field">${l}<input data-scv="${k}" value="${esc(k==='pMax'&&isMbar()?+(s[k]/100).toFixed(2):s[k])}" inputmode="decimal"></label>`).join('')}</div>
     <label class="chk"><input type="checkbox" data-sc="showPressure" ${s.showPressure?'checked':''}> Show air pressure in the strip under the chart</label>
+    ${IPAD?`<label class="chk"><input type="checkbox" data-sc="ipLegend" ${s.ipLegend?'checked':''}> Show the line legend above the chart (Bean temp · Rate of rise · Background · Burner · Air)</label>`:''}
     <label class="chk"><input type="checkbox" data-sc="phaseBar" ${s.phaseBar?'checked':''}> Show the phase bar under the chart (Drying · Maillard · Development)</label>
     <label class="chk" style="margin-left:26px"><input type="checkbox" data-sc="phaseBarBkg" ${s.phaseBarBkg?'checked':''} ${s.phaseBar?'':'disabled'}> …with the background profile’s phases under it, and the difference in each label</label>
     <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">The phase bar colors are in Appearance › Chart.</div>
@@ -3379,7 +3382,7 @@ function wireSettings(){const el=$('#scont');
   $$('[data-rlon]',el).forEach(i=>i.onchange=()=>{cfg['rorLine'+i.dataset.rlon+'On']=i.checked;saveCfg();scheduleDraw()});
   $$('[data-rlval]',el).forEach(i=>i.onchange=()=>{const n=i.dataset.rlval,v=Number(i.value);if(!isFinite(v)||v<=0){toast('Enter a rate of rise above 0');i.value=+toDR(Number(cfg['rorLine'+n+'C'])).toFixed(1);return}cfg['rorLine'+n+'C']=isF()?v/1.8:v;saveCfg();scheduleDraw()});
   $$('[data-rlalpha]',el).forEach(i=>i.oninput=()=>{const n=i.dataset.rlalpha;cfg['rorZone'+n+'Alpha']=Number(i.value);$(`[data-rlal="${n}"]`,el).textContent=i.value+'%';saveCfg();scheduleDraw()});
-  $$('[data-sc]',el).forEach(i=>i.onchange=()=>{cfg.scales[i.dataset.sc]=i.checked;saveCfg();scheduleDraw();if(i.dataset.sc==='phaseBar')renderSettings()});
+  $$('[data-sc]',el).forEach(i=>i.onchange=()=>{cfg.scales[i.dataset.sc]=i.checked;saveCfg();ipLegendApply();scheduleDraw();if(i.dataset.sc==='phaseBar')renderSettings()});
   $$('[data-scv]',el).forEach(i=>i.onchange=()=>{const v=num(i.value);if(v==null){i.value=cfg.scales[i.dataset.scv];return}cfg.scales[i.dataset.scv]=i.dataset.scv==='pMax'&&isMbar()?v*100:v;const s=cfg.scales;if(s.tMax<=s.tMin)s.tMax=s.tMin+50;if(s.rMax<=s.rMin)s.rMax=s.rMin+10;if(s.tStep<=0)s.tStep=25;if(s.rStep<=0)s.rStep=5;saveCfg();scheduleDraw()});
   const su=$('#sUnit');if(su)su.onchange=()=>{const to=su.value;if(to===cfg.unit)return;const s=cfg.scales,cv=to==='C'?(v=>Math.round((v-32)*5/9)):(v=>Math.round(v*9/5+32)),cr=to==='C'?(v=>Math.round(v/1.8)):(v=>Math.round(v*1.8));
     s.tMin=cv(s.tMin);s.tMax=cv(s.tMax);s.tStep=to==='C'?25:50;s.rMin=cr(s.rMin);s.rMax=cr(s.rMax);s.rStep=to==='C'?5:10;cfg.unit=to;saveCfg();renderAll();renderSettings()};
