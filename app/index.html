@@ -1917,13 +1917,21 @@ let drawPending=false;function scheduleDraw(){if(drawPending)return;drawPending=
 function prep(cv){const b=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=Math.max(1,Math.round(b.width*dpr)),h=Math.max(1,Math.round(b.height*dpr));if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}
   const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,b.width,b.height);ctx.font=`${12*TS()}px ${getComputedStyle(document.body).fontFamily}`;return {ctx,W:b.width,H:b.height}}
 const PAD={l:66,r:52,t:12,b:24};
+/* the left/right gutters are as wide as the axis numbers need (they were fixed at 66/52 px, mostly empty) */
+function stripPm(){let pm=Number(cfg.scales.pMax)||0;if(!pm){let mx=0;for(const s of [...S.roast.samples,...(S.bg?S.bg.samples:[])])if(ok(s.pressure))mx=Math.max(mx,s.pressure);pm=Math.max(50,Math.ceil(mx*1.15/50)*50)}return pm}
+const stripPmLabel=pm=>isMbar()?String(+(pm/100).toFixed(2)):String(pm);
+function fitPad(ctx){const T=tempScale(),mw=x=>ctx.measureText(String(x)).width,rs=Number(cfg.scales.rStep),rmin=Number(cfg.scales.rMin),rmax=Number(cfg.scales.rMax);let a=mw('°'+cfg.unit),b=0;
+  if(T.step>0)for(let d=Math.ceil(T.min/T.step)*T.step;d<=T.max+.01;d+=T.step)a=Math.max(a,mw(d));
+  if(rs>0)for(let v=rmin;v<=rmax+.01;v+=rs)b=Math.max(b,mw(v));
+  const f=ctx.font;ctx.font=`${11*TS()}px ${getComputedStyle(document.body).fontFamily}`;b=Math.max(b,mw('100'),cfg.scales.showPressure?mw(stripPmLabel(stripPm())):0);ctx.font=f;
+  PAD.l=Math.ceil(a)+16;PAD.r=Math.ceil(b)+14;return 0}
 function xRange(){const r=S.roast,off=r.events.CHARGE??(r.samples.length?r.samples[0].t+30:0);let lo=-30,hi=(cfg.scales.minutes||13)*60;
   if(r.samples.length){lo=Math.max(-120,Math.min(lo,r.samples[0].t-off));hi=Math.max(hi,r.samples.at(-1).t-off+60)}
   if(S.bg&&S.bg.samples.length){const ro=S.bg.events.CHARGE??0;hi=Math.max(hi,(S.bg.events.DROP??S.bg.samples.at(-1).t)-ro+45)}return {off,lo,hi}}
 function tempScale(){const sc=cfg.scales;if(!sc.auto)return {min:sc.tMin,max:sc.tMax,step:sc.tStep};
   let lo=Infinity,hi=-Infinity;for(const arr of [S.roast.samples,S.bg?S.bg.samples:[]])for(const s of arr){for(const k of ['bt','exhaust']){const v=toD(s[k]);if(ok(v)){lo=Math.min(lo,v);hi=Math.max(hi,v)}}}
   if(!isFinite(lo))return {min:sc.tMin,max:sc.tMax,step:sc.tStep};const st=sc.tStep||50;return {min:Math.floor((lo-10)/st)*st,max:Math.ceil((hi+10)/st)*st,step:st}}
-function drawMain(){const PB=phaseBarH();PAD.b=24+PB;const cv=$('#cvMain'),{ctx,W,H}=prep(cv),w=W-PAD.l-PAD.r,h=H-PAD.t-PAD.b;if(w<40||h<40)return;
+function drawMain(){const PB=phaseBarH();PAD.b=24+PB;const cv=$('#cvMain'),{ctx,W,H}=prep(cv),_fp=fitPad(ctx),w=W-PAD.l-PAD.r,h=H-PAD.t-PAD.b;if(w<40||h<40)return;
   const {off,lo,hi}=xRange();S.view={off,lo,hi,W,w};const T=tempScale(),R={min:cfg.scales.rMin,max:cfg.scales.rMax,step:cfg.scales.rStep};
   const X=x=>PAD.l+(x-lo)/(hi-lo)*w,Y=c=>PAD.t+(1-(toD(c)-T.min)/(T.max-T.min))*h,YR=v=>PAD.t+(1-(toDR(v)-R.min)/(R.max-R.min))*h;
   const r=S.roast,ev=r.events,smp=r.samples,cur=curTime();
@@ -1936,7 +1944,7 @@ function drawMain(){const PB=phaseBarH();PAD.b=24+PB;const cv=$('#cvMain'),{ctx,
   const step=hi-lo>1500?120:60;for(let x=Math.ceil(lo/step)*step;x<=hi;x+=step){const px=Math.round(X(x))+.5;ctx.beginPath();ctx.moveTo(px,PAD.t);ctx.lineTo(px,PAD.t+h);ctx.stroke();ctx.fillText(String(x/60),px,PAD.t+h+6+PB)}
   ctx.textAlign='right';ctx.textBaseline='middle';for(let d=Math.ceil(T.min/T.step)*T.step;d<=T.max+.01;d+=T.step){const y=Math.round(PAD.t+(1-(d-T.min)/(T.max-T.min))*h)+.5;ctx.strokeStyle=COL.grid;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke();ctx.fillStyle=COL.axis;ctx.fillText(String(d),PAD.l-8,y)}
   ctx.textAlign='left';ctx.fillStyle=COL.ror;for(let v=R.min;v<=R.max+.01;v+=R.step)ctx.fillText(String(v),PAD.l+w+8,PAD.t+(1-(v-R.min)/(R.max-R.min))*h);
-  ctx.fillStyle=COL.axis;ctx.textBaseline='top';ctx.fillText('°'+cfg.unit,4,2);ctx.textAlign='right';ctx.fillText('°'+cfg.unit+'/min',W-2,PAD.t+h+6+PB);if(PB)drawPhaseBar(ctx,X,off,PAD.t+h,w);
+  /* unit names sit just inside the top corners of the plot (the gutters only hold the numbers) */ctx.save();ctx.textBaseline='top';ctx.lineJoin='round';ctx.lineWidth=3;ctx.strokeStyle=COL.chartBg;ctx.fillStyle=COL.axis;ctx.textAlign='left';ctx.strokeText('°'+cfg.unit,PAD.l+5,PAD.t+3);ctx.fillText('°'+cfg.unit,PAD.l+5,PAD.t+3);ctx.fillStyle=COL.ror;ctx.textAlign='right';ctx.strokeText('°'+cfg.unit+'/min',PAD.l+w-5,PAD.t+3);ctx.fillText('°'+cfg.unit+'/min',PAD.l+w-5,PAD.t+3);ctx.restore();ctx.fillStyle=COL.axis;ctx.textBaseline='top';ctx.textAlign='right';if(PB)drawPhaseBar(ctx,X,off,PAD.t+h,w);
   for(const L of [['',''],['2','2']]){const [n]=L;if(!cfg['rorLine'+n+'On']||!ok(Number(cfg['rorLine'+n+'C'])))continue;const v=toDR(Number(cfg['rorLine'+n+'C']));if(!(v>R.min&&v<R.max))continue;
     const y=Math.round(PAD.t+(1-(v-R.min)/(R.max-R.min))*h)+.5,lc=COL['rorLine'+n],zc=COL['rorZone'+n],a=clamp(Number(cfg['rorZone'+n+'Alpha'])||0,0,60)/100;if(a>0){ctx.fillStyle=rgba(zc,a);ctx.fillRect(PAD.l,y,w,PAD.t+h-y)}
     ctx.strokeStyle=lc;ctx.lineWidth=1.5;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke();ctx.setLineDash([]);
@@ -1991,13 +1999,12 @@ function drawPhaseBar(ctx,X,off,y0,w){const r=S.roast,ev=r.events,cur=S.recordin
 function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)return;const w=W-PAD.l-PAD.r,X=x=>PAD.l+(x-v.lo)/(v.hi-v.lo)*w;
   ctx.fillStyle=COL.chartBg;ctx.fillRect(0,0,W,H);
   const rows=[{k:'burner',label:'Burner',col:COL.burner,max:100,unit:'%'},{k:'fan',label:'Air',col:COL.air,max:100,unit:'%'}];
-  if(cfg.scales.showPressure){let pm=Number(cfg.scales.pMax)||0;if(!pm){let mx=0;for(const s of [...S.roast.samples,...(S.bg?S.bg.samples:[])])if(ok(s.pressure))mx=Math.max(mx,s.pressure);pm=Math.max(50,Math.ceil(mx*1.15/50)*50)}rows.push({k:'pressure',label:'Pressure',col:COL.pressure,max:pm,maxLabel:isMbar()?String(+(pm/100).toFixed(2)):pm,unit:' '+pU(),noLabels:true})}
+  if(cfg.scales.showPressure){const pm=stripPm();rows.push({k:'pressure',label:'Pressure',col:COL.pressure,max:pm,maxLabel:stripPmLabel(pm),unit:' '+pU(),noLabels:true})}
   const rh=(H-14)/rows.length,font=getComputedStyle(document.body).fontFamily;
   ctx.strokeStyle=COL.grid;ctx.lineWidth=1;const step=v.hi-v.lo>1500?120:60;for(let x=Math.ceil(v.lo/step)*step;x<=v.hi;x+=step){const px=Math.round(X(x))+.5;ctx.beginPath();ctx.moveTo(px,4);ctx.lineTo(px,H-10);ctx.stroke()}
   rows.forEach((R,i)=>{const top=6+i*rh,h=rh-12,Yv=val=>top+h-(clamp(val,0,R.max)/R.max)*h;
     ctx.strokeStyle=COL.grid;for(const f of [0,.5,1]){const y=Math.round(top+h-f*h)+.5;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke()}
-    ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(R.label,PAD.l-8,top+h/2);
-    ctx.textAlign='left';ctx.fillText((R.maxLabel??R.max)+R.unit.trim(),PAD.l+w+6,top+3);ctx.fillText('0',PAD.l+w+6,top+h);
+    ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='left';ctx.fillText(String(R.maxLabel??R.max),PAD.l+w+6,top+3);ctx.fillText('0',PAD.l+w+6,top+h);
     const fk={burner:'fillBurner',fan:'fillAir',pressure:'fillPressure'}[R.k];
     const series=(r,dash,alpha,lw,lab,end)=>{if(!r)return;const o=r.events.CHARGE??0;ctx.save();ctx.beginPath();ctx.rect(PAD.l,0,w,H);ctx.clip();
       if(cfg.scales[fk]&&(r===S.roast||cfg.scales.fillBkg)){ctx.fillStyle=rgba(R.col,r===S.roast?.16:.07);ctx.beginPath();let x0=null,xl=null;const cl=()=>{if(x0!=null){ctx.lineTo(xl,top+h);ctx.lineTo(x0,top+h);ctx.closePath();x0=null}};
@@ -2009,7 +2016,9 @@ function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)re
         ctx.fillStyle=lab.bg==='col'?R.col:COL.chartBg;ctx.fillRect(x+3,y+oy,tw,13);ctx.fillStyle=lab.fg==='col'?R.col:lab.fg;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(tx,x+7,y+oy+6.5)})}
       ctx.restore()};
     if(S.bg)series(S.bg,[5,4],.55,1.5,{bg:'bg',fg:COL.axis,below:true},S.bg.events.DROP!=null?S.bg.events.DROP+60:null);
-    series(S.roast,[],1,2.2,{bg:'col',fg:'#fff'})});
+    series(S.roast,[],1,2.2,{bg:'col',fg:'#fff'});
+    /* lane name (with its unit) inside the lane, bottom left, over a halo — keeps the left gutter narrow */
+    ctx.save();ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='left';ctx.textBaseline='bottom';ctx.lineJoin='round';ctx.lineWidth=3;ctx.strokeStyle=COL.chartBg;ctx.fillStyle=COL.axis;const lt=R.label+' '+R.unit.trim(),lx=PAD.l+5,ly=top+h-2;ctx.strokeText(lt,lx,ly);ctx.fillText(lt,lx,ly);ctx.restore()});
   if(S.recording&&curTime()!=null){const x=X(curTime()-v.off);ctx.strokeStyle=COL.axis;ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(x,2);ctx.lineTo(x,H-8);ctx.stroke();ctx.setLineDash([])}
   if(S.hover!=null){const x=X(S.hover);ctx.strokeStyle=COL.axis;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x,2);ctx.lineTo(x,H-8);ctx.stroke();ctx.setLineDash([])}
   ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText(S.bg?'— — background   ━ this roast':'',PAD.l+w,H)}
