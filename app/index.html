@@ -194,7 +194,7 @@ canvas{display:block;width:100%;height:100%}
 .banner.red{background:var(--danger);color:#fff}
 .banner.info{background:var(--panel);border:1px solid var(--border)}
 .banner button{padding:5px 11px}
-#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--panel);padding:9px 16px;border-radius:9px;font-size:calc(13.5px*var(--ts,1));opacity:0;pointer-events:none;transition:.2s;z-index:80;max-width:90vw}
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--panel);padding:12px 20px;border-radius:11px;font-size:calc(15px*var(--ts,1));box-shadow:0 10px 30px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:.2s;z-index:80;max-width:90vw}
 #toast.show{opacity:1;transform:translateX(-50%)}
 
 /* ---------- drawer ---------- */
@@ -382,6 +382,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .snav button{border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:7px;font-size:calc(14px*var(--ts,1))}
 .snav button.on{background:var(--accentSoft);color:var(--accent)}
 .scont{overflow:auto;min-height:0;padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+@media (min-width:1700px){html:not(.ipad):not(.iphone) .scont>*{max-width:1280px}}
 .scont h2{font-size:calc(17px*var(--ts,1));font-weight:600}
 .scont .sub{font-size:calc(13px*var(--ts,1));color:var(--text2);margin-top:-10px}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
@@ -618,7 +619,9 @@ const LS={cfg:'zr2.cfg',draft:'zr2.inprogress',num:'zr2.lastNum',numAt:'zr2.last
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3200)}
 function mmss(s){if(!ok(s))return '—';const n=s<0;s=Math.abs(Math.round(s));return (n?'-':'')+Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-function fmtDate(iso,withTime=true){if(!iso)return '—';const d=new Date(iso);return d.toLocaleDateString([], {month:'short',day:'numeric'})+(withTime?' · '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'')}
+const dayDate=iso=>/^\d{4}-\d{2}-\d{2}$/.test(String(iso))?new Date(iso+'T12:00:00'):new Date(iso);   // a bare date (e.g. Arrived) is that day here, not UTC midnight
+function fmtDay(iso){if(!iso)return '';const d=dayDate(iso);return isNaN(d)?String(iso):d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})}
+function fmtDate(iso,withTime=true){if(!iso)return '—';const d=dayDate(iso);return d.toLocaleDateString([], {month:'short',day:'numeric'})+(withTime?' · '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'')}
 function fmtLong(iso){if(!iso)return '—';const d=new Date(iso);return d.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}
 function ageOf(iso){if(!iso)return '—';const a=new Date(iso),b=new Date();const d0=new Date(a.getFullYear(),a.getMonth(),a.getDate()),d1=new Date(b.getFullYear(),b.getMonth(),b.getDate());const n=Math.round((d1-d0)/864e5);return n<=0?'today':n===1?'1 day':n+' days'}
 const money=v=>ok(v)?'$'+v.toLocaleString([], {minimumFractionDigits:2,maximumFractionDigits:2}):'—';
@@ -2057,7 +2060,7 @@ function renderGreen(){const q=normName($('#gSearch').value);const list=INV.filt
   $('#gTiles').innerHTML=`<div class="card tile"><div class="l">On hand</div><div class="v">${onHand.toFixed(1)}<small>lb</small></div></div><div class="card tile"><div class="l">Value on hand${noPrice?' (lots with a price)':''}</div><div class="v">${money0(value)}<small>· ${inStock.length} lots</small></div></div>
   <div class="card tile"><div class="l">Roasted this month</div><div class="v">${month.toFixed(1)}<small>lb green</small></div></div><div class="card tile"><div class="l">Running low</div><div class="v" style="${low?'color:var(--g-low)':''}">${low}<small>${low===1?'lot':'lots'} under ${LOW} lb</small></div></div>`;
   $('#gRows').innerHTML=list.map(l=>{const left=invLeft(l),start=(num(l.startLb)||0)+(l.adj||[]).filter(x=>num(x.lb)>0).reduce((a,x)=>a+num(x.lb),0),pct=start?clamp(left/start*100,0,100):0,lw=left<LOW&&left>0;
-    return `<tr class="${l.id===selGreen&&gMode!=='add'?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b></td><td><span class="flag">${flagOf(l.origin)}</span>${esc(l.origin||'')}</td><td>${procTag(l.process)}</td><td class="tnum">${esc(l.lot||'')}</td><td class="muted">${esc(l.supplier||'')}</td><td class="muted tnum">${esc(l.arrived||'')}</td>
+    return `<tr class="${l.id===selGreen&&gMode!=='add'?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b></td><td><span class="flag">${flagOf(l.origin)}</span>${esc(l.origin||'')}</td><td>${procTag(l.process)}</td><td class="tnum">${esc(l.lot||'')}</td><td class="muted">${esc(l.supplier||'')}</td><td class="muted tnum">${esc(fmtDay(l.arrived))}</td>
     <td class="n">${ok(num(l.price))?money(num(l.price)):'—'}</td><td class="n">${start.toFixed(1)}</td><td class="n">${invUsed(l.id).toFixed(1)}</td><td><div class="row tnum" style="justify-content:space-between;flex-wrap:nowrap"><b style="${lw?'color:var(--g-low)':''}">${left.toFixed(1)} lb</b>${lw?'<span class="badge glow">Low</span>':''}</div><div class="bar ${lw?'low':''}"><i style="width:${pct}%"></i></div></td></tr>`}).join('');
   $('#gEmpty').innerHTML=list.length?'':`<div class="empty">${INV.length?'Nothing here.':'No green coffee yet. Press <b>+ Add coffee</b> to add your first lot.'}</div>`;renderGreenDetail()}
 const GFIELDS=[['name','Coffee name','e.g. Brazil Cerrado Natural',1],['origin','Origin / region','Brazil · Cerrado Mineiro'],['process','Process / variety','Natural · Yellow Catuaí'],['lot','Lot',''],['supplier','Supplier',''],['arrived','Arrived','','date'],['startLb','Starting weight (lb)','132'],['price','Price per lb, green ($)','4.85'],['freight','Freight & fees per lb ($)','0.45'],['moisture','Moisture / density','10.8 % · 720 g/L'],['screen','Screen size','16–18'],['wa','Water activity','0.55'],['notes','Notes','',1]];
@@ -2079,7 +2082,7 @@ function renderGreenDetail(){const el=$('#gDetail');
   const l=INV.find(x=>x.id===selGreen);if(!l){el.innerHTML='<div class="empty">Select a coffee, or add one.</div>';return}
   const left=invLeft(l),p=num(l.price),rs=HIST.filter(r=>r.meta.invId===l.id),avgLoss=rs.map(r=>summarize(r).loss).filter(ok);const loss=avgLoss.length?avgLoss.reduce((a,b)=>a+b,0)/avgLoss.length:null;
   const hist=[...rs.map(r=>({d:r.chargedAt||r.created,t:`Roast #${r.num} · ${esc(r.meta.name||'')}${r.isProfile?' ★':''}`,lb:-(num(r.meta.green)||0)})),...(l.adj||[]).map(a=>({d:a.date,t:(a.lb>0?'Received':'Adjusted')+(ok(num(a.price))?` · ${money(num(a.price))} / lb`:'')+(a.note?' · '+esc(a.note):''),lb:num(a.lb)})),{d:l.arrived||l.created,t:'Starting stock'+(ok(p)&&!(l.adj||[]).some(a=>a.price)?` · ${money(p)} / lb · ${money(p*(num(l.startLb)||0))}`:''),lb:num(l.startLb)||0}].sort((a,b)=>String(b.d).localeCompare(String(a.d)));
-  el.innerHTML=`<div><div class="dtitle">${esc(l.name)}</div><div class="muted" style="margin-top:3px">${[l.lot&&'Lot '+esc(l.lot),esc(l.supplier||''),l.arrived&&'arrived '+esc(l.arrived)].filter(Boolean).join(' · ')}</div></div>
+  el.innerHTML=`<div><div class="dtitle">${esc(l.name)}</div><div class="muted" style="margin-top:3px">${[l.lot&&'Lot '+esc(l.lot),esc(l.supplier||''),l.arrived&&'arrived '+esc(fmtDay(l.arrived))].filter(Boolean).join(' · ')}</div></div>
   <div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="l">On hand</div><div class="v">${left.toFixed(1)}<small>lb</small></div></div><div class="stat"><div class="l">Used</div><div class="v">${invUsed(l.id).toFixed(1)}<small>lb</small></div></div><div class="stat"><div class="l">Value on hand</div><div class="v">${ok(p)?money0(p*Math.max(0,left)):'—'}${ok(p)?`<small>@ ${money(p)}/lb</small>`:''}</div></div></div>
   <div><div class="kv"><span>Origin / region</span><b>${esc(l.origin||'—')}</b></div><div class="kv"><span>Process / variety</span><b>${esc(l.process||'—')}</b></div><div class="kv"><span>Moisture / density</span><b>${esc(l.moisture||'—')}</b></div><div class="kv"><span>Screen size · water activity</span><b>${esc(l.screen||'—')} · ${esc(l.wa||'—')}</b></div>
   <div class="kv"><span>Price per lb (green)</span><b class="tnum">${ok(p)?money(p):'<span class="muted">not set</span>'}</b></div>
@@ -2158,7 +2161,7 @@ function newSample(roastId){return {roastId,scores:Object.fromEntries(ATTRS.map(
 const cupScore=x=>ATTRS.reduce((a,k)=>a+(Number(x.scores[k[0]])||0),0)+CUPK.reduce((a,k)=>a+x.cups[k[0]].filter(Boolean).length*2,0)-(Number(x.defects)||0);
 function cupBand(v){const b=cfg.cupBands;for(let i=0;i<b.length-1;i++)if(v>=Number(b[i].min))return b[i];return b[b.length-1]}
 function cupClass(v){return cupBand(v).label}
-function cupSt(v){return cfg.cupColorsOn&&ok(Number(v))?`color:${cupBand(Number(v)).col}`:''}
+function cupSt(v){return cfg.cupColorsOn&&v!=null&&v!==''&&ok(Number(v))?`color:${cupBand(Number(v)).col}`:''}
 function cupPillSt(v){return cfg.cupColorsOn&&ok(Number(v))?`color:${cupBand(Number(v)).col};background:${rgba(cupBand(Number(v)).col,.12)}`:''}
 function renderCupping(){const list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date)));if(cupMode==='view'&&!list.find(s=>s.id===selSession))selSession=list[0]?.id||null;
   const SC=cfg.cupScoring;$('#cHead').innerHTML=`<th>Date</th><th>Session</th><th>Samples</th>${SC?'<th class="n">Best</th>':'<th>Flags</th>'}`;
