@@ -493,7 +493,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
   <div class="page">
     <div id="pList" style="display:contents"><div class="ph"><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:calc(12.5px*var(--ts,1))"></span><button class="pri" id="btnNewProfile">+ New profile</button></div>
     <div class="split">
-      <div class="card scroll"><table id="pTable" class="cupt"><thead><tr><th>Profile</th><th>Coffee</th><th class="n">Batch</th><th class="n">Roasted</th><th>Last roasted</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">Color W / G</th><th class="n">Cup</th></tr></thead><tbody id="pRows"></tbody></table><div id="pEmpty"></div></div>
+      <div class="card scroll"><table id="pTable" class="cupt"><thead><tr><th>Profile</th><th>Coffee</th><th class="n">Batch</th><th class="n">Roasted</th><th>Last roasted</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">Color W / G</th><th class="n">Spread</th><th class="n">Cup</th></tr></thead><tbody id="pRows"></tbody></table><div id="pEmpty"></div></div>
       <div class="card detail" id="pDetail"></div>
     </div></div>
     <div id="pBuild" hidden style="flex:1;min-height:0;display:flex;flex-direction:column;gap:14px"></div>
@@ -1552,7 +1552,7 @@ function renderProfiles(){if(BLD){renderBuilder();return}const q=normName($('#pS
   $('#pRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),key=normName(r.meta.name),uses=HIST.filter(x=>normName(x.meta.name)===key&&sameBatch(batchOf(x),batchOf(r))),last=uses.map(x=>x.chargedAt||x.created).sort().at(-1),sel=r.id===selProfile;
     return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b>${r.planned?' <span class="badge g">Planned</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
-    <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
+    <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${spTxt(spreadOf(r.meta))}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
   $('#pTable').classList.toggle('nocup',!cfg.cupScoring&&!list.some(r=>ok(r.cup)));
   $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${allProfiles().length?'No profiles match.':'No profiles yet.<br>Press <b>+ New profile</b> to plan one before the first roast,<br>or after a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>.'}</div>`;
   renderProfileDetail()}
