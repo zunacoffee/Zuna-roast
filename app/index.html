@@ -548,7 +548,7 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipc .brand small,.ipc .brand .bt{display:none}
 .ipc #nav button{padding:0 9px}
 .ipc #scr-roast{grid-template-columns:minmax(0,1fr) 330px;gap:10px;padding:10px}
-.ipc #rightCol .ipCoolHead,.ipc #rightCol #sw{display:none}
+.ipad #rightCol .ipCoolHead,.ipad #rightCol #sw{display:none}  /* Cooling/Stirrer live in the bottom bar on every iPad */
 .ipc .ipLegend{gap:12px;font-size:11.5px}
 .ipc #ipChips span,.ipc #ipPhase span{padding:4px 8px;font-size:12.5px}
 .ipc #roBT .v{font-size:50px}
@@ -575,6 +575,15 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipTs .r small{font-size:inherit;font-weight:500;color:var(--text2)}
 .ipTs .ch{font-size:22px;color:var(--accent)}
 .ipc #ipToday{margin-top:auto}
+.ipad #ipToday{margin-top:auto}
+.ipTdUp{border-top:1px solid var(--line2);padding:8px 14px 10px}
+.ipTdUp>em{display:block;font-style:normal;font-size:calc(11.5px*var(--ts,1));font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);margin-bottom:4px}
+.ipTdU{display:flex;align-items:center;gap:10px;padding:5px 0}
+.ipTdU>b{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:12px;color:var(--text2);flex:none}
+.ipTdU>span{flex:1;min-width:0;font-size:calc(14px*var(--ts,1));font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ipTdU>span small{color:var(--text2);font-size:inherit;font-weight:500}
+.ipTdU>i{font-style:normal;color:var(--text2);font-size:calc(13px*var(--ts,1));font-variant-numeric:tabular-nums;white-space:nowrap}
+.ipTdMore{color:var(--text2);font-size:calc(13px*var(--ts,1));padding-top:2px}
 .ipc #scr-today .split{grid-template-columns:minmax(0,1fr) 300px}
 .ipc #scr-today td{padding:10px 8px}
 .ipc #scr-today td .badge.gray{display:none}
@@ -1354,7 +1363,8 @@ function renderIpToday(){const el=$('#ipToday');if(!el)return;const {items,done,
   const row=cur||next;
   if(IPC){const b=row||null;el.innerHTML=`<button class="ipTs" id="ipTdAll"><b class="${cur?'c':''}">${b?n(b):'✓'}</b><span class="m"><span class="t">${b?`Batch ${n(b)} of ${items.length}`:`All ${items.length} done`}<span class="ipDots">${items.map(x=>`<i class="${x.status==='done'?'d':cur&&x.id===cur.id?'c':''}"></i>`).join('')}</span></span><span class="r">${b?nm(b):'Every batch is roasted'}${cur&&next?` <small>· Next: ${nm(next)}</small>`:''}</span></span><span class="ch">›</span></button>`;$('#ipTdAll').onclick=openBatchList;return}
   el.innerHTML=`<div class="ipTd"><button class="ipTdH" id="ipTdAll"><span>Today · ${done} of ${items.length} done</span><span class="ipDots">${items.map(x=>`<i class="${x.status==='done'?'d':cur&&x.id===cur.id?'c':''}"></i>`).join('')}</span><span class="ipTdAll">See all ›</span></button>
-    ${row?`<div class="ipTdR ${cur?'now':''}"><b>${n(row)}</b><div><em>${cur?(S.recording?'Now roasting':'Loaded'):'Up next'}</em><span>${nm(row)}${lb(row)}</span>${cur&&next?`<small class="nx">Next: ${nm(next)}${next.green?' · '+esc(next.green)+' lb':''}</small>`:''}</div></div>`
+    ${row?`<div class="ipTdR ${cur?'now':''}"><b>${n(row)}</b><div><em>${cur?(S.recording?'Now roasting':'Loaded'):'Up next'}</em><span>${nm(row)}${lb(row)}</span></div></div>${(()=>{const i=items.indexOf(row),up=items.slice(i+1).filter(x=>x.status!=='done').slice(0,4),more=items.slice(i+1).filter(x=>x.status!=='done').length-up.length;
+        return up.length?`<div class="ipTdUp"><em>Up next</em>${up.map(x=>`<div class="ipTdU"><b>${n(x)}</b><span>${nm(x)}${x.coffee&&x.name&&x.coffee!==x.name?` <small>· ${esc(x.coffee)}</small>`:''}</span><i>${x.green?esc(x.green)+' lb':''}</i></div>`).join('')}${more>0?`<div class="ipTdMore">+ ${more} more</div>`:''}</div>`:''})()}`
       :`<div class="ipTdR"><b>✓</b><div><em>All done</em><span>Every batch for today is roasted</span></div></div>`}</div>`;
   $('#ipTdAll').onclick=openBatchList}
 function openBatchList(){const root=$('#modalRoot'),{items,done,cur}=ipBatchInfo();
@@ -1864,7 +1874,7 @@ function tick(){checkBtAlarm();checkAutoOff();followTick();if(folActive())render
   if(S.bg&&S.recording)renderNext()}
 function renderFkeys(){const ev=S.roast.events,nx=S.recording&&(cfg.nextHighlight||IPAD)?nextEventKey():null;
   if(IPAD){const r=S.roast,c=ev.CHARGE??0,at=k=>{const s=sampleAt(r.samples,ev[k]);return mmss(ev[k]-c)+(s&&ok(s.bt)?` · ${fT(s.bt)}°`:'')};
-    $('#fkeys').innerHTML=(IPC?SWITCHES.filter(w=>!w.confirm).map(w=>`<button class="fk fksw" data-sw="${w.p}"><span><i></i>${w.label}</span><b>—</b></button>`).join('')+'<span class="fkdiv"></span>':'')+cfg.events.filter(e=>e.show&&e.k!=='UNDO').map(e=>{const done=ev[e.k]!=null,isDrop=e.k==='DROP';let lab=esc(e.label),sub='';
+    $('#fkeys').innerHTML=(IPAD?SWITCHES.filter(w=>!w.confirm).map(w=>`<button class="fk fksw" data-sw="${w.p}"><span><i></i>${w.label}</span><b>—</b></button>`).join('')+'<span class="fkdiv"></span>':'')+cfg.events.filter(e=>e.show&&e.k!=='UNDO').map(e=>{const done=ev[e.k]!=null,isDrop=e.k==='DROP';let lab=esc(e.label),sub='';
       if(isDrop&&done&&S.recording){lab='Finish roast';sub='Drop '+at('DROP')}else if(done)sub=at(e.k);else if(e.k===nx)sub='Next';
       else if(isDrop&&S.bg&&S.bg.events.DROP!=null)sub='Background '+mmss(S.bg.events.DROP-(S.bg.events.CHARGE??0));
       return `<button class="fk ${done&&!(isDrop&&S.recording)?'done':''} ${e.k===nx?'nx':''} ${isDrop?'dropk':''}" data-k="${e.k}">${lab}${sub?`<span class="sub">${sub}</span>`:''}</button>`}).join('');if(IPC)renderCtl();return}
