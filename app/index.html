@@ -583,6 +583,7 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipTdU>span{flex:1;min-width:0;font-size:calc(14px*var(--ts,1));font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ipTdU>span small{color:var(--text2);font-size:inherit;font-weight:500}
 .ipTdU>i{font-style:normal;color:var(--text2);font-size:calc(13px*var(--ts,1));font-variant-numeric:tabular-nums;white-space:nowrap}
+.ipTdU[hidden],.ipTdMore[hidden],.ipTdUp[hidden]{display:none}
 .ipTdMore{color:var(--text2);font-size:calc(13px*var(--ts,1));padding-top:2px}
 .ipc #scr-today .split{grid-template-columns:minmax(0,1fr) 300px}
 .ipc #scr-today td{padding:10px 8px}
@@ -1364,9 +1365,17 @@ function renderIpToday(){const el=$('#ipToday');if(!el)return;const {items,done,
   if(IPC){const b=row||null;el.innerHTML=`<button class="ipTs" id="ipTdAll"><b class="${cur?'c':''}">${b?n(b):'✓'}</b><span class="m"><span class="t">${b?`Batch ${n(b)} of ${items.length}`:`All ${items.length} done`}<span class="ipDots">${items.map(x=>`<i class="${x.status==='done'?'d':cur&&x.id===cur.id?'c':''}"></i>`).join('')}</span></span><span class="r">${b?nm(b):'Every batch is roasted'}${cur&&next?` <small>· Next: ${nm(next)}</small>`:''}</span></span><span class="ch">›</span></button>`;$('#ipTdAll').onclick=openBatchList;return}
   el.innerHTML=`<div class="ipTd"><button class="ipTdH" id="ipTdAll"><span>Today · ${done} of ${items.length} done</span><span class="ipDots">${items.map(x=>`<i class="${x.status==='done'?'d':cur&&x.id===cur.id?'c':''}"></i>`).join('')}</span><span class="ipTdAll">See all ›</span></button>
     ${row?`<div class="ipTdR ${cur?'now':''}"><b>${n(row)}</b><div><em>${cur?(S.recording?'Now roasting':'Loaded'):'Up next'}</em><span>${nm(row)}${lb(row)}</span></div></div>${(()=>{const i=items.indexOf(row),up=items.slice(i+1).filter(x=>x.status!=='done').slice(0,4),more=items.slice(i+1).filter(x=>x.status!=='done').length-up.length;
-        return up.length?`<div class="ipTdUp"><em>Up next</em>${up.map(x=>`<div class="ipTdU"><b>${n(x)}</b><span>${nm(x)}${x.coffee&&x.name&&x.coffee!==x.name?` <small>· ${esc(x.coffee)}</small>`:''}</span><i>${x.green?esc(x.green)+' lb':''}</i></div>`).join('')}${more>0?`<div class="ipTdMore">+ ${more} more</div>`:''}</div>`:''})()}`
+        return up.length?`<div class="ipTdUp" data-left="${up.length+Math.max(more,0)}"><em>Up next</em>${up.map(x=>`<div class="ipTdU"><b>${n(x)}</b><span>${nm(x)}${x.coffee&&x.name&&x.coffee!==x.name?` <small>· ${esc(x.coffee)}</small>`:''}</span><i>${x.green?esc(x.green)+' lb':''}</i></div>`).join('')}<div class="ipTdMore"></div></div>`:''})()}`
       :`<div class="ipTdR"><b>✓</b><div><em>All done</em><span>Every batch for today is roasted</span></div></div>`}</div>`;
-  $('#ipTdAll').onclick=openBatchList}
+  $('#ipTdAll').onclick=openBatchList;fitIpToday()}
+/* 13" Today card: show as many "Up next" rows as fit in the right column, then "+ N more" */
+function fitIpToday(){const up=$('#ipToday .ipTdUp'),col=$('#rightCol');if(!up||!col||IPC)return;
+  const left=Number(up.dataset.left)||0,rows=$$('.ipTdU',up),more=$('.ipTdMore',up),over=()=>col.scrollHeight>col.clientHeight+1;
+  rows.forEach(r=>r.hidden=false);const set=()=>{const shown=rows.filter(r=>!r.hidden).length,n=left-shown;more.textContent=n>0?`+ ${n} more`:'';more.hidden=n<=0};
+  set();if(!col.clientHeight)return;
+  for(let i=rows.length-1;i>=0&&over();i--){rows[i].hidden=true;set()}
+  up.hidden=!rows.some(r=>!r.hidden)}
+if(IPAD)addEventListener('resize',()=>requestAnimationFrame(fitIpToday));
 function openBatchList(){const root=$('#modalRoot'),{items,done,cur}=ipBatchInfo();
   root.innerHTML=`<div class="modalbg"><div class="modal ipBl" role="dialog" aria-modal="true"><div class="row"><h3 style="flex:1">Today · ${done} of ${items.length} done</h3><button id="blEdit">Edit plan</button><button class="pri" id="blDone">Done</button></div>
     ${S.recording?'<p class="muted" style="margin:0">Finish and save this roast before switching batches.</p>':''}
@@ -3985,7 +3994,7 @@ function phInit(){const app=$('#phApp');
 /* ================================================================
    Screens & wiring
    ================================================================ */
-function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));if(IPAD)ipadNavSync(n);$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
+function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));if(IPAD){ipadNavSync(n);if(n==='roast')requestAnimationFrame(fitIpToday)}$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
   if(n==='roast'){renderAll();renderTodayMini()}else if(n==='today')renderToday();else if(n==='profiles')renderProfiles();else if(n==='roasts')renderRoasts();else if(n==='green'){gMode='view';setGView(gViewMode)}else if(n==='pricing')renderPricing();else if(n==='cupping'){cupMode='view';renderCupping()}else if(n==='analyze'){renderAnalyze()}else if(n==='settings')renderSettings()}
 function renderUnits(){$$('.up').forEach(e=>e.textContent=pU());$$('.u').forEach(e=>e.textContent='°'+cfg.unit);$$('.ur').forEach(e=>e.textContent='°'+cfg.unit+'/min')}
 function renderAll(){if(IPAD)renderIpToday();renderUnits();renderHeader();renderLive();renderFkeys();renderNotes();renderBgSelect();if($('#drawer').classList.contains('open'))renderDrawer();tick();scheduleDraw()}
