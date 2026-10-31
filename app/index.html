@@ -568,6 +568,7 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipc #nav button{padding:0 9px}
 .ipc #scr-roast{grid-template-columns:minmax(0,1fr) 330px;gap:10px;padding:10px}
 .ipad #rightCol .ipCoolHead,.ipad #rightCol #sw{display:none}  /* Cooling/Stirrer live in the bottom bar on every iPad */
+.ipc .ipLegend{gap:12px;font-size:11.5px}
 .ipc #ipChips span,.ipc #ipPhase span{padding:4px 8px;font-size:12.5px}
 .ipc #roBT .v{font-size:50px}
 .ipc .big3 .ro:not(#roBT) .v{font-size:32px}
@@ -628,6 +629,9 @@ html.ipad .stepper input{flex:1 1 auto;width:auto!important;min-width:80px;paddi
 .ipad.kbOpen .modalbg{align-items:flex-start;padding-top:40px;overflow:auto}
 /* iPad chart header: chips + legend instead of phase text */
 .ipad #phaseTxt{display:none}
+.ipLegend{display:flex;gap:16px;padding:0 16px 2px;font-size:calc(12px*var(--ts,1));color:var(--text2)}
+.ipLegend span{display:flex;align-items:center;gap:6px}
+.ipLegend i{width:16px;height:0;border-top:3px solid;border-radius:2px}
 /* iPad event keys: time · BT under marked keys, Next on the next one, Drop dark */
 .ipad .fk .sub{display:block;font-size:calc(12px*var(--ts,1));font-weight:500;color:var(--text2);margin-top:2px}
 .ipad .fk.nx .sub{color:var(--accent)}
@@ -906,6 +910,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 
   <section class="panel">
     <div class="pt"><button id="chartTitle" title="Open Roast details"></button><span id="ipPhase" class="ipOnly"></span><span id="ipChips" class="ipOnly"></span><span id="phaseTxt" class="tnum"></span></div>
+    <div class="ipLegend ipOnly"><span><i style="border-color:var(--c-bt)"></i>Bean temp</span><span><i style="border-color:var(--c-ror)"></i>Rate of rise</span><span><i style="border-color:var(--c-bkg);border-top-style:dashed"></i>Background</span><span><i style="border-color:var(--c-burner)"></i>Burner</span><span><i style="border-color:var(--c-air)"></i>Air</span></div>
     <div class="chartwrap" style="position:relative">
       <canvas id="cvMain"></canvas>
       <canvas id="cvStrip"></canvas>
