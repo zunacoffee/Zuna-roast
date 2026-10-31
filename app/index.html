@@ -230,7 +230,7 @@ tr.tdone td{color:var(--text2)}
 .plan span{color:var(--text2);font-variant-numeric:tabular-nums}
 .remlist .kv{align-items:center}
 .remadd{display:grid;grid-template-columns:120px 110px 1fr auto;gap:6px}
-html:not(.ipad) .cupt.nocup th:last-child,html:not(.ipad) .cupt.nocup td:last-child{display:none}
+html:not(.ipad) .cupt.nocup th:last-child,html:not(.ipad) .cupt.nocup td:last-child,html.ipad:not(.ipc) .cupt.nocup th:last-child,html.ipad:not(.ipc) .cupt.nocup td:last-child{display:none}
 .pstar{color:var(--warn);margin-left:6px;font-size:.9em}
 .remdet>summary{cursor:pointer;color:var(--accent);font-size:calc(13px*var(--ts,1));list-style:none;margin:8px 0 4px;width:max-content}.remdet>summary::-webkit-details-marker{display:none}.remdet[open]>summary{color:var(--text2)}
 .adjl{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
@@ -562,6 +562,28 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipad:not(.ipc) .pchips:not(.poff) button{min-width:0;padding:0 4px}
 .ipad:not(.ipc) #scr-roast{grid-template-columns:minmax(0,1fr) 364px}
 .ipad #scr-green .kv b{white-space:nowrap}
+/* ---------- 13" iPad: History & Profiles as list → full-screen detail (never on the iMac, iPhone or the compact iPad) ---------- */
+.ipBack{display:none}
+.ipad:not(.ipc) .ipHide2{display:none}
+.ipad:not(.ipc) #scr-roasts .split,.ipad:not(.ipc) #scr-profiles .split{grid-template-columns:minmax(0,1fr)}
+.ipad:not(.ipc) #scr-roasts thead,.ipad:not(.ipc) #scr-profiles thead{display:table-header-group}
+.ipad:not(.ipc) #scr-roasts table,.ipad:not(.ipc) #scr-profiles table{table-layout:auto}
+.ipad:not(.ipc) #scr-roasts td,.ipad:not(.ipc) #scr-profiles td{padding-top:15px;padding-bottom:15px}
+html.ipad:not(.ipc):not(.ipDet-roasts) #rDetail,html.ipad:not(.ipc):not(.ipDet-profiles) #pDetail{display:none}
+html.ipad:not(.ipc).ipDet-roasts #scr-roasts .split>.card.scroll,html.ipad:not(.ipc).ipDet-profiles #scr-profiles .split>.card.scroll{display:none}
+html.ipad:not(.ipc).ipDet-roasts #scr-roasts .ph>:not(.ipBack),html.ipad:not(.ipc).ipDet-profiles #scr-profiles .ph>:not(.ipBack){display:none}
+html.ipad:not(.ipc).ipDet-roasts #rBack,html.ipad:not(.ipc).ipDet-profiles #pBack{display:inline-flex;align-items:center;min-height:44px;border:0;background:transparent;color:var(--accent);font-size:calc(18px*var(--ts,1));font-weight:500;padding:0 6px 0 0}
+html.ipDet-roasts #rDetail,html.ipDet-profiles #pDetail[data-kind=p]{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:32px;row-gap:16px;align-content:stretch}
+html.ipDet-roasts #rDetail>*,html.ipDet-profiles #pDetail[data-kind=p]>*{grid-column:1/-1;min-width:0}
+html.ipDet-roasts #rDetail{grid-template-rows:repeat(4,auto) 1fr}
+html.ipDet-roasts #rDetail>:nth-child(4),html.ipDet-roasts #rDetail>:nth-child(5){grid-column:auto}
+html.ipDet-roasts #rDetail>:last-child{grid-row:5;align-self:end}
+html.ipDet-profiles #pDetail[data-kind=p]{grid-template-rows:repeat(6,auto) 1fr}
+html.ipDet-profiles #pDetail[data-kind=p]>:nth-child(5),html.ipDet-profiles #pDetail[data-kind=p]>:nth-child(6){grid-column:auto}
+html.ipDet-profiles #pDetail[data-kind=p]>:last-child{grid-row:7;align-self:end}
+html.ipDet-roasts #rDetail .minic,html.ipDet-profiles #pDetail .minic{height:270px}
+/* the action buttons stay in view at the bottom while the detail scrolls */
+html.ipDet-roasts #rDetail>:last-child,html.ipDet-profiles #pDetail[data-kind=p]>:last-child{position:sticky;bottom:-18px;background:var(--panel);margin:0 -20px -18px;padding:12px 20px 16px;border-top:1px solid var(--line2);z-index:2}
 /* ---------- compact iPad (10.5"/11"): html.ipad.ipc — never on the 13" or the iMac ---------- */
 .ipc header{height:60px}
 .ipc .brand small,.ipc .brand .bt{display:none}
@@ -951,7 +973,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 <!-- ================= PROFILES ================= -->
 <div class="screen" id="scr-profiles" hidden>
   <div class="page">
-    <div id="pList" style="display:contents"><div class="ph"><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:calc(12.5px*var(--ts,1))"></span><button class="pri" id="btnNewProfile">+ New profile</button></div>
+    <div id="pList" style="display:contents"><div class="ph"><button class="ipOnly ipBack" id="pBack">‹ Profiles</button><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted ipHide2" style="font-size:calc(12.5px*var(--ts,1))">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:calc(12.5px*var(--ts,1))"></span><button class="pri" id="btnNewProfile">+ New profile</button></div>
     <div class="split">
       <div class="card scroll"><table id="pTable" class="cupt"><thead><tr><th>Profile</th><th>Coffee</th><th class="n">Batch</th><th class="n">Roasted</th><th>Last roasted</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">Color W / G</th><th class="n">Cup</th></tr></thead><tbody id="pRows"></tbody></table><div id="pEmpty"></div></div>
       <div class="card detail" id="pDetail"></div>
@@ -963,7 +985,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 <!-- ================= ROASTS ================= -->
 <div class="screen" id="scr-roasts" hidden>
   <div class="page">
-    <div class="ph"><h1>History</h1><input type="search" id="rSearch" placeholder="Search name, coffee, lot, #…">
+    <div class="ph"><button class="ipOnly ipBack" id="rBack">‹ History</button><h1>History</h1><input type="search" id="rSearch" placeholder="Search name, coffee, lot, #…">
       <div class="seg" id="rFilter"><button data-f="all" class="on">All</button><button data-f="prof">Profiles ★</button><button data-f="week">This week</button></div>
       <div class="sp"></div><button id="btnImport">Import</button><button id="btnExportAll">Export all</button><input type="file" id="fileImport" accept=".json" hidden></div>
     <div class="split">
@@ -1079,6 +1101,9 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
    ===================================================================== */
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const IPAD=document.documentElement.classList.contains('ipad');
+/* 13" iPad: History and Profiles are a full-width list; a tap opens the detail full screen, ‹ back returns */
+const ipDet={roasts:false,profiles:false};
+function ipDetSet(k,on){ipDet[k]=on;document.documentElement.classList.toggle('ipDet-'+k,on);const d=$(k==='roasts'?'#rDetail':'#pDetail');if(on&&d){d.scrollTop=0;requestAnimationFrame(()=>{if(k==='roasts')renderRoastDetail();else renderProfileDetail()})}}
 function ipLegendApply(){document.documentElement.classList.toggle('ipLeg',!!(typeof cfg!=='undefined'&&cfg.scales&&cfg.scales.ipLegend))}
 const IPHONE=document.documentElement.classList.contains('iphone');/* iPhone: look things up and quick entries — never roasts or controls (see the iPhone section) */
 let IPC=false;/* compact iPad layout: only on iPads shorter than the 13" (e.g. 10.5" = 834pt) */
@@ -2126,14 +2151,14 @@ function renderProfiles(){if(BLD){renderBuilder();return}const q=normName($('#pS
   $('#pFolder').innerHTML=FS.state==='granted'?`📁 <b style="color:var(--text)">${esc(FS.dir.name)}/Profiles</b> · ${list.length} profiles`:`${list.length} profiles`;
   if(!list.find(r=>r.id===selProfile))selProfile=list[0]?.id||null;
   $('#pRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),key=normName(r.meta.name),uses=HIST.filter(x=>normName(x.meta.name)===key&&sameBatch(batchOf(x),batchOf(r))),last=uses.map(x=>x.chargedAt||x.created).sort().at(-1),sel=r.id===selProfile;
-    if(IPAD)return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(r.meta.name)}</b><div class="s">${esc(r.meta.coffee||'—')}${r.meta.green?' · '+esc(r.meta.green)+' lb':''} · roasted ${uses.length}×${last?' · last '+fmtDate(last,false):''}</div></div><span class="r">from #${r.num}</span></div><div class="k"><span>FC ${mmss(s.fcs)}</span><span>Drop ${mmss(s.drop)}</span><span>Dev ${mmss(s.dev)}</span><span>W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span>${cfg.cupScoring||ok(r.cup)?`<span>Cup ${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</span>`:''}</div></td></tr>`;
+    if(IPAD&&IPC)return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(r.meta.name)}</b><div class="s">${esc(r.meta.coffee||'—')}${r.meta.green?' · '+esc(r.meta.green)+' lb':''} · roasted ${uses.length}×${last?' · last '+fmtDate(last,false):''}</div></div><span class="r">from #${r.num}</span></div><div class="k"><span>FC ${mmss(s.fcs)}</span><span>Drop ${mmss(s.drop)}</span><span>Dev ${mmss(s.dev)}</span><span>W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span>${cfg.cupScoring||ok(r.cup)?`<span>Cup ${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</span>`:''}</div></td></tr>`;
     return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b>${r.planned?' <span class="badge g">Planned</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
     <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
   $('#pTable').classList.toggle('nocup',!cfg.cupScoring&&!list.some(r=>ok(r.cup)));
   $('#pEmpty').innerHTML=list.length?'':`<div class="empty">${allProfiles().length?'No profiles match.':'No profiles yet.<br>Press <b>+ New profile</b> to plan one before the first roast,<br>or after a roast you want to repeat, open Roast details and press <b>Save as profile ★</b>.'}</div>`;
   renderProfileDetail()}
-function renderProfileDetail(){const el=$('#pDetail'),r=findAny(selProfile);if(!r){el.innerHTML='<div class="empty">Select a profile.</div>';return}if(r.planned)return renderPlannedDetail(el,r);
+function renderProfileDetail(){const el=$('#pDetail'),r=findAny(selProfile);el.dataset.kind=r&&!r.planned?'p':'x';if(!r){el.innerHTML='<div class="empty">Select a profile.</div>';return}if(r.planned)return renderPlannedDetail(el,r);
   const s=r.summary||summarize(r),adj=adjustments(r),rc=r.events.CHARGE??0,uses=HIST.filter(x=>x.id!==r.id&&sameSlot(x,r)).slice(0,8),cost=costOf(r);
   const groups={};for(const a of adj){const k=mmss(a.t-rc);(groups[k]=groups[k]||[]).push(`${a.label} ${Math.round(a.to)}`)}
   const first=r.samples.find(x=>x.t>=rc);
@@ -2558,7 +2583,7 @@ function roastList(){const q=normName($('#rSearch').value),wk=Date.now()-7*864e5
   return !q||normName(['#'+r.num,r.num,r.meta.name,r.meta.coffee,r.meta.lot,r.meta.notes].join(' ')).includes(q)})}
 function renderRoasts(){const list=roastList();if(!list.find(r=>r.id===selRoast))selRoast=list[0]?.id||null;
   $('#rRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),sp=spreadOf(r.meta),c=costOf(r),dt=r.chargedAt||r.created;
-    if(IPAD)return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><span class="n">#${r.num}</span><div class="m"><b>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</b><div class="s">${esc(r.meta.coffee||'—')} · ${fmtDate(dt)}</div></div><span class="r">W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span></div></td></tr>`;
+    if(IPAD&&IPC)return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><span class="n">#${r.num}</span><div class="m"><b>${esc(r.meta.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</b><div class="s">${esc(r.meta.coffee||'—')} · ${fmtDate(dt)}</div></div><span class="r">W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span></div></td></tr>`;
     return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(dt)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?'<span class="pstar" title="Profile">★</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td>
     <td class="n">${esc(r.meta.green||'—')}</td><td class="n">${esc(r.meta.roasted||'—')}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':'—'}</td><td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${spTxt(sp)}</td>
     <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):'—'}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
@@ -4088,10 +4113,11 @@ async function init(){
   if(IPAD)ipadInit();
   // profiles / roasts / green / cupping lists
   $('#pSearch').oninput=renderProfiles;$('#btnNewProfile').onclick=()=>openBuilder('scratch');$('#aSearch').oninput=renderAnalyze;
-  $('#pRows').onclick=e=>{const tr=e.target.closest('tr');if(tr&&tr.dataset.id!==selProfile){selProfile=tr.dataset.id;renderProfiles()}};
+  $('#pRows').onclick=e=>{const tr=e.target.closest('tr');if(!tr)return;if(tr.dataset.id!==selProfile){selProfile=tr.dataset.id;renderProfiles()}if(IPAD&&!IPC)ipDetSet('profiles',true)};
+  $('#pBack').onclick=()=>ipDetSet('profiles',false);$('#rBack').onclick=()=>ipDetSet('roasts',false);
   $('#pRows').ondblclick=e=>{const tr=e.target.closest('tr');if(tr)roastThis(tr.dataset.id)};
   $('#rSearch').oninput=renderRoasts;$('#rFilter').onclick=e=>{const b=e.target.closest('button');if(!b)return;rFilter=b.dataset.f;$$('#rFilter button').forEach(x=>x.classList.toggle('on',x===b));renderRoasts()};
-  $('#rRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selRoast=tr.dataset.id;renderRoasts()}};
+  $('#rRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selRoast=tr.dataset.id;renderRoasts();if(IPAD&&!IPC)ipDetSet('roasts',true)}};
   $('#btnExportAll').onclick=()=>download('zuna_roasts_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(HIST),'application/json');
   $('#btnImport').onclick=()=>$('#fileImport').click();
   $('#fileImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=async()=>{try{let d=JSON.parse(rd.result);const full=d&&!Array.isArray(d)&&(d.roasts||d.green||d.cupping||d.settings);
