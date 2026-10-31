@@ -552,7 +552,7 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipad:not(.ipc) #scr-today td button.sm{min-height:44px;min-width:44px;padding:0 12px;font-size:calc(14.5px*var(--ts,1))}
 .ipad:not(.ipc) #scr-today td input[data-tw]{min-height:44px}
 .ipad .ipCard .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ipad .ipCard .r{white-space:nowrap}
+.ipad .ipCard .r{white-space:nowrap;flex:none}
 .ipad #scr-analyze .stats6{grid-template-columns:repeat(3,1fr)}
 .ipad:not(.ipc) .ansplit{grid-template-columns:minmax(0,1fr) 640px}
 .ipad:not(.ipc) .pstage{grid-template-columns:1fr;gap:6px}
@@ -2123,7 +2123,7 @@ function renderProfiles(){if(BLD){renderBuilder();return}const q=normName($('#pS
   $('#pFolder').innerHTML=FS.state==='granted'?`📁 <b style="color:var(--text)">${esc(FS.dir.name)}/Profiles</b> · ${list.length} profiles`:`${list.length} profiles`;
   if(!list.find(r=>r.id===selProfile))selProfile=list[0]?.id||null;
   $('#pRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),key=normName(r.meta.name),uses=HIST.filter(x=>normName(x.meta.name)===key&&sameBatch(batchOf(x),batchOf(r))),last=uses.map(x=>x.chargedAt||x.created).sort().at(-1),sel=r.id===selProfile;
-    if(IPAD)return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(r.meta.name)}</b><div class="s">${esc(r.meta.coffee||'—')}${r.meta.green?' · '+esc(r.meta.green)+' lb':''} · roasted ${uses.length}×${last?' · last '+fmtDate(last,false):''}</div></div><span class="r">from #${r.num}</span></div><div class="k"><span>FC ${mmss(s.fcs)}</span><span>Drop ${mmss(s.drop)}</span><span>Dev ${mmss(s.dev)}</span><span>W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span><span>Cup ${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</span></div></td></tr>`;
+    if(IPAD)return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(r.meta.name)}</b><div class="s">${esc(r.meta.coffee||'—')}${r.meta.green?' · '+esc(r.meta.green)+' lb':''} · roasted ${uses.length}×${last?' · last '+fmtDate(last,false):''}</div></div><span class="r">from #${r.num}</span></div><div class="k"><span>FC ${mmss(s.fcs)}</span><span>Drop ${mmss(s.drop)}</span><span>Dev ${mmss(s.dev)}</span><span>W ${esc(r.meta.colorWhole||'—')} / G ${esc(r.meta.colorGround||'—')}</span>${cfg.cupScoring||ok(r.cup)?`<span>Cup ${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</span>`:''}</div></td></tr>`;
     return `<tr class="${sel?'sel':''}" data-id="${r.id}"><td><b>${esc(r.meta.name)}</b>${r.planned?' <span class="badge g">Planned</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td><td class="n">${esc(r.meta.green||'—')}${r.meta.green?' lb':''}</td><td class="n">${uses.length}×</td>
     <td class="tnum">${last?`${fmtDate(last,false)} <span class="muted">· ${ageOf(last)}</span>`:'—'}</td><td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td>
     <td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
