@@ -1369,13 +1369,17 @@ function renderIpToday(){const el=$('#ipToday');if(!el)return;const {items,done,
       :`<div class="ipTdR"><b>✓</b><div><em>All done</em><span>Every batch for today is roasted</span></div></div>`}</div>`;
   $('#ipTdAll').onclick=openBatchList;fitIpToday()}
 /* 13" Today card: show as many "Up next" rows as fit in the right column, then "+ N more" */
-function fitIpToday(){const up=$('#ipToday .ipTdUp'),col=$('#rightCol');if(!up||!col||IPC)return;
-  const left=Number(up.dataset.left)||0,rows=$$('.ipTdU',up),more=$('.ipTdMore',up),over=()=>col.scrollHeight>col.clientHeight+1;
+function fitIpToday(){const el=$('#ipToday'),up=$('#ipToday .ipTdUp'),col=$('#rightCol');if(!up||!col||IPC)return;
+  const left=Number(up.dataset.left)||0,rows=$$('.ipTdU',up),more=$('.ipTdMore',up),over=()=>col.scrollHeight>col.clientHeight||el.getBoundingClientRect().bottom>col.getBoundingClientRect().bottom-4;
   rows.forEach(r=>r.hidden=false);const set=()=>{const shown=rows.filter(r=>!r.hidden).length,n=left-shown;more.textContent=n>0?`+ ${n} more`:'';more.hidden=n<=0};
   set();if(!col.clientHeight)return;
   for(let i=rows.length-1;i>=0&&over();i--){rows[i].hidden=true;set()}
   up.hidden=!rows.some(r=>!r.hidden)}
-if(IPAD)addEventListener('resize',()=>requestAnimationFrame(fitIpToday));
+if(IPAD){addEventListener('resize',()=>requestAnimationFrame(fitIpToday));
+  /* refit whenever anything in the right column changes size (presets, background lines, fonts loading, coming back from another screen) */
+  let fitQ=0;const refit=()=>{if(fitQ)return;fitQ=requestAnimationFrame(()=>{fitQ=0;fitIpToday()})};
+  const watch=()=>{const col=$('#rightCol');if(!col||!window.ResizeObserver)return;const ro=new ResizeObserver(refit);ro.observe(col);for(const c of col.children)if(c.id!=='ipToday')ro.observe(c)};document.readyState==='loading'?addEventListener('DOMContentLoaded',watch):watch();
+  document.fonts&&document.fonts.ready.then(refit)}
 function openBatchList(){const root=$('#modalRoot'),{items,done,cur}=ipBatchInfo();
   root.innerHTML=`<div class="modalbg"><div class="modal ipBl" role="dialog" aria-modal="true"><div class="row"><h3 style="flex:1">Today · ${done} of ${items.length} done</h3><button id="blEdit">Edit plan</button><button class="pri" id="blDone">Done</button></div>
     ${S.recording?'<p class="muted" style="margin:0">Finish and save this roast before switching batches.</p>':''}
