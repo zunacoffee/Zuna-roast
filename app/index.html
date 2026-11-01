@@ -246,6 +246,7 @@ tr.tcur td{background:var(--accentSoft)}
 #rDetail .stat{padding:var(--sp-2) var(--sp-3);border-radius:var(--r-md)}
 #rDetail .stat .l{font-size:var(--fs-sm)}
 #rDetail .row button{min-height:var(--h-btn)}
+.kv .adjl span{color:var(--text)}
 /* ---- Today on the design rules ---- */
 #scr-today .card{border-radius:var(--r-lg)}
 #scr-today th{font-size:var(--fs-cap)}
@@ -2052,7 +2053,7 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   <div class="kv"><span>Color whole / ground · spread</span><b class="tnum">${fColors(r.meta)}${ok(spreadOf(r.meta))?' · '+spTxt(spreadOf(r.meta)):''}</b></div>
   <div class="kv" style="align-items:flex-start"><span>Adjustments</span><b class="tnum adjl">${adj.map(a=>`<span>${mmss(a.t-rc)} · ${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}</span>`).join('')||DASH}</b></div>
   ${cfg.cupScoring||ok(r.cup)?`<div class="kv"><span>Cupping score</span><b class="tnum" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div>`:''}</div>
-  <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}${(r.tnotes||[]).length?'\n\n'+r.tnotes.map(n=>mmss(n.t-rc)+'  '+esc(n.text)).join('\n'):''}</div></div>
+  <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${[r.meta.notes?esc(r.meta.notes):'',(r.tnotes||[]).map(n=>`<span class="muted tnum">${mmss(n.t-rc)}</span>  ${esc(n.text)}`).join('\n')].filter(Boolean).join('\n\n')||'<span class="muted">No comments.</span>'}</div></div>
   <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="dangerTxt" id="rDel">Delete</button></div>`;
   requestAnimationFrame(()=>miniCurve($('#rBig'),r,{axis:true}));
   $('#rRoast').onclick=()=>roastThis(r.id);$('#rOpen').onclick=()=>openRoast(r.id);$('#rCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
