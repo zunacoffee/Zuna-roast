@@ -1309,7 +1309,7 @@ function renderNext(){const el=$('#nextbar');el.hidden=!cfg.showNextBar;if(!cfg.
   const nx=bgNext(),rc=S.bg.events.CHARGE??0,x=bgTimeNow();
   if(!nx){el.innerHTML=`<span class="muted">Background ${rTag(S.bg)} · ${esc(S.bg.meta.name||'')} — no more burner, air or drum changes.</span>`;return}
   const when=x!=null?`in <b class="tnum">${mmss(nx.t-rc-x)}</b>`:`at <b class="tnum">${mmss(nx.t-rc)}</b>`;
-  el.innerHTML=`<span>Next (bkg): <b style="color:var(--c-${CTL.find(c=>c.key===nx.key).color})">${nx.label} ${Math.round(nx.from)} → ${Math.round(nx.to)}%</b> ${when}</span><span class="sp"></span>${C.on&&link.connected()?`<button class="pri" id="nbSend">Send</button>`:''}`;
+  el.innerHTML=`<span>Next from background: <b style="color:var(--c-${CTL.find(c=>c.key===nx.key).color})">${nx.label} ${Math.round(nx.from)} → ${Math.round(nx.to)}%</b> ${when}</span><span class="sp"></span>${C.on&&link.connected()?`<button class="pri" id="nbSend">Send</button>`:''}`;
   const b=$('#nbSend');if(b)b.onclick=()=>sendControl(nx.key,nx.to)}
 /* ---------- high bean temp alarm ---------- */
 S.alarm={};
@@ -1450,7 +1450,7 @@ function drawStrip(){const cv=$('#cvStrip'),{ctx,W,H}=prep(cv),v=S.view;if(!v)re
   ctx.strokeStyle=COL.grid;ctx.lineWidth=1;const step=v.hi-v.lo>1500?120:60;for(let x=Math.ceil(v.lo/step)*step;x<=v.hi;x+=step){const px=Math.round(X(x))+.5;ctx.beginPath();ctx.moveTo(px,4);ctx.lineTo(px,H-10);ctx.stroke()}
   rows.forEach((R,i)=>{const top=6+i*rh,h=rh-12,Yv=val=>top+h-(clamp(val,0,R.max)/R.max)*h;
     ctx.strokeStyle=COL.grid;for(const f of [0,.5,1]){const y=Math.round(top+h-f*h)+.5;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+w,y);ctx.stroke()}
-    ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='left';ctx.fillText(String(R.maxLabel??R.max),PAD.l+w+6,top+3);ctx.fillText('0',PAD.l+w+6,top+h);
+    ctx.fillStyle=COL.axis;ctx.font=`${11*TS()}px ${font}`;ctx.textAlign='left';ctx.fillText(String(R.maxLabel??R.max),PAD.l+w+6,top+7);ctx.fillText('0',PAD.l+w+6,top+h);
     const fk={burner:'fillBurner',fan:'fillAir',pressure:'fillPressure'}[R.k];
     const series=(r,dash,alpha,lw,lab,end)=>{if(!r)return;const o=r.events.CHARGE??0;ctx.save();ctx.beginPath();ctx.rect(PAD.l,0,w,H);ctx.clip();
       if(cfg.scales[fk]&&(r===S.roast||cfg.scales.fillBkg)){ctx.fillStyle=rgba(R.col,r===S.roast?.16:.07);ctx.beginPath();let x0=null,xl=null;const cl=()=>{if(x0!=null){ctx.lineTo(xl,top+h);ctx.lineTo(x0,top+h);ctx.closePath();x0=null}};
