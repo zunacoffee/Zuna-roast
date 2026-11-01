@@ -8,6 +8,7 @@ import WebKit
 struct AwakeArgs: Decodable { let on: Bool }
 struct ShareArgs: Decodable { let name: String; let text: String }
 struct ChromeArgs: Decodable { let color: String; let dark: Bool }
+struct PdfArgs: Decodable { let name: String }
 
 /// iPad-only helpers for Zuna Roast (see src/lib.rs for what each one is for).
 class ZunaIosPlugin: Plugin, UIDocumentPickerDelegate {
@@ -166,6 +167,42 @@ class ZunaIosPlugin: Plugin, UIDocumentPickerDelegate {
             if let pop = sheet.popoverPresentationController {
                 pop.sourceView = vc.view
                 pop.sourceRect = CGRect(x: vc.view.bounds.midX, y: 70, width: 1, height: 1)
+                pop.permittedArrowDirections = [.up]
+            }
+            sheet.completionWithItemsHandler = { _, done, _, _ in invoke.resolve(["done": done]) }
+            vc.present(sheet, animated: true)
+        }
+    }
+}
+
+extension ZunaIosPlugin {
+    // MARK: reports and roast sheets → PDF → share sheet
+    // The page has already put the report in its print-only area; WebKit lays it out with the print
+    // styles (US Letter, white paper). Print, Save to Files, AirDrop and Mail are all in the share sheet.
+    @objc public func sharePdf(_ invoke: Invoke) throws {
+        let args = try invoke.parseArgs(PdfArgs.self)
+        DispatchQueue.main.async {
+            guard let web = self.webView, let vc = self.manager.viewController else { invoke.reject("The app window is not ready"); return }
+            let page = CGRect(x: 0, y: 0, width: 612, height: 792)          // US Letter in points
+            let renderer = UIPrintPageRenderer()
+            renderer.addPrintFormatter(web.viewPrintFormatter(), startingAtPageAt: 0)
+            renderer.setValue(NSValue(cgRect: page), forKey: "paperRect")
+            renderer.setValue(NSValue(cgRect: page.insetBy(dx: 32, dy: 32)), forKey: "printableRect")
+            let data = NSMutableData()
+            UIGraphicsBeginPDFContextToData(data, page, nil)
+            renderer.prepare(forDrawingPages: NSRange(location: 0, length: renderer.numberOfPages))
+            for i in 0..<renderer.numberOfPages {
+                UIGraphicsBeginPDFPage()
+                renderer.drawPage(at: i, in: UIGraphicsGetPDFContextBounds())
+            }
+            UIGraphicsEndPDFContext()
+            let safe = args.name.replacingOccurrences(of: "/", with: "-")
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent(safe)
+            do { try data.write(to: url, options: .atomic) } catch { invoke.reject("Could not make the PDF: \(error.localizedDescription)"); return }
+            let sheet = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+            if let pop = sheet.popoverPresentationController {
+                pop.sourceView = vc.view
+                pop.sourceRect = CGRect(x: vc.view.bounds.maxX - 120, y: 70, width: 1, height: 1)
                 pop.permittedArrowDirections = [.up]
             }
             sheet.completionWithItemsHandler = { _, done, _, _ in invoke.resolve(["done": done]) }

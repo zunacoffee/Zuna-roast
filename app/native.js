@@ -110,6 +110,13 @@
     return true;
   };
 
+  /* Reports and roast sheets: the Mac opens its print dialog (PDF ▾ › Save as PDF);
+     the iPad and iPhone make a PDF of the page and open the share sheet (Print, Save to Files, AirDrop, Mail). */
+  N.printPage = async (name) => {
+    if (IOS) { const r = await ios('share_pdf', { name: String(name || 'Zuna Roast.pdf') }); return !!(r && r.done); }
+    await invoke('print_page'); return true;
+  };
+
   /* ---------------- roaster WebSocket ---------------- */
   let seq = 0; const socks = new Map();
   class NativeWebSocket {
