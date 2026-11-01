@@ -289,6 +289,10 @@ canvas{display:block;width:100%;height:100%}
 .banner.red{background:var(--danger);color:#fff}
 .banner.info{background:var(--panel);border:1px solid var(--border)}
 .banner button{padding:5px 11px}
+#swHint{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);background:color-mix(in srgb,var(--text) 88%,transparent);color:var(--panel);padding:14px 22px;border-radius:var(--r-lg,12px);display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:60;font-size:18px}
+#swHint.show{opacity:1;transform:translate(-50%,-50%) scale(1)}#swHint span{display:flex;gap:6px}#swHint i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.35}#swHint i.on{opacity:1}
+#recBar{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:55;display:flex;align-items:center;gap:8px;padding:12px 20px;min-height:48px;border-radius:999px;border:0;background:var(--accent);color:#fff;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#recBar i{width:9px;height:9px;border-radius:50%;background:#fff;animation:recp 1.2s infinite}#recBar span{margin-left:10px;font-weight:600}@keyframes recp{50%{opacity:.35}}
 #toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--panel);padding:12px 20px;border-radius:11px;font-size:calc(15px*var(--ts,1));box-shadow:0 10px 30px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:.2s;z-index:80;max-width:90vw}
 #toast.show{opacity:1;transform:translateX(-50%)}
 
@@ -1651,15 +1655,27 @@ function ipadInit(){
   $('#btnMachineDone').onclick=()=>setMachineSheet(false);$('#ipBackdrop').onclick=()=>setMachineSheet(false);
   // tap or drag on the chart shows the readout
   for(const id of ['#cvMain','#cvStrip'])$(id).addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')onHover(e)});
-  // swipe left/right to change screens — never on the Roast screen while recording
+  // swipe left/right anywhere to change screens (all tabs, including the ones under More, and during a roast).
+  // On a chart only a quick long flick counts (a slow drag shows the readout); never on the profile builder chart, text boxes/sliders, or a table that can still scroll sideways that way.
   const order=()=>$$('#nav button').map(b=>b.dataset.s).filter(Boolean);let sw=null;
+  const hScrolls=(el,dx)=>{for(let e=el;e&&e!==document.body;e=e.parentElement){if(e.scrollWidth>e.clientWidth+2){const ox=getComputedStyle(e).overflowX;if(ox==='auto'||ox==='scroll'){if(dx<0&&e.scrollLeft+e.clientWidth<e.scrollWidth-2)return true;if(dx>0&&e.scrollLeft>2)return true}}}return false};
   document.addEventListener('touchstart',e=>{const t=e.touches[0];sw=null;if(e.touches.length!==1)return;
-    if(e.target.closest('input,textarea,select,canvas,.scroll,.drawer,#leftCol,.modalbg,.sps,.pre'))return;sw={x:t.clientX,y:t.clientY,at:Date.now()}},{passive:true});
-  document.addEventListener('touchend',e=>{if(!sw)return;const t=e.changedTouches[0],dx=t.clientX-sw.x,dy=t.clientY-sw.y,ms=Date.now()-sw.at;sw=null;
+    if(e.target.closest('input,textarea,select,#bCv,[contenteditable],.modalbg,#swHint'))return;sw={x:t.clientX,y:t.clientY,at:Date.now(),el:e.target,cv:e.target.tagName==='CANVAS'}},{passive:true});
+  document.addEventListener('touchmove',e=>{if(sw&&e.touches.length!==1)sw=null},{passive:true});
+  document.addEventListener('touchend',e=>{if(!sw)return;const t=e.changedTouches[0],dx=t.clientX-sw.x,dy=t.clientY-sw.y,ms=Date.now()-sw.at,el=sw.el,cv=sw.cv;sw=null;
     if(ms>700||Math.abs(dx)<90||Math.abs(dy)>Math.abs(dx)*0.5)return;
-    if(curScreen==='roast'&&S.recording){toast('Swiping is off during a roast — tap a tab instead');return}
+    if(cv&&(ms>400||Math.abs(dx)<140))return; /* on a chart a slow drag reads values; only a quick long flick changes screens */
     if($('#modalRoot').firstChild||$('#drawer').classList.contains('open'))return;
-    const o=order(),i=o.indexOf(curScreen),n=o[i+(dx<0?1:-1)];if(n){setMachineSheet(false);showScreen(n)}},{passive:true})}
+    if(hScrolls(el,dx))return;
+    const o=order(),i=o.indexOf(curScreen),n=o[i+(dx<0?1:-1)];if(n){setMachineSheet(false);showScreen(n);swHint(n,o)}},{passive:true})}
+let swHintT;function swHint(n,o){let h=$('#swHint');if(!h){h=document.createElement('div');h.id='swHint';document.body.appendChild(h)}
+  const lab=k=>($(`#nav button[data-s=${k}]`)||{}).textContent||k;h.innerHTML=`<b>${esc(lab(n))}</b><span>${o.map(k=>`<i class="${k===n?'on':''}"></i>`).join('')}</span>`;
+  h.classList.add('show');clearTimeout(swHintT);swHintT=setTimeout(()=>h.classList.remove('show'),1100)}
+function renderRecBar(){if(!IPAD||IPHONE)return;let b=$('#recBar');const on=S.recording&&curScreen!=='roast';
+  if(!on){if(b)b.hidden=true;return}
+  if(!b){b=document.createElement('button');b.id='recBar';b.onclick=()=>{showScreen('roast')};document.body.appendChild(b)}
+  const r=S.roast,c=r.events.CHARGE,t=curTime(),el=t==null?null:(c!=null?t-c:t);
+  b.innerHTML=`<i></i>Roasting · <b>${el==null?'—':mmss(Math.max(0,el))}</b> · Bean temp <b>${fT(S.latest.bt)}°${cfg.unit}</b><span>Back to roast ›</span>`;b.hidden=false}
 function nextEventKey(){const ev=S.roast.events;return ['CHARGE','DRY','FCs','FCe','DROP','COOL'].filter(k=>cfg.events.find(e=>e.k===k&&e.show)||k==='CHARGE'||k==='DROP').find(k=>ev[k]==null)}
 
 /* ---------- meta form ---------- */
@@ -2097,7 +2113,7 @@ function checkAutoOff(){const A=S.autoOff;if(!A||!cfg.autoOffOn||!link.connected
     if(!C.on){if(!A.warned){A.warned=true;toast(`Auto off skipped — Control is off. Turn ${label.toLowerCase()} off at the roaster.`);beep(1)}log('ctl',`Auto off skipped for ${label} (Control off)`);continue}
     sendSwitch(p,false,true);log('ctl',`${label} OFF (auto, after Drop)`);toast(`${label} off — ${mmss((key==='cool'?cfg.coolOffMin:cfg.stirOffMin)*60)} after Drop`);
     const r=S.roast;if(r&&(r.id||r.created)===A.rid&&r.events.DROP!=null){r.tnotes.push({t:+(link.clock()-r.t0).toFixed(1),text:`${label} off (auto)`});S.dirty=S.dirty||S.recording;renderNotes()}}}
-function tick(){checkBtAlarm();checkAutoOff();followTick();if(folActive())renderCtl();if(S.autoOff)renderCtl();const r=S.roast,t=curTime(),c=r.events.CHARGE;let label='Roast time',val='0:00';
+function tick(){renderRecBar();checkBtAlarm();checkAutoOff();followTick();if(folActive())renderCtl();if(S.autoOff)renderCtl();const r=S.roast,t=curTime(),c=r.events.CHARGE;let label='Roast time',val='0:00';
   if(t!=null){if(c!=null){val=mmss((r.events.DROP??t)-c);label=r.events.DROP!=null?'Drop time':'Roast time'}else{val=mmss(t);label='Since START (no charge yet)'}}
   $('#vTime').textContent=val;$('#timerLabel').textContent=label;
   $('#recState').innerHTML=S.recording?'<span style="color:var(--danger)">● REC</span>':S.viewingId?'saved':(r.samples.length?'not saved':'');
