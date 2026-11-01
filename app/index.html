@@ -35,55 +35,57 @@
 *{box-sizing:border-box;margin:0;padding:0}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:calc(14px*var(--ts,1));overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:var(--fs-body);overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:7px 12px;font-weight:500;white-space:nowrap}
+button{cursor:pointer;border:1px solid var(--border);background:var(--panel);border-radius:var(--r-md);padding:7px 12px;font-weight:500;white-space:nowrap}
+.page .ph button,.detail>.row button,.prcard .row button,.scont .row>button,.modal button{min-height:var(--h-btn)}
 button:hover:not(:disabled){border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
 button:disabled{opacity:.42;cursor:default}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .pri{background:var(--accent);border-color:var(--accent);color:#fff}
 .dark{background:var(--text);border-color:var(--text);color:var(--panel)}
+.dangerFill{background:var(--danger);border-color:var(--danger);color:#fff}
 .dangerTxt{color:var(--danger)}
-.sm{padding:4px 9px;font-size:calc(12.5px*var(--ts,1))}
-input,select,textarea{color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 10px;width:100%;font-size:calc(14px*var(--ts,1))}
+.sm{padding:4px 9px;font-size:var(--fs-sm)}
+input,select,textarea{color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 10px;width:100%;font-size:var(--fs-body)}
 textarea{resize:vertical;min-height:80px;line-height:1.45}
 .tnum{font-variant-numeric:tabular-nums;font-family:var(--numFont)}
 .ro .v,.spx .v,.pre button,.stat .v,.tile .v,.box b,.total b,.st b,td.n,#clock,.fk small{font-family:var(--numFont)}
 .muted{color:var(--text2)}
-.h3{font-size:calc(11.5px*var(--ts,1));font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
+.h3{font-size:var(--fs-cap);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg)}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .sp{flex:1}
-.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1))}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:var(--sp-2) 0;border-bottom:1px solid var(--line2);font-size:var(--fs-body)}
 .kv span{color:var(--text2)}.kv b{font-weight:500;text-align:right}
-.field{display:flex;flex-direction:column;gap:5px;font-size:calc(12.5px*var(--ts,1));color:var(--text2)}
+.field{display:flex;flex-direction:column;gap:5px;font-size:var(--fs-sm);color:var(--text2)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .box{display:flex;justify-content:space-between;align-items:center;background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:10px 14px}
 .box b{font-size:calc(20px*var(--ss,1));font-weight:var(--smallW,500)}
-.badge{display:inline-block;font-size:calc(10.5px*var(--ts,1));font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:5px;padding:2px 7px;background:var(--accentSoft);color:var(--accent);margin-left:6px;vertical-align:1px}
+.badge{display:inline-block;font-size:var(--fs-cap);font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:5px;padding:2px 7px;background:var(--accentSoft);color:var(--accent);margin-left:6px;vertical-align:1px}
 .badge.r{background:color-mix(in srgb,var(--danger) 12%,var(--panel));color:var(--danger)}
 .badge.g{background:color-mix(in srgb,var(--good) 14%,var(--panel));color:var(--good)}
 .badge.gray{background:var(--soft);color:var(--text2)}
 
 /* ---------- header ---------- */
-header{height:56px;flex:none;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 16px;font-size:calc(13px*var(--ts,1));color:var(--text2);min-width:0}
+header{height:56px;flex:none;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 16px;font-size:var(--fs-sm);color:var(--text2);min-width:0}
 .brand{font-weight:700;font-size:calc(15px*var(--ts,1));color:var(--text);line-height:1.1;white-space:nowrap;display:flex;align-items:center;gap:10px;min-width:0}
 .brand img{height:36px;max-width:150px;object-fit:contain;display:block}
 .brand img.back{background:#fff;border-radius:7px;padding:3px 6px;height:38px}
 .brand .bt{overflow:hidden;text-overflow:ellipsis;max-width:260px}
 .logoBox{display:flex;align-items:center;gap:16px;border:1px dashed var(--border);border-radius:10px;padding:14px;min-height:90px}
 .logoBox img{max-height:72px;max-width:260px;object-fit:contain}
-.logoBox .ph{width:150px;height:60px;border-radius:8px;background:var(--soft);display:grid;place-items:center;color:var(--text2);font-size:calc(12.5px*var(--ts,1))}
-.brand small{display:block;font-weight:500;font-size:calc(11px*var(--ts,1));color:var(--text2)}
+.logoBox .ph{width:150px;height:60px;border-radius:8px;background:var(--soft);display:grid;place-items:center;color:var(--text2);font-size:var(--fs-sm)}
+.brand small{display:block;font-weight:500;font-size:var(--fs-cap);color:var(--text2)}
 nav{display:flex;gap:2px;background:var(--soft);border-radius:9px;padding:3px}
 nav button{border:0;background:transparent;padding:6px 13px;border-radius:7px;color:var(--text2)}
 nav button.on{background:var(--panel);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 .lamps{display:flex;gap:11px}
-.lamp{display:flex;align-items:center;gap:5px;font-size:calc(12px*var(--ts,1));white-space:nowrap}
+.lamp{display:flex;align-items:center;gap:5px;font-size:var(--fs-sm);white-space:nowrap}
 .lamp i{width:8px;height:8px;border-radius:50%;background:var(--border)}
 .lamp i.on{background:var(--good)}.lamp i.bad{background:var(--danger)}.lamp i.wait{background:var(--warn)}
 .hinfo{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:500;white-space:nowrap;min-width:0}
-.hinfo select{width:auto;padding:4px 8px;font-size:calc(12.5px*var(--ts,1));max-width:240px}
+.hinfo select{width:auto;padding:4px 8px;font-size:var(--fs-sm);max-width:240px}
 #clock{font-variant-numeric:tabular-nums}
 .hinfo{overflow:hidden;flex:0 1 auto}.hinfo #hRoast{overflow:hidden;text-overflow:ellipsis;min-width:0}
 @media (max-width:1900px){#clock{display:none}.hinfo>.muted{display:none}}
@@ -94,30 +96,30 @@ header .on-acc{background:var(--accent);border-color:var(--accent);color:#fff}
 
 /* ---------- screens ---------- */
 .screen{flex:1;min-height:0;display:flex;flex-direction:column}
-.page{flex:1;min-height:0;display:flex;flex-direction:column;padding:16px 20px;gap:14px}
+.page{flex:1;min-height:0;display:flex;flex-direction:column;padding:var(--sp-4) var(--sp-5);gap:var(--sp-4)}
 .ph{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.ph h1{font-size:calc(22px*var(--ts,1));font-weight:600;margin-right:6px}
+.ph h1{font-size:var(--fs-page);font-weight:600;margin-right:6px}
 .ph input[type=search]{width:280px}
 .seg{display:flex;background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:3px}
-.seg button{border:0;background:transparent;padding:5px 12px;border-radius:6px;font-size:calc(13px*var(--ts,1));color:var(--text2)}
+.seg button{border:0;background:transparent;padding:5px 12px;border-radius:6px;font-size:var(--fs-sm);color:var(--text2)}
 .seg button.on{background:var(--panel);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.1)}
-.split{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(480px,38%);gap:14px;min-height:0}
+.split{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(480px,38%);gap:var(--sp-4);min-height:0}
 .scroll{overflow:auto;min-height:0}
 table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:calc(11px*var(--ts,1));font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);padding:11px 12px;border-bottom:1px solid var(--border);background:var(--soft);position:sticky;top:0;z-index:1;white-space:nowrap}
-td{padding:10px 12px;border-bottom:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1));white-space:nowrap}
+th{text-align:left;font-size:var(--fs-cap);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);padding:11px 12px;border-bottom:1px solid var(--border);background:var(--soft);position:sticky;top:0;z-index:1;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line2);font-size:var(--fs-body);white-space:nowrap}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--soft)}
 tr.sel td{background:var(--accentSoft)!important}
 tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
-.detail{padding:18px 20px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow:auto}
-.dtitle{font-size:calc(20px*var(--ts,1));font-weight:600}
+.detail{padding:var(--sp-4) var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-4);min-height:0;overflow:auto}
+.dtitle{font-size:var(--fs-title);font-weight:600}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat{border:1px solid var(--line2);border-radius:8px;padding:9px 12px}
-.stat .l{font-size:calc(12px*var(--ts,1));color:var(--text2)}.stat .v{font-size:calc(21px*var(--ss,1));font-weight:var(--smallW,500);margin-top:2px;font-variant-numeric:tabular-nums}
-.stat .v small{font-size:calc(12.5px*var(--ts,1));color:var(--text2);font-weight:500;margin-left:2px}
-.note{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:11px 13px;font-size:calc(13.5px*var(--ts,1));line-height:1.5;white-space:pre-wrap}
+.stat{border:1px solid var(--line2);border-radius:var(--r-md);padding:var(--sp-2) var(--sp-3)}
+.stat .l{font-size:var(--fs-sm);color:var(--text2)}.stat .v{font-size:calc(21px*var(--ss,1));font-weight:var(--smallW,500);margin-top:2px;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:var(--fs-sm);color:var(--text2);font-weight:500;margin-left:2px}
+.note{background:var(--soft);border:1px solid var(--line2);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);font-size:var(--fs-body);line-height:1.5;white-space:pre-wrap}
 .empty{padding:40px 20px;text-align:center;color:var(--text2);line-height:1.6}
 .minic{height:220px;border:1px solid var(--line2);border-radius:8px;padding:4px;background:var(--chartBg)}
 canvas{display:block;width:100%;height:100%}
@@ -173,17 +175,17 @@ canvas{display:block;width:100%;height:100%}
 .chartwrap{padding:4px 10px 10px;flex:1;display:flex;flex-direction:column;min-height:0}
 #cvMain{flex:1;min-height:200px;background:var(--chartBg);border-radius:6px}
 #cvStrip{height:170px;flex:none;margin-top:6px;background:var(--chartBg);border-radius:6px;border-top:1px solid var(--line2)}
-.nextbar{margin:0 12px 12px;background:var(--accentSoft);border:1px solid color-mix(in srgb,var(--accent) 25%,var(--panel));border-radius:var(--r-md);padding:8px 12px;font-size:calc(14.5px*var(--ts,1));display:flex;align-items:center;gap:10px;min-height:46px}
+.nextbar{margin:0 12px 12px;background:var(--accentSoft);border:1px solid color-mix(in srgb,var(--accent) 25%,var(--panel));border-radius:var(--r-md);padding:8px 12px;font-size:var(--fs-body);display:flex;align-items:center;gap:10px;min-height:46px}
 .nextbar .sp{flex:1}
 .readout{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 12px;font-size:var(--fs-sm);box-shadow:0 6px 20px rgba(0,0,0,.12);font-variant-numeric:tabular-nums;line-height:1.5;z-index:5;white-space:nowrap}
 /* notes */
 .notes{padding:4px 16px 16px;display:flex;flex-direction:column;gap:8px;overflow:auto;flex:1;min-height:0}
 .rm{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:var(--r-md);font-size:var(--fs-body)}
-.rm i{flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);font-style:normal;font-size:calc(10px*var(--ts,1));display:grid;place-items:center;margin-top:1px}
+.rm i{flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);font-style:normal;font-size:var(--fs-cap);display:grid;place-items:center;margin-top:1px}
 .rm b{display:block;font-size:var(--fs-cap);font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
 .rm.done{color:var(--text2)}.rm.done i{background:var(--good);border-color:var(--good);color:#fff}
 .rm.next{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--panel));font-weight:600;font-size:calc(15px*var(--ts,1))}
-.rm.next i{border-color:var(--warn);color:var(--warn);font-size:calc(9px*var(--ts,1))}
+.rm.next i{border-color:var(--warn);color:var(--warn);font-size:var(--fs-cap)}
 .rm.next b{color:var(--warn)}
 .rm.flash{animation:flash .5s 6 alternate}
 @keyframes flash{to{background:color-mix(in srgb,var(--warn) 45%,var(--panel))}}
@@ -201,10 +203,10 @@ canvas{display:block;width:100%;height:100%}
 .fk.nx{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 
 .fk.custom small{color:inherit;opacity:.7}.fk.custom.done{opacity:.45}.fk.custom.nx{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
-.evc{display:flex;gap:4px;align-items:center}.evc input[type=color]{width:30px;height:28px;padding:2px;border-radius:6px;flex:none}.evc input[type=text]{width:86px;font-family:var(--mono);font-size:calc(12.5px*var(--ts,1));padding:5px 6px}
+.evc{display:flex;gap:4px;align-items:center}.evc input[type=color]{width:30px;height:28px;padding:2px;border-radius:6px;flex:none}.evc input[type=text]{width:86px;font-family:var(--mono);font-size:var(--fs-sm);padding:5px 6px}
 .fk.stop{color:var(--danger)}
 /* banners */
-.banner{position:fixed;left:50%;top:66px;transform:translateX(-50%);z-index:60;border-radius:10px;padding:10px 16px;font-size:calc(14px*var(--ts,1));display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.18);max-width:92vw}
+.banner{position:fixed;left:50%;top:66px;transform:translateX(-50%);z-index:60;border-radius:10px;padding:10px 16px;font-size:var(--fs-body);display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.18);max-width:92vw}
 .banner.red{background:var(--danger);color:#fff}
 .banner.info{background:var(--panel);border:1px solid var(--border)}
 .banner button{padding:5px 11px}
@@ -215,14 +217,14 @@ canvas{display:block;width:100%;height:100%}
 .drawer{position:fixed;top:56px;right:0;bottom:0;width:min(560px,94vw);background:var(--panel);border-left:1px solid var(--border);box-shadow:-24px 0 60px rgba(0,0,0,.18);display:flex;flex-direction:column;transform:translateX(105%);transition:transform .22s ease;z-index:40}
 .drawer.open{transform:none}
 .dh{padding:18px 22px 12px;border-bottom:1px solid var(--line2);display:flex;align-items:flex-start;gap:10px}
-.dh h2{font-size:calc(20px*var(--ts,1));font-weight:600}.dh p{font-size:calc(12.5px*var(--ts,1));color:var(--text2);margin-top:3px}
+.dh h2{font-size:calc(20px*var(--ts,1));font-weight:600}.dh p{font-size:var(--fs-sm);color:var(--text2);margin-top:3px}
 .db{flex:1;overflow:auto;padding:16px 22px;display:flex;flex-direction:column;gap:12px}
 .df{padding:14px 22px;border-top:1px solid var(--line2);display:flex;gap:8px}
-.hint{font-size:calc(12.5px*var(--ts,1));margin-top:-5px;min-height:15px}
+.hint{font-size:var(--fs-sm);margin-top:-5px;min-height:15px}
 
 /* ---------- profiles ---------- */
 .tm{padding:0 16px 8px;display:flex;flex-direction:column;gap:3px;max-height:260px;overflow:auto}
-.tm .it{display:flex;gap:8px;align-items:center;font-size:calc(13px*var(--ts,1));padding:5px 8px;border-radius:7px;border:1px solid transparent;cursor:pointer;text-align:left;background:transparent;width:100%;font-weight:500}
+.tm .it{display:flex;gap:8px;align-items:center;font-size:var(--fs-sm);padding:5px 8px;border-radius:7px;border:1px solid transparent;cursor:pointer;text-align:left;background:transparent;width:100%;font-weight:500}
 .tm .it i{font-style:normal;width:16px;text-align:center;flex:none;color:var(--text2)}
 .tm .it span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tm .it small{color:var(--text2);font-variant-numeric:tabular-nums}
@@ -285,93 +287,93 @@ tr.tdone td{color:var(--text2)}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-content:start;overflow:auto;min-height:0;padding-bottom:4px}
 .pc{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:9px;cursor:pointer}
 .pc.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.pc .nm{font-size:calc(15px*var(--ts,1));font-weight:600}.pc .cf{font-size:calc(12.5px*var(--ts,1));color:var(--text2);margin-top:2px}
+.pc .nm{font-size:calc(15px*var(--ts,1));font-weight:600}.pc .cf{font-size:var(--fs-sm);color:var(--text2);margin-top:2px}
 .pc .cv{height:90px;background:var(--chartBg);border-radius:6px}
-.pc .r4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:calc(11.5px*var(--ts,1));color:var(--text2)}
-.pc .r4 b{display:block;font-size:calc(14px*var(--ts,1));color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
-.pc .ft{display:flex;align-items:center;gap:8px;font-size:calc(12px*var(--ts,1));color:var(--text2);border-top:1px solid var(--line2);padding-top:9px}
+.pc .r4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:var(--fs-cap);color:var(--text2)}
+.pc .r4 b{display:block;font-size:var(--fs-body);color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.pc .ft{display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--text2);border-top:1px solid var(--line2);padding-top:9px}
 .pc .ft button{margin-left:auto}
-.cup{display:inline-block;font-weight:700;border-radius:6px;padding:2px 7px;font-size:calc(12px*var(--ts,1));font-variant-numeric:tabular-nums;background:var(--accentSoft);color:var(--accent)}
+.cup{display:inline-block;font-weight:700;border-radius:6px;padding:2px 7px;font-size:var(--fs-sm);font-variant-numeric:tabular-nums;background:var(--accentSoft);color:var(--accent)}
 .plan{display:grid;grid-template-columns:56px 1fr;gap:4px 12px;font-size:var(--fs-body)}
 .plan span{color:var(--text2);font-variant-numeric:tabular-nums}
 .remlist .kv{align-items:center}
 .remadd{display:grid;grid-template-columns:120px 110px 1fr auto;gap:6px}
 html:not(.ipad) .cupt.nocup th:last-child,html:not(.ipad) .cupt.nocup td:last-child,html.ipad:not(.ipc) .cupt.nocup th:last-child,html.ipad:not(.ipc) .cupt.nocup td:last-child{display:none}
 .pstar{color:var(--warn);margin-left:6px;font-size:.9em}
-.remdet>summary{cursor:pointer;color:var(--accent);font-size:calc(13px*var(--ts,1));list-style:none;margin:8px 0 4px;width:max-content}.remdet>summary::-webkit-details-marker{display:none}.remdet[open]>summary{color:var(--text2)}
+.remdet>summary{cursor:pointer;color:var(--accent);font-size:var(--fs-sm);list-style:none;margin:8px 0 4px;width:max-content}.remdet>summary::-webkit-details-marker{display:none}.remdet[open]>summary{color:var(--text2)}
 .adjl{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.remadd input,.remadd select{padding:6px 8px;font-size:calc(13px*var(--ts,1))}
+.remadd input,.remadd select{padding:6px 8px;font-size:var(--fs-sm)}
 
 
 /* ---------- pricing ---------- */
 .prwhat{padding:10px 16px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 .prwhat.on{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 7%,var(--panel))}
-td.prc span{display:block;font-weight:600}td.prc small{display:block;font-size:calc(12px*var(--ts,1));margin-top:1px}td.prc small span{font-weight:500}
+td.prc span{display:block;font-weight:600}td.prc small{display:block;font-size:var(--fs-sm);margin-top:1px}td.prc small span{font-weight:500}
 .sug{color:var(--text2)}
 .stack{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--soft)}.stack i{display:block;height:100%}
 .bagbox{border:1px solid var(--line2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
-.pin{display:grid;grid-template-columns:86px 66px 1fr 100px 52px 68px;gap:10px;align-items:center;font-size:calc(13.5px*var(--ts,1))}
-.pin.h span{white-space:nowrap}.pin.h{font-size:calc(11px*var(--ts,1));text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600}
+.pin{display:grid;grid-template-columns:86px 66px 1fr 100px 52px 68px;gap:10px;align-items:center;font-size:var(--fs-body)}
+.pin.h span{white-space:nowrap}.pin.h{font-size:var(--fs-cap);text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600}
 .pin input{padding:5px 8px;text-align:right}.pin input::placeholder{color:var(--text2);opacity:.5}.pin .n{text-align:right}
 table.mini th{position:static;padding:7px 8px}table.mini td{padding:7px 8px;cursor:default}table.mini tbody tr:hover td{background:none}
 #prCosts,#prOverview{flex:1}
-.prbar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line2);font-size:calc(13px*var(--ts,1))}
+.prbar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line2);font-size:var(--fs-sm)}
 .wr span{display:block;line-height:1.5;padding:3px 0}
-.ppill{display:inline-block!important;font-size:calc(11px*var(--ts,1));font-weight:600;letter-spacing:.02em;border-radius:999px;padding:1px 9px!important;line-height:1.6!important;border:0!important}
+.ppill{display:inline-block!important;font-size:var(--fs-cap);font-weight:600;letter-spacing:.02em;border-radius:999px;padding:1px 9px!important;line-height:1.6!important;border:0!important}
 .ppill.w{background:color-mix(in srgb,var(--p-whole) 13%,var(--panel));color:var(--p-whole)}.ppill.r{background:color-mix(in srgb,var(--p-retail) 14%,var(--panel));color:var(--p-retail)}
 .wr .ptc{padding:3px 0}.plow{color:var(--p-low)!important}td.prc.wr span{font-weight:600}.notset{color:var(--text2);font-weight:400!important}
-.prbar select{width:auto;padding:4px 8px;font-size:calc(13px*var(--ts,1))}
-.prlegend{display:flex;gap:16px;align-items:center;padding:10px 14px;font-size:calc(12.5px*var(--ts,1));color:var(--text2)}
+.prbar select{width:auto;padding:4px 8px;font-size:var(--fs-sm)}
+.prlegend{display:flex;gap:16px;align-items:center;padding:10px 14px;font-size:var(--fs-sm);color:var(--text2)}
 .info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text2);cursor:help;font-style:normal}
-.info .tip{display:none;position:absolute;bottom:calc(100% + 8px);right:-10px;width:320px;background:var(--text);color:var(--panel);font-weight:400;font-size:calc(12.5px*var(--ts,1));line-height:1.5;padding:10px 12px;border-radius:8px;z-index:20;text-align:left;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.info .tip{display:none;position:absolute;bottom:calc(100% + 8px);right:-10px;width:320px;background:var(--text);color:var(--panel);font-weight:400;font-size:var(--fs-sm);line-height:1.5;padding:10px 12px;border-radius:8px;z-index:20;text-align:left;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 .info:hover .tip{display:block}
 .costhead{display:flex;align-items:center;gap:10px;cursor:pointer;border:0;background:none;padding:0;width:100%;text-align:left;font-weight:400}
 .costhead .chev{color:var(--text2);transition:transform .15s}.costhead.open .chev{transform:rotate(90deg)}
-.fold{border:0;background:none;padding:0;font-weight:600;color:var(--text2);font-size:calc(11.5px*var(--ts,1));text-transform:uppercase;letter-spacing:.08em}
+.fold{border:0;background:none;padding:0;font-weight:600;color:var(--text2);font-size:var(--fs-cap);text-transform:uppercase;letter-spacing:.08em}
 .ovgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-content:start}
 .ovcard{padding:20px 22px;display:flex;flex-direction:column;gap:12px}
 .ovbig{font-size:calc(34px*var(--ss,1));font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
-.ovbig small{font-size:calc(14px*var(--ts,1));font-weight:500;color:var(--text2);margin-left:6px;letter-spacing:0}
+.ovbig small{font-size:var(--fs-body);font-weight:500;color:var(--text2);margin-left:6px;letter-spacing:0}
 .ovsay{font-size:calc(15px*var(--ts,1));line-height:1.55}
 .ovstat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ovstat>div{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:10px 14px}
-.ovstat .l{font-size:calc(12px*var(--ts,1));color:var(--text2)}.ovstat .v{font-size:calc(22px*var(--ss,1));font-weight:500;font-variant-numeric:tabular-nums;margin-top:2px}
+.ovstat .l{font-size:var(--fs-sm);color:var(--text2)}.ovstat .v{font-size:calc(22px*var(--ss,1));font-weight:500;font-variant-numeric:tabular-nums;margin-top:2px}
 .dayb{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:150px;padding-top:6px}
-.dayb>div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;font-size:calc(12.5px*var(--ts,1))}
+.dayb>div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;font-size:var(--fs-sm)}
 .dayb i{display:block;width:100%;max-width:64px;border-radius:5px 5px 0 0;background:color-mix(in srgb,var(--accent) 30%,var(--panel))}
 .dayb .on i{background:var(--accent)}.dayb .on b{color:var(--accent)}
 table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover td{background:none}
 .prgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-content:start}
 .prcard{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
 .prrow{display:grid;grid-template-columns:1fr 110px 70px 32px;gap:8px;align-items:center}.prrow.t{grid-template-columns:1fr 110px 80px 32px}
-.prrow.h{font-size:calc(11px*var(--ts,1));text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600}
+.prrow.h{font-size:var(--fs-cap);text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600}
 .prrow input{padding:6px 8px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 
 /* ---------- green ---------- */
 .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.tile{padding:13px 16px}.tile .l{font-size:calc(12px*var(--ts,1));color:var(--text2)}.tile .v{font-size:calc(26px*var(--ss,1));font-weight:var(--smallW,500);margin-top:2px;font-variant-numeric:tabular-nums}
-.tile .v small{font-size:calc(13px*var(--ts,1));color:var(--text2);font-weight:500;margin-left:3px}
+.tile{padding:var(--sp-3) var(--sp-4)}.tile .l{font-size:var(--fs-sm);color:var(--text2)}.tile .v{font-size:calc(26px*var(--ss,1));font-weight:var(--smallW,500);margin-top:2px;font-variant-numeric:tabular-nums}
+.tile .v small{font-size:var(--fs-sm);color:var(--text2);font-weight:500;margin-left:3px}
 .bar{height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin-top:5px;min-width:120px}.bar i{display:block;height:100%;background:var(--g-stock,var(--text));border-radius:3px}
 .bar.low i{background:var(--g-low,var(--danger))}
 .badge.glow{background:color-mix(in srgb,var(--g-low) 12%,var(--panel));color:var(--g-low)}
 .ychart{height:300px;position:relative;padding:14px 16px 8px}
 .ychart canvas{height:100%}
-.legend{display:flex;gap:18px;font-size:calc(13px*var(--ts,1));color:var(--text2);align-items:center}
+.legend{display:flex;gap:18px;font-size:var(--fs-sm);color:var(--text2);align-items:center}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .origins{padding:18px 20px 6px}.otitle{font-size:calc(20px*var(--ts,1));font-weight:700;margin-bottom:6px}
 .orow{padding:12px 0 14px;border-bottom:1px solid var(--line2)}.orow:last-child{border-bottom:0}
 .otop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.oname{font-size:calc(17px*var(--ts,1))}.olb{font-family:var(--numFont);font-size:calc(17px*var(--ts,1));font-variant-numeric:tabular-nums}.olb small{color:var(--text2);margin-left:5px;font-size:.85em}
 .obar{height:8px;border-radius:5px;background:var(--line2);overflow:hidden}.obar i{display:block;height:100%;border-radius:5px}
 .ygrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
-.delta{font-size:calc(12px*var(--ts,1));color:var(--text2);margin-top:3px}
+.delta{font-size:var(--fs-sm);color:var(--text2);margin-top:3px}
 
 /* ---------- cupping ---------- */
 .samples{display:flex;gap:6px;flex-wrap:wrap}
-.samples button{font-size:calc(13px*var(--ts,1))}
+.samples button{font-size:var(--fs-sm)}
 .samples button.on{background:var(--text);border-color:var(--text);color:var(--panel)}
 .attrs{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
 .at{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line2)}
-.at .nm{flex:1;font-size:calc(14px*var(--ts,1))}
+.at .nm{flex:1;font-size:var(--fs-body)}
 .st{display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden}
 .st button{border:0;border-radius:0;width:30px;height:30px;padding:0;font-size:calc(16px*var(--ts,1))}
 .st b{width:calc(58px*var(--ss,1));text-align:center;font-size:calc(15px*var(--ss,1));font-weight:var(--smallW,500);border-left:1px solid var(--line2);border-right:1px solid var(--line2);line-height:30px;font-variant-numeric:tabular-nums}
@@ -381,10 +383,10 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .total{display:flex;align-items:center;justify-content:space-between;background:var(--soft);border:1px solid var(--line2);border-radius:10px;padding:12px 16px}
 .total b{font-size:calc(38px*var(--ss,1));font-weight:700;letter-spacing:-.02em}
 .tags{display:flex;flex-wrap:wrap;gap:6px}
-.tags button{border-radius:999px;padding:5px 12px;font-size:calc(13px*var(--ts,1))}
+.tags button{border-radius:999px;padding:5px 12px;font-size:var(--fs-sm)}
 .tags button.on{background:var(--accentSoft);border-color:color-mix(in srgb,var(--accent) 35%,var(--panel));color:var(--accent)}
 .picklist{max-height:320px;overflow:auto;border:1px solid var(--line2);border-radius:8px}
-.picklist label{display:flex;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1));cursor:pointer}
+.picklist label{display:flex;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line2);font-size:var(--fs-body);cursor:pointer}
 .picklist input{width:auto}
 
 
@@ -392,64 +394,64 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .bsplit{flex:1;display:grid;grid-template-columns:minmax(440px,36%) minmax(0,1fr);gap:14px;min-height:0}
 .bform{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
 .bform .on-acc{background:var(--accent);border-color:var(--accent);color:#fff}
-.bsug{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:9px 11px;font-size:calc(12.5px*var(--ts,1));color:var(--text2);line-height:1.45}
+.bsug{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:9px 11px;font-size:var(--fs-sm);color:var(--text2);line-height:1.45}
 .chipb{background:var(--panel);border:1px solid var(--line2);border-radius:6px;padding:3px 8px;color:var(--text)}.chipb b{color:var(--burner,inherit);font-weight:600}
-.bhint{font-size:calc(12.5px*var(--ts,1));color:var(--text2);line-height:1.45}
+.bhint{font-size:var(--fs-sm);color:var(--text2);line-height:1.45}
 .bbox{background:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:10px 12px}
-.mstones{display:grid;grid-template-columns:130px 1fr 1fr 34px;gap:6px 8px;align-items:center;font-size:calc(13.5px*var(--ts,1))}
+.mstones{display:grid;grid-template-columns:130px 1fr 1fr 34px;gap:6px 8px;align-items:center;font-size:var(--fs-body)}
 .mstones .xname{grid-column:1}.mstones .seg{padding:2px}.mstones .seg button{padding:3px 8px;flex:1}
-.bsteps{display:grid;grid-template-columns:1.3fr .8fr .7fr .7fr .7fr 30px;gap:6px;align-items:center;font-size:calc(12px*var(--ts,1))}
+.bsteps{display:grid;grid-template-columns:1.3fr .8fr .7fr .7fr .7fr 30px;gap:6px;align-items:center;font-size:var(--fs-sm)}
 .bsteps input,.bsteps select{padding:6px 7px}
 .bchart{flex:1;min-height:340px;touch-action:none;border:1px solid var(--line2);border-radius:8px;background:var(--chartBg)}
-.pbar{display:flex;border-radius:7px;overflow:hidden;font-size:calc(12px*var(--ts,1));font-weight:600}
+.pbar{display:flex;border-radius:7px;overflow:hidden;font-size:var(--fs-sm);font-weight:600}
 .pbar i{font-style:normal;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
 .pbar i:nth-child(1){background:color-mix(in srgb,var(--good) 16%,var(--panel))}.pbar i:nth-child(2){background:color-mix(in srgb,var(--warn) 18%,var(--panel))}.pbar i:nth-child(3){background:color-mix(in srgb,var(--danger) 16%,var(--panel))}
-.ansplit{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(620px,56%);gap:14px;min-height:0}
+.ansplit{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(620px,56%);gap:var(--sp-4);min-height:0}
 .anchart{height:300px;border:1px solid var(--line2);border-radius:8px;background:var(--chartBg)}
 .stats6{grid-template-columns:repeat(6,1fr)}.stat.flag-w{border-color:color-mix(in srgb,var(--warn) 55%,var(--panel));background:color-mix(in srgb,var(--warn) 7%,var(--panel))}
-.chk2{display:flex;gap:9px;align-items:flex-start;font-size:calc(13.5px*var(--ts,1));padding:4px 0;line-height:1.45;font-weight:700}
+.chk2{display:flex;gap:9px;align-items:flex-start;font-size:var(--fs-body);padding:4px 0;line-height:1.45;font-weight:700}
 .chk2 span{font-weight:400;color:var(--text)}.chk2.cw{color:var(--warn)}.chk2.cg{color:var(--good)}
 .taste .sev{font-size:.8em;letter-spacing:1px;margin-left:3px}.taste button.gd.on{background:color-mix(in srgb,var(--good) 14%,var(--panel));border-color:color-mix(in srgb,var(--good) 40%,var(--panel));color:var(--good)}
-.rec{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line2);border-radius:9px;padding:11px 13px;margin-bottom:8px;cursor:pointer;font-size:calc(13.5px*var(--ts,1));line-height:1.45}
+.rec{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line2);border-radius:9px;padding:11px 13px;margin-bottom:8px;cursor:pointer;font-size:var(--fs-body);line-height:1.45}
 .rec input{width:auto;margin-top:3px}.rec.on{border-color:color-mix(in srgb,var(--accent) 45%,var(--panel));background:var(--accentSoft)}
-.rec .muted{margin-top:2px}.rec .lrn{font-size:calc(12px*var(--ts,1));color:var(--text2);margin-top:5px}
+.rec .muted{margin-top:2px}.rec .lrn{font-size:var(--fs-sm);color:var(--text2);margin-top:5px}
 .ttxt{max-width:260px;overflow:hidden;text-overflow:ellipsis}
 .taste button.fc{border-style:dashed}.taste .cupt{font-size:.72em;text-transform:uppercase;letter-spacing:.06em;opacity:.75;margin-left:4px}
 .pl{margin-top:4px}.pl.y{color:var(--good)}.pl.n{color:var(--text2)}
-.tgtline{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline;font-size:calc(13.5px*var(--ts,1));border:1px dashed color-mix(in srgb,var(--good) 55%,var(--panel));background:color-mix(in srgb,var(--good) 6%,var(--panel));border-radius:8px;padding:9px 13px}
+.tgtline{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:baseline;font-size:var(--fs-body);border:1px dashed color-mix(in srgb,var(--good) 55%,var(--panel));background:color-mix(in srgb,var(--good) 6%,var(--panel));border-radius:8px;padding:9px 13px}
 .cupsplit{grid-template-columns:minmax(300px,24%) minmax(0,1fr)}
 .cctbl{overflow:auto;border:1px solid var(--line2);border-radius:10px;min-height:0}
-.cctbl table td,.cctbl table th{vertical-align:top}.cctbl thead th{min-width:250px;text-transform:none;letter-spacing:0;font-weight:400;font-size:calc(12px*var(--ts,1));color:var(--text)}
-.cctbl th.ccl,.cctbl td.ccl{min-width:118px;width:118px;font-size:calc(11.5px*var(--ts,1));font-weight:700;letter-spacing:.04em;color:var(--text2);white-space:nowrap;vertical-align:middle;position:sticky;left:0;background:var(--panel);z-index:1}
+.cctbl table td,.cctbl table th{vertical-align:top}.cctbl thead th{min-width:250px;text-transform:none;letter-spacing:0;font-weight:400;font-size:var(--fs-sm);color:var(--text)}
+.cctbl th.ccl,.cctbl td.ccl{min-width:118px;width:118px;font-size:var(--fs-cap);font-weight:700;letter-spacing:.04em;color:var(--text2);white-space:nowrap;vertical-align:middle;position:sticky;left:0;background:var(--panel);z-index:1}
 .cctbl thead th.ccl{background:var(--soft);z-index:2}
-.cch{display:flex;align-items:center;gap:6px}.cch b{font-size:calc(14px*var(--ts,1));font-weight:600;flex:1}.ccx{padding:1px 7px;color:var(--text2)}
-.ccs{color:var(--text2);font-size:calc(11.5px*var(--ts,1));margin-top:2px}
-.cctbl tr.sec td{background:var(--soft);font-size:calc(10.5px*var(--ts,1));font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;padding:5px 12px}
-.mini{display:flex;gap:4px}.mt{width:36px;height:28px;border-radius:6px;padding:0;font-size:calc(10.5px*var(--ts,1));font-weight:700;color:var(--text2)}
-.mt.on{background:var(--text);border-color:var(--text);color:var(--panel)}.mt.carbon.on{background:var(--danger);border-color:var(--danger);color:#fff}
-.cseg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}.cseg button{border:0;border-radius:0;padding:5px 11px;font-size:calc(12.5px*var(--ts,1));border-right:1px solid var(--border)}.cseg button:last-child{border-right:0}
-.cseg button.on{background:var(--text);color:var(--panel)}.cseg.yn button.on.y{background:var(--good);color:#fff}.cseg.yn button.on.n{background:var(--danger);color:#fff}
-.ccoff{gap:4px}.ccoff .chip{padding:3px 9px;font-size:calc(12px*var(--ts,1))}.ccoff .sev{font-size:.75em;letter-spacing:1px}
+.cch{display:flex;align-items:center;gap:6px}.cch b{font-size:var(--fs-body);font-weight:600;flex:1}.ccx{padding:1px 7px;color:var(--text2)}
+.ccs{color:var(--text2);font-size:var(--fs-cap);margin-top:2px}
+.cctbl tr.sec td{background:var(--soft);font-size:var(--fs-cap);font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;padding:5px 12px}
+.mini{display:flex;gap:4px}.mt{width:36px;height:28px;border-radius:6px;padding:0;font-size:var(--fs-cap);font-weight:700;color:var(--text2)}
+.mt.on{background:var(--accent);border-color:var(--accent);color:#fff}.mt.carbon.on{background:var(--danger);border-color:var(--danger);color:#fff}
+.cseg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}.cseg button{border:0;border-radius:0;padding:5px 11px;font-size:var(--fs-sm);border-right:1px solid var(--border)}.cseg button:last-child{border-right:0}
+.cseg button.on{background:var(--accent);color:#fff}.cseg.yn button.on.y{background:var(--good);color:#fff}.cseg.yn button.on.n{background:var(--danger);color:#fff}
+.ccoff{gap:4px}.ccoff .chip{padding:3px 9px;font-size:var(--fs-sm)}.ccoff .sev{font-size:.75em;letter-spacing:1px}
 .chip{border-radius:999px}.chip.bad.on{background:color-mix(in srgb,var(--danger) 10%,var(--panel));border-color:color-mix(in srgb,var(--danger) 40%,var(--panel));color:var(--danger)}
-.ccask{font-size:calc(12px*var(--ts,1));color:var(--warn);margin-bottom:5px}
-.ccn{width:100%;min-height:52px;font-size:calc(12.5px*var(--ts,1))}
-.ccan td{background:color-mix(in srgb,var(--accent) 3%,var(--panel))}.ccan .p{display:inline-block;border-radius:999px;padding:2px 9px;font-size:calc(12px*var(--ts,1));font-weight:600;margin:0 4px 4px 0}
+.ccask{font-size:var(--fs-sm);color:var(--warn);margin-bottom:5px}
+.ccn{width:100%;min-height:52px;font-size:var(--fs-sm)}
+.ccan td{background:color-mix(in srgb,var(--accent) 3%,var(--panel))}.ccan .p{display:inline-block;border-radius:999px;padding:2px 9px;font-size:var(--fs-sm);font-weight:600;margin:0 4px 4px 0}
 .p.r{background:color-mix(in srgb,var(--danger) 12%,var(--panel));color:var(--danger)}.p.w{background:color-mix(in srgb,var(--warn) 15%,var(--panel));color:#a86f00}.p.g{background:color-mix(in srgb,var(--good) 12%,var(--panel));color:var(--good)}
 .cvseg{margin-right:6px}
 .ppills{display:flex;gap:8px;flex-wrap:wrap}.ppills button{border-radius:999px;min-height:44px;padding:0 18px;font-size:calc(15px*var(--ts,1))}.ppills button.on{background:var(--text);border-color:var(--text);color:var(--panel)}
-.pstage{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:start}.psl b{display:block;font-size:calc(15px*var(--ts,1))}.psl span{font-size:calc(12px*var(--ts,1));color:var(--text2)}
+.pstage{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:start}.psl b{display:block;font-size:calc(15px*var(--ts,1))}.psl span{font-size:var(--fs-sm);color:var(--text2)}
 .pchips{display:flex;flex-wrap:wrap;gap:8px}.pchips button{border-radius:12px;min-height:46px;min-width:96px;padding:0 14px;font-size:calc(15px*var(--ts,1))}
 .pchips button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}.pchips button.carbon.on{background:var(--danger);border-color:var(--danger)}
 .poff button{min-width:0}.poff button.on{background:color-mix(in srgb,var(--danger) 10%,var(--panel));border-color:color-mix(in srgb,var(--danger) 45%,var(--panel));color:var(--danger)}.poff .sev{font-size:.75em;letter-spacing:1px}
 .prow4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.pbig{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:6px}
 .pbig button{flex:1;border:0;border-radius:0;min-height:48px;font-size:calc(15px*var(--ts,1));border-right:1px solid var(--border)}.pbig button:last-child{border-right:0}
-.pbig button.on{background:var(--text);color:var(--panel);font-weight:600}.pbig.yn button.on.y{background:var(--good);color:#fff}.pbig.yn button.on.n{background:var(--danger);color:#fff}
+.pbig button.on{background:var(--accent);color:#fff;font-weight:600}.pbig.yn button.on.y{background:var(--good);color:#fff}.pbig.yn button.on.n{background:var(--danger);color:#fff}
 .pan{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;border:1px solid var(--line2)}
 .ipc .prow4{grid-template-columns:repeat(2,minmax(0,1fr))}.ipc .pstage{grid-template-columns:1fr}.ipc .pchips button{min-width:84px}
-.cot{overflow:auto;border:1px solid var(--line2);border-radius:8px}.cot table td,.cot table th{padding:5px 10px;text-align:center}.cot td.ccl{text-align:left;position:static;width:auto;min-width:110px;font-size:calc(11.5px*var(--ts,1))}
+.cot{overflow:auto;border:1px solid var(--line2);border-radius:8px}.cot table td,.cot table th{padding:5px 10px;text-align:center}.cot td.ccl{text-align:left;position:static;width:auto;min-width:110px;font-size:var(--fs-cap)}
 .cot th.cur,.cot td.cur{background:var(--accentSoft)}
 .cdot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)}.cdot.half{opacity:.35}.cdot.no{background:transparent;border:1.5px solid var(--border)}.cdot.carbon{background:var(--danger)}
-.ins{border-left:3px solid var(--warn);padding:3px 0 3px 11px;font-size:calc(13px*var(--ts,1));margin-top:6px}.ins.g{border-color:var(--good)}.ins.r{border-color:var(--danger)}.ins small{display:block;color:var(--text2);font-size:calc(11.5px*var(--ts,1));margin-top:1px}
+.ins{border-left:3px solid var(--warn);padding:3px 0 3px 11px;font-size:var(--fs-sm);margin-top:6px}.ins.g{border-color:var(--good)}.ins.r{border-color:var(--danger)}.ins small{display:block;color:var(--text2);font-size:var(--fs-cap);margin-top:1px}
 .chk2.cd{color:var(--danger)}.btok{color:var(--good);font-weight:600}.btdip{color:var(--danger);font-weight:600}.btflat{color:var(--warn);font-weight:600}
 .flatsw{background:color-mix(in srgb,var(--warn) 35%,var(--panel));border:1px solid var(--warn)}.rortg{display:flex;align-items:center;gap:6px;margin-left:auto;cursor:pointer}.rortg input{width:auto}
 #roBT.falling{animation:btFall .6s infinite alternate;border-radius:8px}#roBT.falling #vBT,#roBT.falling #btLabel{color:var(--warn)!important;font-weight:700}
@@ -459,42 +461,42 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 /* ---------- settings ---------- */
 #scr-settings .wrap{flex:1;display:grid;grid-template-columns:230px minmax(0,1fr);gap:14px;padding:16px 20px;min-height:0}
 .snav{padding:10px;display:flex;flex-direction:column;gap:2px;align-self:start}
-.snav button{border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:7px;font-size:calc(14px*var(--ts,1))}
+.snav button{border:0;background:transparent;text-align:left;padding:var(--sp-2) var(--sp-3);min-height:var(--h-btn);border-radius:var(--r-md);font-size:var(--fs-body)}
 .snav button.on{background:var(--accentSoft);color:var(--accent)}
-.scont{overflow:auto;min-height:0;padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+.scont{overflow:auto;min-height:0;padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-4)}
 @media (min-width:1700px){html:not(.ipad):not(.iphone) .scont>*{max-width:1280px}}
-.scont h2{font-size:calc(17px*var(--ts,1));font-weight:600}
-.scont .sub{font-size:calc(13px*var(--ts,1));color:var(--text2);margin-top:-10px}
+.scont h2{font-size:var(--fs-title);font-weight:600}
+.scont .sub{font-size:var(--fs-sm);color:var(--text2);margin-top:-10px}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
-.chk{display:flex;align-items:center;gap:10px;font-size:calc(14px*var(--ts,1));padding:6px 0}
+.chk{display:flex;align-items:center;gap:10px;font-size:var(--fs-body);padding:6px 0}
 .chk input{width:auto}
 .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .chip{display:flex;gap:8px;align-items:center;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-weight:600;font-size:calc(15px*var(--ts,1))}
-.chip button{border:0;padding:0 2px;color:var(--text2);background:transparent;font-size:calc(13px*var(--ts,1))}
+.chip button{border:0;padding:0 2px;color:var(--text2);background:transparent;font-size:var(--fs-sm)}
 .chips input{width:80px;padding:6px 8px}
 .themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .th{border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;padding:0;text-align:left;background:var(--panel)}
 .th.on{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
 .th .pv{height:56px;display:flex;align-items:flex-end;gap:5px;padding:9px}
 .th .pv i{display:block;flex:1;border-radius:3px}
-.th .nm{padding:7px 10px;font-size:calc(13px*var(--ts,1));font-weight:600;border-top:1px solid var(--line2);display:flex;justify-content:space-between}
+.th .nm{padding:7px 10px;font-size:var(--fs-sm);font-weight:600;border-top:1px solid var(--line2);display:flex;justify-content:space-between}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 30px}
-.crow{display:grid;grid-template-columns:1fr 38px 104px;gap:10px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1))}
+.crow{display:grid;grid-template-columns:1fr 38px 104px;gap:10px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line2);font-size:var(--fs-body)}
 .crow input[type=color]{width:38px;height:30px;padding:2px;border-radius:6px}
-.crow input[type=text]{font-family:var(--mono);font-size:calc(13px*var(--ts,1));padding:6px 8px}
+.crow input[type=text]{font-family:var(--mono);font-size:var(--fs-sm);padding:6px 8px}
 .cupbands{max-width:620px}.spx.locked .ab,.spx.locked .pre button,button.locked[data-sw]{opacity:.45}.sech{font-size:calc(16px*var(--ts,1));font-weight:700;margin-top:14px;padding-top:16px;border-top:1px solid var(--border)}.rlbox{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:10px}.rlgrid{display:grid;grid-template-columns:200px 260px minmax(0,460px);gap:18px;align-items:start}
-.evcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}.ptag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:calc(12.5px*var(--ts,1));font-weight:500;white-space:nowrap}.flag{font-size:1.15em;margin-right:8px;vertical-align:-1px;font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif}.cupbands input[data-cupl],.cupbands input[data-spl],.cupbands input[data-procw]{font-family:var(--font)}
-.warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--panel));border-radius:8px;padding:9px 12px;font-size:calc(13px*var(--ts,1))}
+.evcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}.ptag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:var(--fs-sm);font-weight:500;white-space:nowrap}.flag{font-size:1.15em;margin-right:8px;vertical-align:-1px;font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif}.cupbands input[data-cupl],.cupbands input[data-spl],.cupbands input[data-procw]{font-family:var(--font)}
+.warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--panel));border-radius:8px;padding:9px 12px;font-size:var(--fs-sm)}
 .evtbl td{padding:6px 10px}
-.evtbl input{padding:5px 8px;font-size:calc(13px*var(--ts,1))}
+.evtbl input{padding:5px 8px;font-size:var(--fs-sm)}
 .evtbl input[type=checkbox]{width:auto}
-.log{font-family:var(--mono);font-size:calc(11.5px*var(--ts,1));max-height:420px;overflow:auto;background:var(--soft);border-radius:8px;padding:8px;white-space:pre-wrap;word-break:break-all}
+.log{font-family:var(--mono);font-size:var(--fs-cap);max-height:420px;overflow:auto;background:var(--soft);border-radius:8px;padding:8px;white-space:pre-wrap;word-break:break-all}
 .log .err{color:var(--danger)}.log .ctl{color:var(--warn)}.log .sys{color:var(--good)}
 
 /* ---------- modal ---------- */
 .modalbg{position:fixed;inset:0;background:rgba(10,12,14,.38);display:grid;place-items:center;z-index:90}
-.modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px 22px;width:min(440px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px}
-.modal h3{font-size:calc(17px*var(--ts,1))}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;width:min(440px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px}
+.modal h3{font-size:var(--fs-title)}
 .modal p{color:var(--text2);line-height:1.5}
 
 /* ---------- iPad (13" landscape, touch) — only when <html> has class "ipad"; the iMac never gets it ---------- */
@@ -515,14 +517,14 @@ html:not(.ipad) .ipOnly{display:none!important}
 .ipad #leftCol .pt{padding-left:22px;padding-right:22px}
 .ipad #leftCol .notes{padding:4px 22px 16px;flex:none}
 #ipCtlRow{display:flex;align-items:center;gap:14px;padding:12px 22px 6px}
-#ipCtlRow b{display:block;font-size:calc(16px*var(--ts,1))}#ipCtlRow small{color:var(--text2);font-size:calc(13px*var(--ts,1))}
+#ipCtlRow b{display:block;font-size:calc(16px*var(--ts,1))}#ipCtlRow small{color:var(--text2);font-size:var(--fs-sm)}
 .tog{width:64px;height:38px;border-radius:19px;border:0;background:var(--border);position:relative;padding:0;flex:none}
 .tog::after{content:'';position:absolute;left:3px;top:3px;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
 .tog.on{background:var(--good)}.tog.on::after{left:29px}
 #ipLive{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:6px 22px 14px}
-#ipLive div{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:calc(12.5px*var(--ts,1));color:var(--text2)}
+#ipLive div{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:var(--fs-sm);color:var(--text2)}
 #ipLive b{display:block;font-size:calc(24px*var(--ss,1));font-weight:400;color:var(--text);font-variant-numeric:tabular-nums}
-.ipSheetHead small{display:block;font-size:calc(13px*var(--ts,1));color:var(--text2);font-weight:400;margin-top:2px}
+.ipSheetHead small{display:block;font-size:var(--fs-sm);color:var(--text2);font-weight:400;margin-top:2px}
 /* iPad lists as cards (Roasts, Profiles, Green, Cupping) */
 .ipad #scr-roasts .split,.ipad #scr-profiles .split{grid-template-columns:440px minmax(0,1fr)}
 .ipad #scr-cupping .split{grid-template-columns:340px minmax(0,1fr)}
@@ -532,11 +534,11 @@ html:not(.ipad) .ipOnly{display:none!important}
 .ipad td.ipCard{white-space:normal;padding:12px 16px}
 .ipCard .c{display:flex;align-items:center;gap:12px}
 .ipCard .m{flex:1;min-width:0}.ipCard .m>b{font-size:calc(15.5px*var(--ts,1));font-weight:600}
-.ipCard .s{font-size:calc(13px*var(--ts,1));color:var(--text2);margin-top:2px}
+.ipCard .s{font-size:var(--fs-sm);color:var(--text2);margin-top:2px}
 .ipCard .n{width:48px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
 tr.sel .ipCard .n{color:var(--accent)}
-.ipCard .r{font-size:calc(13px*var(--ts,1));color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
-.ipCard .k{display:flex;gap:14px;font-size:calc(13px*var(--ts,1));margin-top:6px;font-variant-numeric:tabular-nums}
+.ipCard .r{font-size:var(--fs-sm);color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
+.ipCard .k{display:flex;gap:14px;font-size:var(--fs-sm);margin-top:6px;font-variant-numeric:tabular-nums}
 .ipCard .gb{display:flex;align-items:center;gap:8px;width:190px}.ipCard .gb .bar{flex:1}
 #ipBackdrop{position:fixed;inset:56px 0 0 0;background:rgba(21,24,27,.32);z-index:45;opacity:0;pointer-events:none;transition:opacity .2s}
 .ipad.machineOpen #ipBackdrop{opacity:1;pointer-events:auto}
@@ -544,18 +546,18 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipSheetHead button{min-height:40px;padding:0 16px}
 .ipad #leftCol .spx .ab{width:60px;height:60px}
 #ipChips{display:flex;gap:6px;margin-left:auto;margin-right:10px;text-transform:none;letter-spacing:0;font-weight:500}
-#ipChips span{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:calc(13px*var(--ts,1));color:var(--text2);white-space:nowrap}
+#ipChips span{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:var(--fs-sm);color:var(--text2);white-space:nowrap}
 #ipChips b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
 #ipPhase{display:flex;gap:6px;margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500}
 #ipPhase:empty{display:none}#ipPhase:not(:empty)+#ipChips{margin-left:6px}
-#ipPhase span{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:calc(13px*var(--ts,1));color:var(--text2);white-space:nowrap}
+#ipPhase span{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:var(--fs-sm);color:var(--text2);white-space:nowrap}
 #ipPhase span.on{background:color-mix(in srgb,var(--accent) 14%,var(--panel));color:var(--accent)}
 #ipPhase b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}#ipPhase span.on b{color:var(--accent)}
 .ipad .spx .ab{width:54px;height:54px;font-size:calc(17px*var(--ts,1))}
 .ipad .pre button{padding:10px 0;min-height:46px}
 .ipad .sw button{padding:18px 14px;min-height:64px}
 .ipad #sw{grid-template-columns:1fr 1fr}
-.ipad #phaseTxt{font-size:calc(10.5px*var(--ts,1))}
+.ipad #phaseTxt{font-size:var(--fs-cap)}
 .ipad .fk{min-height:76px;font-size:calc(17px*var(--ts,1))}
 .ipad .nextbar button,.ipad .ctloff button{min-height:40px}
 .ipad .drawer{width:min(600px,94vw)}
@@ -589,18 +591,18 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipad .sps{flex:none;overflow:visible}
 .ipad .ipCoolHead{margin-top:auto}
 .ipTd{margin:6px 16px 10px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.ipTdH{display:flex;align-items:center;gap:8px;width:100%;border:0;border-radius:0;background:transparent;min-height:40px;padding:6px 14px;font-size:calc(11.5px*var(--ts,1));font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
+.ipTdH{display:flex;align-items:center;gap:8px;width:100%;border:0;border-radius:0;background:transparent;min-height:40px;padding:6px 14px;font-size:var(--fs-cap);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
 .ipTdH>span:first-child{flex:1}
 .ipDots{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end;max-width:130px}
 .ipDots i{width:7px;height:6px;border-radius:3px;background:var(--border)}.ipDots i.d{background:var(--good)}.ipDots i.c{background:var(--accent)}
 .ipTdR{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line2)}
 .ipTdR>b{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:13px;color:var(--text2);flex:none}
-.ipTdR em{display:block;font-style:normal;font-size:calc(11.5px*var(--ts,1));font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2)}
+.ipTdR em{display:block;font-style:normal;font-size:var(--fs-cap);font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2)}
 .ipTdR span{font-size:calc(15px*var(--ts,1));font-weight:500}.ipTdR small{color:var(--text2);font-size:inherit;font-weight:500}
 .ipTdR.now{background:var(--accentSoft);border-top-color:color-mix(in srgb,var(--accent) 18%,var(--panel))}
 .ipTdR.now>b{background:var(--accent);border-color:var(--accent);color:#fff}.ipTdR.now em{color:var(--accent)}.ipTdR.now span{font-weight:600}
-.ipTdAll{color:var(--accent);text-transform:none;letter-spacing:0;font-size:calc(13.5px*var(--ts,1));white-space:nowrap}
-.ipTdR small.nx{display:block;color:var(--text2);font-size:calc(13px*var(--ts,1));font-weight:500;margin-top:1px}
+.ipTdAll{color:var(--accent);text-transform:none;letter-spacing:0;font-size:var(--fs-body);white-space:nowrap}
+.ipTdR small.nx{display:block;color:var(--text2);font-size:var(--fs-sm);font-weight:500;margin-top:1px}
 .ipTdR{padding:8px 14px}
 .ipTd{margin:4px 16px 6px}
 .ipad .spx{padding-bottom:8px}.ipad .spx .rowv{margin-top:-2px}
@@ -610,12 +612,12 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipBlRow{display:flex;align-items:center;gap:12px;border:0;border-radius:0;border-bottom:1px solid var(--line2);min-height:58px;padding:0 14px;text-align:left;background:var(--panel)}
 .ipBlRow:last-child{border-bottom:0}
 .ipBlRow>b{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:13px;flex:none;color:var(--text2)}
-.ipBlRow span{flex:1;font-size:calc(15.5px*var(--ts,1));font-weight:500}.ipBlRow small{display:block;color:var(--text2);font-size:calc(12.5px*var(--ts,1))}
-.ipBlRow em{font-style:normal;color:var(--text2);font-size:calc(13.5px*var(--ts,1));font-variant-numeric:tabular-nums}
+.ipBlRow span{flex:1;font-size:calc(15.5px*var(--ts,1));font-weight:500}.ipBlRow small{display:block;color:var(--text2);font-size:var(--fs-sm)}
+.ipBlRow em{font-style:normal;color:var(--text2);font-size:var(--fs-body);font-variant-numeric:tabular-nums}
 .ipBlRow.d>b{background:var(--good);border-color:var(--good);color:#fff}.ipBlRow.d span{color:var(--text2)}
 .ipBlRow.c{background:var(--accentSoft)}.ipBlRow.c>b{background:var(--accent);border-color:var(--accent);color:#fff}.ipBlRow.c em{color:var(--accent);font-weight:600}
 /* ---------- UI polish 1 (iPad): touch targets, no wrapping, 13" layout ---------- */
-.ipad:not(.ipc) #scr-today td button.sm{min-height:44px;min-width:44px;padding:0 12px;font-size:calc(14.5px*var(--ts,1))}
+.ipad:not(.ipc) #scr-today td button.sm{min-height:44px;min-width:44px;padding:0 12px;font-size:var(--fs-body)}
 .ipad:not(.ipc) #scr-today td input[data-tw]{min-height:44px}
 .ipad .ipCard .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ipad .ipCard .r{white-space:nowrap;flex:none}
@@ -684,14 +686,14 @@ html.ipDet-roasts #rDetail>:last-child,html.ipDet-profiles #pDetail[data-kind=p]
 .ipc #ipToday{margin-top:auto}
 .ipad #ipToday{margin-top:auto}
 .ipTdUp{border-top:1px solid var(--line2);padding:8px 14px 10px}
-.ipTdUp>em{display:block;font-style:normal;font-size:calc(11.5px*var(--ts,1));font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);margin-bottom:4px}
+.ipTdUp>em{display:block;font-style:normal;font-size:var(--fs-cap);font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);margin-bottom:4px}
 .ipTdU{display:flex;align-items:center;gap:10px;padding:5px 0}
 .ipTdU>b{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:12px;color:var(--text2);flex:none}
-.ipTdU>span{flex:1;min-width:0;font-size:calc(14px*var(--ts,1));font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ipTdU>span{flex:1;min-width:0;font-size:var(--fs-body);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ipTdU>span small{color:var(--text2);font-size:inherit;font-weight:500}
-.ipTdU>i{font-style:normal;color:var(--text2);font-size:calc(13px*var(--ts,1));font-variant-numeric:tabular-nums;white-space:nowrap}
+.ipTdU>i{font-style:normal;color:var(--text2);font-size:var(--fs-sm);font-variant-numeric:tabular-nums;white-space:nowrap}
 .ipTdU[hidden],.ipTdMore[hidden],.ipTdUp[hidden]{display:none}
-.ipTdMore{color:var(--text2);font-size:calc(13px*var(--ts,1));padding-top:2px}
+.ipTdMore{color:var(--text2);font-size:var(--fs-sm);padding-top:2px}
 .ipc #scr-today .split{grid-template-columns:minmax(0,1fr) 300px}
 .ipc #scr-today td{padding:10px 8px}
 .ipc #scr-today td .badge.gray{display:none}
@@ -723,17 +725,17 @@ html:not(.ipLeg) .ipLegend{display:none!important}
 .ipad:not(.ipc) .big3 .ro:not(#roBT) .v{font-size:calc(50px*var(--bs,1))}
 .ipad:not(.ipc) .spx .v{font-size:calc(52px*var(--bs,1))}
 .ipad:not(.ipc) .pre button{min-height:var(--h-btn)}  /* iPad chart legend: off unless Settings › Chart scales turns it on */
-.ipLegend{display:flex;gap:16px;padding:0 16px 2px;font-size:calc(12px*var(--ts,1));color:var(--text2)}
+.ipLegend{display:flex;gap:16px;padding:0 16px 2px;font-size:var(--fs-sm);color:var(--text2)}
 .ipLegend span{display:flex;align-items:center;gap:6px}
 .ipLegend i{width:16px;height:0;border-top:3px solid;border-radius:2px}
 /* iPad event keys: time · BT under marked keys, Next on the next one, Drop dark */
-.ipad .fk .sub{display:block;font-size:calc(12px*var(--ts,1));font-weight:500;color:var(--text2);margin-top:2px}
+.ipad .fk .sub{display:block;font-size:var(--fs-sm);font-weight:500;color:var(--text2);margin-top:2px}
 .ipad .fk.nx .sub{color:var(--accent)}
 .ipad .fk.dropk{background:var(--text);border-color:var(--text);color:var(--panel)}
 .ipad .fk.dropk .sub{color:inherit;opacity:.75}
 .ipad .fk:focus,.ipad button:focus:not(:focus-visible){outline:none}
 .ipad #spsL .spx .l,.ipad #spsL .spx .d{display:none}
-.ipad .lamp{color:var(--text);font-weight:500;font-size:calc(13px*var(--ts,1))}
+.ipad .lamp{color:var(--text);font-weight:500;font-size:var(--fs-sm)}
 /* iPad forms and Settings: finger-sized, and 16px+ text so iPadOS doesn't zoom on tap */
 .ipad input:not([type=checkbox]):not([type=radio]):not([type=color]),.ipad select,.ipad textarea{font-size:max(16px,calc(15px*var(--ts,1)));min-height:48px}
 .ipad input[type=checkbox],.ipad input[type=radio]{width:24px;height:24px;flex:none}
@@ -745,14 +747,14 @@ html:not(.ipLeg) .ipLegend{display:none!important}
 .stepper button{flex:none;width:56px;min-height:48px;border:0;border-radius:0;font-size:24px;padding:0;background:var(--panel);color:var(--text)}
 .stepper input{flex:1 1 0;min-width:0;width:0!important}
 .ipad .grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ipad .grid2>*{min-width:0}
-.ipad header select{font-size:calc(13px*var(--ts,1))!important;min-height:40px}
+.ipad header select{font-size:var(--fs-sm)!important;min-height:40px}
 .stepper button:first-child{border-right:1px solid var(--border)}.stepper button:last-child{border-left:1px solid var(--border)}
 .stepper input{border:0!important;text-align:center;font-size:18px!important;border-radius:0}
 /* iPad Settings like the mockup: wider menu, data card, status bar, on/off switches */
 .ipad #scr-settings .wrap{grid-template-columns:290px minmax(0,1fr)}
-.ipData{margin:10px 4px 4px;padding:12px 12px 4px;border-top:1px solid var(--line2);font-size:calc(13.5px*var(--ts,1));line-height:1.45;color:var(--text2);display:flex;flex-direction:column;gap:2px}
-.ipData b{color:var(--text);font-size:calc(14.5px*var(--ts,1))}
-.ipConnBar{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--line2);border-radius:10px;padding:0 14px;min-height:56px;font-size:calc(14.5px*var(--ts,1));margin:4px 0 6px}
+.ipData{margin:10px 4px 4px;padding:12px 12px 4px;border-top:1px solid var(--line2);font-size:var(--fs-body);line-height:1.45;color:var(--text2);display:flex;flex-direction:column;gap:2px}
+.ipData b{color:var(--text);font-size:var(--fs-body)}
+.ipConnBar{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--line2);border-radius:10px;padding:0 14px;min-height:56px;font-size:var(--fs-body);margin:4px 0 6px}
 .ipConnBar i{width:10px;height:10px;border-radius:50%;background:var(--border);flex:none}
 .ipConnBar span:not(.sp){color:var(--text2)}.ipConnBar .sp{flex:1}
 .ipConnBar.on{background:color-mix(in srgb,var(--good) 10%,var(--panel));border-color:color-mix(in srgb,var(--good) 35%,var(--panel))}.ipConnBar.on i{background:var(--good)}
@@ -1044,7 +1046,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 <!-- ================= PROFILES ================= -->
 <div class="screen" id="scr-profiles" hidden>
   <div class="page">
-    <div id="pList" style="display:contents"><div class="ph"><button class="ipOnly ipBack" id="pBack">‹ Profiles</button><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted ipHide2" style="font-size:calc(12.5px*var(--ts,1))">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:calc(12.5px*var(--ts,1))"></span><button class="pri" id="btnNewProfile">+ New profile</button></div>
+    <div id="pList" style="display:contents"><div class="ph"><button class="ipOnly ipBack" id="pBack">‹ Profiles</button><h1>Profiles</h1><input type="search" id="pSearch" placeholder="Search profiles, coffee…"><span class="muted ipHide2" style="font-size:var(--fs-sm)">Double-click a profile to roast it</span><div class="sp"></div><span class="muted" id="pFolder" style="font-size:var(--fs-sm)"></span><button class="pri" id="btnNewProfile">+ New profile</button></div>
     <div class="split">
       <div class="card scroll"><table id="pTable" class="cupt"><thead><tr><th>Profile</th><th>Coffee</th><th class="n">Batch</th><th class="n">Roasted</th><th>Last roasted</th><th class="n">FC</th><th class="n">Drop</th><th class="n">Dev</th><th class="n">Color W / G</th><th class="n">Spread</th><th class="n">Cup</th></tr></thead><tbody id="pRows"></tbody></table><div id="pEmpty"></div></div>
       <div class="card detail" id="pDetail"></div>
@@ -1088,7 +1090,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
       <div class="sp"></div><span id="prWhatTag"></span><button id="btnPrSheet">Wholesale price sheet</button></div>
     <div id="prOverview" class="scroll" hidden></div>
     <div class="split" id="prSplit">
-      <div class="card scroll"><div class="prbar" id="prBar"></div><table><thead><tr><th>Coffee</th><th style="width:100px"></th><th class="n" style="width:120px">12 oz</th><th class="n" style="width:120px">2 lb</th><th class="n" style="width:120px">5 lb</th></tr></thead><tbody id="prRows"></tbody></table><div id="prEmpty"></div></div>
+      <div class="card scroll"><div class="prbar" id="prBar"></div><table><thead><tr><th>Coffee</th><th style="width:110px"></th><th class="n" style="width:16%">12 oz</th><th class="n" style="width:16%">2 lb</th><th class="n" style="width:16%">5 lb</th></tr></thead><tbody id="prRows"></tbody></table><div id="prEmpty"></div></div>
       <div class="card detail" id="prDetail"></div>
     </div>
     <div id="prCosts" class="scroll" hidden></div>
@@ -1109,7 +1111,7 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 <!-- ================= ANALYZE ================= -->
 <div class="screen" id="scr-analyze" hidden>
   <div class="page">
-    <div class="ph"><h1>Analyze</h1><input type="search" id="aSearch" placeholder="Search roasts, profiles…"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Pick a roast, say how it tasted, build the next profile</span></div>
+    <div class="ph"><h1>Analyze</h1><input type="search" id="aSearch" placeholder="Search roasts, profiles…"><span class="muted" style="font-size:var(--fs-sm)">Pick a roast, say how it tasted, build the next profile</span></div>
     <div class="ansplit">
       <div class="card scroll"><table><thead><tr><th>#</th><th>Date</th><th>Profile</th><th class="n">Batch</th><th>Bean temp</th><th class="n">Dev</th><th class="n">Cup</th><th>Taste</th></tr></thead><tbody id="aRows"></tbody></table><div id="aEmpty"></div></div>
       <div class="card detail" id="aDetail"></div>
@@ -1141,14 +1143,14 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
       <label class="field">Roasted weight (lb)<input id="fRoasted" inputmode="decimal"></label>
     </div>
     <div class="box"><span class="muted">Weight loss</span><b class="tnum" id="oLoss">—</b></div>
-    <div class="box"><span class="muted">Batch cost <span id="oPrice" style="font-size:calc(12px*var(--ts,1))"></span></span><b class="tnum" id="oCost" style="font-size:calc(16px*var(--ts,1))">—</b></div>
+    <div class="box"><span class="muted">Batch cost <span id="oPrice" style="font-size:var(--fs-sm)"></span></span><b class="tnum" id="oCost" style="font-size:calc(16px*var(--ts,1))">—</b></div>
     <div class="grid2">
       <label class="field">Whole bean color (Agtron)<input id="fCw" inputmode="decimal"></label>
       <label class="field">Ground color (Agtron)<input id="fCg" inputmode="decimal"></label>
     </div>
-    <div class="box"><span class="muted">Color spread <span style="font-size:calc(12px*var(--ts,1))">(ground − whole)</span></span><b class="tnum" id="oSpread">—</b></div>
+    <div class="box"><span class="muted">Color spread <span style="font-size:var(--fs-sm)">(ground − whole)</span></span><b class="tnum" id="oSpread">—</b></div>
     <label class="field">Comments<textarea id="fNotes" placeholder="Aroma, appearance, cupping…"></textarea></label>
-    <details><summary class="muted" style="cursor:pointer;font-size:calc(12.5px*var(--ts,1))">Coffee &amp; lot names</summary>
+    <details><summary class="muted" style="cursor:pointer;font-size:var(--fs-sm)">Coffee &amp; lot names</summary>
       <div class="grid2" style="margin-top:8px"><label class="field">Coffee<input id="fCoffee"></label><label class="field">Lot<input id="fLot"></label></div></details>
     <div id="dNotesList"></div>
   </div>
@@ -1199,7 +1201,7 @@ const money0=v=>ok(v)?'$'+Math.round(v).toLocaleString():'—';
 
 /* ---------------- modal confirm (works in every browser / app shell) ---------------- */
 function ask(title,msg,okLabel='OK',danger=false){return new Promise(res=>{
-  const root=$('#modalRoot');root.innerHTML=`<div class="modalbg"><div class="modal" role="dialog" aria-modal="true"><h3>${esc(title)}</h3>${msg?`<p>${esc(msg)}</p>`:''}<div class="row" style="justify-content:flex-end"><button id="mNo">Cancel</button><button id="mYes" class="${danger?'dark':'pri'}">${esc(okLabel)}</button></div></div></div>`;
+  const root=$('#modalRoot');root.innerHTML=`<div class="modalbg"><div class="modal" role="dialog" aria-modal="true"><h3>${esc(title)}</h3>${msg?`<p>${esc(msg)}</p>`:''}<div class="row" style="justify-content:flex-end"><button id="mNo">Cancel</button><button id="mYes" class="${danger?'dangerFill':'pri'}">${esc(okLabel)}</button></div></div></div>`;
   const done=v=>{root.innerHTML='';res(v)};$('#mNo').onclick=()=>done(false);$('#mYes').onclick=()=>done(true);$('#mYes').focus();
   root.firstChild.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();done(false)}});
 })}
@@ -1926,7 +1928,7 @@ function renderNotes(){const el=$('#notes');if(!el)return;const rems=(S.bg&&S.bg
   $('#notesHead').hidden=!hasAny;
   let h=bMis?`<div class="warn">Background ${rTag(S.bg)} was a ${lbTxt(batchOf(S.bg))} batch — this one is ${lbTxt(gNow)}. Its curve${S.bg.target?', target':''} and reminders may not fit.</div>`:'';
   h+=rems.map((m,i)=>`<div class="rm ${S.firedRem[i]?'done':i===nextIdx?'next':''} ${S.flashRem===i?'flash':''}"><i>${S.firedRem[i]?'✓':i===nextIdx?'▶':''}</i><div><b>${esc(remWhen(m))}</b>${esc(m.text)}</div></div>`).join('');
-  if(S.bg&&S.bg.meta.notes)h+=`<div class="pn">“${esc(S.bg.meta.notes)}”<span style="display:block;font-size:calc(11.5px*var(--ts,1));margin-top:3px">— ${S.bg.planned?'plan note':'last time ('+rTag(S.bg)+')'}</span></div>`;
+  if(S.bg&&S.bg.meta.notes)h+=`<div class="pn">“${esc(S.bg.meta.notes)}”<span style="display:block;font-size:var(--fs-cap);margin-top:3px">— ${S.bg.planned?'plan note':'last time ('+rTag(S.bg)+')'}</span></div>`;
   h+=tn.map(n=>`<div class="tnote"><span>${mmss(n.t-(r.events.CHARGE??0))}</span>${esc(n.text)}</div>`).join('');
   if(S.recording)h+=S.noteOpen?`<div class="addnote"><input id="noteIn" placeholder="Add a note…"><button class="sm" id="noteAdd">Add</button></div>`:`<button class="sm" id="noteOpen" style="align-self:flex-start;color:var(--text2)">+ Note</button>`;
   el.innerHTML=h;S.flashRem=null;
@@ -2240,7 +2242,7 @@ function renderProfileDetail(){const el=$('#pDetail'),r=findAny(selProfile);el.d
   const s=r.summary||summarize(r),adj=adjustments(r),rc=r.events.CHARGE??0,uses=HIST.filter(x=>x.id!==r.id&&sameSlot(x,r)).slice(0,8),cost=costOf(r);
   const groups={};for(const a of adj){const k=mmss(a.t-rc);(groups[k]=groups[k]||[]).push(`${a.label} ${Math.round(a.to)}`)}
   const first=r.samples.find(x=>x.t>=rc);
-  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${esc(r.meta.name)}${ok(batchOf(r))?` <span class="dsub">${lbTxt(batchOf(r))}</span>`:''}</div><div class="muted" style="margin-top:3px">From roast #${r.num} · ${fmtLong(r.chargedAt||r.created)} · ${ageOf(r.chargedAt||r.created)} · roasted ${uses.length+1}×</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:calc(14px*var(--ts,1));padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin-top:4px">cupping score</div></div>`:''}</div>
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${esc(r.meta.name)}${ok(batchOf(r))?` <span class="dsub">${lbTxt(batchOf(r))}</span>`:''}</div><div class="muted" style="margin-top:3px">From roast #${r.num} · ${fmtLong(r.chargedAt||r.created)} · ${ageOf(r.chargedAt||r.created)} · roasted ${uses.length+1}×</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:var(--fs-body);padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:var(--fs-cap);margin-top:4px">cupping score</div></div>`:''}</div>
   <div class="minic"><canvas id="pBig"></canvas></div>
   <div class="stats"><div class="stat"><div class="l">Charge</div><div class="v">${fT(s.charge)}<small>°${cfg.unit}</small></div></div><div class="stat"><div class="l">First crack</div><div class="v">${mmss(s.fcs)}</div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(s.drop)}</div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(s.dev)}</div></div></div>
   <div class="grid2" style="gap:22px"><div><div class="h3" style="margin-bottom:8px">Burner &amp; air plan</div><div class="plan">${first?`<span>0:00</span><b>Burner ${f0(first.burner)} · Air ${f0(first.fan)} · Drum ${f0(first.drum)}</b>`:''}${Object.entries(groups).map(([t,v])=>`<span>${t}</span><b>${v.join(' · ')}</b>`).join('')}</div></div>
@@ -2466,7 +2468,7 @@ function renderBuilder(){if(!BLD)return;const b=BLD,u='°'+cfg.unit,el=$('#pBuil
   const evOpts=s=>[...BLD_EV,...b.extra.map(x=>['x:'+x.id,(x.name||'Milestone').trim()])].map(([k,l])=>`<option value="${k}"${s.when==='ev'&&s.at===k?' selected':''}>${esc(l)}</option>`).join('')+`<option value="__t"${s.when==='t'?' selected':''}>At time…</option>`;
   el.innerHTML=`<div class="ph"><button id="bBack">← Profiles</button><h1>${b.editId?'Edit profile':'New profile'}</h1>
       <div class="seg" id="bMode">${[['scratch','From scratch'],['copy','From another profile'],['edit','Edit a profile']].map(([k,l])=>`<button data-m="${k}" class="${b.mode===k?'on':''}">${l}</button>`).join('')}</div>
-      <span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Plan the curve before the first roast — it becomes the green target on the Roast screen</span></div>
+      <span class="muted" style="font-size:var(--fs-sm)">Plan the curve before the first roast — it becomes the green target on the Roast screen</span></div>
     <div class="bsplit">
       <div class="card scroll bform">
         ${b.mode!=='scratch'?`<label class="field">${b.mode==='copy'?'Start from':'Profile to edit'}<select id="bSrc"><option value="">— pick a profile —</option>${srcs.map(r=>`<option value="${r.id}"${r.id===b.srcId?' selected':''}>${esc(r.meta.name)}${ok(batchOf(r))?' · '+lbTxt(batchOf(r)):''} · ${r.planned?'planned':'roast #'+r.num}</option>`).join('')}</select></label>
@@ -2479,7 +2481,7 @@ function renderBuilder(){if(!BLD)return;const b=BLD,u='°'+cfg.unit,el=$('#pBuil
         ${diffSize?`<div class="bbox"><div class="h3" style="margin-bottom:6px">Batch change ${lbTxt(b.srcBatch)} → ${lbTxt(g)}</div>
           <div class="grid2"><label class="field">Charge temp change (${u})${inp('chargeAdj','0')}</label><label class="field">Burner change (%)${inp('burnerAdj','0')}</label></div>
           <div class="bhint" style="margin-top:6px" id="bAdjTxt"></div><div class="bhint" style="margin-top:6px">Starting guesses, not tuned to your P12. A bigger load usually needs a hotter charge and more burner; first crack and drop times stay as planned.</div></div>`:''}
-        ${b.mode==='scratch'?`<div class="row"><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Start with</span><button class="sm${b.style!=='scurve'?' on-acc':''}" data-preset="std">Brewed Behavior targets</button><button class="sm${b.style==='scurve'?' on-acc':''}" data-preset="scurve">Hard bean S-curve</button></div>`:''}
+        ${b.mode==='scratch'?`<div class="row"><span class="muted" style="font-size:var(--fs-sm)">Start with</span><button class="sm${b.style!=='scurve'?' on-acc':''}" data-preset="std">Brewed Behavior targets</button><button class="sm${b.style==='scurve'?' on-acc':''}" data-preset="scurve">Hard bean S-curve</button></div>`:''}
         <div class="h3" style="margin-top:4px">Milestones <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">time from charge · bean temp</span></div>
         <div class="mstones">
           <span>Charge</span><span class="muted">0:00</span>${inp('charge','400')}<span class="muted">${u}</span>
@@ -2492,23 +2494,23 @@ function renderBuilder(){if(!BLD)return;const b=BLD,u='°'+cfg.unit,el=$('#pBuil
           ${b.extra.map((x,i)=>`<input data-xi="${i}" data-xk="name" value="${esc(x.name)}" list="bXNames" class="xname"><input data-xi="${i}" data-xk="t" value="${esc(x.t)}" placeholder="6:30"><input data-xi="${i}" data-xk="bt" value="${esc(x.bt)}" inputmode="decimal"><button class="sm" data-xdel="${i}" title="Remove">✕</button>`).join('')}
         </div>
         <datalist id="bXNames">${XNAMES.map(n=>`<option value="${n}">`).join('')}</datalist>
-        <div class="row"><button class="sm" id="bAddMs">+ Add milestone</button><span class="muted" style="font-size:calc(12px*var(--ts,1))">Or drag the dots on the chart</span></div>
-        <div class="row" style="margin-top:4px"><div class="h3" style="flex:1">Burner &amp; air plan</div><label class="chk" style="padding:0;font-size:calc(12.5px*var(--ts,1))"><input type="checkbox" id="bAuto" style="width:auto"${b.autoBurner?' checked':''}> Match burner to the curve</label><button class="sm" id="bSug">Suggest burner</button></div>
+        <div class="row"><button class="sm" id="bAddMs">+ Add milestone</button><span class="muted" style="font-size:var(--fs-sm)">Or drag the dots on the chart</span></div>
+        <div class="row" style="margin-top:4px"><div class="h3" style="flex:1">Burner &amp; air plan</div><label class="chk" style="padding:0;font-size:var(--fs-sm)"><input type="checkbox" id="bAuto" style="width:auto"${b.autoBurner?' checked':''}> Match burner to the curve</label><button class="sm" id="bSug">Suggest burner</button></div>
         <div class="bsug" id="bSugBox" hidden></div>
         <div class="bsteps"><span class="muted">When</span><span></span><span class="muted">Burner %</span><span class="muted">Air %</span><span class="muted">Drum %</span><span></span>
           ${b.steps.map((s,i)=>`<select data-bw="${i}">${evOpts(s)}</select>${s.when==='t'?`<input data-bs="${i}" data-k="at" value="${esc(s.at)}" placeholder="6:00">`:'<span></span>'}
             <input data-bs="${i}" data-k="burner" value="${esc(s.burner)}" inputmode="decimal"><input data-bs="${i}" data-k="fan" value="${esc(s.fan)}" inputmode="decimal"><input data-bs="${i}" data-k="drum" value="${esc(s.drum)}" inputmode="decimal" placeholder="—"><button class="sm" data-bd="${i}" title="Remove">✕</button>`).join('')}
         </div>
-        <div class="row"><button class="sm" id="bAddStep">+ Add change</button><span class="muted" style="font-size:calc(12px*var(--ts,1))">Blank = no change at that point</span></div>
+        <div class="row"><button class="sm" id="bAddStep">+ Add change</button><span class="muted" style="font-size:var(--fs-sm)">Blank = no change at that point</span></div>
         <label class="field">Comments<textarea data-b="notes" placeholder="Why this plan — new crop, espresso version, customer spec…">${esc(b.notes)}</textarea></label>
       </div>
       <div class="card detail" id="bOut">
-        <div class="row"><div class="dtitle" style="flex:1" id="bTitle"></div><span class="muted" id="bLegend" style="font-size:calc(12px*var(--ts,1))"></span></div>
+        <div class="row"><div class="dtitle" style="flex:1" id="bTitle"></div><span class="muted" id="bLegend" style="font-size:var(--fs-sm)"></span></div>
         <div class="bchart"><canvas id="bCv"></canvas></div>
         <div class="stats" id="bStats"></div>
         <div id="bPhase"></div>
         <div><div class="h3" style="margin-bottom:6px">Checks</div><div id="bChk"></div></div>
-        <div class="row" style="margin-top:auto"><button class="pri" id="bSave">Save profile ★</button><button id="bCancel">Cancel</button><span class="sp"></span><span class="muted" id="bSlot" style="font-size:calc(12.5px*var(--ts,1))"></span></div>
+        <div class="row" style="margin-top:auto"><button class="pri" id="bSave">Save profile ★</button><button id="bCancel">Cancel</button><span class="sp"></span><span class="muted" id="bSlot" style="font-size:var(--fs-sm)"></span></div>
       </div></div>`;
   // wiring — typing only redraws the right side so inputs keep focus
   $('#bBack').onclick=$('#bCancel').onclick=closeBuilder;
@@ -2764,7 +2766,7 @@ const GFIELDS=[['name','Coffee name','e.g. Brazil Cerrado Natural',1],['origin',
 function renderGreenDetail(){const el=$('#gDetail');
   if(gMode==='add'||gMode==='edit'){const l=gMode==='edit'?INV.find(x=>x.id===selGreen):{};
     el.innerHTML=`<div class="dtitle">${gMode==='add'?'Add green coffee':'Edit '+esc(l.name)}</div><div class="grid2">${GFIELDS.filter(f=>!(gMode==='edit'&&f[0]==='startLb')).map(f=>`<label class="field" style="${f[3]===1?'grid-column:1/-1':''}">${f[1]}<input id="g_${f[0]}" ${f[3]==='date'?'type="date"':''} placeholder="${esc(f[2])}" value="${esc(l[f[0]]??'')}" ${['startLb','price'].includes(f[0])?'inputmode="decimal"':''}></label>`).join('')}</div>
-    ${gMode==='edit'?'<div class="muted" style="font-size:calc(12.5px*var(--ts,1))">To change the amount in stock, use Adjust stock.</div>':''}
+    ${gMode==='edit'?'<div class="muted" style="font-size:var(--fs-sm)">To change the amount in stock, use Adjust stock.</div>':''}
     <div class="row"><button class="pri" id="gSave">${gMode==='add'?'Add to inventory':'Save changes'}</button><button id="gCancel">Cancel</button></div>`;
     $('#g_name').focus();
     $('#gCancel').onclick=()=>{gMode='view';renderGreen()};
@@ -2865,7 +2867,7 @@ function renderCupping(){const list=[...CUP].sort((a,b)=>String(b.date).localeCo
   $('#cRows').innerHTML=list.map(s=>{const sc=s.samples.map(cupScore),best=sc.length?Math.max(...sc):null;
     const flags=s.samples.reduce((a,x)=>{const r=HIST.find(h=>h.id===x.roastId);return a+(r&&Object.keys(cupFaults(r).t).filter(k=>k!=='good').length?1:0)},0);
     if(IPAD)return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="ipCard"><div class="c"><div class="m"><b>${esc(s.name)}</b><div class="s">${s.samples.length} sample${s.samples.length===1?'':'s'} · ${SC?'Best '+(ok(best)?best.toFixed(2):'—'):flags?'<span class="btflat">⚠ '+flags+' to fix</span>':'nothing to fix'}${s.cuppers?' · '+esc(s.cuppers):''}</div></div><span class="r">${fmtDate(s.date,false)}</span></div></td></tr>`;
-    return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b>${s.cuppers?`<div class="muted" style="font-size:calc(11.5px*var(--ts,1))">${esc(s.cuppers)}</div>`:''}</td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td>${SC?`<td class="n"><span class="cup" style="${cupPillSt(best)}">${ok(best)?best.toFixed(2):'—'}</span></td>`:`<td>${flags?`<span class="btflat">⚠ ${flags}</span>`:'<span class="muted">—</span>'}</td>`}</tr>`}).join('');
+    return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b>${s.cuppers?`<div class="muted" style="font-size:var(--fs-cap)">${esc(s.cuppers)}</div>`:''}</td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td>${SC?`<td class="n"><span class="cup" style="${cupPillSt(best)}">${ok(best)?best.toFixed(2):'—'}</span></td>`:`<td>${flags?`<span class="btflat">⚠ ${flags}</span>`:'<span class="muted">—</span>'}</td>`}</tr>`}).join('');
   $('#cEmpty').innerHTML=list.length?'':'<div class="empty">No cupping sessions yet. Press <b>+ New session</b> and pick the roasts on the table.</div>';renderCupDetail()}
 function renderCupDetail(){const el=$('#cDetail');
   if(cupMode==='new'){const recent=HIST.filter(r=>!r.archived).slice(0,40);
@@ -2881,11 +2883,11 @@ function renderCupDetail(){const el=$('#cDetail');
   const scored=ATTRS.reduce((a,k)=>a+Number(x.scores[k[0]]),0),cups=CUPK.reduce((a,k)=>a+x.cups[k[0]].filter(Boolean).length*2,0);
   el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} samples${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · SCA 100-point form</div></div><div class="seg cvseg"><button data-cv="card">Card</button><button class="on" data-cv="score">100-point</button></div><button class="sm dangerTxt" id="csDel">Delete session</button></div>
   <div class="samples">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===selSample?'on':''}" data-i="${i}">#${rr?rr.num:'?'} ${esc(rr?rr.meta.name||'Untitled':'(roast removed)')}</button>`}).join('')}</div>
-  ${r?`<div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Roast #${r.num} · ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · drop ${mmss(sm.drop)} @ ${fT(sm.dropBT)}°${cfg.unit} · dev ${mmss(sm.dev)} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' (spread '+spTxt(spreadOf(r.meta))+')':''}${ok(sm.loss)?' · '+sm.loss.toFixed(1)+'% loss':''}</div>`:''}
+  ${r?`<div class="muted" style="font-size:var(--fs-sm)">Roast #${r.num} · ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · drop ${mmss(sm.drop)} @ ${fT(sm.dropBT)}°${cfg.unit} · dev ${mmss(sm.dev)} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' (spread '+spTxt(spreadOf(r.meta))+')':''}${ok(sm.loss)?' · '+sm.loss.toFixed(1)+'% loss':''}</div>`:''}
   <div class="attrs">${ATTRS.map(a=>`<div class="at"><span class="nm">${a[1]}</span><div class="st"><button data-a="${a[0]}" data-d="-0.25">−</button><b>${Number(x.scores[a[0]]).toFixed(2)}</b><button data-a="${a[0]}" data-d="0.25">+</button></div></div>`).join('')}
     <div class="at"><span class="nm">Defects</span><div class="st"><button data-def="-2">−</button><b>${x.defects}</b><button data-def="2">+</button></div></div>
     ${CUPK.map(c=>`<div class="at"><span class="nm">${c[1]}</span><div class="cups">${x.cups[c[0]].map((v,i)=>`<button class="${v?'':'x'}" data-c="${c[0]}" data-ci="${i}" title="Cup ${i+1}"></button>`).join('')}</div></div>`).join('')}</div>
-  <div class="total"><div><div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Final score</div><div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:2px"><span style="${cupSt(total)}">${esc(cupClass(total))}</span> · ${scored.toFixed(2)} scored + ${cups} cups − ${x.defects} defects</div></div><b class="tnum" style="${cupSt(total)}">${total.toFixed(2)}</b></div>
+  <div class="total"><div><div class="muted" style="font-size:var(--fs-sm)">Final score</div><div class="muted" style="font-size:var(--fs-sm);margin-top:2px"><span style="${cupSt(total)}">${esc(cupClass(total))}</span> · ${scored.toFixed(2)} scored + ${cups} cups − ${x.defects} defects</div></div><b class="tnum" style="${cupSt(total)}">${total.toFixed(2)}</b></div>
   <div><div class="h3" style="margin-bottom:8px">Flavor notes</div><div class="tags">${[...new Set([...TAGS,...(x.tags||[])])].map(t=>`<button class="${x.tags.includes(t)?'on':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button id="tagAdd">+ Add</button></div></div>
   ${r?`<div><div class="h3" style="margin-bottom:8px">How did it taste? <span style="text-transform:none;letter-spacing:0;font-weight:400">— used by Analyze</span></div><div id="cTaste"></div></div>`:''}
   <label class="field">Comments<textarea id="cComm">${esc(x.comments||'')}</textarea></label>
@@ -2930,7 +2932,7 @@ function renderCupPad(el,s){cupPadI=clamp(cupPadI,0,s.samples.length-1);const x=
   el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.cuppers?'cuppers: '+esc(s.cuppers)+' · ':''}sample ${cupPadI+1} of ${s.samples.length}</div></div>
     ${cfg.cupScoring?`<div class="seg cvseg"><button class="on" data-cv="card">Card</button><button data-cv="score">100-point</button></div>`:''}<button id="ccAdd">+ Sample</button><button class="dangerTxt" id="csDel">Delete</button></div>
   <div class="ppills">${s.samples.map((y,i)=>{const rr=HIST.find(h=>h.id===y.roastId);return `<button class="${i===cupPadI?'on':''}" data-pi="${i}">#${rr?rr.num:'?'} ${esc(rr?(rr.meta.coffee||rr.meta.name||'Untitled').split(' ').slice(0,2).join(' '):'(removed)')}</button>`}).join('')}</div>
-  ${r?`<div class="muted" style="font-size:calc(13px*var(--ts,1))"><b style="color:var(--text)">#${r.num} · ${esc(r.meta.coffee||r.meta.name||'')}</b> · ${esc(r.meta.name||'')} · roasted ${fmtDate(r.chargedAt||r.created,false)} · ${lbTxt(batchOf(r))} · WB/GB ${esc(r.meta.colorWhole||'—')}/${esc(r.meta.colorGround||'—')}${ok(sp)?' · spread '+spTxt(sp):''}${l?` · moisture ${esc(l.moisture||'—')} · screen ${esc(l.screen||'—')} · aw ${esc(l.wa||'—')}`:''}</div>`:''}
+  ${r?`<div class="muted" style="font-size:var(--fs-sm)"><b style="color:var(--text)">#${r.num} · ${esc(r.meta.coffee||r.meta.name||'')}</b> · ${esc(r.meta.name||'')} · roasted ${fmtDate(r.chargedAt||r.created,false)} · ${lbTxt(batchOf(r))} · WB/GB ${esc(r.meta.colorWhole||'—')}/${esc(r.meta.colorGround||'—')}${ok(sp)?' · spread '+spTxt(sp):''}${l?` · moisture ${esc(l.moisture||'—')} · screen ${esc(l.screen||'—')} · aw ${esc(l.wa||'—')}`:''}</div>`:''}
   ${CSTAGE.map(([k,lab,sub])=>`<div class="pstage"><div class="psl"><b>${lab}</b><span>${sub}</span></div><div class="pchips">${FAMS.map(([f,fl])=>`<button class="${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-pf="${f}:${k}">${fl}</button>`).join('')}</div></div>`).join('')}
   <div class="prow4"><div><div class="h3">Body</div>${big('body',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']])}</div><div><div class="h3">Acidity</div>${big('acid',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']])}</div>
     <div><div class="h3">Balance</div>${big('bal',[['Y','Yes','y'],['N','No','n']],1)}</div><div><div class="h3">Overall</div>${big('ov',[['Y','Yes','y'],['N','No','n']],1)}</div></div>
@@ -3141,8 +3143,8 @@ function anRecommend(r){const m=anMetrics(r);S_an.r=r;const t=tasteEff(r);if(!ha
 function tasteEditor(el,r,onChange){if(!el||!r)return;const t=tasteEff(r),mine=tasteOf(r),cf=cupFaults(r),fromCup=k=>!(k in mine)&&cf.t[k]>0;
   const cupNote=Object.keys(cf.t).filter(fromCup).map(k=>TASTE.find(x=>x[0]===k)[1].split(' / ')[0]+' ('+cf.why[k]+')');
   el.innerHTML=`<div class="tags taste">${TASTE.map(([k,l])=>`<button class="${t[k]>0?'on':''}${k==='good'?' gd':''}${fromCup(k)?' fc':''}" data-tk="${k}" title="Click again for more">${esc(l)}${k!=='good'&&t[k]>0?` <span class="sev">${'●'.repeat(t[k])}${'○'.repeat(3-t[k])}</span>`:''}${fromCup(k)?' <span class="cupt">cupping</span>':''}</button>`).join('')}</div>
-   ${cupNote.length?`<div class="muted" style="font-size:calc(12px*var(--ts,1));margin-top:6px">From the cupping form: ${esc(cupNote.join(' · '))}. Tap one to change it.</div>`:''}
-   <div class="muted" style="font-size:calc(12px*var(--ts,1));margin-top:6px">Click once for a little, again for some, again for a lot, a fourth time to clear.</div>
+   ${cupNote.length?`<div class="muted" style="font-size:var(--fs-sm);margin-top:6px">From the cupping form: ${esc(cupNote.join(' · '))}. Tap one to change it.</div>`:''}
+   <div class="muted" style="font-size:var(--fs-sm);margin-top:6px">Click once for a little, again for some, again for a lot, a fourth time to clear.</div>
    <label class="field" style="margin-top:8px">What did you taste?<textarea class="tNote" placeholder="e.g. bready finish, sweetness muted when it cooled">${esc((r.taste&&r.taste.note)||'')}</textarea></label>`;
   const save=async()=>{r.taste={tags:{...tasteOf(r)},note:$('.tNote',el).value,at:new Date().toISOString()};await commitRoast(r,true);if(onChange)onChange()};
   $$('[data-tk]',el).forEach(b=>b.onclick=()=>{const k=b.dataset.tk,tags={...tasteOf(r)},cur=tasteEff(r)[k]||0;if(k==='good'){tags.good=cur?0:1;if(tags.good)for(const [x] of TASTE)if(x!=='good')tags[x]=0}else{tags[k]=(cur+1)%4;if(tags[k])tags.good=0}
@@ -3169,14 +3171,14 @@ function cardTimeHTML(r){const H=cardHistory(r);if(!H.length)return '';const C=H
    <tr><td class="ccl">Body / acidity</td>${C.map(({x,c})=>`<td class="${x.id===r.id?'cur':''}">${(c.body||'—')[0]}/${(c.acid||'—')[0]}</td>`).join('')}</tr>
    <tr><td class="ccl">Development</td>${C.map(({x,s})=>`<td class="${x.id===r.id?'cur':''}">${mmss(s.dev)}</td>`).join('')}</tr>
    <tr><td class="ccl">WB / GB</td>${C.map(({x})=>`<td class="${x.id===r.id?'cur':''}">${esc(x.meta.colorWhole||'—')}/${esc(x.meta.colorGround||'—')}</td>`).join('')}</tr></tbody></table></div>
-   <div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin:4px 0 6px">Full dot = in the cup (flavor or aftertaste) · faint = only on the dry or break</div>${notes.slice(-3).reverse().join('')}</div>`}
+   <div class="muted" style="font-size:var(--fs-cap);margin:4px 0 6px">Full dot = in the cup (flavor or aftertaste) · faint = only on the dry or break</div>${notes.slice(-3).reverse().join('')}</div>`}
 function anPrev(r){return HIST.filter(x=>x.id!==r.id&&(x.num||0)<(r.num||0)&&sameSlot(x,r)&&x.samples&&x.samples.length).sort((a,b)=>(b.num||0)-(a.num||0))[0]||null}
 function renderAnDetail(){const el=$('#aDetail'),r=HIST.find(x=>x.id===selAn);if(!r){el.innerHTML='<div class="empty">Select a roast.</div>';return}
   const {m,recs,keep}=anRecommend(r),prev=anPrev(r),checks=anChecks(m),off=anOff[r.id]||(anOff[r.id]={});recs.forEach(x=>{if(off[x.id]!=null)x.on=off[x.id]});
   const pj=anProject(r,m,keep?[]:recs.filter(x=>x.on));
   const src=HIST.find(x=>x.id===r.bgId),srcPlan=src&&src.plan&&anNextOf(src)?.id===r.id?src.plan.recs:null;
   const stat=(l,v,flag)=>`<div class="stat${flag?' flag-'+flag:''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;const devBad=ok(m.dev)&&(m.dev<cfg.bbDevMin||m.dev>cfg.bbDevMax),r6Bad=ok(m.ror6)&&(m.ror6>=cfg.bb6Fast||m.ror6<=cfg.bb6Slow);
-  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">#${r.num} · ${esc(r.meta.name||'Untitled')}</div><div class="muted" style="margin-top:3px">${fmtLong(r.chargedAt||r.created)} · ${esc(r.meta.coffee||'')}${r.meta.green?' · <b>'+esc(r.meta.green)+' lb batch</b>':''} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(m.spread)?' · spread '+spTxt(m.spread)+(cfg.spColorsOn?` <span class="muted">(${esc(spBand(m.spread).label)})</span>`:''):''}</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:calc(14px*var(--ts,1));padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:calc(11.5px*var(--ts,1));margin-top:4px">cupping score</div></div>`:''}</div>
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">#${r.num} · ${esc(r.meta.name||'Untitled')}</div><div class="muted" style="margin-top:3px">${fmtLong(r.chargedAt||r.created)} · ${esc(r.meta.coffee||'')}${r.meta.green?' · <b>'+esc(r.meta.green)+' lb batch</b>':''} · color ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(m.spread)?' · spread '+spTxt(m.spread)+(cfg.spColorsOn?` <span class="muted">(${esc(spBand(m.spread).label)})</span>`:''):''}</div></div>${ok(r.cup)?`<div style="text-align:right"><span class="cup" style="font-size:var(--fs-body);padding:4px 10px;${cupPillSt(r.cup)}">${Number(r.cup).toFixed(2)}</span><div class="muted" style="font-size:var(--fs-cap);margin-top:4px">cupping score</div></div>`:''}</div>
   <div class="anchart"><canvas id="aCv"></canvas></div>
   <div class="legend"><span><i style="background:${COL.bt}"></i>Bean temp</span>${m.dips.length?'<span><i style="background:var(--danger)"></i>Bean temp fell</span>':''}${m.flats.length?'<span><i class="flatsw"></i>Held flat</span>':''}${anRor()?`<span><i style="background:${COL.ror}"></i>RoR</span>`:''}${prev?`<span><i style="background:${COL.bkg||COL.axis}"></i>#${prev.num} (last time)</span>`:''}<span><i style="background:var(--warn)"></i>Burner / air changes</span><label class="rortg"><input type="checkbox" id="aRorTg" ${anRor()?'checked':''}> Show RoR</label>${recs.some(x=>x.on)?`<span><i style="background:var(--good)"></i>Recommended changes${pj?' &amp; target curve':''}</span>`:''}</div>
   ${pj?`<div class="tgtline"><b>Target for next roast</b><span>First crack ${mmss(pj.fcs)} <small>(was ${mmss(m.fcs)})</small></span><span>Drop ${mmss(pj.drop)} @ ${fT(pj.dropBT)}°${cfg.unit} <small>(was ${mmss(m.drop)} @ ${fT(m.dropBT)}°)</small></span><span>Development ${mmss(pj.dev)} <small>(was ${mmss(m.dev)})</small></span></div>`:''}
@@ -3185,8 +3187,8 @@ function renderAnDetail(){const el=$('#aDetail'),r=HIST.find(x=>x.id===selAn);if
   ${srcPlan?`<div class="note"><b>This roast used the plan from #${src.num}:</b>${!sameBatch(batchOf(src),batchOf(r))?`<div class="pl n">Batch size changed (${lbTxt(batchOf(src))} → ${lbTxt(batchOf(r))}), so none of these are counted.</div>`:''}${srcPlan.map(x=>{const f=anFollowed(x.exp,r)&&sameBatch(batchOf(src),batchOf(r));return `<div class="pl ${f?'y':'n'}">${f?'✓':'✗'} ${esc(x.title)}${f||!sameBatch(batchOf(src),batchOf(r))?'':' <span class="muted">— not made, so it isn\'t counted</span>'}</div>`}).join('')}${hasTaste(src)&&hasTaste(r)?`<br><span class="muted">Then: ${esc(tasteText(src))} → now: ${esc(tasteText(r))}</span>`:''}</div>`:''}
   ${cardTimeHTML(r)}
   <div><div class="h3" style="margin-bottom:8px">How did it taste?</div><div id="aTaste"></div></div>
-  <div><div class="h3" style="margin-bottom:8px">For the next roast</div>${!hasTaste(r)?'<div class="muted" style="font-size:calc(13px*var(--ts,1))">Tell it how this roast tasted and the changes appear here.</div>':keep?'<div class="note">Tasted good — repeat it as is. Build the profile to use this roast as the background next time.</div>':recs.length?recs.map(x=>`<label class="rec ${x.on?'on':''}"><input type="checkbox" data-rec="${x.id}" ${x.on?'checked':''}><div><b>${esc(x.title)}</b><div class="muted">${esc(x.detail)}</div><div class="lrn">${x.L.tries?`${x.L.bad?'⚠ ':''}Helped ${x.L.helped} of ${x.L.tries} time${x.L.tries>1?'s':''} on this coffee at ${lbTxt(batchOf(r))}${x.mag!==1?` · step sized ${x.mag>1?'up':'down'} from what happened before`:''}`:`Not tried on this coffee at ${lbTxt(batchOf(r))} yet — starting rule`}</div></div></label>`).join(''):'<div class="muted" style="font-size:calc(13px*var(--ts,1))">The curve doesn\'t point to a burner or air change for that taste. Note it in the comments and see how the next roast goes.</div>'}</div>
-  <div class="row" style="margin-top:auto"><button class="pri" id="aBuild" ${!hasTaste(r)?'disabled':''}>Build next profile ★</button><button id="aOpen">Open roast #${r.num}</button><span class="sp"></span><span class="muted" style="font-size:calc(12px*var(--ts,1))">${(n=>n?`Learned from ${n} follow-up roast${n>1?'s':''} of this coffee at ${lbTxt(batchOf(r))}`:`Nothing learned for this coffee at ${lbTxt(batchOf(r))} yet`)(new Set(anOutcomes().filter(o=>o.coffee===coffeeKey(r)&&o.followed&&o.sameBatch&&sameBatch(o.batch,batchOf(r))).map(o=>o.to)).size)}</span></div>`;
+  <div><div class="h3" style="margin-bottom:8px">For the next roast</div>${!hasTaste(r)?'<div class="muted" style="font-size:var(--fs-sm)">Tell it how this roast tasted and the changes appear here.</div>':keep?'<div class="note">Tasted good — repeat it as is. Build the profile to use this roast as the background next time.</div>':recs.length?recs.map(x=>`<label class="rec ${x.on?'on':''}"><input type="checkbox" data-rec="${x.id}" ${x.on?'checked':''}><div><b>${esc(x.title)}</b><div class="muted">${esc(x.detail)}</div><div class="lrn">${x.L.tries?`${x.L.bad?'⚠ ':''}Helped ${x.L.helped} of ${x.L.tries} time${x.L.tries>1?'s':''} on this coffee at ${lbTxt(batchOf(r))}${x.mag!==1?` · step sized ${x.mag>1?'up':'down'} from what happened before`:''}`:`Not tried on this coffee at ${lbTxt(batchOf(r))} yet — starting rule`}</div></div></label>`).join(''):'<div class="muted" style="font-size:var(--fs-sm)">The curve doesn\'t point to a burner or air change for that taste. Note it in the comments and see how the next roast goes.</div>'}</div>
+  <div class="row" style="margin-top:auto"><button class="pri" id="aBuild" ${!hasTaste(r)?'disabled':''}>Build next profile ★</button><button id="aOpen">Open roast #${r.num}</button><span class="sp"></span><span class="muted" style="font-size:var(--fs-sm)">${(n=>n?`Learned from ${n} follow-up roast${n>1?'s':''} of this coffee at ${lbTxt(batchOf(r))}`:`Nothing learned for this coffee at ${lbTxt(batchOf(r))} yet`)(new Set(anOutcomes().filter(o=>o.coffee===coffeeKey(r)&&o.followed&&o.sameBatch&&sameBatch(o.batch,batchOf(r))).map(o=>o.to)).size)}</span></div>`;
   tasteEditor($('#aTaste'),r,()=>{renderAnalyze()});
   $$('[data-rec]',el).forEach(b=>b.onchange=()=>{off[b.dataset.rec]=b.checked;renderAnDetail()});
   $('#aRorTg').onchange=e=>{store.set('zr2.anRor',e.target.checked);renderAnDetail()};
@@ -3243,9 +3245,9 @@ function anDraw(cv,r,prev,m,recs,pj){if(!cv)return;const b=cv.getBoundingClientR
   c.restore();
   c.font='600 '+font(10.5);c.textAlign='center';for(const [k,l] of [['TP','TP'],['DRY','DRY'],['FCs','FC'],['DROP','DROP']]){const t=r.events[k];if(t==null)continue;const s=sampleAt(r.samples,t);if(!s||!ok(s.bt))continue;c.fillStyle=COL.bt;c.beginPath();c.arc(X(t-o),Y(s.bt),3,0,7);c.fill();c.fillText(l,X(t-o),Y(s.bt)-9)}
   // burner/air changes lane
-  const lane=H-B+20;c.font=font(10.5);c.textAlign='left';let lastX=-99;
+  const lane=H-B+30;c.font=font(10.5);c.textAlign='left';let lastX=-99;
   for(const a of m.adj){const x=X(a.rt);c.strokeStyle=getComputedStyle(document.body).getPropertyValue('--warn')||'#c80';c.lineWidth=1;c.setLineDash([2,3]);c.beginPath();c.moveTo(x,T);c.lineTo(x,H-B);c.stroke();c.setLineDash([]);
-    c.fillStyle=c.strokeStyle;const txt=(a.key==='burner'?'B':a.key==='fan'?'A':'D')+Math.round(a.to);const y=lane+(x-lastX<34?12:0);c.fillText(txt,x+2,y);if(x-lastX>=34)lastX=x}
+    c.fillStyle=c.strokeStyle;const txt=(a.key==='burner'?'B':a.key==='fan'?'A':'D')+Math.round(a.to);const y=lane+(x-lastX<34?11:0);c.fillText(txt,x+2,y);if(x-lastX>=34)lastX=x}
   // recommended points
   const acc=getComputedStyle(document.body).getPropertyValue('--good').trim()||'#2a8';c.fillStyle=acc;c.strokeStyle=acc;c.setLineDash([6,4]);
   for(const rc of recs)for(const z of rc.rem){let t=null;if(z.type==='time')t=z.at;else if(z.type==='event')t=z.at==='CHARGE'?0:r.events[z.at]!=null?r.events[z.at]-o:z.at==='DRY'&&ok(m.dry)?m.dry:null;else{const s=r.samples.find(x=>x.t>o+60&&ok(x.bt)&&x.bt>=z.at);t=s?s.t-o:ok(m.drop)?m.drop+10:null}
@@ -3259,7 +3261,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="h3" style="margin-top:6px">Simulator</div>
     <div class="row" style="align-items:flex-end;gap:12px"><button class="${!link.manual&&link.sim?'':'pri'}" id="sSim">${!link.manual&&link.sim?'Stop simulator':'Start simulator'}</button>
       <label class="field" style="width:130px">Speed<select id="sSimSpeed">${[1,4,10].map(v=>`<option value="${v}" ${simSpeed()===v?'selected':''}>${v}×</option>`).join('')}</select></label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">A pretend P12 for testing and practice. The Link light at the top says “(sim)” while it runs. Use Disconnect or Stop simulator at the top to end it.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">A pretend P12 for testing and practice. The Link light at the top says “(sim)” while it runs. Use Disconnect or Stop simulator at the top to end it.</div>
     <details><summary class="muted" style="cursor:pointer">Advanced: message nodes and inputs</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
     <div class="sgrid">${Object.entries(cfg.nodes).map(([k,v])=>`<label class="field">Node: ${k}<input data-node="${k}" value="${esc(v)}"></label>`).join('')}${['dataRequest','msgCharge','msgDrop','eventMsg','eventNode','evDRY','evFCs','evFCe','evSCs','evSCe'].map(k=>`<label class="field">${k}<input data-cfg="${k}" value="${esc(cfg[k])}"></label>`).join('')}</div>
     <table class="evtbl"><thead><tr><th>Input</th><th>Node</th><th>Unit sent</th><th>Scale ×</th></tr></thead><tbody>${Object.entries(cfg.channels).map(([k,c])=>`<tr><td>${k}</td><td><input data-ch="${k}" data-f="node" value="${esc(c.node)}"></td><td>${TEMP_KEYS.includes(k)?`<select data-ch="${k}" data-f="mode"><option ${c.mode==='C'?'selected':''}>C</option><option ${c.mode==='F'?'selected':''}>F</option></select>`:'<span class="muted">raw</span>'}</td><td><input data-ch="${k}" data-f="scale" value="${esc(c.scale)}" style="width:90px"></td></tr>`).join('')}</tbody></table></div></details>
@@ -3274,12 +3276,12 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="h3">High bean temp alarm</div>
     <div class="row" style="align-items:flex-end;gap:14px"><label class="chk" style="padding:0"><input type="checkbox" data-cfgb="btAlarmOn" ${cfg.btAlarmOn?'checked':''}> Flash bean temp and sound an alarm at</label>
       <label class="field" style="width:160px">Alarm temperature (°${cfg.unit})<input id="sBtAlarm" inputmode="decimal" value="${Math.round(toD(cfg.btAlarmC))}"></label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Click the flashing bean temp to silence the sound. The alarm resets once bean temp drops 5° below the setting.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">Click the flashing bean temp to silence the sound. The alarm resets once bean temp drops 5° below the setting.</div>
     <div class="h3">Auto cooling</div>
     <div class="row" style="align-items:flex-end;gap:14px"><label class="chk" style="padding:0"><input type="checkbox" data-cfgb="autoCoolOn" ${cfg.autoCoolOn?'checked':''}> Turn on Cooling when bean temp reaches</label>
       <label class="field" style="width:150px">Temperature (°${cfg.unit})<input id="sAutoCool" inputmode="decimal" value="${Math.round(toD(cfg.autoCoolC))}"></label>
       <label class="field" style="width:190px">then Stirrer after (seconds)<input id="sAutoStir" inputmode="decimal" value="${esc(cfg.autoStirDelay)}"></label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Happens once per roast, only while recording with Control on, and only after the turning point (so the hot charge temperature doesn't set it off).</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">Happens once per roast, only while recording with Control on, and only after the turning point (so the hot charge temperature doesn't set it off).</div>
     <div class="h3">Setpoints at Drop</div>
     <div class="row" style="align-items:flex-end;gap:14px"><label class="chk" style="padding:0"><input type="checkbox" data-cfgb="dropSetOn" ${cfg.dropSetOn?'checked':''}> When Drop is marked, set:</label>
       <label class="field" style="width:150px">Burner (%)<input id="sDropB" inputmode="numeric" value="${esc(cfg.dropBurner)}"></label>
@@ -3289,7 +3291,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="row" style="align-items:flex-end;gap:14px"><label class="chk" style="padding:0"><input type="checkbox" data-cfgb="autoOffOn" ${cfg.autoOffOn?'checked':''}> Turn off automatically after Drop:</label>
       <label class="field" style="width:170px">Cooling fan off after (min)<input id="sCoolOff" inputmode="decimal" value="${esc(cfg.coolOffMin)}"></label>
       <label class="field" style="width:170px">Stirrer off after (min)<input id="sStirOff" inputmode="decimal" value="${esc(cfg.stirOffMin)}"></label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Counts from when Drop is marked, even after you press Stop. A countdown shows on the Cooling and Stirrer buttons. Needs Control on. Use 2.5 for 2 min 30 s.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">Counts from when Drop is marked, even after you press Stop. A countdown shows on the Cooling and Stirrer buttons. Needs Control on. Use 2.5 for 2 min 30 s.</div>
     <label class="chk"><input type="checkbox" data-cfgb="coolOnDrop" ${cfg.coolOnDrop?'checked':''}> Turn on Cooling and Stirrer automatically at Drop (Control must be on)</label>
     <label class="chk"><input type="checkbox" data-cfgb="sound" ${cfg.sound?'checked':''}> Sounds for reminders and lost connection</label>`,
   ev:()=>`<h2>Event buttons</h2><div class="sub">Choose which keys show along the bottom of the Roast screen. Hidden events still work from their keyboard key.</div>
@@ -3297,9 +3299,9 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <table class="evtbl"><thead><tr><th>Show</th><th>Event</th><th>Label on button</th><th>Keyboard key</th><th>Button color</th><th>Text color</th><th></th></tr></thead><tbody>${cfg.events.map((e,i)=>`<tr><td><input type="checkbox" data-evs="${i}" ${e.show?'checked':''}></td><td>${esc(EVENTS_ALL.find(x=>x.k===e.k).label)}</td><td><input data-evl="${i}" value="${esc(e.label)}"></td><td><input data-evk="${i}" value="${esc(keyName(e.key))}" placeholder="press a key" readonly style="cursor:pointer"></td><td>${evc(i,'bg',e.bg)}</td><td>${evc(i,'fg',e.fg)}</td><td><button class="sm" data-up="${i}" ${i===0?'disabled':''}>↑</button> <button class="sm" data-dn="${i}" ${i===cfg.events.length-1?'disabled':''}>↓</button></td></tr>`).join('')}
     <tr><td><input type="checkbox" checked disabled></td><td>Start / Stop</td><td class="muted">always shown</td><td><input data-startkey="1" value="${esc(cfg.startKey)}" readonly style="cursor:pointer"></td><td>${evc('start','bg',cfg.startBg)}</td><td>${evc('start','fg',cfg.startFg)}</td><td></td></tr>
     ${SWITCHES.filter(w=>!w.confirm).map(w=>`<tr><td></td><td>${w.label} on/off</td><td class="muted">switch button</td><td><input data-swkey="${w.p}" value="${esc(keyName(cfg.swKeys[w.p]))}" placeholder="press a key" readonly style="cursor:pointer"></td><td></td><td></td><td></td></tr>`).join('')}</tbody></table>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Leave a color empty to use the normal look.</div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Cooling and Stirrer keys work when Control is on, and not while you're typing in a box.</div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Click a keyboard box, then press the key you want (Backspace clears it). Number keys work best on a Mac. F-keys need the fn key unless “Use F1, F2, etc. keys as standard function keys” is on in System Settings → Keyboard.</div>
+    <div class="muted" style="font-size:var(--fs-sm)">Leave a color empty to use the normal look.</div>
+    <div class="muted" style="font-size:var(--fs-sm)">Cooling and Stirrer keys work when Control is on, and not while you're typing in a box.</div>
+    <div class="muted" style="font-size:var(--fs-sm)">Click a keyboard box, then press the key you want (Backspace clears it). Number keys work best on a Mac. F-keys need the fn key unless “Use F1, F2, etc. keys as standard function keys” is on in System Settings → Keyboard.</div>
     <div class="row"><button id="evReset">Reset to defaults</button></div>`,
   biz:()=>`<h2>Business</h2><div class="sub">Your name and logo at the top left of the app, and on roast CSV exports.</div>
     <label class="field" style="max-width:420px">Business name<input id="bizName" value="${esc(cfg.bizName)}" placeholder="e.g. Zuna Coffee"></label>
@@ -3309,7 +3311,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="field" style="max-width:640px">Logo for the Dark look <span style="font-weight:400">(optional — e.g. a white version)</span>
       <div class="logoBox" style="background:#1C1F22">${cfg.bizLogoDark?`<img src="${cfg.bizLogoDark}" alt="Dark logo">`:'<div class="ph" style="background:#2A2E32;color:#9AA1A9">None — main logo is shown on a light backing</div>'}<div class="row"><button class="pri" id="bizUpD">${cfg.bizLogoDark?'Change…':'Upload…'}</button>${cfg.bizLogoDark?'<button id="bizDelD" class="dangerTxt">Remove</button>':''}</div></div>
       <input type="file" id="bizFileD" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">PNG with a transparent background looks best, and on the Dark look too. Wide logos fit better than tall ones; it’s shown about 36px high.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">PNG with a transparent background looks best, and on the Dark look too. Wide logos fit better than tall ones; it’s shown about 36px high.</div>
     <label class="chk"><input type="checkbox" data-cfgb="bizHeader" ${cfg.bizHeader?'checked':''}> Show logo and name at the top left</label>`,
   look:()=>{const c=cfg.theme.colors,themes=[{name:'White',colors:WHITE},{name:'Dark',colors:DARK},...cfg.customThemes];
     const warns=[];if(contrast(c.text,c.panel)<4.5)warns.push('Text is hard to read on the panels.');if(contrast(c.text,c.bg)<3)warns.push('Text is hard to read on the background.');if(contrast(c.bt,c.chartBg)<3)warns.push('The bean temp line is hard to see on the chart background.');if(contrast(c.ror,c.chartBg)<2.5)warns.push('The rate-of-rise line is hard to see on the chart background.');
@@ -3322,16 +3324,16 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     </div>
     <div class="sgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[['textScale','Text size'],['bigScale','Big number size'],['smallScale','Small number size']].map(([k,l])=>`<label class="field">${l} · <b id="lbl_${k}" style="color:var(--text)">${cfg[k]}%</b><input type="range" min="80" max="140" step="5" data-scale="${k}" value="${cfg[k]}" style="padding:0;border:0"></label>`).join('')}</div>
     <div class="note" style="display:flex;gap:28px;align-items:baseline;flex-wrap:wrap"><span style="font-size:calc(15px*var(--ts,1))">Roast #43 · Brazil Espresso</span><span style="font-family:var(--numFont);font-weight:var(--bigW);font-size:calc(48px*var(--bs,1));color:var(--text)">402.6</span><span style="font-family:var(--numFont);font-weight:var(--smallW);font-size:calc(22px*var(--ss,1));color:var(--text)">60 · 9:41</span><button class="sm" id="sizeReset" style="margin-left:auto">Reset sizes</button></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Big numbers: roast time, bean temp, rate of rise and setpoints. Small numbers: exhaust, air pressure, preset buttons, stats and tiles. For “Other font…”, type the name exactly as it shows in the Mac’s Font Book.</div>
-    <div class="sech">General</div><div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-8px">Colors used on every screen.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">Big numbers: roast time, bean temp, rate of rise and setpoints. Small numbers: exhaust, air pressure, preset buttons, stats and tiles. For “Other font…”, type the name exactly as it shows in the Mac’s Font Book.</div>
+    <div class="sech">General</div><div class="muted" style="font-size:var(--fs-sm);margin-top:-8px">Colors used on every screen.</div>
     <div class="cols"><div>${COLOR_ROWS.screen.map(([k,l])=>crow(k,l)).join('')}</div><div></div></div>
     <div class="sech">Roast screen</div>
     <div class="cols"><div><div class="h3" style="margin:6px 0">Big numbers &amp; setpoints (right side)</div>${COLOR_ROWS.big.map(([k,l])=>crow(k,l)).join('')}</div><div><div class="h3" style="margin:6px 0">Chart</div>${COLOR_ROWS.chart.map(([k,l])=>crow(k,l)).join('')}</div></div>
-    <div class="h3" style="margin:10px 0 6px">Event buttons</div><div class="evcols">${cfg.events.map((e,i)=>`<div class="crow" style="grid-template-columns:1fr auto auto"><span>${esc(e.label||EVENTS_ALL.find(x=>x.k===e.k).label)}${e.show?'':' <span class="muted">(hidden)</span>'}</span><span class="row" style="gap:6px;flex-wrap:nowrap"><span class="muted" style="font-size:calc(12px*var(--ts,1))">Button</span>${evc(i,'bg',e.bg)}</span><span class="row" style="gap:6px;flex-wrap:nowrap"><span class="muted" style="font-size:calc(12px*var(--ts,1))">Text</span>${evc(i,'fg',e.fg)}</span></div>`).join('')}</div>
+    <div class="h3" style="margin:10px 0 6px">Event buttons</div><div class="evcols">${cfg.events.map((e,i)=>`<div class="crow" style="grid-template-columns:1fr auto auto"><span>${esc(e.label||EVENTS_ALL.find(x=>x.k===e.k).label)}${e.show?'':' <span class="muted">(hidden)</span>'}</span><span class="row" style="gap:6px;flex-wrap:nowrap"><span class="muted" style="font-size:var(--fs-sm)">Button</span>${evc(i,'bg',e.bg)}</span><span class="row" style="gap:6px;flex-wrap:nowrap"><span class="muted" style="font-size:var(--fs-sm)">Text</span>${evc(i,'fg',e.fg)}</span></div>`).join('')}</div>
     <div class="sech">Green coffee</div>
     <div class="cols"><div><div class="h3" style="margin:6px 0">Page colors</div>${COLOR_ROWS.green.map(([k,l])=>crow(k,l)).join('')}</div><div><div class="h3" style="margin:6px 0">Process colors</div>
     <label class="chk"><input type="checkbox" id="procOn" ${cfg.procColorsOn?'checked':''}> Color the process by type</label>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin:6px 0 8px">A process gets the color of the first row whose words appear in it, checked top to bottom. Separate words with commas — “anaerobic” above “natural” makes “Anaerobic natural” purple.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin:6px 0 8px">A process gets the color of the first row whose words appear in it, checked top to bottom. Separate words with commas — “anaerobic” above “natural” makes “Anaerobic natural” purple.</div>
     <div class="cupbands" >${cfg.procColors.map((r,i)=>`<div class="crow" style="grid-template-columns:150px 1fr 44px 96px 92px"><span>${procTag(procWords(r)[0]?procWords(r)[0].replace(/^./,c=>c.toUpperCase()):'—')}</span><input type="text" data-procw="${i}" value="${esc(r.words)}" placeholder="Words, separated by commas"><input type="color" data-procc="${i}" value="${r.col}"><input type="text" data-proch="${i}" value="${r.col.toUpperCase()}" maxlength="7"><span class="row" style="gap:4px;flex-wrap:nowrap"><button class="sm" data-procup="${i}" ${i===0?'disabled':''} title="Move up">↑</button><button class="sm" data-procdel="${i}" title="Remove">✕</button></span></div>`).join('')}</div>
     <div class="row"><button id="procAdd">+ Add process</button><span class="sp"></span><button id="procReset">Reset process colors</button></div></div></div>
     <div class="sech">Pricing</div>
@@ -3354,36 +3356,36 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     ${IPAD?`<label class="chk"><input type="checkbox" data-sc="ipLegend" ${s.ipLegend?'checked':''}> Show the line legend above the chart (Bean temp · Rate of rise · Background · Burner · Air)</label>`:''}
     <label class="chk"><input type="checkbox" data-sc="phaseBar" ${s.phaseBar?'checked':''}> Show the phase bar under the chart (Drying · Maillard · Development)</label>
     <label class="chk" style="margin-left:26px"><input type="checkbox" data-sc="phaseBarBkg" ${s.phaseBarBkg?'checked':''} ${s.phaseBar?'':'disabled'}> …with the background profile’s phases under it, and the difference in each label</label>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">The phase bar colors are in Appearance › Chart.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">The phase bar colors are in Appearance › Chart.</div>
     <div class="h3" style="margin-top:6px">Shade under lines</div>
     <div class="sgrid" style="grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 14px">${[['fillBt','Bean temp'],['fillRor','Rate of rise'],['fillEx','Exhaust'],['fillBkg','Background curves'],['fillBurner','Burner'],['fillAir','Air'],['fillPressure','Air pressure']].map(([k,l])=>`<label class="chk"><input type="checkbox" data-sc="${k}" ${s[k]?'checked':''}> ${l}</label>`).join('')}</div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">A soft fill in each line’s own color. Turn on only the ones you find helpful — too many at once gets busy.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">A soft fill in each line’s own color. Turn on only the ones you find helpful — too many at once gets busy.</div>
     <div class="h3" style="margin-top:6px">RoR lines</div>
     ${['',  '2'].map(n=>`<div class="rlbox"><label class="chk"><input type="checkbox" data-rlon="${n}" ${cfg['rorLine'+n+'On']?'checked':''}> <b>Line ${n||'1'}</b> — a line across the chart at a set rate of rise, with everything below it shaded</label>
     <div class="rlgrid"><label class="field">Line at (°${cfg.unit}/min)<input type="number" step="0.5" data-rlval="${n}" value="${+toDR(Number(cfg['rorLine'+n+'C'])).toFixed(1)}"></label><label class="field">Shading strength · <b data-rlal="${n}" style="color:var(--text)">${cfg['rorZone'+n+'Alpha']}%</b><input type="range" min="0" max="40" step="2" data-rlalpha="${n}" value="${cfg['rorZone'+n+'Alpha']}" style="padding:0;border:0"></label><div>${crow('rorLine'+n,'Line color')}${crow('rorZone'+n,'Shading color')}</div></div></div>`).join('')}
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Uses the rate-of-rise scale on the right side of the chart. Where both shadings overlap they add together, so the area under the lower line looks a little deeper. Shading strength 0% shows just the line. The colors are also under Appearance → Roast screen → Chart.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">Uses the rate-of-rise scale on the right side of the chart. Where both shadings overlap they add together, so the area under the lower line looks a little deeper. Shading strength 0% shows just the line. The colors are also under Appearance → Roast screen → Chart.</div>
     <div class="sgrid"><label class="field">Temperature unit<select id="sUnit"><option value="F" ${isF()?'selected':''}>°F</option><option value="C" ${!isF()?'selected':''}>°C</option></select></label><label class="field">Air pressure unit<select id="sPUnit"><option value="Pa" ${!isMbar()?'selected':''}>Pa (pascals)</option><option value="mbar" ${isMbar()?'selected':''}>mbar (millibars)</option></select></label><label class="field">Rate of rise smoothing (s)<input data-cfg="rorWindow" value="${esc(cfg.rorWindow)}"></label><label class="field">Show rate of rise<select id="sRorFrom"><option value="charge" ${cfg.rorFrom!=='tp'?'selected':''}>Right away, from Charge</option><option value="tp" ${cfg.rorFrom==='tp'?'selected':''}>After the turning point</option></select></label></div>
     <div class="sgrid"><label class="field">Turning point: mark after a rise of (°${cfg.unit})<input type="number" step="0.5" min="0.5" id="sTpRise" value="${+(isF()?cfg.tpRiseC*1.8:cfg.tpRiseC).toFixed(1)}"></label><label class="field">…and at least this many seconds after the low<input type="number" step="1" min="1" id="sTpSecs" value="${esc(cfg.tpSecs)}"></label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">The turning point time is always the lowest bean temp. These only set how soon the app is sure the temperature has turned. Lower = the TP mark shows sooner, but a jittery probe could mark it too early.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">The turning point time is always the lowest bean temp. These only set how soon the app is sure the temperature has turned. Lower = the TP mark shows sooner, but a jittery probe could mark it too early.</div>
     <div class="row"><button id="scReset">Reset scales</button></div>`},
   store:()=>`<h2>Saving &amp; storage</h2><div class="sub">Every roast is saved as files in a folder on this Mac.</div>
     ${!FS.supported?'<div class="warn">This browser can’t save straight to a folder. Open the app in Google Chrome to save into a roasts folder. Until then, roasts are kept inside the browser — use Export all for backups.</div>':
       FS.state==='granted'?`<div class="box"><span>📁 Saving to <b>${esc(window.ZR_NATIVE?ZR_NATIVE.folder:FS.dir.name)}</b></span><span class="row">${window.ZR_NATIVE&&!IPAD?'<button id="stReveal">Show in Finder</button>':''}<button id="stChange">Change folder</button></span></div>`:FS.dir?`<div class="warn">📁 <b>${esc(FS.dir.name)}</b> needs permission again. <button class="pri sm" id="stRe">Reconnect folder</button></div>`:`<div class="box"><span>No folder chosen yet — roasts are only inside the browser.</span><button class="pri" id="stChoose">Choose roasts folder</button></div>`}
-    <div class="note" style="font-family:var(--mono);font-size:calc(12.5px*var(--ts,1))">Your folder/
+    <div class="note" style="font-family:var(--mono);font-size:var(--fs-sm)">Your folder/
   Profiles/           one file per profile, named by profile
   Roasts/2026/10 October/R0042_2026-10-12_1445_….json + .csv
   Green coffee/       inventory.json + inventory.csv
   Cupping/            cupping.json + cupping.csv
   Settings/           settings.json · today-plan.json · roast-in-progress.json</div>
-    <div class="muted" style="font-size:calc(13px*var(--ts,1));line-height:1.5">Tip: put the folder in iCloud Drive so it’s backed up and you can open it from another Mac. ${HIST.length} roasts · ${INV.length} green lots · ${CUP.length} cupping sessions stored.</div>
+    <div class="muted" style="font-size:var(--fs-sm);line-height:1.5">Tip: put the folder in iCloud Drive so it’s backed up and you can open it from another Mac. ${HIST.length} roasts · ${INV.length} green lots · ${CUP.length} cupping sessions stored.</div>
     <div class="row"><button id="stExport">Export everything (JSON)</button></div>
     <div class="h3">Start fresh</div>
-    <div class="muted" style="font-size:calc(13px*var(--ts,1));line-height:1.5;margin-top:-6px">Clears all roasts and profiles, planned profiles, green coffee, cupping sessions and today’s plan — on every device that uses this folder — and the next roast is #1. Your settings stay. A backup of everything is saved first (Settings/start-fresh-backup-….json); to bring it back, use Import on the History screen.</div>
+    <div class="muted" style="font-size:var(--fs-sm);line-height:1.5;margin-top:-6px">Clears all roasts and profiles, planned profiles, green coffee, cupping sessions and today’s plan — on every device that uses this folder — and the next roast is #1. Your settings stay. A backup of everything is saved first (Settings/start-fresh-backup-….json); to bring it back, use Import on the History screen.</div>
     <div class="row"><button id="stFresh" class="dangerTxt">Start fresh…</button></div>
     ${window.ZR_NATIVE?(IPAD?`<div class="box"><span>Zuna Roast for iPad · version <b>${esc(ZR_NATIVE.version||'—')}</b></span><span class="muted">Updates come through TestFlight</span></div>`:`<div class="box"><span>Zuna Roast for Mac · version <b>${esc(ZR_NATIVE.version||'—')}</b></span><button id="stUpd">Check for updates</button></div>`):''}`,
   an:()=>`<h2>Analyze rules</h2><div class="sub">The starting rules the Analyze screen uses. Once a coffee has history, it also learns from that coffee's own results and sizes the steps up or down on its own.</div>
     <div class="h3">What counts as a problem on the curve</div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">From the Brewed Behavior roasting manual. The first crack mark is machine-specific — the manual's roasters crack at 378°F; yours is set to where your P12 cracks.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">From the Brewed Behavior roasting manual. The first crack mark is machine-specific — the manual's roasters crack at 378°F; yours is set to where your P12 cracks.</div>
     <div class="sgrid"><label class="field">Turning point target (m:ss)<input data-cfgm="bbTp" value="${mmss(cfg.bbTp)}"></label><label class="field">Turning point — within (seconds)<input data-cfg="bbTpTol" value="${esc(cfg.bbTpTol)}"></label>
       <label class="field">Color change — earliest (m:ss)<input data-cfgm="bbDryMin" value="${mmss(cfg.bbDryMin)}"></label><label class="field">Color change — latest (m:ss)<input data-cfgm="bbDryMax" value="${mmss(cfg.bbDryMax)}"></label>
       <label class="field">Color change temp (°${cfg.unit})<input data-cfgt="bbDryC" value="${fT(cfg.bbDryC)}"></label><label class="field">Color change temp — within ± (°${cfg.unit})<input data-cfgr="bbDryTol" value="${toDR(cfg.bbDryTol).toFixed(0)}"></label>
@@ -3392,16 +3394,16 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
       <label class="field">Development — shortest (m:ss)<input data-cfgm="bbDevMin" value="${mmss(cfg.bbDevMin)}"></label><label class="field">Development — longest (m:ss)<input data-cfgm="bbDevMax" value="${mmss(cfg.bbDevMax)}"></label>
       <label class="field">Long roast — over (minutes)<input data-cfg="anLong" value="${esc(cfg.anLong)}"></label><label class="field">Short roast — under (minutes)<input data-cfg="anShort" value="${esc(cfg.anShort)}"></label>
       <label class="field">Color spread target — at or under (Agtron)<input data-cfg="anSpread" value="${esc(cfg.anSpread)}"></label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">6-minute rule: 15°F/min is 1° every 4 s; 20 (1° every 3 s) is too fast, 12 (1° every 5 s) too slow.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">6-minute rule: 15°F/min is 1° every 4 s; 20 (1° every 3 s) is too fast, 12 (1° every 5 s) too slow.</div>
     <div class="h3">Bean temp — steady rise</div>
     <div class="sgrid"><label class="field">Counts as a fall when it drops by (°${cfg.unit})<input data-cfgr="anBtDip" value="${toDR(cfg.anBtDip).toFixed(1)}"></label><label class="field">Counts as flat after (seconds)<input data-cfg="anBtFlat" value="${esc(cfg.anBtFlat)}"></label></div>
     <label class="chk"><input type="checkbox" data-cfgb="anBtLive" ${cfg.anBtLive?'checked':''}> Flash bean temp amber on the Roast screen if it starts falling after the turning point</label>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Smaller wobbles are treated as probe noise. Flat means it rose less than half the fall amount over that many seconds.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">Smaller wobbles are treated as probe noise. Flat means it rose less than half the fall amount over that many seconds.</div>
     <div class="h3">Size of each suggested change</div>
     <div class="sgrid"><label class="field">Burner step (%)<input data-cfg="anBurnerStep" value="${esc(cfg.anBurnerStep)}"></label><label class="field">Air step (%)<input data-cfg="anAirStep" value="${esc(cfg.anAirStep)}"></label></div>
     <div class="h3">Cupping form</div>
     <div class="sgrid"><label class="field">A score at or below this counts as low<input data-cfg="anCupLow" value="${esc(cfg.anCupLow)}"></label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin-top:-6px">Low Body reads as thin body; low Acidity, or 3 or fewer sweet cups, reads as dull / muted; Roasty and Grassy flavor notes count too. Anything you tap on the taste buttons wins over the form.</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin-top:-6px">Low Body reads as thin body; low Acidity, or 3 or fewer sweet cups, reads as dull / muted; Roasty and Grassy flavor notes count too. Anything you tap on the taste buttons wins over the form.</div>
     <div class="row"><button id="sAnReset">Reset to starting values</button></div>`,
   log:()=>`<h2>Connection log</h2><div class="row"><label class="chk"><input type="checkbox" id="logV" ${logVerbose?'checked':''}> Show data traffic</label><button class="sm" id="logClear">Clear</button><span class="sp"></span><span class="muted">${esc(link.url())}</span></div><div class="log" id="logBox"></div>`};
   el.innerHTML=P[curPane]();wireSettings()}
@@ -3590,21 +3592,21 @@ function renderPrOverview(o,ctx){const el=$('#prOverview'),what=PRW.days!=null||
   el.innerHTML=`<div class="ovgrid">
   <div class="card ovcard"><div class="h3">Your roasting${what?' — what-if':''}</div>
     <div class="ovsay">You roast about <b>${ok(ctx.month)?Math.round(ctx.month).toLocaleString():'—'} lb</b> a month on <b>${ctx.days} day${ctx.days===1?'':'s'}</b> a week. Your fixed costs are <b>${money0(ctx.ohMonth)}</b> a month, so every pound carries <b style="color:var(--warn)">${money(ctx.ohPerLb)}</b> of overhead${ok(ohShare)?` — about <b>${Math.round(ohShare)} %</b> of what a pound costs you`:''}.</div>
-    ${ok(avgPer)?`<div><div class="row" style="font-size:calc(13px*var(--ts,1));margin-bottom:6px"><span class="muted">Where an average pound’s cost goes</span><span class="sp"></span><b class="tnum">${money(avgPer)} / lb</b></div>
+    ${ok(avgPer)?`<div><div class="row" style="font-size:var(--fs-sm);margin-bottom:6px"><span class="muted">Where an average pound’s cost goes</span><span class="sp"></span><b class="tnum">${money(avgPer)} / lb</b></div>
       <div class="stack" style="height:14px"><i style="width:${avgCoffee/avgPer*100}%;background:var(--p-coffee)"></i><i style="width:${ctx.ohPerLb/avgPer*100}%;background:var(--p-over)"></i><i style="width:${ctx.labPerLb/avgPer*100}%;background:var(--p-labor)"></i></div>
-      <div class="row" style="gap:16px;font-size:calc(12.5px*var(--ts,1));margin-top:6px"><span><b>${money(avgCoffee)}</b> <span class="muted">green coffee</span></span><span><b style="color:var(--p-over)">${money(ctx.ohPerLb)}</b> <span class="muted">overhead</span></span><span><b>${money(ctx.labPerLb)}</b> <span class="muted">labor</span></span><span class="muted">+ bags, per size</span></div></div>`:''}</div>
-  <div class="card ovcard"><div class="row"><div class="h3">What if</div><span class="sp"></span>${what?'<span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Nothing is saved</span><button class="sm" id="prWr">Reset</button>':''}</div>
+      <div class="row" style="gap:16px;font-size:var(--fs-sm);margin-top:6px"><span><b>${money(avgCoffee)}</b> <span class="muted">green coffee</span></span><span><b style="color:var(--p-over)">${money(ctx.ohPerLb)}</b> <span class="muted">overhead</span></span><span><b>${money(ctx.labPerLb)}</b> <span class="muted">labor</span></span><span class="muted">+ bags, per size</span></div></div>`:''}</div>
+  <div class="card ovcard"><div class="row"><div class="h3">What if</div><span class="sp"></span>${what?'<span class="muted" style="font-size:var(--fs-sm)">Nothing is saved</span><button class="sm" id="prWr">Reset</button>':''}</div>
     <div class="row" style="gap:18px"><span class="row" style="gap:6px"><span class="muted">Roast days a week</span><button class="sm" id="prDm">−</button><b class="tnum" style="min-width:18px;text-align:center">${ctx.days}</b><button class="sm" id="prDp">+</button></span>
       <span class="row" style="gap:6px"><span class="muted">Green price change</span><input id="prGc" inputmode="decimal" value="${Number(PRW.green)?PRW.green:''}" placeholder="0.00" style="width:80px;padding:5px 8px"><span class="muted">$ / lb</span></span></div>
-    <div class="muted" style="font-size:calc(13px*var(--ts,1))">Overhead per lb at each roast schedule (same rent &amp; gas, more coffee):</div>
+    <div class="muted" style="font-size:var(--fs-sm)">Overhead per lb at each roast schedule (same rent &amp; gas, more coffee):</div>
     <div class="dayb">${days.map(x=>`<div class="${x.d===ctx.days?'on':''}"><b class="tnum">${money(x.oh)}</b><i style="height:${x.oh&&maxOh?Math.max(4,x.oh/maxOh*100):0}%"></i><span class="muted">${x.d} day${x.d===1?'':'s'}</span></div>`).join('')}</div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Every price on the Price list follows these settings while they’re on.</div></div>
+    <div class="muted" style="font-size:var(--fs-sm)">Every price on the Price list follows these settings while they’re on.</div></div>
   <div class="card ovcard" style="grid-column:1/-1"><div class="h3">Do your prices work?</div>
-    ${rows.length?`<div class="muted" style="font-size:calc(13px*var(--ts,1));margin-top:-4px">For each price you’ve set: how many lb you need to roast a month to cover all costs, and to reach your target margin. You roast about <b style="color:var(--text)">${Math.round(ctx.month).toLocaleString()} lb</b> now.</div>
+    ${rows.length?`<div class="muted" style="font-size:var(--fs-sm);margin-top:-4px">For each price you’ve set: how many lb you need to roast a month to cover all costs, and to reach your target margin. You roast about <b style="color:var(--text)">${Math.round(ctx.month).toLocaleString()} lb</b> now.</div>
     <table class="be"><thead><tr><th>Coffee</th><th>Bag</th><th class="n">Your price</th><th class="n">Covers costs at</th><th class="n">Hits target at <span style="text-transform:none;letter-spacing:0">(after overhead)</span></th><th></th></tr></thead><tbody>
     ${rows.map(r=>`<tr><td><b>${esc(r.l.name)}</b></td><td>${r.b.label} · ${r.n.toLowerCase()}</td><td class="n">${money(r.p)}</td><td class="n">${vol(r.zero)}</td><td class="n">${vol(r.tgt)} <span class="muted">(${r.m} %)</span></td>
       <td>${okNow(r.tgt)?'<span class="badge g">Works now</span>':r.tgt==null?'<span class="badge r">Raise price</span>':okNow(r.zero)?'<span class="badge" style="background:color-mix(in srgb,var(--warn) 14%,var(--panel));color:var(--warn)">Needs more volume</span>':'<span class="badge r">Losing money now</span>'}</td></tr>`).join('')}</tbody></table>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">“Never” means the price doesn’t cover the coffee, labor and bag even with no rent at all.</div>`
+    <div class="muted" style="font-size:var(--fs-sm)">“Never” means the price doesn’t cover the coffee, labor and bag even with no rent at all.</div>`
     :'<div class="empty" style="padding:20px">Type your prices on the Price list to see how many pounds a month each one needs.</div>'}</div>
   </div>`;
   $('#prDm').onclick=()=>{PRW.days=Math.max(1,ctx.days-1);if(PRW.days===ctx.daysNow)PRW.days=null;renderPricing()};
@@ -3626,7 +3628,7 @@ function renderPrPrices(o,ctx){const q=normName($('#prSearch').value);
   const one=(b,k)=>{const a=b['a'+k];if(!ok(a))return '<span class="notset">—</span>';const m=b['m'+k],low=m<(k==='w'?T.w:T.r)-0.05;
     return `<span class="${low?'plow':''}" title="${b.lb!==1?money(a/b.lb)+' / lb · ':''}${ok(m)?m.toFixed(0)+' % margin':''}">${money(a)}</span>`};
   $('#prRows').innerHTML=list.map(l=>{const c=prCalc(l,o,ctx);
-    return `<tr class="${l.id===prSel?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b><div class="muted" style="font-size:calc(12px*var(--ts,1))">${esc([l.origin,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></td>
+    return `<tr class="${l.id===prSel?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b><div class="muted" style="font-size:var(--fs-sm)">${esc([l.origin,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></td>
       ${c.hasPrice?`<td class="wr"><span class="ptc"><b class="ppill w">Wholesale</b></span><span class="ptc"><b class="ppill r">Retail</b></span></td>${c.bags.map(b=>`<td class="n prc wr">${one(b,'w')}${one(b,'r')}</td>`).join('')}`:'<td colspan="4" class="muted">No green price yet — add it on the Green coffee screen</td>'}</tr>`}).join('');
   $('#prEmpty').innerHTML=list.length?`<div class="prlegend"><span><b style="color:var(--text)">Black</b> = your price</span><span class="plow">Red = below target</span><span>— = not set yet</span><span class="sp"></span>
     ${infoTip(`Only the prices you’ve set show here. Pick a coffee and type its prices in the card on the right — it also shows the suggested price, price per lb and both margins.<br><br><b>Margin is not markup.</b> Margin is the share of the price you keep. A $10 cost at ${num(T.w)} % margin sells for ${money(10/(1-T.w/100))}, not ${money(10*(1+T.w/100))}.`)}</div>`
@@ -3642,7 +3644,7 @@ function renderPrDetail(o,ctx){const el=$('#prDetail'),l=INV.find(x=>x.id===prSe
   el.innerHTML=`<div><div class="dtitle">${esc(l.name)}</div><div class="muted">${esc([l.origin,l.process,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></div>
     <div><button class="costhead ${prOpen.cost?'open':''}" id="prCostTg"><span class="chev">▸</span><span>True cost per lb roasted</span><span class="sp"></span><b class="tnum" style="font-size:calc(17px*var(--ts,1))">${money(c.perLb)}</b></button>
       <div class="stack" style="margin-top:8px"><i style="width:${c.coffee/per*100}%;background:${COL.coffee}"></i><i style="width:${(ctx.ohPerLb||0)/per*100}%;background:${COL.overhead}"></i><i style="width:${lab/per*100}%;background:${COL.labor}"></i></div>
-      <div class="row" style="gap:14px;font-size:calc(12px*var(--ts,1));margin-top:6px">${['coffee','overhead','labor'].map(x=>`<span class="row" style="gap:5px"><i style="width:9px;height:9px;border-radius:2px;background:${COL[x]}"></i><span class="muted">${NAME[x]}</span> <b class="tnum">${money(x==='coffee'?c.coffee:x==='overhead'?ctx.ohPerLb:lab)}</b></span>`).join('')}</div>
+      <div class="row" style="gap:14px;font-size:var(--fs-sm);margin-top:6px">${['coffee','overhead','labor'].map(x=>`<span class="row" style="gap:5px"><i style="width:9px;height:9px;border-radius:2px;background:${COL[x]}"></i><span class="muted">${NAME[x]}</span> <b class="tnum">${money(x==='coffee'?c.coffee:x==='overhead'?ctx.ohPerLb:lab)}</b></span>`).join('')}</div>
       ${prOpen.cost?`<div style="margin-top:8px"><div class="kv"><span>Green, landed</span><b class="tnum">${money(num(l.price))}${num(l.freight)?' + '+money(num(l.freight))+' freight':''}${Number(PRW.green)?' '+(PRW.green>0?'+':'−')+' '+money(Math.abs(PRW.green))+' what-if':''} = ${money(c.landed)} / lb</b></div>
         <div class="kv"><span>Weight loss</span><b class="tnum">${c.loss.toFixed(1)} % ${c.lossN?`<span class="muted">· avg of last ${c.lossN} roast${c.lossN===1?'':'s'}</span>`:'<span class="muted">· default, no roasts yet</span>'}</b></div>
         <div class="kv"><span>Coffee per lb roasted <span class="muted">(incl. ${num(o.waste)||0} % waste)</span></span><b class="tnum">${money(c.coffee)}</b></div>
@@ -3651,11 +3653,11 @@ function renderPrDetail(o,ctx){const el=$('#prDetail'),l=INV.find(x=>x.id===prSe
     ${c.bags.map(b=>`<div class="bagbox"><div class="row"><b style="font-size:calc(15px*var(--ts,1))">${b.label} bag</b><span class="sp"></span><span class="muted">Cost</span><b class="tnum">${money(b.cost)}</b></div>
       <div class="stack" title="${Object.keys(COL).map(x=>NAME[x]+' '+money(b.parts[x])).join(' · ')}">${Object.keys(COL).map(x=>`<i style="width:${b.parts[x]/b.cost*100}%;background:${COL[x]}"></i>`).join('')}</div>
       <div class="pin h"><span></span><span>Suggested</span><span></span><span>Your price</span><span class="n">Gross</span><span class="n" title="After rent, gas &amp; other overhead">After OH</span></div>
-      ${[['w','Wholesale','gwMargin','wMargin'],['r','Retail','grMargin','rMargin']].map(([k,n,g,nt])=>{const sg=b['s'+k],a=b['a'+k];return `<div class="pin"><span><b class="ppill ${k}">${n}</b></span><span class="tnum sug">${money(sg)}</span><span class="muted tnum" style="text-align:right;font-size:calc(12.5px*var(--ts,1))">${b.lb!==1&&ok(a)?money(a/b.lb)+' / lb':''}</span><input data-act="${b.k}:${k}" inputmode="decimal" value="${ok(a)?a.toFixed(2):''}" placeholder="${sg.toFixed(2)}"><b class="n tnum">${ok(a)?tg(b['g'+k],num(o[g])):'<span class="muted">—</span>'}</b><b class="n tnum">${ok(a)?tg(b['n'+k],num(o[nt])):'<span class="muted">—</span>'}</b></div>`}).join('')}
+      ${[['w','Wholesale','gwMargin','wMargin'],['r','Retail','grMargin','rMargin']].map(([k,n,g,nt])=>{const sg=b['s'+k],a=b['a'+k];return `<div class="pin"><span><b class="ppill ${k}">${n}</b></span><span class="tnum sug">${money(sg)}</span><span class="muted tnum" style="text-align:right;font-size:var(--fs-sm)">${b.lb!==1&&ok(a)?money(a/b.lb)+' / lb':''}</span><input data-act="${b.k}:${k}" inputmode="decimal" value="${ok(a)?a.toFixed(2):''}" placeholder="${sg.toFixed(2)}"><b class="n tnum">${ok(a)?tg(b['g'+k],num(o[g])):'<span class="muted">—</span>'}</b><b class="n tnum">${ok(a)?tg(b['n'+k],num(o[nt])):'<span class="muted">—</span>'}</b></div>`}).join('')}
       </div>`).join('')}
     ${o.tiers.length>1?`<div><button class="fold" id="prTierTg">${prOpen.tiers?'▾':'▸'} Wholesale volume pricing</button>${prOpen.tiers?`<table class="mini" style="margin-top:6px"><thead><tr><th>Tier</th>${c.bags.map(b=>`<th class="n">${b.label}</th>`).join('')}<th class="n">${prT(o).name==='gross'?'Gross':'After OH'} (12 oz)</th></tr></thead><tbody>${o.tiers.map(t=>{const f=1-(num(t.off)||0)/100,p0=c.bags[0].w*f,c0=o.basis==='net'?c.bags[0].cost:c.bags[0].gcost,m=p0>0?(p0-c0)/p0*100:null;
       return `<tr><td>${esc(t.name)}${num(t.off)?` <span class="muted">−${num(t.off)} %</span>`:''}</td>${c.bags.map(b=>`<td class="n">${money(b.w*f)}</td>`).join('')}<td class="n">${tg(m,prT(o).w)}</td></tr>`}).join('')}</tbody></table>`:''}</div>`:''}
-    <div class="row muted" style="font-size:calc(12.5px*var(--ts,1));gap:8px">${infoTip(`Your prices are kept for “${esc(l.name)}” and carry over to its next lot. Leave a box empty until you’ve decided — the list on the left shows only prices you’ve set.<br><br>Targets — gross: wholesale ${num(o.gwMargin)} %, retail ${num(o.grMargin)} % · after overhead: wholesale ${num(o.wMargin)} %, retail ${num(o.rMargin)} %.`)}<span>How these numbers work</span></div>`;
+    <div class="row muted" style="font-size:var(--fs-sm);gap:8px">${infoTip(`Your prices are kept for “${esc(l.name)}” and carry over to its next lot. Leave a box empty until you’ve decided — the list on the left shows only prices you’ve set.<br><br>Targets — gross: wholesale ${num(o.gwMargin)} %, retail ${num(o.grMargin)} % · after overhead: wholesale ${num(o.wMargin)} %, retail ${num(o.rMargin)} %.`)}<span>How these numbers work</span></div>`;
   $('#prCostTg').onclick=()=>{prOpen.cost=!prOpen.cost;renderPrDetail(o,ctx)};
   if($('#prTierTg'))$('#prTierTg').onclick=()=>{prOpen.tiers=!prOpen.tiers;renderPrDetail(o,ctx)};
   $$('[data-act]',el).forEach(i=>i.onchange=()=>{const [bk,t]=i.dataset.act.split(':'),v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter the price as a number, e.g. 12.50');return}
@@ -3667,13 +3669,13 @@ function renderPrCosts(o,ctx){const el=$('#prCosts');
   <div class="card prcard"><div class="row"><div class="h3">Monthly overhead</div><span class="sp"></span><b class="tnum">${money(ctx.ohMonth)} / month</b></div>
     <div class="prrow h"><span>Cost</span><span>$ / month</span><span>Estimate</span><span></span></div>
     ${o.overhead.map((x,i)=>`<div class="prrow"><input data-oh="${i}:name" value="${esc(x.name)}"><input data-oh="${i}:amt" inputmode="decimal" value="${ok(num(x.amt))?x.amt:''}" placeholder="0"><label class="row" style="justify-content:center"><input type="checkbox" data-oh="${i}:est" ${x.est?'checked':''} style="width:auto"></label><button class="sm" data-ohdel="${i}" title="Remove">×</button></div>`).join('')}
-    <div class="row"><button class="sm" id="prOhAdd">+ Add cost</button><span class="sp"></span><span class="muted" style="font-size:calc(12.5px*var(--ts,1))">Electric is $0 — the landowner pays it. For the P12, enter its cost ÷ the months you want it paid back in.</span></div></div>
+    <div class="row"><button class="sm" id="prOhAdd">+ Add cost</button><span class="sp"></span><span class="muted" style="font-size:var(--fs-sm)">Electric is $0 — the landowner pays it. For the P12, enter its cost ÷ the months you want it paid back in.</span></div></div>
   <div class="card prcard"><div class="h3">Pounds roasted per month</div>
     <label class="row"><input type="radio" name="prVol" value="auto" ${o.volMode!=='manual'?'checked':''} style="width:auto"> From my roasts — last 90 days <b class="tnum" style="margin-left:auto">${ok(ctx.auto)?Math.round(ctx.auto)+' lb / month':'no roasts yet'}</b></label>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1));margin:-4px 0 0 24px">${ctx.rs.length} roast${ctx.rs.length===1?'':'s'} counted · simulator roasts left out</div>
+    <div class="muted" style="font-size:var(--fs-sm);margin:-4px 0 0 24px">${ctx.rs.length} roast${ctx.rs.length===1?'':'s'} counted · simulator roasts left out</div>
     <label class="row"><input type="radio" name="prVol" value="manual" ${o.volMode==='manual'?'checked':''} style="width:auto"> My own number ${inp('volManual',o.volManual,'90px','150')} <span class="muted">lb roasted / month</span></label>
     <label class="field">Roast days a week right now${inp('daysNow',o.daysNow,'90px','1')}</label>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Overhead per lb = ${money(ctx.ohMonth)} ÷ ${ok(ctx.base)?Math.round(ctx.base):'—'} lb = <b>${money(ctx.base>0?ctx.ohMonth/ctx.base:null)}</b>. It drops as you roast more — try the What if box on the Overview.</div></div>
+    <div class="muted" style="font-size:var(--fs-sm)">Overhead per lb = ${money(ctx.ohMonth)} ÷ ${ok(ctx.base)?Math.round(ctx.base):'—'} lb = <b>${money(ctx.base>0?ctx.ohMonth/ctx.base:null)}</b>. It drops as you roast more — try the What if box on the Overview.</div></div>
   <div class="card prcard"><div class="h3">Labor</div>
     <div class="grid2"><label class="field">Hourly rate ($)${inp('rate',o.rate,'100%','20')}</label><label class="field">Minutes per batch, all-in${inp('batchMin',o.batchMin,'100%','25')}</label></div>
     <label class="field">Batch size, lb roasted${ctx.batchFromHist?` — your average is ${ctx.batchLb.toFixed(1)} lb`:''}${ctx.batchFromHist?'':inp('batchLb',o.batchLb,'100%','20')}</label>
@@ -3682,13 +3684,13 @@ function renderPrCosts(o,ctx){const el=$('#prCosts');
   <div class="card prcard"><div class="h3">Bag, valve &amp; label cost per bag ($)</div>
     <div class="grid3">${BAGS.map(b=>`<label class="field">${b.label}${inp('pack.'+b.k,o.pack[b.k],'100%')}</label>`).join('')}</div>
     <div class="h3" style="margin-top:6px">Margins</div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Gross — before rent &amp; overhead (how most roasters set prices)</div>
+    <div class="muted" style="font-size:var(--fs-sm)">Gross — before rent &amp; overhead (how most roasters set prices)</div>
     <div class="grid3"><label class="field">Wholesale gross (%)${inp('gwMargin',o.gwMargin,'100%','45')}</label><label class="field">Retail gross (%)${inp('grMargin',o.grMargin,'100%','65')}</label><span></span></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">After overhead — what’s left once rent, gas and other costs are paid</div>
+    <div class="muted" style="font-size:var(--fs-sm)">After overhead — what’s left once rent, gas and other costs are paid</div>
     <div class="grid3"><label class="field">Wholesale after overhead (%)${inp('wMargin',o.wMargin,'100%','30')}</label><label class="field">Retail after overhead (%)${inp('rMargin',o.rMargin,'100%','50')}</label>
       <label class="field">Round prices up to<select data-pr="round">${[[0,'Exact'],[0.05,'$0.05'],[0.25,'$0.25'],[0.5,'$0.50'],[1,'$1.00']].map(([v,t])=>`<option value="${v}" ${Number(o.round)===v?'selected':''}>${t}</option>`).join('')}</select></label></div>
     <div class="grid3"><label class="field">Waste — samples, rejects (%)${inp('waste',o.waste,'100%','3')}</label><label class="field">Weight loss if no roasts yet (%)${inp('lossDefault',o.lossDefault,'100%','15')}</label></div>
-    <div class="muted" style="font-size:calc(12.5px*var(--ts,1))">Margin is profit ÷ price. A 30 % margin means price = cost ÷ 0.70. Suggested prices follow the Gross / After overhead switch on the Price list. The gross targets are common starting points — adjust them to what works for you.</div></div>
+    <div class="muted" style="font-size:var(--fs-sm)">Margin is profit ÷ price. A 30 % margin means price = cost ÷ 0.70. Suggested prices follow the Gross / After overhead switch on the Price list. The gross targets are common starting points — adjust them to what works for you.</div></div>
   <div class="card prcard"><div class="h3">Wholesale volume tiers</div>
     <div class="prrow t h"><span>Tier</span><span>Min lb / week</span><span>% off</span><span></span></div>
     ${o.tiers.map((t,i)=>`<div class="prrow t"><input data-tier="${i}:name" value="${esc(t.name)}"><input data-tier="${i}:minLb" inputmode="decimal" value="${ok(num(t.minLb))?t.minLb:''}"><input data-tier="${i}:off" inputmode="decimal" value="${ok(num(t.off))?t.off:''}"><button class="sm" data-tierdel="${i}" ${i===0?'disabled':''} title="Remove">×</button></div>`).join('')}
