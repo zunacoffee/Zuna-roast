@@ -629,6 +629,13 @@ tr.sel .ipCard .n{color:var(--accent)}
 .ipad:not(.ipc) .pchips:not(.poff){display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:7px}
 .ipad:not(.ipc) .pchips:not(.poff) button{min-width:0;padding:0 4px}
 .ipad:not(.ipc) #scr-roast{grid-template-columns:minmax(0,1fr) 364px}
+/* after the design-rules text sizes: keep the 13" layouts fitting */
+.ipad:not(.ipc) #scr-analyze th,.ipad:not(.ipc) #scr-analyze td{padding-left:8px;padding-right:8px}
+.ipad:not(.ipc) .ansplit{grid-template-columns:minmax(0,1fr) 600px}
+.ipad:not(.ipc) #scr-cupping .detail{gap:var(--sp-3)}
+.ipad:not(.ipc) .pchips button{min-height:44px}
+.ipad:not(.ipc) .pstage{gap:4px}
+.ipad:not(.ipc) #scr-green .split{grid-template-columns:minmax(0,1fr) 440px}
 .ipad #scr-green .kv b{white-space:nowrap}
 /* ---------- 13" iPad: History & Profiles as list → full-screen detail (never on the iMac, iPhone or the compact iPad) ---------- */
 .ipBack{display:none}
