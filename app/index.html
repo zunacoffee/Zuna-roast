@@ -245,7 +245,7 @@ tr.tcur td{background:var(--accentSoft)}
 #scr-today .tact button.q.dangerTxt{color:var(--danger)}
 .tst{font-size:var(--fs-sm);color:var(--text2)}.tst.d{color:var(--good);font-weight:500}.tst.c{color:var(--accent);font-weight:600}
 .tneedh{border-bottom:0;padding:0 0 2px;font-size:var(--fs-cap)}.tneedh b{color:var(--text2);font-weight:500}
-.kv b .tok{color:var(--good)}.kv b .tshort{color:var(--danger);font-weight:600}
+.kv b .tok{color:var(--good)}.kv b .tshort{display:block;color:var(--danger);font-weight:600}
 tr.tdone td{color:var(--text2)}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-content:start;overflow:auto;min-height:0;padding-bottom:4px}
 .pc{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:9px;cursor:pointer}
@@ -1546,7 +1546,7 @@ function renderToday(){planRoll();$('#tDate').textContent=new Date().toLocaleDat
     return `<tr class="${done?'tdone':''} ${isCur?'tcur':''}" style="cursor:default"><td class="tnum"><b>${i+1}</b></td><td>${esc(x.name||'—')}</td><td>${esc(l?l.name:(x.coffee||'—'))}${!x.invId?' <span class="badge gray">not from inventory</span>':''}</td>
     <td class="n">${done?esc(x.green):`<input class="tw" data-tw="${x.id}" value="${esc(x.green)}" inputmode="decimal" aria-label="Green lb">`}</td>
     <td>${done?`<span class="tst d">✓ Roasted #${x.roastNum}</span>`:isCur?'<span class="tst c">▶ Loaded</span>':'<span class="tst">Planned</span>'}</td>
-    <td class="tact">${done?`<button class="sm" data-topen="${x.roastId}">Open</button>`:`<button class="sm" data-tload="${x.id}">Load</button><button class="sm q" data-tup="${i}" ${i===0?'disabled':''} title="Move up" aria-label="Move up">↑</button><button class="sm q" data-tdn="${i}" ${i===PLAN.items.length-1?'disabled':''} title="Move down" aria-label="Move down">↓</button><button class="sm q dangerTxt" data-tdel="${x.id}" title="Remove" aria-label="Remove">✕</button>`}</td></tr>`}).join('');
+    <td class="tact">${done?`<button class="sm" data-topen="${x.roastId}">Open</button>`:`${isCur?'':`<button class="sm" data-tload="${x.id}">Load</button>`}<button class="sm q" data-tup="${i}" ${i===0?'disabled':''} title="Move up" aria-label="Move up">↑</button><button class="sm q" data-tdn="${i}" ${i===PLAN.items.length-1?'disabled':''} title="Move down" aria-label="Move down">↓</button><button class="sm q dangerTxt" data-tdel="${x.id}" title="Remove" aria-label="Remove">✕</button>`}</td></tr>`}).join('');
   $('#tEmpty').innerHTML=PLAN.items.length?'':`<div class="empty">No batches planned for today.<br>Add them on the right, in the order you’ll roast them.</div>`;
   if(PLAN.carried){$('#tEmpty').innerHTML+=`<div class="muted" style="padding:12px 16px;font-size:var(--fs-sm)">${PLAN.carried} unroasted batch${PLAN.carried===1?' was':'es were'} carried over from your last roast day.</div>`;PLAN.carried=0;savePlan()}
   // side: add form + green needed
@@ -1558,7 +1558,7 @@ function renderToday(){planRoll();$('#tDate').textContent=new Date().toLocaleDat
     <div class="grid2"><label class="field">Green lb per batch<input id="tGreen" inputmode="decimal"></label><label class="field">Number of batches<input id="tCount" inputmode="numeric" value="1"></label></div>
     <button class="pri" id="tAdd">Add to today</button>
     <div><div class="h3" style="margin:8px 0 4px">Green coffee needed</div><div class="kv tneedh"><span></span><b>need · on hand</b></div>${Object.keys(need).length?Object.entries(need).map(([id,lb])=>{const l=INV.find(v=>v.id===id);if(!l)return'';const left=invLeft(l),short=lb>left+1e-6;
-      return `<div class="kv"><span>${esc(l.name)}</span><b class="tnum ${short?'dangerTxt':''}">${lb.toFixed(1)} · ${left.toFixed(1)} lb${short?` <span class="tshort">short ${(lb-left).toFixed(1)}</span>`:' <span class="tok">✓</span>'}</b></div>`}).join(''):'<div class="muted" style="font-size:var(--fs-sm)">Add batches to see how much green you need.</div>'}</div>
+      return `<div class="kv"><span>${esc(l.name)}</span><b class="tnum ${short?'dangerTxt':''}">${lb.toFixed(1)} · ${left.toFixed(1)} lb${short?` <span class="tshort">Short ${(lb-left).toFixed(1)} lb</span>`:' <span class="tok">✓</span>'}</b></div>`}).join(''):'<div class="muted" style="font-size:var(--fs-sm)">Add batches to see how much green you need.</div>'}</div>
     <div class="muted" style="font-size:var(--fs-sm);line-height:1.5">When you save a planned roast, it’s checked off and the next batch loads by itself: profile, background, coffee and weight. Just charge the roaster.</div>`;
   const fillFromProf=()=>{const r=findAny($('#tProf').value);if(!r)return;const l=INV.find(v=>v.id===r.meta.invId&&invLeft(v)>0.001);$('#tInv').value=l?l.id:'';$('#tGreen').value=r.meta.green||''};
   $('#tProf').onchange=fillFromProf;
