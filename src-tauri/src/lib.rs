@@ -47,6 +47,22 @@ fn device_name() -> String {
     name
 }
 
+/// Reports and roast sheets: opens the Mac print dialog for the page. The app fills a print-only
+/// area first, so only the report prints. PDF ▾ › Save as PDF is in that dialog.
+/// (The iPad and iPhone make the PDF in the zuna-ios plugin instead.)
+#[tauri::command]
+fn print_page(window: tauri::WebviewWindow) -> Result<(), String> {
+    #[cfg(desktop)]
+    {
+        window.print().map_err(|e| e.to_string())
+    }
+    #[cfg(mobile)]
+    {
+        let _ = window;
+        Err("Printing goes through the share sheet on the iPad and iPhone".into())
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = tauri::Builder::default().plugin(tauri_plugin_dialog::init());
@@ -75,6 +91,7 @@ pub fn run() {
             files::reveal_data_folder,
             files::fs_stamp,
             device_name,
+            print_page,
             roaster::ws_open,
             roaster::ws_send,
             roaster::ws_close,

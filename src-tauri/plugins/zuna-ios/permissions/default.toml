@@ -9,4 +9,5 @@ permissions = [
   "allow-keep-awake",
   "allow-share-file",
   "allow-set-chrome",
+  "allow-share-pdf",
 ]

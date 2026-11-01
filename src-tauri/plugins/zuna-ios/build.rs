@@ -1,4 +1,4 @@
-const COMMANDS: &[&str] = &["pick_folder", "restore_folder", "download_folder", "keep_awake", "share_file", "set_chrome"];
+const COMMANDS: &[&str] = &["pick_folder", "restore_folder", "download_folder", "keep_awake", "share_file", "set_chrome", "share_pdf"];
 
 fn main() {
     tauri_plugin::Builder::new(COMMANDS).ios_path("ios").build();

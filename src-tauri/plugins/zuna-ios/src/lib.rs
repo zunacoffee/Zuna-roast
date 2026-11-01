@@ -8,6 +8,7 @@
 //!   the iPad (iCloud can leave files "in the cloud" until they're asked for).
 //! * keep_awake — keeps the screen on during a roast.
 //! * share_file — exports (CSV etc.) go out through the iPad share sheet.
+//! * share_pdf — reports and roast sheets: makes a PDF of the page (print layout) and opens the share sheet.
 //! * set_chrome — status bar and screen edges follow the app theme (no white strips).
 
 use serde::Serialize;
@@ -74,6 +75,16 @@ async fn share_file<R: Runtime>(app: AppHandle<R>, name: String, text: String) -
     native(app, "shareFile", Share { name, text }).await
 }
 
+#[derive(Serialize)]
+struct Pdf {
+    name: String,
+}
+
+#[tauri::command]
+async fn share_pdf<R: Runtime>(app: AppHandle<R>, name: String) -> Result<Value, String> {
+    native(app, "sharePdf", Pdf { name }).await
+}
+
 /// Paint the screen edges (status bar strip, home-indicator strip) in the app's background
 /// color, and pick light or dark status-bar text to match.
 #[tauri::command]
@@ -83,7 +94,7 @@ async fn set_chrome<R: Runtime>(app: AppHandle<R>, color: String, dark: bool) ->
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("zuna-ios")
-        .invoke_handler(tauri::generate_handler![pick_folder, restore_folder, download_folder, keep_awake, share_file, set_chrome])
+        .invoke_handler(tauri::generate_handler![pick_folder, restore_folder, download_folder, keep_awake, share_file, set_chrome, share_pdf])
         .setup(|app, api| {
             #[cfg(target_os = "ios")]
             {
