@@ -90,6 +90,7 @@ nav button.on{background:var(--panel);color:var(--text);box-shadow:0 1px 2px rgb
 .hinfo{overflow:hidden;flex:0 1 auto}.hinfo #hRoast{overflow:hidden;text-overflow:ellipsis;min-width:0}
 @media (max-width:1900px){#clock{display:none}.hinfo>.muted{display:none}}
 @media (max-width:1700px){#hRoast{display:none}}
+@media (max-width:1600px){nav button{padding:6px 10px}}
 @media (max-width:1450px){nav button{padding:6px 9px}.brand small{display:none}}
 header .on-ctl{background:var(--c-ctl);border-color:var(--c-ctl);color:#fff}
 header .on-acc{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -123,6 +124,84 @@ tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .empty{padding:40px 20px;text-align:center;color:var(--text2);line-height:1.6}
 .minic{height:220px;border:1px solid var(--line2);border-radius:8px;padding:4px;background:var(--chartBg)}
 canvas{display:block;width:100%;height:100%}
+
+/* ---------- reports (read-only: Production, Inventory, Roast sheet) ---------- */
+#scr-reports .page{overflow:hidden}
+#rpHead{flex:1;display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+.rpDates{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-sm)}
+.rpDates input{width:auto;min-height:var(--h-btn);padding:4px 8px;font-variant-numeric:tabular-nums}
+#rpBody{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--sp-4);overflow:auto}
+.tiles.rpTiles{grid-template-columns:repeat(6,minmax(0,1fr))}.tiles.rpTiles.rp5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.rpTiles .v{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpGrid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:var(--sp-4)}
+.rpGridInv{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+.rpCol{display:flex;flex-direction:column;gap:var(--sp-4);min-height:0}
+/* MacBook-size windows: the coffee table gets the full width; chart and detail sit side by side below it */
+@media (max-width:1800px){.rpGrid{display:flex;flex-direction:column;flex:none}
+  .rpGrid>.rpCol+.rpCol{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);align-items:start}
+  .rpGridInv>.rpCol+.rpCol{grid-template-columns:minmax(0,1fr)}
+  .rpTable{overflow:visible}.rpTable>.scroll{overflow-x:auto;overflow-y:visible}.rpDet{max-height:none}}
+.rpTable{display:flex;flex-direction:column;min-height:0;overflow:hidden;flex:0 1 auto}
+.rpTable>.scroll{min-height:0}
+.rpTh{padding:var(--sp-3) var(--sp-4)}
+.rpt td small{display:block;color:var(--text2);font-size:var(--fs-sm);margin-top:1px}
+.rpt tr.tot td{font-weight:600;border-top:1.5px solid var(--text);border-bottom:0;background:var(--soft)}
+.rpt tbody tr.tot,.rpt tbody tr.rpOpen{cursor:default}
+.rpRoasts td,.rpRoasts th{padding:8px 10px}
+.rpChart{padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-2);flex:none}
+.rpBarsBox{height:220px}
+.rpDet{flex:0 1 auto;min-height:0}.rpDet .scroll{min-height:0}.rpDet .foot{font-size:var(--fs-sm)}
+.rpBar{display:inline-block;vertical-align:middle;width:calc(100% - 52px);height:8px;border-radius:var(--r-pill);background:var(--soft);overflow:hidden}.rpBar i{display:block;height:100%}
+.rpPct{display:inline-block;width:44px;text-align:right;font-size:var(--fs-sm)}
+.rpIn{color:var(--good)}
+.badge.rpLow{background:color-mix(in srgb,var(--warn) 16%,var(--panel));color:var(--warn)}
+.rpFoot{padding:var(--sp-2) var(--sp-4);font-size:var(--fs-sm)}
+.rsBack{border-color:transparent;background:transparent;color:var(--accent);padding-left:0}
+.rsH{font-size:var(--fs-title);font-weight:600}
+.rsPaperNote{font-size:var(--fs-sm)}
+.paperView{flex:1;min-height:0;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:var(--sp-5);background:color-mix(in srgb,var(--text) 7%,var(--bg));border-radius:var(--r-lg)}
+.paperScale{flex:none;position:relative}
+.paperScale>.paperDoc{position:absolute;left:0;top:0;transform-origin:top left;width:816px;min-height:1056px;padding:48px;box-shadow:0 2px 18px rgba(0,0,0,.18)}
+/* the paper: always white with dark ink, whatever the app's look */
+.paperDoc{background:#fff;color:#15181B;font-family:var(--font);font-size:11.5px;line-height:1.4;display:flex;flex-direction:column;gap:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-align:left}
+.paperDoc .n,.paperDoc .tnum{font-variant-numeric:tabular-nums}
+.pdHead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1.5px solid #15181B;padding-bottom:12px;gap:16px}
+.pdBiz{display:flex;align-items:center;gap:12px}.pdBiz img{height:44px;max-width:180px;object-fit:contain}
+.pdBiz b{display:block;font-size:16px}.pdBiz span,.pdRight span{color:#6B7280;font-size:11px}
+.pdRight{text-align:right}.pdRight b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.pdTitle h2{font-size:17px;font-weight:650;margin:0}
+.pdStar{font-size:11px;color:#B7791F;font-weight:600}
+.pdMeta{display:flex;gap:16px;flex-wrap:wrap;color:#6B7280;margin-top:3px}.pdMeta b{color:#15181B;font-weight:600}
+.pdLegend{display:flex;gap:14px;color:#6B7280;font-size:10px;margin-top:2px}.pdLegend i{display:inline-block;width:14px;height:2px;vertical-align:middle;margin-right:5px}.pdLegend i.dash{height:0;border-top:2px dashed;background:none}
+.pdH{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:#6B7280;margin-bottom:5px}
+.pd2{display:grid;grid-template-columns:1fr 1fr;gap:22px}.pd3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.paperDoc table{width:100%;border-collapse:collapse}
+.paperDoc th{background:transparent;color:#6B7280;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-bottom:1px solid #15181B;position:static}
+.paperDoc td{padding:4px 6px;border-bottom:1px solid #E6E8EB;font-size:11px;color:#15181B;white-space:nowrap}
+.paperDoc tbody tr{cursor:default}.paperDoc tbody tr:hover td{background:none}
+.paperDoc tr.tot td{font-weight:700;border-top:1.5px solid #15181B;border-bottom:0;background:#F4F5F7}
+.paperDoc .muted,.paperDoc .miss{color:#6B7280}
+.paperDoc .badge{font-size:9px;padding:1px 5px;background:#EEF2FF;color:#1E40AF}.paperDoc .badge.rpLow{background:#FEF3C7;color:#92400E}
+.paperDoc .rpIn{color:#15803D}
+.pdKv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid #E6E8EB}.pdKv span{color:#6B7280}.pdKv b{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.pdNote{border:1px solid #E6E8EB;border-radius:6px;padding:7px 9px;line-height:1.45;white-space:pre-wrap}
+.pdT{color:#6B7280;font-variant-numeric:tabular-nums}
+.pdFam{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px}.pdFam div{display:flex;justify-content:space-between;gap:8px}.pdFam i{font-style:normal;color:#6B7280}
+.pdSub{font-weight:600;margin-bottom:4px}.pdCup+.pdCup{margin-top:8px}.pdTags{color:#6B7280;margin-top:4px}.pdCup .pdNote{margin-top:6px}
+.pdNone{color:#6B7280}
+.pdSmall{color:#6B7280;font-size:10px;margin-top:5px}
+.pdTiles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.pdTiles>div{border:1px solid #E6E8EB;border-radius:6px;padding:6px 8px}.pdTiles span{color:#6B7280;font-size:9.5px;display:block}.pdTiles b{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}.pdTiles small{font-size:9.5px;color:#6B7280;font-weight:500}.pdD{color:#6B7280;font-size:9px;margin-top:1px}
+.pdGroup{break-inside:avoid;page-break-inside:avoid}
+.pdFoot{margin-top:auto;display:flex;justify-content:space-between;gap:16px;color:#6B7280;font-size:9.5px;border-top:1px solid #E6E8EB;padding-top:7px}
+#printArea{display:none}
+@media print{
+  @page{size:letter;margin:.45in}
+  html,body{height:auto!important;overflow:visible!important;display:block!important;background:#fff!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important}
+  #printArea .paperDoc{width:auto;min-height:0;padding:0;box-shadow:none}
+  #printArea .pdFoot{margin-top:10px}
+}
 
 /* ---------- roast screen ---------- */
 #scr-roast{display:grid;grid-template-columns:clamp(240px,15vw,300px) minmax(0,1fr) clamp(280px,14.5vw,320px);grid-template-rows:minmax(0,1fr) auto;gap:12px;padding:12px}
@@ -495,7 +574,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 <header>
   <div class="brand" id="brand"></div>
   <nav id="nav">
-    <button data-s="roast" class="on">Roast</button><button data-s="today">Today</button><button data-s="profiles">Profiles</button><button data-s="roasts">History</button><button data-s="green">Green coffee</button><button data-s="pricing">Pricing</button><button data-s="cupping">Cupping</button><button data-s="analyze">Analyze</button><button data-s="settings">Settings</button>
+    <button data-s="roast" class="on">Roast</button><button data-s="today">Today</button><button data-s="profiles">Profiles</button><button data-s="roasts">History</button><button data-s="green">Green coffee</button><button data-s="pricing">Pricing</button><button data-s="cupping">Cupping</button><button data-s="analyze">Analyze</button><button data-s="reports">Reports</button><button data-s="settings">Settings</button>
   </nav>
   <div class="lamps" id="lamps"></div>
   <div class="sp"></div>
@@ -632,6 +711,15 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
   </div>
 </div>
 
+<!-- ================= REPORTS (read-only) ================= -->
+<div class="screen" id="scr-reports" hidden>
+  <div class="page">
+    <div class="ph"><h1 id="rpTitle">Reports</h1><div id="rpHead"></div></div>
+    <div class="ph" id="rpHead2" hidden></div>
+    <div id="rpBody"></div>
+  </div>
+</div>
+
 <!-- ================= SETTINGS ================= -->
 <div class="screen" id="scr-settings" hidden>
   <div class="wrap">
@@ -673,6 +761,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 <div id="toast"></div>
 <div id="modalRoot"></div>
 
+<div id="printArea" aria-hidden="true"></div>
 <script src="native.js"></script>
 <script>
 'use strict';
@@ -2073,9 +2162,9 @@ function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoa
   <div class="kv" style="align-items:flex-start"><span>Adjustments</span><b class="tnum adjl">${adj.map(a=>`<span>${mmss(a.t-rc)} · ${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}</span>`).join('')||DASH}</b></div>
   ${cfg.cupScoring||ok(r.cup)?`<div class="kv"><span>Cupping score</span><b class="tnum" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div>`:''}</div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${[r.meta.notes?esc(r.meta.notes):'',(r.tnotes||[]).map(n=>`<span class="muted tnum">${mmss(n.t-rc)}</span>  ${esc(n.text)}`).join('\n')].filter(Boolean).join('\n\n')||'<span class="muted">No comments.</span>'}</div></div>
-  <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="dangerTxt" id="rDel">Delete</button></div>`;
+  <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rSheet">Roast sheet</button><button id="rCsv">CSV</button><button class="dangerTxt" id="rDel">Delete</button></div>`;
   requestAnimationFrame(()=>miniCurve($('#rBig'),r,{axis:true}));
-  $('#rRoast').onclick=()=>roastThis(r.id);$('#rOpen').onclick=()=>openRoast(r.id);$('#rCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
+  $('#rRoast').onclick=()=>roastThis(r.id);$('#rOpen').onclick=()=>openRoast(r.id);$('#rCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));$('#rSheet').onclick=()=>openSheet(r.id,'roasts');
   $('#rProf').onclick=async()=>{if(!r.isProfile){if(!normName(r.meta.name)){toast('This roast has no profile name — open it and add one first');return}await unprofileSlot(r);r.isProfile=true}else r.isProfile=false;await commitRoast(r,true);resolveBg();renderRoasts();toast(r.isProfile?`#${r.num} is now the profile for “${r.meta.name}”`:'Profile mark removed')};
   const del=$('#rDel');if(del)del.onclick=()=>deleteRoastForever(r.id)}
 /* Start fresh: back everything up, then clear roasts, profiles, planned profiles, green, cupping and today's plan
@@ -2664,7 +2753,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="muted" style="font-size:var(--fs-sm)">Cooling and Stirrer keys work when Control is on, and not while you're typing in a box.</div>
     <div class="muted" style="font-size:var(--fs-sm)">Click a keyboard box, then press the key you want (Backspace clears it). Number keys work best on a Mac. F-keys need the fn key unless “Use F1, F2, etc. keys as standard function keys” is on in System Settings → Keyboard.</div>
     <div class="row"><button id="evReset">Reset to defaults</button></div>`,
-  biz:()=>`<h2>Business</h2><div class="sub">Your name and logo at the top left of the app, and on roast CSV exports.</div>
+  biz:()=>`<h2>Business</h2><div class="sub">Your name and logo at the top left of the app, on roast CSV exports, and on printed reports and roast sheets.</div>
     <label class="field" style="max-width:420px">Business name<input id="bizName" value="${esc(cfg.bizName)}" placeholder="e.g. Zuna Coffee"></label>
     <div class="field" style="max-width:640px">Logo
       <div class="logoBox" style="background:#fff">${cfg.bizLogo?`<img src="${cfg.bizLogo}" alt="Logo">`:'<div class="ph">No logo</div>'}<div class="row"><button class="pri" id="bizUp">${cfg.bizLogo?'Change logo…':'Upload logo…'}</button>${cfg.bizLogo?'<button id="bizDel" class="dangerTxt">Remove</button>':''}</div></div>
@@ -3082,10 +3171,291 @@ ${rows.map(({l,c})=>`<tr><td><b>${esc(l.name)}</b><small>${esc([l.origin,l.proce
   toast('Price sheet saved — open it in Safari and choose File › Export as PDF')}
 
 /* ================================================================
+   Reports — Production by coffee, Inventory by lot, Roast sheet.
+   Read-only: reports never write to the data folder. Print / PDF fills #printArea (shown only when printing)
+   and opens the Mac print dialog (Save as PDF is built in), or the iPad/iPhone share sheet with a PDF.
+   ================================================================ */
+let RP={view:'prod',preset:'lastMonth',from:'',to:'',by:'coffee',bars:'auto',sel:null,lot:null,sheet:null,back:null,ipDet:false};
+{const s=store.get('zr2.reports',null);if(s)for(const k of ['view','preset','from','to','by','bars'])if(s[k]!=null)RP[k]=s[k]}
+const rpSave=()=>store.set('zr2.reports',{view:RP.view,preset:RP.preset,from:RP.from,to:RP.to,by:RP.by,bars:RP.bars});
+const RP_PRE=[['thisWeek','This week'],['lastWeek','Last week'],['thisMonth','This month'],['lastMonth','Last month'],['thisQuarter','This quarter'],['lastQuarter','Last quarter'],['thisYear','This year'],['lastYear','Last year'],['custom','Custom']];
+const rd0=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const rdAdd=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const rdMon=(d,n)=>new Date(d.getFullYear(),d.getMonth()+n,1);
+const rdWeek=d=>rdAdd(rd0(d),-((d.getDay()+6)%7));                     /* weeks start on Monday */
+const rdIso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const rdParse=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''))?new Date(s+'T00:00:00'):null;
+const rdShort=(d,yr)=>d.toLocaleDateString([], yr?{month:'short',day:'numeric',year:'numeric'}:{month:'short',day:'numeric'});
+/* a range is [from, to) in local days; label names it the way a person would ("October 2026", "Q4 2026", "Oct 3 – Oct 17, 2026") */
+function rpLabel(a,bx){const b=rdAdd(bx,-1);
+  if(a.getDate()===1&&rdAdd(b,1).getDate()===1){const n=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth()+1;
+    if(n===1)return MONTHS[a.getMonth()]+' '+a.getFullYear();if(n===3&&a.getMonth()%3===0)return `Q${a.getMonth()/3+1} ${a.getFullYear()}`;if(n===12&&a.getMonth()===0)return String(a.getFullYear())}
+  if(+a===+b)return rdShort(a,true);
+  return a.getFullYear()===b.getFullYear()?`${rdShort(a)} – ${rdShort(b)}, ${b.getFullYear()}`:`${rdShort(a,true)} – ${rdShort(b,true)}`}
+function rpRange(){const now=new Date(),t=rd0(now);let from,to,unit=null;
+  switch(RP.preset){
+    case 'thisWeek':from=rdWeek(now);to=rdAdd(from,7);unit='w';break;
+    case 'lastWeek':from=rdAdd(rdWeek(now),-7);to=rdAdd(from,7);unit='w';break;
+    case 'thisMonth':from=rdMon(now,0);to=rdMon(now,1);unit=1;break;
+    case 'lastMonth':from=rdMon(now,-1);to=rdMon(now,0);unit=1;break;
+    case 'thisQuarter':from=new Date(now.getFullYear(),Math.floor(now.getMonth()/3)*3,1);to=rdMon(from,3);unit=3;break;
+    case 'lastQuarter':from=new Date(now.getFullYear(),Math.floor(now.getMonth()/3)*3-3,1);to=rdMon(from,3);unit=3;break;
+    case 'thisYear':from=new Date(now.getFullYear(),0,1);to=new Date(now.getFullYear()+1,0,1);unit=12;break;
+    case 'lastYear':from=new Date(now.getFullYear()-1,0,1);to=new Date(now.getFullYear(),0,1);unit=12;break;
+    default:{let a=rdParse(RP.from)||rdAdd(t,-29),b=rdParse(RP.to)||t;if(b<a)[a,b]=[b,a];from=a;to=rdAdd(b,1)}}
+  const end=to>rdAdd(t,1)?rdAdd(t,1):to,toDate=+end!==+to;              /* a range that runs into the future stops at today */
+  let pf,pt;
+  if(unit==='w'){pf=rdAdd(from,-7);pt=rdAdd(end,-7)}
+  else if(unit){pf=rdMon(from,-unit);pt=toDate?new Date(end.getFullYear(),end.getMonth()-unit,end.getDate()):from;if(pt>from)pt=from;if(!toDate)pt=from}
+  else{const days=Math.round((to-from)/864e5);pf=rdAdd(from,-days);pt=from}
+  return {from,to,end,toDate,label:rpLabel(from,to)+(toDate&&end>from?' to date':''),prev:{from:pf,to:pt,label:rpLabel(pf,pt>pf?pt:rdAdd(pf,1))}}}
+
+/* ---------- production ---------- */
+const rpRoasts=(a,b)=>HIST.filter(r=>r.meta&&r.samples&&r.samples.length&&(d=>d>=a&&d<b)(rDate(r))).sort((x,y)=>rDate(x)-rDate(y));
+const rpMean=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
+function rpGroup(name){return {name,key:'',batch:null,rs:[],n:0,g:0,gw:0,ww:0,wh:[],gr:[],sp:[],cost:0,cw:0,cww:0,noPrice:0,origin:'',process:'',lots:new Set()}}
+function rpAdd(o,r){const m=r.meta,g=num(m.green)||0,w=num(m.roasted),p=priceOf(m.invId),sp=spreadOf(m),wh=num(m.colorWhole),gr=num(m.colorGround);
+  o.rs.push(r);o.n++;o.g+=g;if(ok(w)&&g>0){o.gw+=g;o.ww+=w}if(ok(wh))o.wh.push(wh);if(ok(gr))o.gr.push(gr);if(ok(sp))o.sp.push(sp);
+  if(ok(p)&&g){o.cost+=p*g;if(ok(w)&&w>0){o.cw+=p*g;o.cww+=w}}else o.noPrice++;if(m.invId)o.lots.add(m.invId)}
+/* batch sizes within 12 % are one size (13 lb vs 25 lb); a size is named by its most common batch */
+function rpBatches(rs){const v=[...new Set(rs.map(r=>num(r.meta.green)).filter(ok))].sort((a,b)=>a-b),cl=[];
+  for(const x of v){const c=cl.at(-1);if(c&&sameBatch(c[0],x))c.push(x);else cl.push([x])}
+  const of=g=>{if(!ok(g))return null;const c=cl.find(c=>c.includes(g));if(!c)return null;const cnt=new Map();for(const r of rs){const x=num(r.meta.green);if(c.includes(x))cnt.set(x,(cnt.get(x)||0)+1)}
+    return [...cnt].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]};return of}
+function rpProd(a,b,by=RP.by){const rs=rpRoasts(a,b),tot=rpGroup('All coffees'),G=new Map();
+  const byC=new Map();for(const r of rs){const nm=r.meta.coffee||r.meta.name||'(no coffee named)';if(!byC.has(nm))byC.set(nm,[]);byC.get(nm).push(r)}
+  for(const [nm,list] of byC){const bOf=by==='batch'?rpBatches(list):()=>null;
+    for(const r of list){const bt=bOf(num(r.meta.green)),k=nm+'|'+(bt??'');if(!G.has(k)){const o=rpGroup(nm);o.key=k;o.batch=bt;G.set(k,o)}rpAdd(G.get(k),r);rpAdd(tot,r)}}
+  const groups=[...G.values()];for(const o of groups){const lot=INV.find(l=>o.lots.has(l.id));if(lot){o.origin=lot.origin||'';o.process=lot.process||''}}
+  groups.sort((x,y)=>y.g-x.g||x.name.localeCompare(y.name)||(x.batch||0)-(y.batch||0));return {rs,tot,groups}}
+const rpLoss=o=>o.gw>0?(o.gw-o.ww)/o.gw*100:null;
+const rpPerLb=o=>o.cww>0?o.cw/o.cww:null;
+const rpNum=(v,d=1)=>ok(v)?v.toLocaleString([], {minimumFractionDigits:d,maximumFractionDigits:d}):DASH;
+const rpSp=v=>{const t=Number(v).toFixed(1);return cfg.spColorsOn?`<span style="${spSt(+t)}" title="${esc(spBand(+t).label)}">${t}</span>`:t};
+const rpGName=o=>esc(o.name)+(o.batch!=null?` <span class="muted">· ${+o.batch.toFixed(2)} lb</span>`:'');
+/* bar chart buckets: by roast day for a month or less, by week up to a quarter, by month beyond */
+function rpBuckets(R,rs){const days=Math.round((R.end-R.from)/864e5),mode=RP.bars!=='auto'?RP.bars:days<=35?'day':days<=100?'week':'month',B=new Map();
+  for(const r of rs){const d=rDate(r),k=mode==='day'?rdIso(d):mode==='week'?rdIso(rdWeek(d)):`${d.getFullYear()}-${d.getMonth()}`;
+    if(!B.has(k))B.set(k,{d:mode==='month'?new Date(d.getFullYear(),d.getMonth(),1):mode==='week'?rdWeek(d):rd0(d),v:0,n:0});const o=B.get(k);o.v+=num(r.meta.green)||0;o.n++}
+  if(mode!=='day'){let d=mode==='week'?rdWeek(R.from):new Date(R.from.getFullYear(),R.from.getMonth(),1);while(d<R.end){const k=mode==='week'?rdIso(d):`${d.getFullYear()}-${d.getMonth()}`;if(!B.has(k))B.set(k,{d,v:0,n:0});d=mode==='week'?rdAdd(d,7):rdMon(d,1)}}
+  const list=[...B.values()].sort((a,b)=>a.d-b.d).map(o=>({...o,label:mode==='month'?MONTHS[o.d.getMonth()].slice(0,3)+(R.from.getFullYear()!==rdAdd(R.end,-1).getFullYear()?` ’${String(o.d.getFullYear()).slice(2)}`:''):rdShort(o.d)}));
+  return {mode,list}}
+/* SVG so it prints sharp; colors come in as CSS colors (tokens on screen, paper colors when printing) */
+function rpBarsSvg(list,W,H,P){const pl=46,pr=8,pt=26,pb=26,w=W-pl-pr,h=H-pt-pb;if(!list.length||w<40)return '';
+  const steps=[5,10,20,25,50,100,200,250,500,1000,2000,5000];let mx=Math.max(1,...list.map(o=>o.v));const st=steps.find(s=>mx/s<=4)||10000;mx=Math.ceil(mx/st)*st;
+  const gw=w/list.length,bw=Math.max(3,Math.min(56,gw*.58)),fs=12,every=Math.max(1,Math.ceil(list.length/Math.max(1,Math.floor(w/64))));
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Green pounds roasted" style="display:block;font-family:inherit">`;
+  for(let v=0;v<=mx;v+=st){const y=(pt+h-v/mx*h).toFixed(1);s+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="${P.grid}"/><text x="${pl-8}" y="${+y+4}" text-anchor="end" font-size="${fs}" fill="${P.axis}">${v}</text>`}
+  s+=`<text x="${pl-8}" y="11" text-anchor="end" font-size="${fs-1}" fill="${P.axis}">lb</text>`;
+  list.forEach((o,i)=>{const cx=pl+gw*i+gw/2,bh=o.v/mx*h,y=pt+h-bh;
+    if(o.v>0){s+=`<rect x="${(cx-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1.5,bh).toFixed(1)}" rx="3" fill="${P.bar}"><title>${esc(o.label)}: ${rpNum(o.v)} lb green · ${o.n} roast${o.n===1?'':'s'}</title></rect>`;
+      if(list.length<=16)s+=`<text x="${cx.toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="${P.ink}">${rpNum(o.v)}</text>`}
+    if(i%every===0)s+=`<text x="${cx.toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="${fs}" fill="${P.axis}">${esc(o.label)}</text>`});
+  return s+'</svg>'}
+const RP_SCREEN={grid:'var(--grid)',axis:'var(--text2)',bar:'var(--accent)',ink:'var(--text)'};
+
+function rpTiles(P,Q,R){const pl=esc(R.prev.label),d=(f,v)=>Q.tot.n?`<div class="delta">${pl}: ${f(v)}</div>`:`<div class="delta">${pl}: no roasts</div>`;
+  const t=P.tot,l=rpLoss(t),q=Q.tot,ql=rpLoss(q),pct=(a,b)=>b>0?` · ${a>=b?'+':'−'}${Math.round(Math.abs(a-b)/b*100)} %`:'';
+  return [['Roasts',String(t.n),'',d(v=>String(v),q.n)],
+    ['Green in',rpNum(t.g),'lb',Q.tot.n?`<div class="delta">${pl}: ${rpNum(q.g)} lb${pct(t.g,q.g)}</div>`:d(()=>'',0)],
+    ['Roasted out',rpNum(t.ww,2),'lb',d(v=>rpNum(v,2)+' lb',q.ww)],
+    ['Average loss',ok(l)?rpNum(l):'—',ok(l)?'%':'',d(v=>ok(v)?rpNum(v)+' %':'—',ql)],
+    ['Green cost',t.cost?money(t.cost):'—','',t.noPrice?`<div class="delta">${t.noPrice} roast${t.noPrice===1?'':'s'} without a price not counted</div>`:d(v=>v?money(v):'—',q.cost)],
+    ['Per roasted lb',ok(rpPerLb(t))?money(rpPerLb(t)):'—','',d(v=>ok(v)?money(v):'—',rpPerLb(q))]]}
+function rpProdTable(P,opt={}){const sel=opt.sel,spC=v=>ok(v)?(opt.paper?rpNum(v):rpSp(v)):DASH;
+  const row=(o,cls,tag)=>`<tr class="${cls||''}" ${tag||''}><td>${o===P.tot?'All coffees':`<b>${rpGName(o)}</b>${!opt.paper&&(o.origin||o.process)?`<small>${esc([o.origin,o.process].filter(Boolean).join(' · '))}</small>`:''}`}</td>
+    <td class="n">${o.n}</td><td class="n">${rpNum(o.g)} lb</td><td class="n">${o.gw?rpNum(o.ww,2)+' lb':DASH}</td><td class="n">${ok(rpLoss(o))?rpNum(rpLoss(o))+' %':DASH}</td>
+    <td class="n">${rpNum(rpMean(o.wh))}</td><td class="n">${rpNum(rpMean(o.gr))}</td><td class="n">${spC(rpMean(o.sp))}</td><td class="n">${o.cost?money(o.cost):DASH}</td><td class="n">${ok(rpPerLb(o))?money(rpPerLb(o)):DASH}</td></tr>`;
+  return `<table class="rpt"><thead><tr><th>Coffee</th><th class="n">Roasts</th><th class="n">Green in</th><th class="n">Roasted out</th><th class="n">Avg loss</th><th class="n">Avg whole</th><th class="n">Avg ground</th><th class="n">Avg spread</th><th class="n">Green cost</th><th class="n">Per roasted lb</th></tr></thead><tbody>
+    ${P.groups.map(o=>row(o,o.key===sel?'sel':'',opt.paper?'':`data-g="${esc(o.key)}"`)).join('')}${P.groups.length>1||opt.paper?row(P.tot,'tot'):''}</tbody></table>`}
+function rpRoastRows(rs,opt={}){return `<table class="rpt rpRoasts"><thead><tr><th>Roast</th><th>Date</th>${opt.name?'<th>Profile</th>':''}<th class="n">Green</th><th class="n">Roasted</th><th class="n">Loss</th><th class="n">Whole</th><th class="n">Ground</th><th class="n">Spread</th><th class="n">Cost</th>${opt.paper?'':'<th></th>'}</tr></thead><tbody>
+  ${rs.map(r=>{const m=r.meta,s=r.summary||summarize(r),sp=spreadOf(m),c=costOf(r);return `<tr ${opt.paper?'':`data-sheet="${r.id}"`}><td><b>#${r.num}</b>${r.isProfile?' ★':''}</td><td>${fmtDate(r.chargedAt||r.created,false)}</td>${opt.name?`<td>${esc(m.name||'')}</td>`:''}
+    <td class="n">${fGreen(m.green)}</td><td class="n">${fRoasted(m.roasted)}</td><td class="n">${ok(s.loss)?rpNum(s.loss)+' %':DASH}</td><td class="n">${fAg(m.colorWhole)}</td><td class="n">${fAg(m.colorGround)}</td>
+    <td class="n">${ok(sp)?(opt.paper?rpNum(sp):rpSp(sp)):DASH}</td><td class="n">${c&&ok(c.batch)?money(c.batch):DASH}</td>${opt.paper?'':'<td class="n"><button class="q sm" tabindex="-1">Roast sheet</button></td>'}</tr>`}).join('')}</tbody></table>`}
+
+/* ---------- inventory ---------- */
+function rpLotEvents(l){const ev=[],hasAdjPrice=(l.adj||[]).some(a=>ok(num(a.price)));
+  ev.push({d:dayDate(l.arrived||l.created||'1970-01-01'),lb:num(l.startLb)||0,kind:'in',t:'Starting stock',price:hasAdjPrice?null:num(l.price)});
+  for(const a of l.adj||[]){const lb=num(a.lb)||0;ev.push({d:dayDate(a.date),lb,kind:lb>0?'in':'adj',t:(lb>0?'Received':'Adjusted')+(a.note?' · '+a.note:''),price:lb>0?num(a.price):null})}
+  for(const r of HIST)if(r.meta&&r.meta.invId===l.id){const g=num(r.meta.green)||0;if(g)ev.push({d:rDate(r),lb:-g,kind:'roast',t:`Roast #${r.num}${r.meta.name?' · '+r.meta.name:''}${r.isProfile?' ★':''}`,r})}
+  return ev.filter(e=>!isNaN(e.d)).sort((a,b)=>a.d-b.d)}
+function rpInv(a,b){const lots=[],tot={open:0,in:0,used:0,adj:0,close:0,cost:0,inN:0,roasts:0,adjN:0};
+  for(const l of INV){const ev=rpLotEvents(l),o={l,open:0,in:0,used:0,adj:0,cost:0,inN:0,roasts:0,adjN:0,ev:[],isNew:false};
+    for(const e of ev){if(e.d<a)o.open+=e.lb;else if(e.d<b){o.ev.push(e);if(e.kind==='in'){o.in+=e.lb;o.inN++;if(ok(e.price))o.cost+=e.lb*e.price;if(e.t==='Starting stock')o.isNew=true}else if(e.kind==='roast'){o.used-=e.lb;o.roasts++}else{o.adj+=e.lb;o.adjN++}}}
+    o.close=o.open+o.in-o.used+o.adj;if(Math.abs(o.open)<0.005&&!o.ev.length)continue;
+    o.low=o.close>0.001&&o.close<LOW;lots.push(o);for(const k of ['open','in','used','adj','close','cost','inN','roasts','adjN'])tot[k]+=o[k]}
+  lots.sort((x,y)=>y.used-x.used||y.close-x.close||String(x.l.name).localeCompare(String(y.l.name)));return {lots,tot}}
+const rpSigned=(v,cls)=>Math.abs(v)<0.05?DASH:`<span class="${cls||''}">${v>0?'+':'−'}${rpNum(Math.abs(v))}</span>`;
+function rpInvTable(I,R,opt={}){const f=rdShort(R.from),e=rdShort(rdAdd(R.end,-1));
+  return `<table class="rpt"><thead><tr><th>Lot</th><th class="n">${esc(f)}</th><th class="n">Came in</th><th class="n">Roasted</th><th class="n">Adjusted</th><th class="n">${esc(e)}</th>${opt.paper?'':'<th style="width:24%">Left of what was available</th>'}</tr></thead><tbody>
+  ${I.lots.map(o=>{const av=Math.max(0,o.open)+o.in,pct=av>0?clamp(o.close/av*100,0,100):0;return `<tr class="${o.l.id===opt.sel?'sel':''}" ${opt.paper?'':`data-lot="${o.l.id}"`}><td><b>${esc(o.l.name)}</b>${o.low?'<span class="badge rpLow">Low</span>':''}${o.isNew?'<span class="badge">New</span>':''}${o.l.origin&&!opt.paper?`<small>${esc([o.l.origin,o.l.process].filter(Boolean).join(' · '))}</small>`:''}</td>
+    <td class="n">${Math.abs(o.open)<0.05?DASH:rpNum(o.open)}</td><td class="n">${rpSigned(o.in,'rpIn')}</td><td class="n">${o.used?'−'+rpNum(o.used):DASH}</td><td class="n">${rpSigned(o.adj)}</td><td class="n"><b>${rpNum(o.close)}</b></td>
+    ${opt.paper?'':`<td><div class="rpBar"><i style="width:${pct.toFixed(1)}%;background:${o.low?'var(--warn)':'var(--g-stock,var(--good))'}"></i></div><span class="tnum muted rpPct">${Math.round(pct)} %</span></td>`}</tr>`}).join('')}
+  <tr class="tot"><td>All lots</td><td class="n">${rpNum(I.tot.open)}</td><td class="n">${rpSigned(I.tot.in)}</td><td class="n">${I.tot.used?'−'+rpNum(I.tot.used):DASH}</td><td class="n">${rpSigned(I.tot.adj)}</td><td class="n">${rpNum(I.tot.close)}</td>${opt.paper?'':'<td></td>'}</tr></tbody></table>`}
+function rpLedger(o,R,opt={}){let bal=o.open;const rows=[`<tr class="rpOpen"><td>${rdShort(R.from)}</td><td>On hand at the start</td><td class="n">${DASH}</td><td class="n"><b>${rpNum(bal)}</b></td></tr>`];
+  for(const e of o.ev){bal+=e.lb;rows.push(`<tr ${e.r&&!opt.paper?`data-sheet="${e.r.id}"`:''}><td>${rdShort(e.d)}</td><td>${esc(e.t)}${ok(e.price)&&e.kind==='in'?` · ${money(e.price)} / lb`:''}</td><td class="n">${rpSigned(e.lb,e.lb>0?'rpIn':'')}</td><td class="n"><b>${rpNum(bal)}</b></td></tr>`)}
+  return `<table class="rpt rpLed"><thead><tr><th>Date</th><th>Entry</th><th class="n">Change</th><th class="n">On hand</th></tr></thead><tbody>${rows.join('')}</tbody></table>`}
+
+/* ---------- roast sheet ---------- */
+/* paper colors: the chart keeps your chart colors, but anything too light to read on white paper falls back to the White look */
+function rpPaperCols(){const c=cfg.theme.colors||{},pick=k=>{const v=c[k];return v&&/^#[0-9a-f]{6}$/i.test(v)&&hexLum(v)<.62?v:WHITE[k]};
+  return {bt:pick('bt'),ror:pick('ror'),bkg:hexLum(c.bkg||'#000')<.62&&hexLum(c.bkg||'#000')>.08?c.bkg:WHITE.bkg,burner:pick('burner'),air:pick('air'),accent:pick('accent'),grid:'#ECEEF1',axis:'#6B7280',ink:'#15181B',bar:pick('accent')}}
+function rpBgOf(r){const bg=r.bgId?findAny(r.bgId):null;return bg&&bg.id!==r.id&&bg.samples&&bg.samples.length?bg:null}
+let rsN=0;
+function rsChart(r,bg,W,H,P){const cid='rsClip'+(++rsN);const ev=r.events||{},o=ev.CHARGE??(r.samples[0]?.t??0),bo=bg?(bg.events.CHARGE??bg.samples[0].t):0;
+  const dr=(ev.DROP??r.samples.at(-1).t)-o,bdr=bg?((bg.events.DROP??bg.samples.at(-1).t)-bo):0,xmax=Math.max(120,Math.ceil((Math.max(dr,bdr)+20)/60)*60);
+  const strip=Math.round(H*.2),pl=40,pr=40,pt=12,pb=20,ch=H-pt-pb-strip-10,X=t=>pl+(W-pl-pr)*t/xmax;
+  let lo=Infinity,hi=-Infinity;const scan=(x,off,end)=>{for(const s of x.samples){if(s.t<off-5||s.t>off+end+5)continue;const v=toD(s.bt);if(ok(v)){lo=Math.min(lo,v);hi=Math.max(hi,v)}}};scan(r,o,dr);if(bg)scan(bg,bo,bdr);
+  if(!isFinite(lo)){lo=100;hi=450}const st=cfg.unit==='F'?50:25,tmin=Math.floor((lo-5)/st)*st,tmax=Math.ceil((hi+5)/st)*st,Y=v=>pt+ch*(1-(v-tmin)/(tmax-tmin));
+  const R={min:cfg.scales.rMin,max:cfg.scales.rMax,step:cfg.scales.rStep||10},YR=v=>pt+ch*(1-(v-R.min)/(R.max-R.min)),sy=pt+ch+10,YS=v=>sy+strip*(1-clamp(v,0,100)/100);
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Roast curve" style="display:block;font-family:inherit">`;
+  for(let v=tmin;v<=tmax;v+=st)s+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="${P.grid}"/><text x="${pl-5}" y="${(Y(v)+3.5).toFixed(1)}" text-anchor="end" font-size="9.5" fill="${P.axis}">${v}</text>`;
+  for(let v=R.min+R.step;v<=R.max;v+=R.step)s+=`<text x="${W-pr+5}" y="${(YR(v)+3.5).toFixed(1)}" font-size="9.5" fill="${P.ror}">${v}</text>`;
+  for(let t=0;t<=xmax;t+=120)s+=`<text x="${X(t).toFixed(1)}" y="${H-5}" text-anchor="middle" font-size="9.5" fill="${P.axis}">${t/60}:00</text>`;
+  s+=`<text x="${pl+3}" y="${pt+9}" font-size="9.5" fill="${P.axis}">°${cfg.unit}</text><text x="${W-pr-3}" y="${pt+9}" text-anchor="end" font-size="9.5" fill="${P.ror}">°${cfg.unit}/min</text>`;
+  const path=(x,off,end,f,Yf,from)=>{let d='',lt=-9;for(const p of x.samples){const t=p.t-off;if(t<(from??-2)||t>end)continue;const v=f(p);if(!ok(v)){lt=-9;continue}if(t-lt<1.5&&d)continue;d+=(lt<-1?'M':'L')+X(t).toFixed(1)+' '+Yf(v).toFixed(1);lt=t}return d};
+  s+=`<defs><clipPath id="${cid}"><rect x="${pl}" y="${pt}" width="${W-pl-pr}" height="${ch}"/></clipPath></defs><g clip-path="url(#${cid})">`;
+  if(bg)s+=`<path d="${path(bg,bo,bdr,p=>toD(p.bt),Y)}" fill="none" stroke="${P.bkg}" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+  const rs0=(rorStart(ev)??o)-o;s+=`<path d="${path(r,o,dr,p=>toDR(p.ror),YR,rs0)}" fill="none" stroke="${P.ror}" stroke-width="1.3"/>`;
+  s+=`<path d="${path(r,o,dr,p=>toD(p.bt),Y)}" fill="none" stroke="${P.bt}" stroke-width="2.1"/></g>`;
+  for(const [k,l] of [['TP','TP'],['DRY','DE'],['FCs','FC'],['DROP','Drop']]){const t=ev[k];if(t==null)continue;const p=sampleAt(r.samples,t);if(!p||!ok(p.bt))continue;const x=X(t-o),y=Y(toD(p.bt)),end=k==='DROP';
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${P.bt}"/><text x="${(x+(end?-6:6)).toFixed(1)}" y="${(y-(k==='TP'?-14:7)).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="${end?'end':'start'}" fill="${P.ink}">${l} ${mmss(t-o)}</text>`}
+  s+=`<rect x="${pl}" y="${sy}" width="${W-pl-pr}" height="${strip}" fill="none" stroke="${P.grid}"/>`;
+  const step=(x,off,end,k)=>{let d='',last=null;for(const p of x.samples){const t=p.t-off;if(t<-2||t>end||!ok(p[k]))continue;if(last!=null&&Math.abs(p[k]-last)<.5&&t<end-1)continue;d+=(d?`L${X(t).toFixed(1)} ${YS(last).toFixed(1)}L`:'M')+X(t).toFixed(1)+' '+YS(p[k]).toFixed(1);last=p[k]}
+    if(last!=null)d+=`L${X(end).toFixed(1)} ${YS(last).toFixed(1)}`;return d};
+  if(bg)for(const [k,c] of [['burner',P.burner],['fan',P.air]])s+=`<path d="${step(bg,bo,bdr,k)}" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>`;
+  for(const [k,c] of [['burner',P.burner],['fan',P.air]])s+=`<path d="${step(r,o,dr,k)}" fill="none" stroke="${c}" stroke-width="1.7"/>`;
+  for(const a of adjustments(r)){if(a.key==='drum')continue;const x=X(a.t-o),y=YS(a.to),c=a.key==='burner'?P.burner:P.air;s+=`<text x="${(x+2).toFixed(1)}" y="${(a.key==='burner'?y-3:y+10).toFixed(1)}" font-size="9" font-weight="600" fill="${c}">${Math.round(a.to)}</text>`}
+  s+=`<text x="${W-pr-3}" y="${sy+strip-4}" text-anchor="end" font-size="9" fill="${P.axis}">Burner % · Air %</text>`;
+  return s+'</svg>'}
+const RS_EV=[['CHARGE','Charge'],['TP','Turning point'],['DRY',null],['FCs',null],['FCe',null],['SCs',null],['SCe',null],['DROP','Drop']];
+const rsEvLabel=(k,l)=>l||(cfg.events.find(e=>e.k===k)||{}).label||k;
+const rpBizHead=(right)=>`<div class="pdHead"><div class="pdBiz">${cfg.bizLogo?`<img src="${cfg.bizLogo}" alt="">`:''}<div><b>${esc(cfg.bizName||'Zuna Roast')}</b><span>${right.sub}</span></div></div><div class="pdRight"><b>${right.title}</b><span>${right.line||''}</span></div></div>`;
+const rpFoot=()=>`<div class="pdFoot"><span>${esc(cfg.bizName||'')}</span><span>Printed ${new Date().toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})} from Zuna Roast${window.ZR_NATIVE&&ZR_NATIVE.version?' '+esc(ZR_NATIVE.version):''}</span></div>`;
+function rsCupping(r){const out=[];for(const s of CUP)for(const x of s.samples||[])if(x.roastId===r.id)out.push({s,x});out.sort((a,b)=>String(a.s.date).localeCompare(String(b.s.date)));return out}
+function roastSheetHtml(r){const m=r.meta,s=r.summary||summarize(r),ev=r.events||{},o=ev.CHARGE??0,bg=rpBgOf(r),bev=bg?bg.events:{},bo=bg?(bev.CHARGE??0):0,c=costOf(r),sp=spreadOf(m),P=rpPaperCols(),adj=adjustments(r),cups=rsCupping(r),dt=r.chargedAt||r.created;
+  const evRows=RS_EV.filter(([k])=>ev[k]!=null).map(([k,l])=>{const p=sampleAt(r.samples,ev[k]),bt=k==='CHARGE'?s.charge??p?.bt:p?.bt,dd=bg&&bev[k]!=null&&k!=='CHARGE'?(ev[k]-o)-(bev[k]-bo):null;
+    return `<tr><td>${esc(rsEvLabel(k,l))}</td><td class="n">${mmss(ev[k]-o)}</td><td class="n">${ok(bt)?fT(bt):'—'}</td>${bg?`<td class="n">${ok(dd)?(dd>0?'+':dd<0?'−':'')+mmss(Math.abs(dd)):'—'}</td>`:''}</tr>`}).join('');
+  const bgAdj=bg?adjustments(bg).filter(a=>a.key!=='drum'):[];
+  const kv=(l,v)=>`<div class="pdKv"><span>${l}</span><b>${v}</b></div>`;
+  const cupHtml=cups.length?cups.map(({s:se,x})=>{const cd=x.card||{},fam=FAMS.map(([k,l])=>(cd.fam&&cd.fam[k]&&cd.fam[k].length)?[l,cd.fam[k].join(' ')]:null).filter(Boolean);
+      const more=[cd.body?['Body',cd.body]:null,cd.acid?['Acidity',cd.acid]:null,cd.bal||cd.ov?['Balance · overall',`${cd.bal||'—'} · ${cd.ov||'—'}`]:null,cfg.cupScoring&&x.scores?['Score',cupScore(x).toFixed(2)]:null].filter(Boolean);
+      return `<div class="pdCup"><div class="pdSub">${fmtDay(se.date)}${se.name?' · '+esc(se.name):''}${se.cuppers?' · '+esc(se.cuppers):''}</div>${fam.length||more.length?`<div class="pdFam">${[...fam,...more].map(([a,b])=>`<div><span>${esc(a)}</span><i>${esc(b)}</i></div>`).join('')}</div>`:''}${(x.tags||[]).length?`<div class="pdTags">${x.tags.map(esc).join(' · ')}</div>`:''}${x.comments?`<div class="pdNote">${esc(x.comments)}</div>`:''}</div>`}).join('')
+    :'<div class="pdNone">Not cupped yet.</div>';
+  const notes=[m.notes?esc(m.notes):'',(r.tnotes||[]).map(n=>`<span class="pdT">${mmss(n.t-o)}</span> ${esc(n.text)}`).join('<br>')].filter(Boolean).join('<br><br>');
+  return `<div class="paperDoc pdSheet">${rpBizHead({sub:'Roast sheet · Probat P12 III',title:`Roast #${r.num}`,line:esc(fmtLong(dt))})}
+  <div class="pdTitle"><h2>${esc(m.name||'Untitled')}${r.isProfile?' <span class="pdStar">★ Profile</span>':''}</h2><div class="pdMeta">${m.coffee?`<span>Coffee <b>${esc(m.coffee)}</b></span>`:''}${m.lot?`<span>Lot <b>${esc(m.lot)}</b></span>`:''}<span>Batch <b>${fGreen(m.green)} lb</b></span>${bg?`<span>Background <b>${esc(rTag(bg))} ${esc(bg.meta.name||'')}</b></span>`:''}</div></div>
+  <div class="pdChart">${rsChart(r,bg,720,300,P)}<div class="pdLegend"><span><i style="background:${P.bt}"></i>Bean temp</span>${bg?`<span><i class="dash" style="border-color:${P.bkg}"></i>Background ${esc(rTag(bg))}</span>`:''}<span><i style="background:${P.ror}"></i>RoR</span><span><i style="background:${P.burner}"></i>Burner</span><span><i style="background:${P.air}"></i>Air</span></div></div>
+  <div class="pd2"><div><div class="pdH">Events</div><table class="pdT2"><thead><tr><th>Event</th><th class="n">Time</th><th class="n">Bean °${cfg.unit}</th>${bg?`<th class="n">vs ${esc(rTag(bg))}</th>`:''}</tr></thead><tbody>${evRows||`<tr><td colspan="4">No events marked.</td></tr>`}</tbody></table>
+      ${kv('Development after FC',mmss(s.dev))}${kv('Total time',mmss(s.drop))}</div>
+    <div><div class="pdH">Burner and air changes</div><table class="pdT2"><thead><tr><th>Time</th><th>Change</th></tr></thead><tbody>${adj.length?adj.map(a=>`<tr><td class="tnum">${mmss(a.t-o)}</td><td>${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}${a.key==='drum'?'':' %'}</td></tr>`).join(''):'<tr><td colspan="2">No changes during the roast.</td></tr>'}</tbody></table>
+      ${bg&&bgAdj.length?`<div class="pdSmall">Background ${esc(rTag(bg))}: ${bgAdj.map(a=>`${mmss(a.t-bo)} ${a.label.toLowerCase()} ${Math.round(a.to)}`).join(' · ')}</div>`:''}</div></div>
+  <div class="pd3"><div><div class="pdH">Weights</div>${kv('Green',fGreen(m.green)+' lb')}${kv('Roasted',fRoasted(m.roasted)+' lb')}${kv('Loss',ok(s.loss)?rpNum(s.loss)+' %':'—')}</div>
+    <div><div class="pdH">Color (Agtron)</div>${kv('Whole bean',fAg(m.colorWhole))}${kv('Ground',fAg(m.colorGround))}${kv('Spread',ok(sp)?rpNum(sp)+(cfg.spColorsOn?' · '+esc(spBand(sp).label):''):'—')}</div>
+    <div><div class="pdH">Cost</div>${c?kv(`Green ${money(c.price)} / lb`,ok(c.batch)?money(c.batch):'—')+kv('Per roasted lb',ok(c.perLb)?money(c.perLb):'—')+kv('Green in a 12 oz bag',ok(c.perLb)?money(c.perLb*.75):'—'):kv('Green price','Not set')}</div></div>
+  <div class="pd2"><div><div class="pdH">Cupping</div>${cupHtml}</div><div><div class="pdH">Comments</div>${notes?`<div class="pdNote">${notes}</div>`:'<div class="pdNone">No comments.</div>'}</div></div>
+  ${rpFoot()}</div>`}
+function rsCsvName(r){return roastBase(r)}
+
+/* ---------- print documents ---------- */
+function rpProdDoc(R,P,Q){const C=rpPaperCols(),B=rpBuckets(R,P.rs),tl=rpTiles(P,Q,R);
+  return `<div class="paperDoc">${rpBizHead({sub:'Production report',title:esc(R.label),line:`${P.tot.n} roast${P.tot.n===1?'':'s'}${RP.by==='batch'?' · by coffee and batch size':' · by coffee'}`})}
+  <div class="pdTiles">${tl.map(t=>`<div><span>${t[0]}</span><b>${t[1]}${t[2]?` <small>${t[2]}</small>`:''}</b>${t[3].replace('class="delta"','class="pdD"')}</div>`).join('')}</div>
+  ${rpProdTable(P,{paper:1})}
+  <div class="pdH" style="margin-top:14px">Green roasted by ${B.mode}</div>${rpBarsSvg(B.list,720,180,C)}
+  ${P.groups.map(o=>`<div class="pdGroup"><div class="pdH">${rpGName(o)} · ${o.n} roast${o.n===1?'':'s'}</div>${rpRoastRows(o.rs,{paper:1,name:1})}</div>`).join('')}
+  <div class="pdSmall">Weights in lb. Colors are Agtron averages of the roasts that have them. Green cost uses each lot’s green price. ★ = saved profile.</div>${rpFoot()}</div>`}
+function rpInvDoc(R,I){return `<div class="paperDoc">${rpBizHead({sub:'Green coffee inventory',title:esc(R.label),line:`${I.lots.length} lot${I.lots.length===1?'':'s'}`})}
+  <div class="pdTiles">${rpInvTiles(I,R).map(t=>`<div><span>${t[0]}</span><b>${t[1]} <small>lb</small></b><div class="pdD">${t[2]}</div></div>`).join('')}</div>
+  ${rpInvTable(I,R,{paper:1})}
+  ${I.lots.filter(o=>o.ev.length).map(o=>`<div class="pdGroup"><div class="pdH">${esc(o.l.name)}</div>${rpLedger(o,R,{paper:1})}</div>`).join('')}${rpFoot()}</div>`}
+function rpInvTiles(I,R){const t=I.tot;return [[`On hand ${rdShort(R.from)}`,rpNum(t.open),`${I.lots.filter(o=>o.open>0.001).length} lot${I.lots.filter(o=>o.open>0.001).length===1?'':'s'}`],
+  ['Came in',rpNum(t.in),`${t.inN} deliver${t.inN===1?'y':'ies'}${t.cost?' · '+money(t.cost):''}`],['Roasted',rpNum(t.used),`${t.roasts} roast${t.roasts===1?'':'s'}`],
+  ['Other adjustments',(t.adj<-0.04?'−':t.adj>0.04?'+':'')+rpNum(Math.abs(t.adj)),`${t.adjN} entr${t.adjN===1?'y':'ies'}`],[`On hand ${rdShort(rdAdd(R.end,-1))}`,rpNum(t.close),(n=>n?`${n} lot${n===1?'':'s'} low`:'None low')(I.lots.filter(o=>o.low).length)]]}
+/* Print / PDF: Mac → print dialog (PDF ▾ › Save as PDF); iPad/iPhone → share sheet with a PDF; a browser → its print dialog */
+async function rpPrint(html,name){const el=$('#printArea');el.innerHTML=html;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  try{if(window.ZR_NATIVE&&ZR_NATIVE.printPage)await ZR_NATIVE.printPage(name+'.pdf');else window.print()}catch(e){toast('Could not print: '+e)}}
+const rpFileDate=R=>rdIso(R.from)+'_to_'+rdIso(rdAdd(R.end,-1));
+
+/* ---------- CSV ---------- */
+function rpProdCSV(R,P){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,n=(v,d=2)=>ok(v)?v.toFixed(d):'',rows=[`# Production ${R.label} (${rdIso(R.from)} to ${rdIso(rdAdd(R.end,-1))})`];
+  rows.push(['coffee','batch_lb','roasts','green_lb','roasted_lb','avg_loss_pct','avg_whole','avg_ground','avg_spread','green_cost','cost_per_roasted_lb','roasts_without_price'].join(','));
+  for(const o of [...P.groups,P.tot])rows.push([q(o===P.tot?'All coffees':o.name),o.batch??'',o.n,n(o.g),n(o.ww),n(rpLoss(o)),n(rpMean(o.wh),1),n(rpMean(o.gr),1),n(rpMean(o.sp),1),n(o.cost),n(rpPerLb(o)),o.noPrice].join(','));
+  rows.push('');rows.push(['roast','date','coffee','profile','green_lb','roasted_lb','loss_pct','whole','ground','spread','green_cost','profile_mark'].join(','));
+  for(const r of P.rs){const m=r.meta,s=r.summary||summarize(r),c=costOf(r);rows.push([r.num,rdIso(rDate(r)),q(m.coffee||''),q(m.name||''),m.green||'',m.roasted||'',n(s.loss),m.colorWhole||'',m.colorGround||'',spreadOf(m)??'',c&&ok(c.batch)?c.batch.toFixed(2):'',r.isProfile?'yes':''].join(','))}
+  return rows.join('\n')}
+function rpInvCSV(R,I){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,n=v=>ok(v)?v.toFixed(2):'',rows=[`# Green coffee inventory ${R.label} (${rdIso(R.from)} to ${rdIso(rdAdd(R.end,-1))})`];
+  rows.push(['lot','origin','process','on_hand_start','came_in','roasted','adjusted','on_hand_end','cost_in'].join(','));
+  for(const o of I.lots)rows.push([q(o.l.name),q(o.l.origin||''),q(o.l.process||''),n(o.open),n(o.in),n(o.used),n(o.adj),n(o.close),n(o.cost)].join(','));
+  rows.push(['All lots','','',n(I.tot.open),n(I.tot.in),n(I.tot.used),n(I.tot.adj),n(I.tot.close),n(I.tot.cost)].map((v,i)=>i?v:q(v)).join(','));
+  rows.push('');rows.push(['lot','date','entry','change_lb','on_hand_lb','price_per_lb'].join(','));
+  for(const o of I.lots){let b=o.open;for(const e of o.ev){b+=e.lb;rows.push([q(o.l.name),rdIso(e.d),q(e.t),n(e.lb),n(b),ok(e.price)&&e.kind==='in'?e.price.toFixed(2):''].join(','))}}
+  return rows.join('\n')}
+
+/* ---------- screen ---------- */
+function openSheet(id,back){RP.sheet=id;RP.back=back||curScreen;if(curScreen==='reports')renderReports();else showScreen('reports')}
+function rpRangeBar(R){return `<div class="seg rpPre" id="rpPre">${RP_PRE.map(([k,l])=>`<button data-p="${k}" class="${RP.preset===k?'on':''}">${l}</button>`).join('')}</div>
+  <div class="rpDates"><input type="date" id="rpFrom" value="${rdIso(R.from)}" aria-label="From"><span class="muted">to</span><input type="date" id="rpTo" value="${rdIso(rdAdd(R.to,-1))}" aria-label="To"></div>`}
+function renderReports(){const el=$('#rpBody');if(!el)return;
+  if(RP.sheet){const r=HIST.find(x=>x.id===RP.sheet);if(r)return renderSheetView(el,r);RP.sheet=null}
+  const R=rpRange(),ipd=false;$('#rpTitle').hidden=false;
+  $('#rpHead').innerHTML=`<div class="seg" id="rpView"><button data-v="prod" class="${RP.view==='prod'?'on':''}">Production</button><button data-v="inv" class="${RP.view==='inv'?'on':''}">Inventory</button></div>
+    ${ipd?'':rpRangeBar(R)}<div class="sp"></div><button id="rpCsv">Export CSV</button><button class="pri" id="rpPrint">Print / PDF…</button>`;
+  $('#rpHead2').innerHTML=ipd?rpRangeBar(R):'';$('#rpHead2').hidden=!ipd;
+  if(RP.view==='inv')renderRpInv(el,R);else renderRpProd(el,R);
+  $$('#rpView button').forEach(b=>b.onclick=()=>{RP.view=b.dataset.v;RP.ipDet=false;rpSave();renderReports()});
+  $$('#rpPre button').forEach(b=>b.onclick=()=>{const was=rpRange();RP.preset=b.dataset.p;if(RP.preset==='custom'&&!RP.from){RP.from=rdIso(was.from);RP.to=rdIso(rdAdd(was.to,-1))}RP.ipDet=false;rpSave();renderReports()});
+  for(const id of ['rpFrom','rpTo'])$('#'+id).onchange=()=>{const a=$('#rpFrom').value,b=$('#rpTo').value;if(!rdParse(a)||!rdParse(b))return;RP.preset='custom';RP.from=a;RP.to=b;rpSave();renderReports()}}
+function renderRpProd(el,R){const P=rpProd(R.from,R.end),Q=rpProd(R.prev.from,R.prev.to),ipd=false;
+  if(RP.sel&&!P.groups.some(o=>o.key===RP.sel))RP.sel=null;if(!RP.sel&&P.groups.length&&!ipd)RP.sel=P.groups[0].key;
+  $('#rpCsv').onclick=()=>download(`production_${rpFileDate(R)}.csv`,rpProdCSV(R,P));
+  $('#rpPrint').onclick=()=>P.tot.n?rpPrint(rpProdDoc(R,P,Q),`production_${rpFileDate(R)}`):toast('No roasts in '+R.label);
+  const by=`<div class="seg" id="rpBy"><button data-b="coffee" class="${RP.by==='coffee'?'on':''}">By coffee</button><button data-b="batch" class="${RP.by==='batch'?'on':''}">Coffee + batch size</button></div>`;
+  const sel=P.groups.find(o=>o.key===RP.sel);
+  if(ipd&&RP.ipDet&&sel){el.innerHTML=`<div class="row"><button class="ipBack" id="rpBack">‹ Production</button><div class="dtitle">${rpGName(sel)}</div><span class="muted">${esc(R.label)}</span></div>
+      <div class="card scroll rpDetCard">${rpRoastRows(sel.rs,{name:1})}</div>`;$('#rpBack').onclick=()=>{RP.ipDet=false;renderReports()};rpWireSheets(el);return}
+  const tiles=`<div class="tiles rpTiles">${rpTiles(P,Q,R).map(t=>`<div class="card tile"><div class="l">${t[0]}</div><div class="v">${t[1]}${t[2]?`<small>${t[2]}</small>`:''}</div>${t[3]}</div>`).join('')}</div>`;
+  if(!P.tot.n){el.innerHTML=`${tiles}<div class="card empty">No roasts in ${esc(R.label)}. Pick another range above.</div>`;return}
+  const B=rpBuckets(R,P.rs),chart=`<div class="card rpChart"><div class="row"><div class="h3">Green roasted by ${B.mode}</div><span class="sp"></span><div class="seg" id="rpBars">${[['auto','Auto'],['day','Day'],['week','Week'],['month','Month']].map(([k,l])=>`<button data-b="${k}" class="${RP.bars===k?'on':''}">${l}</button>`).join('')}</div></div><div id="rpBarsBox" class="rpBarsBox"></div></div>`;
+  const table=`<div class="card rpTable"><div class="row rpTh"><div class="h3">${esc(R.label)}</div><span class="sp"></span>${by}</div><div class="scroll">${rpProdTable(P,{sel:ipd?null:RP.sel})}</div></div>`;
+  const detail=sel&&!ipd?`<div class="card detail rpDet"><div><div class="dtitle">${rpGName(sel)}</div><div class="muted" style="margin-top:3px">${sel.n} roast${sel.n===1?'':'s'} · ${esc(R.label)}${sel.origin?' · '+esc(sel.origin):''}</div></div><div class="scroll">${rpRoastRows(sel.rs)}</div>
+      <div class="foot muted">Averages skip roasts without that value${sel.rs.some(r=>!ok(spreadOf(r.meta)))?` (${sel.rs.filter(r=>!ok(spreadOf(r.meta))).length} without colors)`:''}. Click a roast for its roast sheet.</div></div>`:'';
+  el.innerHTML=ipd?`${tiles}${table}${chart}`:`${tiles}<div class="rpGrid"><div class="rpCol">${table}</div><div class="rpCol">${chart}${detail}</div></div>`;
+  requestAnimationFrame(()=>{const bx=$('#rpBarsBox');if(bx)bx.innerHTML=rpBarsSvg(B.list,bx.clientWidth,bx.clientHeight||220,RP_SCREEN)});
+  $$('#rpBy button').forEach(b=>b.onclick=()=>{RP.by=b.dataset.b;RP.sel=null;rpSave();renderReports()});
+  $$('#rpBars button').forEach(b=>b.onclick=()=>{RP.bars=b.dataset.b;rpSave();renderReports()});
+  $$('[data-g]',el).forEach(tr=>tr.onclick=()=>{RP.sel=tr.dataset.g;if(ipd)RP.ipDet=true;renderReports()});rpWireSheets(el)}
+function rpWireSheets(el){$$('[data-sheet]',el).forEach(tr=>tr.onclick=()=>openSheet(tr.dataset.sheet,'reports'))}
+function renderRpInv(el,R){const I=rpInv(R.from,R.end),ipd=false;
+  if(RP.lot&&!I.lots.some(o=>o.l.id===RP.lot))RP.lot=null;if(!RP.lot&&I.lots.length&&!ipd)RP.lot=I.lots[0].l.id;
+  $('#rpCsv').onclick=()=>download(`inventory_${rpFileDate(R)}.csv`,rpInvCSV(R,I));
+  $('#rpPrint').onclick=()=>I.lots.length?rpPrint(rpInvDoc(R,I),`inventory_${rpFileDate(R)}`):toast('No green coffee in '+R.label);
+  const o=I.lots.find(x=>x.l.id===RP.lot);
+  const det=o?`<div class="card detail rpDet"><div class="row" style="align-items:flex-start"><div><div class="dtitle">${esc(o.l.name)}</div><div class="muted" style="margin-top:3px">${[o.l.arrived?'Arrived '+fmtDay(o.l.arrived):'',ok(num(o.l.price))?money(num(o.l.price))+' / lb':'',rpPace(o,R)].filter(Boolean).join(' · ')}</div></div><span class="sp"></span><button class="sm" id="rpToGreen">Open in Green coffee</button></div>
+      <div class="scroll">${rpLedger(o,R)}</div></div>`:'';
+  if(ipd&&RP.ipDet&&o){el.innerHTML=`<div class="row"><button class="ipBack" id="rpBack">‹ Inventory</button><span class="muted">${esc(R.label)}</span></div>${det}`;$('#rpBack').onclick=()=>{RP.ipDet=false;renderReports()};rpWireInv(el,o);return}
+  const tiles=`<div class="tiles rpTiles rp5">${rpInvTiles(I,R).map(t=>`<div class="card tile"><div class="l">${t[0]}</div><div class="v">${t[1]}<small>lb</small></div><div class="delta">${t[2]}</div></div>`).join('')}</div>`;
+  if(!I.lots.length){el.innerHTML=`${tiles}<div class="card empty">No green coffee on hand or moving in ${esc(R.label)}.</div>`;return}
+  const table=`<div class="card rpTable"><div class="row rpTh"><div class="h3">${esc(R.label)}</div></div><div class="scroll">${rpInvTable(I,R,{sel:ipd?null:RP.lot})}</div><div class="foot muted rpFoot">Lots with no stock and no movement in this range are left out.</div></div>`;
+  el.innerHTML=ipd?`${tiles}${table}`:`${tiles}<div class="rpGrid rpGridInv"><div class="rpCol">${table}</div><div class="rpCol">${det}</div></div>`;
+  $$('[data-lot]',el).forEach(tr=>tr.onclick=()=>{RP.lot=tr.dataset.lot;if(ipd)RP.ipDet=true;renderReports()});rpWireInv(el,o)}
+function rpWireInv(el,o){const g=$('#rpToGreen');if(g&&o)g.onclick=()=>{selGreen=o.l.id;showScreen('green')};rpWireSheets(el)}
+function rpPace(o,R){const days=Math.max(1,(R.end-R.from)/864e5);if(!o.used||o.close<=0.05)return '';const w=o.close/(o.used/days)/7;
+  return w<1?'less than a week left at this pace':w<10?`about ${Math.round(w)} week${Math.round(w)===1?'':'s'} left at this pace`:`about ${Math.round(w/4.35)} months left at this pace`}
+function renderSheetView(el,r){const back=RP.back&&RP.back!=='reports'?RP.back:null,bl={roasts:'History',profiles:'Profiles',analyze:'Analyze',green:'Green coffee'}[back]||'Reports';
+  $('#rpHead').innerHTML=`<button class="rsBack" id="rsBack">‹ ${bl}</button><h2 class="rsH">Roast sheet · #${r.num}</h2><div class="sp"></div><span class="muted rsPaperNote">Letter · portrait</span><button id="rsCsv">Export CSV</button><button class="pri" id="rsPrint">Print / PDF…</button>`;
+  $('#rpHead2').hidden=true;$('#rpTitle').hidden=true;
+  el.innerHTML=`<div class="paperView"><div class="paperScale" id="rsScale">${roastSheetHtml(r)}</div></div>`;
+  const fit=()=>{const box=el.querySelector('.paperView'),sc=$('#rsScale');if(!box||!sc)return;const s=Math.min(1.25,(box.clientWidth-48)/816),doc=sc.firstElementChild;doc.style.transform=`scale(${s})`;sc.style.width=(816*s)+'px';sc.style.height=(doc.offsetHeight*s)+'px'};requestAnimationFrame(fit);
+  $('#rsBack').onclick=()=>{RP.sheet=null;if(back)showScreen(back);else renderReports()};
+  $('#rsCsv').onclick=()=>download(roastBase(r)+'.csv',csvText(r));
+  $('#rsPrint').onclick=()=>rpPrint(roastSheetHtml(r),`roast_sheet_${r.num}`)}
+
+/* ================================================================
    Screens & wiring
    ================================================================ */
-function showScreen(n){curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
-  if(n==='roast'){renderAll();renderTodayMini()}else if(n==='today')renderToday();else if(n==='profiles')renderProfiles();else if(n==='roasts')renderRoasts();else if(n==='green'){gMode='view';setGView(gViewMode)}else if(n==='pricing')renderPricing();else if(n==='cupping'){cupMode='view';renderCupping()}else if(n==='analyze'){renderAnalyze()}else if(n==='settings')renderSettings()}
+function showScreen(n){if(n!=='reports')RP.sheet=null;curScreen=n;$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===n));$$('.screen').forEach(s=>s.hidden=s.id!=='scr-'+n);if(n!=='roast')closeDrawer();
+  if(n==='roast'){renderAll();renderTodayMini()}else if(n==='today')renderToday();else if(n==='profiles')renderProfiles();else if(n==='roasts')renderRoasts();else if(n==='green'){gMode='view';setGView(gViewMode)}else if(n==='pricing')renderPricing();else if(n==='cupping'){cupMode='view';renderCupping()}else if(n==='analyze'){renderAnalyze()}else if(n==='reports')renderReports();else if(n==='settings')renderSettings()}
 function renderUnits(){$$('.up').forEach(e=>e.textContent=pU());$$('.u').forEach(e=>e.textContent='°'+cfg.unit);$$('.ur').forEach(e=>e.textContent='°'+cfg.unit+'/min')}
 function renderAll(){renderUnits();renderHeader();renderLive();renderFkeys();renderNotes();renderBgSelect();if($('#drawer').classList.contains('open'))renderDrawer();tick();scheduleDraw()}
 function handleKey(e){if(e.metaKey||e.ctrlKey||e.altKey)return;if($('#modalRoot').firstChild)return;const tg=e.target.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tg))return;if(curScreen!=='roast')return;

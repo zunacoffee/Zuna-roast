@@ -78,6 +78,9 @@
     return true;
   };
 
+  /* Reports and roast sheets: opens the Mac print dialog (PDF ▾ › Save as PDF). */
+  N.printPage = async () => { await invoke('print_page'); return true; };
+
   /* ---------------- roaster WebSocket ---------------- */
   let seq = 0; const socks = new Map();
   class NativeWebSocket {
