@@ -229,6 +229,23 @@ canvas{display:block;width:100%;height:100%}
 .tm .it.done{color:var(--text2)}.tm .it.done i{color:var(--good)}
 .tm .it.cur{background:var(--accentSoft);border-color:color-mix(in srgb,var(--accent) 35%,var(--panel));color:var(--accent);font-weight:600}.tm .it.cur i{color:var(--accent)}
 tr.tcur td{background:var(--accentSoft)}
+.miss{color:var(--text2);font-weight:400}
+.pstar{color:var(--warn);margin-left:8px;font-size:var(--fs-sm);font-weight:600;vertical-align:2px}
+/* ---- History on the design rules ---- */
+#scr-roasts .card{border-radius:var(--r-lg)}
+#scr-roasts th{font-size:var(--fs-cap)}
+#scr-roasts td{font-size:var(--fs-body);padding:var(--sp-2) var(--sp-3);height:44px}
+#scr-roasts .ph button{min-height:var(--h-btn)}
+#scr-roasts .ph input[type=search]{min-height:var(--h-btn)}
+#scr-roasts .seg button{font-size:var(--fs-sm)}
+#rDetail{padding:var(--sp-4) var(--sp-5);gap:var(--sp-4)}
+#rDetail .dtitle{font-size:var(--fs-title)}
+#rDetail .kv{font-size:var(--fs-body);padding:var(--sp-2) 0}
+#rDetail .note{font-size:var(--fs-body);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md)}
+#rDetail .stats{gap:var(--sp-2)}
+#rDetail .stat{padding:var(--sp-2) var(--sp-3);border-radius:var(--r-md)}
+#rDetail .stat .l{font-size:var(--fs-sm)}
+#rDetail .row button{min-height:var(--h-btn)}
 /* ---- Today on the design rules ---- */
 #scr-today .card{border-radius:var(--r-lg)}
 #scr-today th{font-size:var(--fs-cap)}
@@ -962,6 +979,12 @@ const normName=n=>String(n||'').trim().toLowerCase().replace(/\s+/g,' ');
 const batchOf=r=>r&&r.meta?num(r.meta.green):null;
 const sameBatch=(a,b)=>!ok(a)||!ok(b)||Math.abs(a-b)<=Math.max(a,b)*.12;
 const lbTxt=v=>ok(v)?(+v.toFixed(1))+' lb':'—';
+/* design rule 6 — display formats (saved values stay exactly as typed) */
+const DASH='<span class="miss">—</span>';
+const fRoasted=v=>{const n=num(v);return ok(n)?n.toFixed(2):DASH};      // roasted weight: 2 decimals
+const fGreen=v=>{const n=num(v);return ok(n)?String(+n.toFixed(2)):DASH}; // batch: as typed, no trailing zeros
+const fAg=v=>{const n=num(v);return ok(n)?n.toFixed(1):DASH};           // Agtron: 1 decimal
+const fColors=m=>`${fAg(m.colorWhole)} / ${fAg(m.colorGround)}`;
 // one profile per name AND batch size — a 13 lb and a 25 lb profile of the same coffee live side by side
 const sameSlot=(a,b)=>normName(a.meta.name)===normName(b.meta.name)&&sameBatch(batchOf(a),batchOf(b));
 const profileByName=(n,g)=>{const x=normName(n);if(!x)return null;const all=allProfiles().filter(r=>normName(r.meta.name)===x);if(!all.length)return null;
@@ -2014,20 +2037,20 @@ function roastList(){const q=normName($('#rSearch').value),wk=Date.now()-7*864e5
 function renderRoasts(){const list=roastList();if(!list.find(r=>r.id===selRoast))selRoast=list[0]?.id||null;
   $('#rRows').innerHTML=list.map(r=>{const s=r.summary||summarize(r),sp=spreadOf(r.meta),c=costOf(r),dt=r.chargedAt||r.created;
     return `<tr class="${r.id===selRoast?'sel':''}" data-id="${r.id}"><td class="tnum"><b>${r.num}</b></td><td class="muted tnum">${fmtDate(dt)}</td><td>${esc(r.meta.name||'Untitled')}${r.isProfile?'<span class="pstar" title="Profile">★</span>':''}</td><td class="muted">${esc(r.meta.coffee||'—')}</td>
-    <td class="n">${esc(r.meta.green||'—')}</td><td class="n">${esc(r.meta.roasted||'—')}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':'—'}</td><td class="n">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}</td><td class="n">${spTxt(sp)}</td>
-    <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):'—'}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</td></tr>`}).join('');
+    <td class="n">${fGreen(r.meta.green)}</td><td class="n">${fRoasted(r.meta.roasted)}</td><td class="n">${ok(s.loss)?s.loss.toFixed(1)+'%':DASH}</td><td class="n">${fColors(r.meta)}</td><td class="n">${ok(sp)?spTxt(sp):DASH}</td>
+    <td class="n">${mmss(s.fcs)}</td><td class="n">${mmss(s.drop)}</td><td class="n">${mmss(s.dev)}</td><td class="n">${c&&ok(c.perLb)?money(c.perLb):DASH}</td><td class="n" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):DASH}</td></tr>`}).join('');
   $('#rTable').classList.toggle('nocup',!cfg.cupScoring&&!list.some(r=>ok(r.cup)));
   $('#rEmpty').innerHTML=list.length?'':`<div class="empty">${HIST.length?'No roasts match.':'No saved roasts yet. Record a roast and press Save in Roast details.'}</div>`;renderRoastDetail()}
 function renderRoastDetail(){const el=$('#rDetail'),r=HIST.find(x=>x.id===selRoast);if(!r){el.innerHTML='<div class="empty">Select a roast.</div>';return}
   const s=r.summary||summarize(r),c=costOf(r),adj=adjustments(r),rc=r.events.CHARGE??0,dt=r.chargedAt||r.created;
-  el.innerHTML=`<div><div class="dtitle">Roast #${r.num}${r.isProfile?'<span class="badge">Profile ★</span>':''}${r.archived?'<span class="badge gray">Archived</span>':''}</div><div class="muted" style="margin-top:3px">${esc(r.meta.name||'Untitled')} · ${fmtLong(dt)} · <b style="color:var(--text)">${ageOf(dt)==='today'?'roasted today':ageOf(dt)+' old'}</b></div></div>
+  el.innerHTML=`<div><div class="dtitle">Roast #${r.num}${r.isProfile?'<span class="pstar">★ Profile</span>':''}${r.archived?'<span class="badge gray">Archived</span>':''}</div><div class="muted" style="margin-top:3px">${esc(r.meta.name||'Untitled')} · ${fmtLong(dt)} · <b style="color:var(--text)">${ageOf(dt)==='today'?'roasted today':ageOf(dt)+' old'}</b></div></div>
   <div class="minic"><canvas id="rBig"></canvas></div>
   <div class="stats"><div class="stat"><div class="l">First crack</div><div class="v">${mmss(s.fcs)}</div></div><div class="stat"><div class="l">Drop</div><div class="v">${mmss(s.drop)}</div></div><div class="stat"><div class="l">Development</div><div class="v">${mmss(s.dev)}</div></div><div class="stat"><div class="l">Drop temp</div><div class="v">${fT(s.dropBT)}<small>°${cfg.unit}</small></div></div></div>
-  <div><div class="kv"><span>Green coffee</span><b>${esc(r.meta.coffee||'—')}${r.meta.lot?' · '+esc(r.meta.lot):''}</b></div>
-  <div class="kv"><span>Green → roasted</span><b class="tnum">${esc(r.meta.green||'—')} → ${esc(r.meta.roasted||'—')} lb${ok(s.loss)?' · '+s.loss.toFixed(1)+' %':''}</b></div>
-  <div class="kv"><span>Batch cost</span><b class="tnum">${c&&ok(c.batch)?money(c.batch)+' green'+(ok(c.perLb)?' · '+money(c.perLb)+' / lb roasted':''):'—'}</b></div>
-  <div class="kv"><span>Color whole / ground · spread</span><b class="tnum">${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(spreadOf(r.meta))?' · '+spTxt(spreadOf(r.meta)):''}</b></div>
-  <div class="kv" style="align-items:flex-start"><span>Adjustments</span><b class="tnum adjl">${adj.map(a=>`<span>${mmss(a.t-rc)} · ${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}</span>`).join('')||'—'}</b></div>
+  <div><div class="kv"><span>Green coffee</span><b>${r.meta.coffee?esc(r.meta.coffee):DASH}${r.meta.lot?' · '+esc(r.meta.lot):''}</b></div>
+  <div class="kv"><span>Green → roasted</span><b class="tnum">${fGreen(r.meta.green)} → ${fRoasted(r.meta.roasted)} lb${ok(s.loss)?' · '+s.loss.toFixed(1)+'%':''}</b></div>
+  <div class="kv"><span>Batch cost</span><b class="tnum">${c&&ok(c.batch)?money(c.batch)+' green'+(ok(c.perLb)?' · '+money(c.perLb)+' / lb roasted':''):DASH}</b></div>
+  <div class="kv"><span>Color whole / ground · spread</span><b class="tnum">${fColors(r.meta)}${ok(spreadOf(r.meta))?' · '+spTxt(spreadOf(r.meta)):''}</b></div>
+  <div class="kv" style="align-items:flex-start"><span>Adjustments</span><b class="tnum adjl">${adj.map(a=>`<span>${mmss(a.t-rc)} · ${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}</span>`).join('')||DASH}</b></div>
   ${cfg.cupScoring||ok(r.cup)?`<div class="kv"><span>Cupping score</span><b class="tnum" style="${cupSt(r.cup)}">${ok(r.cup)?Number(r.cup).toFixed(2):'—'}</b></div>`:''}</div>
   <div><div class="h3" style="margin-bottom:6px">Comments</div><div class="note">${r.meta.notes?esc(r.meta.notes):'<span class="muted">No comments.</span>'}${(r.tnotes||[]).length?'\n\n'+r.tnotes.map(n=>mmss(n.t-rc)+'  '+esc(n.text)).join('\n'):''}</div></div>
   <div class="row" style="margin-top:auto"><button class="pri" id="rRoast">Roast this again ▶</button><button id="rOpen">Open</button><button id="rProf">${r.isProfile?'Unmark profile':'Make profile ★'}</button><span class="sp"></span><button id="rCsv">CSV</button><button class="dangerTxt" id="rDel">Delete</button></div>`;
