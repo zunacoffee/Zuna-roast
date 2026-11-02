@@ -2,6 +2,10 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## iPhone build after 1.0.33 — Report PDFs no longer blank (Nov 2, 2026; iPhone, `ipad` branch, TestFlight build 47, no Mac release)
+- Ty: "the reports are blank when pdf is selected on the iPhone." The phone rule `html.iphone body>*:not(#phApp)…{display:none!important}` (specificity 3 ids) beat the print rule `#printArea{display:block!important}`, so More › Reports › PDF and History › Share roast sheet (PDF) printed an empty page. Added `:not(#printArea)` to the phone rule.
+- Print styles: `:root{color-scheme:light!important}` so the paper margins stay white with the Dark theme (`applyTheme` sets `colorScheme` dark inline; the @page margins took the dark canvas). Print only — no screen changes (iMac 2240, 13" iPad, iPhone compared). **This line still needs to go to `main` with the next Mac release** (the Mac's Save as PDF has the same dark-margin issue with the Dark theme).
+
 ## iPad build after 1.0.33 — Full swipe between tabs (Nov 1, 2026; 13" iPad only, `ipad` branch, TestFlight, no Mac release)
 - Ty wanted "full swipe functionality". `ipadInit` swipe handler: one-finger quick sideways swipe (≥90 px, <700 ms, mostly horizontal) moves through **every** `#nav` screen in order, including the ones under More (Roast → Today → Profiles → History → Green → Pricing → Cupping → Analyze → Reports → Settings); stops at the ends (no wrap).
 - Works almost anywhere, **including during a roast**. Not when the finger starts in input/textarea/select, the profile builder chart `#bCv`, a modal, or when Roast details is open; a table that can still scroll sideways in that direction scrolls instead (`hScrolls`). On other charts (`cvMain` etc.) only a quick long flick (<400 ms, ≥140 px) switches; a slow drag keeps the readout.
