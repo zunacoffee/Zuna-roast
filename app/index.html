@@ -889,7 +889,7 @@ let logT;function renderLogSoon(){clearTimeout(logT);logT=setTimeout(()=>{const 
 const getPath=(o,p)=>!p?o:String(p).split('.').reduce((a,k)=>a==null?undefined:a[k],o);
 class SimSocket{
   constructor(speed){this.speed=speed;this.readyState=0;this.t0=performance.now();this.fired={};
-    this.ctl={drivesState:true,burnerState:true,coolingFanState:false,stirrerState:false,standby:false};
+    this.ctl={drivesState:1,burnerState:2,coolingFanState:0,stirrerState:0,standby:0}; /* numbers, like the real P12 */
     setTimeout(()=>{if(this.readyState!==0)return;this.readyState=1;this.onopen&&this.onopen()},200);
     this.pushTimer=setInterval(()=>this.checkPushes(),100)}
   simNow(){return (performance.now()-this.t0)/1000*this.speed}
@@ -897,7 +897,10 @@ class SimSocket{
   send(s){if(this.readyState!==1)return;let m;try{m=JSON.parse(s)}catch(e){return}
     const n=cfg.nodes,cmd=m[n.command];
     const reply=d=>setTimeout(()=>this.emit({[n.id]:m[n.id],[n.machine]:m[n.machine],[n.data||'data']:d}),10);
-    if(cmd==='setControlParams'&&m.params){Object.assign(this.ctl,m.params);return reply({result:'ok'})}
+    if(cmd==='setControlParams'&&m.params){
+      for(const [k,v] of Object.entries(m.params)){if(typeof v!=='boolean'){this.ctl[k]=v;continue}
+        this.ctl[k]=k==='burnerState'?(v?2:-1):(v?1:0);setTimeout(()=>this.emit({[n.data||'data']:{[k]:this.ctl[k]},[n.message]:k}),5)}
+      return reply({result:'ok'})}
     if(cmd==='getControlParams'){return reply({...this.ctl})}
     if(cmd!==cfg.dataRequest)return;
     const vals=this.values(),resp={[n.id]:m[n.id],[n.machine]:m[n.machine]};
@@ -913,7 +916,7 @@ class SimSocket{
     if(r<0){bt=210;et=232;inlet=330;exhaust=178;burner=55;fan=60}
     else if(r<=640){const b=tb(r);bt=b+(210-b)*Math.exp(-r/35);et=245-55*Math.exp(-r/150)-30*Math.exp(-r/12);burner=r<300?85:r<510?68:45;fan=r<510?60:75;inlet=burner*3.6+40;exhaust=150+58*(1-Math.exp(-r/220))}
     else{const d=r-640,b=tb(640);bt=32+(b-32)*Math.exp(-d/70);et=238;burner=40;fan=75;inlet=190;exhaust=172;cooling=26+70*Math.exp(-d/160)*(1-Math.exp(-d/8))}
-    const o=this.ctl;if(o.burner!=null)burner=o.burner;if(o.exhaustFan!=null)fan=o.exhaustFan;if(o.drum!=null)drum=o.drum;if(o.burnerState===false)burner=0;
+    const o=this.ctl;if(o.burner!=null)burner=o.burner;if(o.exhaustFan!=null)fan=o.exhaustFan;if(o.drum!=null)drum=o.drum;if(!(o.burnerState>0))burner=0;
     const out={},c=cfg.channels;
     const put=(k,v,a)=>{const node=c[k].node;if(!node)return;let x=v+nz(a);x/=Number(c[k].scale)||1;if(TEMP_KEYS.includes(k)&&c[k].mode==='F')x=x*9/5+32;out[node]=+x.toFixed(3)};
     put('bt',bt,.15);put('et',et,.4);put('inlet',inlet,1.2);put('exhaust',exhaust,.5);put('cooling',cooling,.3);put('burner',burner,0);put('fan',fan,0);put('drum',drum,0);put('pressure',fan*1.8,1.5);
@@ -950,7 +953,10 @@ class Link{
     this.pending.set(id,setTimeout(()=>{this.pending.delete(id);this.missed++;if(this.missed===3)log('err','No response to the last 3 data requests');renderHeader()},cfg.requestTimeout*1000))}
   sendCommand(obj){if(!this.connected())return null;const n=cfg.nodes,id=this.nextId();obj[n.id]=id;obj[n.machine]=Number(cfg.roasterId)||0;const s=JSON.stringify(obj);try{this.ws.send(s)}catch(e){log('err','Send failed');return null}log('out',s);return id}
   ask(obj,ms=2000){return new Promise(res=>{const id=this.sendCommand(obj);if(id==null)return res(null);const t=setTimeout(()=>{this.asks.delete(id);res(null)},ms);this.asks.set(id,m=>{clearTimeout(t);res(m)})})}
-  onMessage(raw){let m;try{m=JSON.parse(raw)}catch(e){log('err','Non-JSON message: '+String(raw).slice(0,200));return}
+  onMessage(raw){let m;try{m=JSON.parse(raw)}catch(e){
+      // the P12 sometimes packs several messages into one frame, one per line
+      const parts=String(raw).split(/\r?\n/).filter(s=>s.trim());if(parts.length>1){for(const s of parts)this.onMessage(s);return}
+      log('err','Non-JSON message: '+String(raw).slice(0,200));return}
     const n=cfg.nodes,push=m[n.message],id=Number(m[n.id]);
     if(this.asks.has(id)){log('in',raw);const f=this.asks.get(id);this.asks.delete(id);f(m);return}
     if(this.pending.has(id)){log('in',raw);clearTimeout(this.pending.get(id));this.pending.delete(id);const was=this.missed>=3;this.missed=0;if(was)renderHeader();
@@ -1013,6 +1019,7 @@ function detectTP(s){const ev=S.roast.events;if(ev.CHARGE==null||ev.TP!=null||!o
   const rise=Math.max(.1,Number(cfg.tpRiseC)||1/1.8),wait=Math.max(1,Number(cfg.tpSecs)||3),prev=S.roast.samples.at(-2);
   if(!S.tpMin||s.bt<S.tpMin.bt)S.tpMin={t:s.t,bt:s.bt};else if(s.bt-S.tpMin.bt>=rise&&s.t-S.tpMin.t>=wait&&prev&&ok(prev.bt)&&prev.bt>S.tpMin.bt){ /* two readings above the low, so one jittery reading can't mark it */ev.TP=S.tpMin.t;log('evt','Turning point '+mmss(ev.TP-ev.CHARGE))}}
 function onPush(p,m){log('push',JSON.stringify(m));
+  if(SWITCHES.some(w=>w.p===p)){onSwitchPush(p,m);return}
   if(p===cfg.msgCharge){if(!S.recording){if(cfg.startOnCharge){if(!startRoast(true))return}else{toast('Roaster charged — press START to record');return}}markEvent('CHARGE','machine')}
   else if(p===cfg.msgDrop){if(S.recording)markEvent('DROP','machine')}
   else if(p===cfg.eventMsg){const d=cfg.nodes.data?getPath(m,cfg.nodes.data):m,e=(d&&d[cfg.eventNode]!=null)?d[cfg.eventNode]:m[cfg.eventNode];
@@ -1368,12 +1375,17 @@ function sendControl(k,v,auto){const c=CTL.find(x=>x.key===k);if(!auto)followToo
   log('ctl',`${c.label} → ${v}%${auto?' (auto, from background)':''}`);renderCtl()}
 function nudge(k,d){if(!C.on||!link.connected())return;followTookOver(k);const v=Math.round(clamp(ctlBase(k)+d,0,ctlMax(k)));C.target[k]={v,at:performance.now(),pending:true};renderCtl();clearTimeout(C.deb[k]);C.deb[k]=setTimeout(()=>sendControl(k,v),350)}
 async function sendSwitch(p,val,silent){const w=SWITCHES.find(x=>x.p===p);if(!C.on){toast('Control is off — turn it on at the top');return}if(!link.connected()){toast('Not connected — control is locked');return}
-  if(p==='standby'&&S.sw.standby==null){const m=await link.ask({[cfg.nodes.command]:'getControlParams'},2500);const d=m&&(cfg.nodes.data?getPath(m,cfg.nodes.data):m);if(d&&typeof d.standby==='boolean'){S.sw.standby=d.standby;val=!d.standby}}
+  if(p==='standby'&&S.sw.standby==null){const m=await link.ask({[cfg.nodes.command]:'getControlParams'},2500);const d=m&&(cfg.nodes.data?getPath(m,cfg.nodes.data):m);const sb=swState(d&&d.standby);if(sb!=null){S.sw.standby=sb;val=!sb}}
   if(!silent&&w.confirm&&cfg.confirmMachine&&!await ask(`Turn ${w.label} ${val?'ON':'OFF'}?`,'This is sent to the roaster now.',`Turn ${val?'on':'off'}`,!val))return;
   link.sendCommand({[cfg.nodes.command]:'setControlParams',params:{[p]:val}});S.sw[p]=val;S.swSentAt=performance.now();log('ctl',`${w.label} ${val?'ON':'OFF'}`);renderCtl();renderHeader()}
 async function pollSwitches(){if(!link.connected())return;const m=await link.ask({[cfg.nodes.command]:'getControlParams'},2500);if(!m)return;const d=cfg.nodes.data?getPath(m,cfg.nodes.data):m;if(!d||typeof d!=='object')return;
   if(S.swSentAt&&performance.now()-S.swSentAt<2500)return;
-  for(const w of SWITCHES)if(typeof d[w.p]==='boolean')S.sw[w.p]=d[w.p];renderCtl();renderHeader()}
+  for(const w of SWITCHES){const v=swState(d[w.p]);if(v!=null)S.sw[w.p]=v}renderCtl();renderHeader()}
+/* The P12 reports switches as numbers, not true/false: burnerState −1 off, 0 between, 2 on; the others 0 off, 1 on. */
+function swState(v){return typeof v==='boolean'?v:typeof v==='number'&&isFinite(v)?v>0:null}
+/* The P12 pushes a switch change the moment it happens (e.g. {"data":{"burnerState":2},"pushMessage":"burnerState"}), including from its own touchscreen. */
+function onSwitchPush(p,m){const d=cfg.nodes.data?getPath(m,cfg.nodes.data):m,v=swState(d&&d[p]);if(v==null)return;
+  if(S.swSentAt&&performance.now()-S.swSentAt<2500)return;S.sw[p]=v;renderCtl();renderHeader()}
 function sendEventToRoaster(k){if(!C.on||!cfg.sendEvents||!link.connected())return;
   if(k==='CHARGE'){link.sendCommand({[cfg.nodes.command]:'startRoasting',params:{mode:'manual'}});log('ctl','Sent start roast (Charge) to the roaster');return}
   if(k==='DROP'){link.sendCommand({[cfg.nodes.command]:'stopRoasting'});log('ctl','Sent stop roast (Drop) to the roaster');return}
