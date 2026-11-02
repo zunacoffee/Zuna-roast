@@ -2,6 +2,15 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.34 — Switch lights follow the P12 touchscreen (Nov 2, 2026; iMac)
+- Mac 1.0.34 from `main` (via `preview/switch-state-follow`). Not yet merged into `ipad`.
+- Found by listening to the real P12 (read-only: `getCurrentRoastingStep` + `getControlParams`) while Ty switched the burner on the touchscreen. The P12 reports switches as **numbers**, not true/false: `burnerState` −1 off (also before drives are on), 0 in between, 2 burning, 1 seen for ~1 s while shutting off; `drivesState`/`coolingFanState`/`stirrerState`/`standby` 0/1. The burner can only be switched on with the drives on.
+- `swState(v)`: boolean as is, number → `v>0`. Used by `pollSwitches` (every 3 s) and the standby lookup in `sendSwitch`. Before, the `typeof … === 'boolean'` check skipped every value, so no switch light ever followed the machine.
+- `onSwitchPush`: the P12 pushes `{"data":{"burnerState":2},"pushMessage":"burnerState"}` (same for each switch) the moment it changes, including from its own touchscreen; `onPush` now updates the light from it (ignored for 2.5 s after the app's own switch, like the poll). Also seen: `afterBurnerState`, `setBurnerCapacity` (`burnercapacity`), `addAlert`/`setAlert`, `exhaustFan` pushes — not used.
+- `Link.onMessage`: the P12 sometimes puts several JSON messages in one frame, one per line (12 times in ~3.5 min, including the burner on/off pushes). These failed as "Non-JSON message" and were lost; now split and handled one by one.
+- Simulator sends numbers and switch pushes like the real P12.
+- Tested on the P12 (Control off): Drives and Burner lights changed within ~1 s of the touchscreen. Burner OFF can show ON for ~1 s (state 1). Untested: whether the P12 accepts true/false in `setControlParams` for switches (the app still sends booleans).
+
 ## iPad build after 1.0.33 — Full swipe between tabs (Nov 1, 2026; 13" iPad only, `ipad` branch, TestFlight, no Mac release)
 - Ty wanted "full swipe functionality". `ipadInit` swipe handler: one-finger quick sideways swipe (≥90 px, <700 ms, mostly horizontal) moves through **every** `#nav` screen in order, including the ones under More (Roast → Today → Profiles → History → Green → Pricing → Cupping → Analyze → Reports → Settings); stops at the ends (no wrap).
 - Works almost anywhere, **including during a roast**. Not when the finger starts in input/textarea/select, the profile builder chart `#bCv`, a modal, or when Roast details is open; a table that can still scroll sideways in that direction scrolls instead (`hScrolls`). On other charts (`cvMain` etc.) only a quick long flick (<400 ms, ≥140 px) switches; a slow drag keeps the readout.
