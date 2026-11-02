@@ -32,13 +32,13 @@ Release history with technical notes: `CHANGELOG.md`. Open questions and unteste
 ## Screenshots for review
 Headless Chrome (Playwright) on `app/index.html` at iMac 2240×1260, 13" iPad 1366×1024 (`?ipad=1`), iPhone 393×852 (`?iphone=1`). Load demo data through History › Import (a full backup JSON) and run the built-in simulator at 10× for a live-roast shot. Compare before and after for every device the shared file affects. Don't check the 10.5"/11" compact iPad (`ipc`) — Ty stopped using it.
 
-## iPad version (branch `ipad` until it's merged)
+## iPad version (branch `ipad`)
 - Same `app/index.html`; iPad layout only when `<html>` has class `ipad` (touch iPad, or `?ipad=1` in a browser).
   `ipc` = compact layout for iPads shorter than the 13" (10.5"/11"; `?ipc=1` to test). The iMac and the 13" must never change from iPad work — compare screenshots before/after.
 - `src-tauri/plugins/zuna-ios` is iPad-only (folder picker that remembers iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast, iCloud download, keep screen on, share sheet). The Mac build never includes it; updater/process plugins are `cfg(desktop)`.
 - `Release iPad app` workflow: unsigned simulator build on every `ipad` push; signed TestFlight upload when run by hand and on the 1st of every other month (TestFlight builds expire after 90 days; schedules only fire once the file is on `main`). Secrets: APPLE_TEAM_ID, APPLE_API_KEY_ID, APPLE_API_ISSUER, APPLE_API_KEY_P8.
 
-## iPhone version (branch `preview/iphone`, made from `ipad`)
+## iPhone version (also on `ipad`, same TestFlight app)
 - Same `app/index.html` and the same TestFlight app as the iPad (device family is already iPhone + iPad). Phone layout only when `<html>` has class `iphone` (an iPhone, or `?iphone=1` in a browser; never on an iPad or the iMac).
 - The phone has its own shell, `#phApp`, built by the iPhone section of the script (`PH`, `PHV.*` screens, `phInit`). Everything else on the page is hidden on the phone; the iMac and iPad never show `#phApp`. Compare iMac/iPad screenshots before and after any phone change.
 - For looking things up and quick entries, never roasting: `startRoast`, `setControl(true)`, `sendControl`, `nudge`, `sendSwitch` and `sendEventToRoaster` all refuse on the phone. Roast pushes from the roaster go to `phPush`, not the recorder.
