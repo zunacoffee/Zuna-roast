@@ -21,7 +21,7 @@ You can also check by hand in **Settings → Saving & storage → Check for upda
 
 ## Where your data lives
 
-Everything is saved as ordinary files in **`Documents/Zuna Roast`**:
+Everything is saved as ordinary files in **`Desktop/ZUNA COFFEE/Zuna Roast`** (iCloud), shared by the iMac, MacBook, iPad and iPhone:
 
 ```
 Zuna Roast/
@@ -32,7 +32,7 @@ Zuna Roast/
   Settings/        settings.json · today-plan.json · roast-in-progress.json
 ```
 
-- Turn on **iCloud → Desktop & Documents Folders** so the folder is backed up and readable from your phone or another Mac.
+- Turn on **iCloud → Desktop & Documents Folders** so the folder is shared with your other devices. iCloud syncs changes (including mistakes) to every device, so also keep a backup: Time Machine on the iMac, plus **Export everything** now and then.
 - **New Mac?** Install the app and let iCloud bring the folder down, or copy the folder over. Everything is there.
 - **Settings → Saving & storage** shows the folder, has **Show in Finder**, and lets you pick a different folder.
 - **Export everything** saves one backup file. **Roasts → Import** restores it: roasts, green coffee, cupping and (if you say yes) settings, without making duplicates.
