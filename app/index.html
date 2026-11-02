@@ -197,6 +197,7 @@ canvas{display:block;width:100%;height:100%}
 @media print{
   @page{size:letter;margin:.45in}
   html,body{height:auto!important;overflow:visible!important;display:block!important;background:#fff!important}
+  :root{color-scheme:light!important}   /* white paper, margins too, even with the Dark theme */
   body>*:not(#printArea){display:none!important}
   #printArea{display:block!important}
   #printArea .paperDoc{width:auto;min-height:0;padding:0;box-shadow:none}
@@ -865,7 +866,7 @@ html:not(.ipLeg) .ipLegend{display:none!important}
 .ipad #scont .chk input[type=checkbox]:checked::after{left:25px}
 /* ---------- iPhone: html.iphone — the phone has its own shell (#phApp); the iMac and iPad never show it ---------- */
 #phApp{display:none}
-html.iphone body>*:not(#phApp):not(#toast):not(#modalRoot):not(script){display:none!important}
+html.iphone body>*:not(#phApp):not(#toast):not(#modalRoot):not(#printArea):not(script){display:none!important}   /* #printArea: reports and roast sheets still print to PDF */
 html.iphone,html.iphone body{background:var(--bg);overscroll-behavior:none}
 html.iphone #phApp{display:flex;flex-direction:column;position:fixed;inset:0;background:var(--bg);color:var(--text);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 html.iphone #toast{bottom:calc(96px + env(safe-area-inset-bottom,0px));max-width:calc(100vw - 32px);text-align:center;font-size:15px}
