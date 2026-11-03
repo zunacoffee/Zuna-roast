@@ -2,6 +2,14 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.36 — Roast sheet on one page (Nov 3, 2026; iMac, 13" iPad, iPhone)
+- Ty printed a roast sheet from the iPad and it ran to two pages. Cause: `.ipad td{padding:14px 12px}` (touch-size rows, same specificity as `.paperDoc td`, later in the file) doubled every paper table row; the 2/4/6/8-minute rows from 1.0.35 made the sheet longer on the Mac too.
+- `.paperDoc th/td`: padding 3px 6px, font size and `height:auto` with `!important`, so no screen rule can stretch a printed page (also the on-screen sheet preview and the printed reports).
+- `.pdSheet` (roast sheet only): gap 9, tighter header/kv/notes, chart 300 → 270 px tall.
+- `rsFit(el)` in `rpPrint`: measures the sheet in an off-screen 730 px box; if taller than ~930 px (one Letter page inside the margins, Mac `@page .45in` and the iPad/iPhone PDF alike) sets CSS `zoom` to fit (min 0.7). Reports (production/inventory) still flow onto more pages.
+- Also on `main` now: `:root{color-scheme:light!important}` in `@media print` (white PDF margins with the Dark theme), which was on `ipad` since build 47.
+- Checked as PDFs in Chromium (Mac and `?ipad=1`), demo roast and a long one (extra notes, two cupping cards): all one page. Not yet tried in the Mac print dialog or iPad share sheet.
+
 ## 1.0.35 — Bean temp at 2, 4, 6 and 8 minutes (Nov 2, 2026; iMac, 13" iPad, iPhone)
 - Ty wanted the **exact** bean temp at 2:00, 4:00, 6:00 and 8:00 for every roast — no averages. `btAt(r,sec)`: the recorded reading nearest CHARGE+sec (within 1.5 s; `sampleAt`), none past Drop or with no Charge. `RP_MARKS=[120,240,360,480]`.
 - **Reports › Production**: new card "Bean temp at 2, 4, 6 and 8 minutes" listing every roast in the range (newest first: #, date, coffee, profile, batch, 2:00–8:00), click → roast sheet (`rpMarksTable`). Coffee drill-down roast list got the four columns; its on-screen Cost column was dropped to fit (still in print/CSV) and the "Roast sheet" button column removed (row click opens it). Printed production report includes the table; CSV per-roast rows get `bt_2min_F`…`bt_8min_F` (unit follows the setting).
