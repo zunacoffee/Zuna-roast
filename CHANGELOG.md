@@ -2,6 +2,12 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.37 — MacBook fit (Nov 3, 2026; MacBook only)
+- Ty has no iMac for now: the MacBook (16" Pro, maybe a 15" Air later) is the roasting Mac. Checked every screen with demo data at 1728×1050 and 1710×1045 (the maximized window); Roast, Today, Profiles, Green coffee, Pricing, Analyze and Settings already fit.
+- **History** (`@media (max-width:1900px)`, `html:not(.ipad):not(.iphone)`): detail column `minmax(460px,34%)` (was 38 %), `#rTable` cells 7 px side padding — every column fits (Drop, Dev, $/lb were cut off). Detail buttons wrap on purpose into two rows (`.sp` → full-width break, `#rSheet` margin-left:auto): Roast this again · Open · Make profile, then Roast sheet · CSV · Delete (Delete was hidden).
+- **Reports** (`max-width:1800px`): `#rpHead` gap 8, range buttons 8 px side padding — the bar stays on one line (Print / PDF had wrapped alone).
+- iMac 2240×1260: all ten screens compared before/after, identical except the clock. iPad/iPhone excluded by the `.ipad/.iphone` scope.
+
 ## 1.0.36 — Roast sheet on one page (Nov 3, 2026; iMac, 13" iPad, iPhone)
 - Ty printed a roast sheet from the iPad and it ran to two pages. Cause: `.ipad td{padding:14px 12px}` (touch-size rows, same specificity as `.paperDoc td`, later in the file) doubled every paper table row; the 2/4/6/8-minute rows from 1.0.35 made the sheet longer on the Mac too.
 - `.paperDoc th/td`: padding 3px 6px, font size and `height:auto` with `!important`, so no screen rule can stretch a printed page (also the on-screen sheet preview and the printed reports).
