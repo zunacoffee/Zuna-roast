@@ -2,6 +2,14 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.38 — Blend pricing (Nov 3, 2026; Mac; iPad/iPhone get the Mac Pricing screen code but their phone Pricing view does not list blends yet)
+- **Pricing › + New blend**: a name and a recipe of green coffees by share (%). Total ≠ 100 % shows red. Blends get their own "Blends" group on the Price list (with "Single origins" above when both exist), recipe line under the name, same Wholesale/Retail rows and typed prices.
+- Data: `cfg.pricing.blends = [{id, name, parts:[{key, name, pct}]}]` (settings only — roast files and the data folder unchanged). `key` = `normName(coffee name)`, so a blend follows a coffee to its next lot like typed prices. Blend prices in `cfg.pricing.actual['blend:'+id]`. Selection id `'b:'+id`.
+- Cost: blended after roasting — coffee per lb = Σ share × that coffee's own `prCalc().coffee` (its green + freight ÷ own avg weight loss, incl. waste) ÷ total share. `prLotFor(key)` = newest in-stock lot with a price, else newest priced lot. Overhead/labor/bags/margins via the new shared `prBags(coffee,key,o,ctx)` (split out of `prCalc`; `prCalc` returns the same fields as before).
+- A part with no green price → the blend shows which coffee is missing instead of a cost. Detail card: recipe editor (`prRecipeHtml`/`prRecipeWire`), cost fold lists each part's share of the cost, "Delete blend" (red confirm; removes its prices too).
+- Overview "Do your prices work?" includes blend prices. Wholesale price sheet lists blends as "Blend · Brazil, Colombia" — no shares (recipe stays private).
+- Checked with demo data at MacBook 1728×1050 and iMac 2240×1260. With no blends saved, the Price list looks as before (only the new header button).
+
 ## 1.0.37 — MacBook fit (Nov 3, 2026; MacBook only)
 - Ty has no iMac for now: the MacBook (16" Pro, maybe a 15" Air later) is the roasting Mac. Checked every screen with demo data at 1728×1050 and 1710×1045 (the maximized window); Roast, Today, Profiles, Green coffee, Pricing, Analyze and Settings already fit.
 - **History** (`@media (max-width:1900px)`, `html:not(.ipad):not(.iphone)`): detail column `minmax(460px,34%)` (was 38 %), `#rTable` cells 7 px side padding — every column fits (Drop, Dev, $/lb were cut off). Detail buttons wrap on purpose into two rows (`.sp` → full-width break, `#rSheet` margin-left:auto): Roast this again · Open · Make profile, then Roast sheet · CSV · Delete (Delete was hidden).
