@@ -4482,6 +4482,7 @@ function rpPaperCols(){const c=cfg.theme.colors||{},pick=k=>{const v=c[k];return
   return {bt:pick('bt'),ror:pick('ror'),bkg:hexLum(c.bkg||'#000')<.62&&hexLum(c.bkg||'#000')>.08?c.bkg:WHITE.bkg,burner:pick('burner'),air:pick('air'),accent:pick('accent'),grid:'#ECEEF1',axis:'#6B7280',ink:'#15181B',bar:pick('accent')}}
 function rpBgOf(r){const bg=r.bgId?findAny(r.bgId):null;return bg&&bg.id!==r.id&&bg.samples&&bg.samples.length?bg:null}
 let rsN=0;
+const RS_HALO='stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke"';
 function rsChart(r,bg,W,H,P){const cid='rsClip'+(++rsN);const ev=r.events||{},o=ev.CHARGE??(r.samples[0]?.t??0),bo=bg?(bg.events.CHARGE??bg.samples[0].t):0;
   const dr=(ev.DROP??r.samples.at(-1).t)-o,bdr=bg?((bg.events.DROP??bg.samples.at(-1).t)-bo):0,xmax=Math.max(120,Math.ceil((Math.max(dr,bdr)+20)/60)*60);
   const strip=Math.round(H*.2),pl=40,pr=40,pt=12,pb=20,ch=H-pt-pb-strip-10,X=t=>pl+(W-pl-pr)*t/xmax;
@@ -4499,13 +4500,18 @@ function rsChart(r,bg,W,H,P){const cid='rsClip'+(++rsN);const ev=r.events||{},o=
   const rs0=(rorStart(ev)??o)-o;s+=`<path d="${path(r,o,dr,p=>toDR(p.ror),YR,rs0)}" fill="none" stroke="${P.ror}" stroke-width="1.3"/>`;
   s+=`<path d="${path(r,o,dr,p=>toD(p.bt),Y)}" fill="none" stroke="${P.bt}" stroke-width="2.1"/></g>`;
   for(const [k,l] of [['TP','TP'],['DRY','DE'],['FCs','FC'],['DROP','Drop']]){const t=ev[k];if(t==null)continue;const p=sampleAt(r.samples,t);if(!p||!ok(p.bt))continue;const x=X(t-o),y=Y(toD(p.bt)),end=k==='DROP';
-    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${P.bt}"/><text x="${(x+(end?-6:6)).toFixed(1)}" y="${(y-(k==='TP'?-14:7)).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="${end?'end':'start'}" fill="${P.ink}">${l} ${mmss(t-o)}</text>`}
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${P.bt}"/><text x="${(x+(end?-6:6)).toFixed(1)}" y="${(y-(k==='TP'?-14:7)).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="${end?'end':'start'}" fill="${P.ink}" ${RS_HALO}>${l} ${mmss(t-o)}</text>`}
   s+=`<rect x="${pl}" y="${sy}" width="${W-pl-pr}" height="${strip}" fill="none" stroke="${P.grid}"/>`;
   const step=(x,off,end,k)=>{let d='',last=null;for(const p of x.samples){const t=p.t-off;if(t<-2||t>end||!ok(p[k]))continue;if(last!=null&&Math.abs(p[k]-last)<.5&&t<end-1)continue;d+=(d?`L${X(t).toFixed(1)} ${YS(last).toFixed(1)}L`:'M')+X(t).toFixed(1)+' '+YS(p[k]).toFixed(1);last=p[k]}
     if(last!=null)d+=`L${X(end).toFixed(1)} ${YS(last).toFixed(1)}`;return d};
   if(bg)for(const [k,c] of [['burner',P.burner],['fan',P.air]])s+=`<path d="${step(bg,bo,bdr,k)}" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>`;
   for(const [k,c] of [['burner',P.burner],['fan',P.air]])s+=`<path d="${step(r,o,dr,k)}" fill="none" stroke="${c}" stroke-width="1.7"/>`;
-  for(const a of adjustments(r)){if(a.key==='drum')continue;const x=X(a.t-o),y=YS(a.to),c=a.key==='burner'?P.burner:P.air;s+=`<text x="${(x+2).toFixed(1)}" y="${(a.key==='burner'?y-3:y+10).toFixed(1)}" font-size="9" font-weight="600" fill="${c}">${Math.round(a.to)}</text>`}
+  /* strip labels: only changes made before Drop (the lines stop there; resets for the next batch aren't drawn), never on top of each other */
+  const boxes=[{x0:W-pr-78,x1:W-pr,y0:sy+strip-13,y1:sy+strip}],hit=b=>boxes.some(o=>b.x0<o.x1&&b.x1>o.x0&&b.y0<o.y1&&b.y1>o.y0);
+  for(const a of adjustments(r)){if(a.key==='drum'||a.t-o>=dr-1)continue;const x=X(a.t-o),y=YS(a.to),c=a.key==='burner'?P.burner:P.air,txt=String(Math.round(a.to)),w=txt.length*5.4+2;
+    const above=a.key==='burner',tries=[[x+2,above?y-3:y+10],[x+2,above?y+10:y-3],[x+2+w,above?y-3:y+10],[x+2+w,above?y+10:y-3]];
+    for(const [tx,ty] of tries){const b={x0:tx-1,x1:tx+w,y0:ty-9,y1:ty+2};if(b.y0<sy-2||b.y1>sy+strip+2||b.x1>W-pr+2||hit(b))continue;boxes.push(b);
+      s+=`<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" font-size="9" font-weight="600" fill="${c}" ${RS_HALO}>${txt}</text>`;break}}
   s+=`<text x="${W-pr-3}" y="${sy+strip-4}" text-anchor="end" font-size="9" fill="${P.axis}">Burner % · Air %</text>`;
   return s+'</svg>'}
 const RS_EV=[['CHARGE','Charge'],['TP','Turning point'],['DRY',null],['FCs',null],['FCe',null],['SCs',null],['SCe',null],['DROP','Drop']];
