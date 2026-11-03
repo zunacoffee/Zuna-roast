@@ -1094,6 +1094,25 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 .p-welcome h2{margin:0;font-size:26px;font-weight:700}
 .p-welcome p{margin:0;font-size:16px;line-height:1.5;color:var(--text2)}
 .p-welcome code{font-family:inherit;font-weight:600;color:var(--text)}
+/* phone Reports */
+.p-chipRow{display:flex;gap:6px;overflow-x:auto;flex:none;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:2px max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
+.p-chipRow::-webkit-scrollbar{display:none}
+.p-chipRow button{flex:none;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:var(--r-pill,999px);padding:0 14px;min-height:36px;font-size:14px;font-weight:500;white-space:nowrap}
+.p-chipRow button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.p-rpLabel{font-size:15px;font-weight:600;margin:-2px 2px 0}
+.p-rpTiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:none}
+.p-rpTiles .p-tile b{font-size:22px}
+.p-rpTiles>.p-tile:last-child:nth-child(odd){grid-column:1/-1}
+.p-rpTiles .dl{display:block;font-size:12px;color:var(--text2);margin-top:2px;line-height:1.3}
+.p-rpChart{padding-bottom:6px}
+#phRpBars{padding:4px 6px 0;min-height:190px}
+.p-marks{display:grid;grid-template-columns:minmax(0,1fr) repeat(4,60px);font-variant-numeric:tabular-nums}
+.p-marks>*{padding:10px 0;border-top:1px solid var(--line2);font-size:14px;text-align:right;display:flex;align-items:center;justify-content:flex-end}
+.p-marks>:nth-child(5n){padding-right:14px}
+.p-marks>.hd{border-top:0;font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--text2);text-transform:uppercase;padding-block:9px}
+.p-marks>.hd:first-child,.p-marks>.c{justify-content:flex-start;padding-left:14px;text-align:left}
+.p-marks>.c{display:block;min-width:0;border:0;border-top:1px solid var(--line2);background:none;border-radius:0}
+.p-marks>.c b{display:block;font-size:15px}.p-marks>.c small{display:block;font-size:12.5px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -4247,7 +4266,7 @@ PHV.gAdd=()=>{const F=GFIELDS.filter(f=>f[0]!=='moisture');
 PHV.more=()=>{const fold=window.ZR_NATIVE&&ZR_NATIVE.folder?ZR_NATIVE.folder:FS.dir?FS.dir.name:'';
   return {nav:phNavBig('More'),body:`<div class="p-card p-menu"><button class="p-row" data-m="cups"><span class="ic">${PH_IC.cup}</span><div class="m"><b>Cupping</b><small>${CUP.length} session${CUP.length===1?'':'s'}</small></div><span class="gt">›</span></button>
       <button class="p-row" data-m="price"><span class="ic">${PH_IC.price}</span><div class="m"><b>Pricing</b><small>12 oz, 2 lb and 5 lb, wholesale and retail</small></div><span class="gt">›</span></button>
-      <button class="p-row" data-m="rprod"><span class="ic">${PH_IC.chart}</span><div class="m"><b>Reports</b><small>Production by coffee for a week, month or year</small></div><span class="gt">›</span></button></div>
+      <button class="p-row" data-m="rprod"><span class="ic">${PH_IC.chart}</span><div class="m"><b>Reports</b><small>Production and green coffee inventory</small></div><span class="gt">›</span></button></div>
     <div class="p-sec"><span class="p-h3">Data</span><div class="p-card p-menu"><div class="p-row"><span class="ic">${PH_IC.folder}</span><div class="m"><b>${FS.state==='granted'?'Shared folder':'No folder yet'}</b><small>${esc(fold||(FS.supported?'Pick the Zuna Roast folder':'Not available in this browser'))}</small></div>${FS.supported?`<button class="p-btn sm" id="phFold">${FS.state==='granted'?'Change':'Choose'}</button>`:''}</div>
       <div class="p-row"><div class="m"><b>${HIST.length} roasts · ${INV.length} green lots</b><small>Synced with the iMac and iPad through the folder</small></div><button class="p-btn sm" id="phSync">Check now</button></div></div></div>
     <div class="p-sec"><span class="p-h3">Appearance on this phone</span><div class="p-card p-menu">${PH_THEMES.map(([k,l])=>`<button class="p-row" data-th="${k}"><div class="m"><b style="font-weight:500">${l}</b>${k==='app'?`<small>Now ${esc(cfg.theme.name||'Custom')} — set in Settings › Appearance</small>`:''}</div>${phThemePick()===k?'<span style="color:var(--accent);font-size:19px;font-weight:600">✓</span>':''}</button>`).join('')}</div></div>
@@ -4255,23 +4274,89 @@ PHV.more=()=>{const fold=window.ZR_NATIVE&&ZR_NATIVE.folder?ZR_NATIVE.folder:FS.
     wire:el=>{$$('[data-m]',el).forEach(b=>b.onclick=()=>phGo({v:b.dataset.m}));$$('[data-th]',el).forEach(b=>b.onclick=()=>phSetTheme(b.dataset.th));const f=$('#phFold');if(f)f.onclick=async()=>{await chooseFolder();phRender(true)};
       $('#phSync').onclick=async()=>{const b=$('#phSync');b.disabled=true;b.textContent='Checking…';await watchTick(true);phPollDraft();phRender(true);toast('Up to date')}}}};
 
-/* ---------- reports on the phone: a read-only Production summary (More › Reports) and the roast sheet as a PDF ---------- */
+/* ---------- reports on the phone (More › Reports): the same Production and Inventory reports as the Mac and iPad, read-only, laid out for a narrow screen ---------- */
 PH_IC.chart='<svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>';
-PHV.rprod=()=>{const pre=[['thisWeek','This week'],['thisMonth','This month'],['lastMonth','Last month'],['thisYear','This year']];
-  if(!pre.some(p=>p[0]===PH.rp))PH.rp='lastMonth';const keep=RP.preset;RP.preset=PH.rp;const R=rpRange();RP.preset=keep;
-  const P=rpProd(R.from,R.end,'coffee'),t=P.tot,l=rpLoss(t),pl=rpPerLb(t);
-  const body=`<div class="p-seg" id="phRp">${pre.map(([k,lb])=>`<button data-p="${k}" class="${PH.rp===k?'on':''}">${lb}</button>`).join('')}</div>
-    <div style="font-size:14px;color:var(--text2);margin:-4px 2px 0">${esc(R.label)}</div>
-    ${t.n?`<div class="p-tiles"><div class="p-tile"><small>Roasts</small><b>${t.n}</b></div><div class="p-tile"><small>Green in</small><b>${Math.round(t.g)}<em>lb</em></b></div><div class="p-tile"><small>Avg loss</small><b>${ok(l)?l.toFixed(1):'—'}<em>%</em></b></div></div>
-    <div class="p-card"><div class="p-kv"><span>Roasted out</span><b>${rpNum(t.ww,2)} lb</b><span>Green cost</span><b>${t.cost?money(t.cost):'—'}</b><span>Per roasted lb</span><b>${ok(pl)?money(pl):'—'}</b></div></div>
-    <div class="p-sec"><span class="p-h3">By coffee</span><div class="p-card">${P.groups.map(o=>{const ol=rpLoss(o),sp=rpMean(o.sp);return `<div class="p-row"><div class="m"><b>${esc(o.name)}</b>
-      <small>${o.n} roast${o.n===1?'':'s'} · ${rpNum(o.g)} → ${o.gw?rpNum(o.ww,2):'—'} lb${ok(ol)?' · '+ol.toFixed(1)+' % loss':''}</small>
-      <small>Colors ${rpNum(rpMean(o.wh))} / ${rpNum(rpMean(o.gr))}${ok(sp)?' · spread '+rpSp(sp):''}${o.cost?' · '+money(o.cost):''}</small></div></div>`}).join('')}</div></div>`
-    :`<div class="p-empty">No roasts in ${esc(R.label)}.</div>`}
-    <p class="p-note">The full Production and Inventory reports are on the iMac and iPad (Reports).</p>`;
-  return {nav:phNavSmall(phBackLabel(),'Reports',t.n?'<button class="p-lnk" id="phRpPdf">PDF</button>':''),body,wire:(el,nav)=>{
-    $$('#phRp button').forEach(b=>b.onclick=()=>{PH.rp=b.dataset.p;phRender(true)});
-    const pdf=$('#phRpPdf',nav);if(pdf)pdf.onclick=()=>{const kb=RP.by;RP.by='coffee';const Q=rpProd(R.prev.from,R.prev.to,'coffee');const html=rpProdDoc(R,P,Q);RP.by=kb;rpPrint(html,`production_${rpFileDate(R)}`)}}}};
+/* the phone keeps its own range, view and grouping (zr2.phReports), so the Mac/iPad Reports settings on this device aren't touched */
+{const s=store.get('zr2.phReports',null)||{};PH.rp=s.preset||'lastMonth';PH.rv=s.view==='inv'?'inv':'prod';PH.rby=s.by==='batch'?'batch':'coffee';PH.rfrom=s.from||'';PH.rto=s.to||''}
+const phRpSave=()=>store.set('zr2.phReports',{preset:PH.rp,view:PH.rv,by:PH.rby,from:PH.rfrom,to:PH.rto});
+/* run a Reports helper with the phone's range and grouping in RP, then put RP back */
+function phRpWith(f){const k={preset:RP.preset,from:RP.from,to:RP.to,by:RP.by,bars:RP.bars};RP.preset=RP_PRE.some(p=>p[0]===PH.rp)?PH.rp:'lastMonth';RP.from=PH.rfrom;RP.to=PH.rto;RP.by=PH.rby;RP.bars='auto';
+  try{return f()}finally{Object.assign(RP,k)}}
+const phRpRange=()=>phRpWith(()=>rpRange());
+function phRpHead(R){const custom=PH.rp==='custom';
+  return `<div class="p-seg" id="phRv"><button data-v="prod" class="${PH.rv==='prod'?'on':''}">Production</button><button data-v="inv" class="${PH.rv==='inv'?'on':''}">Inventory</button></div>
+    <div class="p-chipRow" id="phRpPre">${RP_PRE.map(([k,l])=>`<button data-p="${k}" class="${PH.rp===k?'on':''}">${l}</button>`).join('')}</div>
+    ${custom?`<div class="p-g2"><div class="p-field"><label for="phRf">From</label><div class="p-inp"><input id="phRf" class="t" type="date" value="${rdIso(R.from)}"></div></div><div class="p-field"><label for="phRt">To</label><div class="p-inp"><input id="phRt" class="t" type="date" value="${rdIso(rdAdd(R.to,-1))}"></div></div></div>`:''}
+    <div class="p-rpLabel">${esc(R.label)}</div>`}
+function phRpWireHead(el){$$('#phRv button',el).forEach(b=>b.onclick=()=>{PH.rv=b.dataset.v;phRpSave();phRender()});
+  $$('#phRpPre button',el).forEach(b=>b.onclick=()=>{const was=phRpRange();PH.rp=b.dataset.p;if(PH.rp==='custom'&&!PH.rfrom){PH.rfrom=rdIso(was.from);PH.rto=rdIso(rdAdd(was.to,-1))}phRpSave();phRender(true)});
+  for(const id of ['#phRf','#phRt']){const i=$(id,el);if(i)i.onchange=()=>{const a=$('#phRf').value,b=$('#phRt').value;if(!rdParse(a)||!rdParse(b))return;PH.rfrom=a;PH.rto=b;phRpSave();phRender(true)}}
+  const on=$('#phRpPre .on',el);if(on)on.scrollIntoView({block:'nearest',inline:'center'})}
+/* one roast as a phone row: weights, loss, colors, spread, and the 2/4/6/8-minute bean temps */
+function phRpRoastRow(r,name){const m=r.meta,s=r.summary||summarize(r),sp=spreadOf(m),marks=RP_MARKS.map(mk=>btAt(r,mk));
+  return `<button class="p-row" data-rr="${r.id}" style="align-items:flex-start"><div class="m"><b><span style="color:var(--text2);font-weight:500">#${r.num}</span> ${esc(name?(m.name||m.coffee||'Untitled'):fmtDate(r.chargedAt||r.created,false))}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</b>
+    <small>${name?fmtDate(r.chargedAt||r.created,false)+' · ':''}${fGreen(m.green)} → ${fRoasted(m.roasted)} lb${ok(s.loss)?' · '+rpNum(s.loss)+' % loss':''}</small>
+    <div class="p-chips"><span>W/G <b>${fAg(m.colorWhole)} / ${fAg(m.colorGround)}</b></span>${ok(sp)?`<span>Spread <b>${rpSp(sp)}</b></span>`:''}${marks.some(ok)?`<span>2·4·6·8 min <b>${marks.map(v=>ok(v)?Math.round(toD(v)):'–').join(' · ')}°</b></span>`:''}</div></div><span class="gt" style="margin-top:12px">›</span></button>`}
+const phRpWireRoasts=el=>$$('[data-rr]',el).forEach(b=>b.onclick=()=>phGo({v:'roast',id:b.dataset.rr}));
+function phRpTiles(list){return `<div class="p-rpTiles">${list.map(t=>`<div class="p-tile"><small>${t[0]}</small><b>${t[1]}${t[2]?`<em>${t[2]}</em>`:''}</b>${t[3]?`<span class="dl">${t[3]}</span>`:''}</div>`).join('')}</div>`}
+const phRpDelta=h=>String(h||'').replace(/<[^>]+>/g,'').trim();
+
+PHV.rprod=()=>{const R=phRpRange();
+  if(PH.rv==='inv'){const I=rpInv(R.from,R.end);
+    const tiles=phRpTiles(rpInvTiles(I,R).map(t=>[t[0],t[1],'lb',t[2]]));
+    const body=`${phRpHead(R)}${tiles}${I.lots.length?`<div class="p-sec"><span class="p-h3">By lot</span><div class="p-card">${I.lots.map(o=>{const av=Math.max(0,o.open)+o.in,pct=av>0?clamp(o.close/av*100,0,100):0;
+        return `<button class="p-row" data-lot="${o.l.id}" style="align-items:flex-start"><span class="fl">${flagOf(o.l.origin)||'·'}</span><div class="m"><b>${esc(o.l.name)}${o.low?' <span class="p-pill w">Low</span>':''}${o.isNew?' <span class="p-pill a">New</span>':''}</b>
+          <small>${rpNum(o.open)} → <b style="display:inline;font-size:inherit;color:var(--text)">${rpNum(o.close)} lb</b>${o.in>0.04?' · +'+rpNum(o.in)+' in':''}${o.used?' · −'+rpNum(o.used)+' roasted':''}${Math.abs(o.adj)>0.04?' · '+(o.adj>0?'+':'−')+rpNum(Math.abs(o.adj))+' adj.':''}</small>
+          <div class="p-bar ${o.low?'low':''}" style="width:100%;margin-left:0;margin-top:8px"><i style="width:${pct.toFixed(1)}%"></i></div>${rpPace(o,R)?`<small>${esc(rpPace(o,R))}</small>`:''}</div><span class="gt" style="margin-top:12px">›</span></button>`}).join('')}</div></div>
+        <p class="p-note">Lots with no stock and no movement in this range are left out.</p>`:`<div class="p-card"><div class="p-empty">No green coffee on hand or moving in ${esc(R.label)}.</div></div>`}`;
+    return {nav:phNavSmall(phBackLabel(),'Reports',I.lots.length?'<button class="p-lnk" id="phRpOut">Share</button>':''),body,wire:(el,nav)=>{phRpWireHead(el);
+      $$('[data-lot]',el).forEach(b=>b.onclick=()=>phGo({v:'rlot',id:b.dataset.lot}));
+      const s=$('#phRpOut',nav);if(s)s.onclick=()=>phRpShare(`inventory_${rpFileDate(R)}`,()=>rpInvDoc(R,I),()=>rpInvCSV(R,I))}}}
+  const P=phRpWith(()=>rpProd(R.from,R.end,PH.rby)),Q=phRpWith(()=>rpProd(R.prev.from,R.prev.to,PH.rby)),t=P.tot;
+  const tiles=phRpTiles(rpTiles(P,Q,R).map(x=>[x[0].replace('Per roasted lb','Per roasted lb').replace('Average loss','Avg loss'),x[1],x[2],phRpDelta(x[3])]));
+  const B=t.n?phRpWith(()=>rpBuckets(R,P.rs)):null;
+  const body=`${phRpHead(R)}${tiles}${t.n?`
+    <div class="p-card p-rpChart"><div class="p-calc" style="padding:12px 14px 0"><span class="p-h3">Green roasted by ${B.mode}</span></div><div id="phRpBars"></div></div>
+    <div class="p-sec"><div class="p-calc"><span class="p-h3">${PH.rby==='batch'?'By coffee and batch size':'By coffee'}</span></div>
+      <div class="p-seg" id="phRby"><button data-b="coffee" class="${PH.rby==='coffee'?'on':''}">By coffee</button><button data-b="batch" class="${PH.rby==='batch'?'on':''}">Coffee + batch size</button></div>
+      <div class="p-card">${P.groups.map(o=>{const ol=rpLoss(o),sp=rpMean(o.sp),pl=rpPerLb(o);return `<button class="p-row" data-cg="${esc(o.key)}" style="align-items:flex-start"><div class="m"><b>${rpGName(o)}</b>
+        <small>${o.n} roast${o.n===1?'':'s'} · ${rpNum(o.g)} → ${o.gw?rpNum(o.ww,2):DASH} lb${ok(ol)?' · '+rpNum(ol)+' % loss':''}</small>
+        <div class="p-chips"><span>W/G <b>${rpNum(rpMean(o.wh))} / ${rpNum(rpMean(o.gr))}</b></span>${ok(sp)?`<span>Spread <b>${rpSp(sp)}</b></span>`:''}${o.cost?`<span>Cost <b>${money(o.cost)}</b></span>`:''}${ok(pl)?`<span><b>${money(pl)}</b>/lb</span>`:''}</div></div><span class="gt" style="margin-top:12px">›</span></button>`}).join('')}</div></div>
+    <div class="p-sec"><span class="p-h3">Bean temp at 2, 4, 6 and 8 minutes</span><div class="p-card"><div class="p-marks"><span class="hd">Roast</span>${RP_MARKS.map(m=>`<span class="hd">${mmss(m)}</span>`).join('')}
+      ${[...P.rs].reverse().map(r=>`<button class="c" data-rr="${r.id}"><b>#${r.num}</b><small>${esc(r.meta.name||r.meta.coffee||'')}</small></button>${RP_MARKS.map(mk=>`<span>${(v=>ok(v)?fT(v):DASH)(btAt(r,mk))}</span>`).join('')}`).join('')}</div></div>
+      <p class="p-note">°${cfg.unit}, the reading recorded at that second after Charge. Newest first.</p></div>`
+    :`<div class="p-card"><div class="p-empty">No roasts in ${esc(R.label)}. Pick another range.</div></div>`}`;
+  return {nav:phNavSmall(phBackLabel(),'Reports',t.n?'<button class="p-lnk" id="phRpOut">Share</button>':''),body,wire:(el,nav)=>{phRpWireHead(el);
+    $$('#phRby button',el).forEach(b=>b.onclick=()=>{PH.rby=b.dataset.b;phRpSave();phRender(true)});
+    $$('[data-cg]',el).forEach(b=>b.onclick=()=>phGo({v:'rcof',key:b.dataset.cg}));phRpWireRoasts(el);
+    const bx=$('#phRpBars',el);if(bx&&B)bx.innerHTML=rpBarsSvg(B.list,bx.clientWidth||340,190,RP_SCREEN);
+    const s=$('#phRpOut',nav);if(s)s.onclick=()=>phRpShare(`production_${rpFileDate(R)}`,()=>phRpWith(()=>rpProdDoc(R,P,Q)),()=>rpProdCSV(R,P))}}};
+/* one coffee (or coffee + batch size) in the range: its roasts, newest first */
+PHV.rcof=v=>{const R=phRpRange(),P=phRpWith(()=>rpProd(R.from,R.end,PH.rby)),o=P.groups.find(g=>g.key===v.key);
+  if(!o)return {nav:phNavSmall(phBackLabel(),'Reports'),body:'<div class="p-card"><div class="p-empty">No roasts of this coffee in this range.</div></div>'};
+  const ol=rpLoss(o),sp=rpMean(o.sp),pl=rpPerLb(o);
+  return {nav:phNavSmall('Reports',o.name),body:`<div><div style="font-size:20px;font-weight:700;line-height:1.25">${rpGName(o)}</div><div style="font-size:14px;color:var(--text2);margin-top:3px">${esc(R.label)}${o.origin?' · '+esc(o.origin):''}</div></div>
+    <div class="p-card"><div class="p-kv"><span>Roasts</span><b>${o.n}</b><span>Green in → roasted out</span><b>${rpNum(o.g)} → ${o.gw?rpNum(o.ww,2):DASH} lb</b><span>Average loss</span><b>${ok(ol)?rpNum(ol)+' %':DASH}</b>
+      <span>Average whole / ground</span><b>${rpNum(rpMean(o.wh))} / ${rpNum(rpMean(o.gr))}</b><span>Average spread</span><b>${ok(sp)?rpSp(sp):DASH}</b><span>Green cost</span><b>${o.cost?money(o.cost):DASH}${ok(pl)?`<small>${money(pl)}/lb</small>`:''}</b></div></div>
+    <div class="p-sec"><span class="p-h3">Roasts · newest first</span><div class="p-card">${[...o.rs].reverse().map(r=>phRpRoastRow(r,true)).join('')}</div>
+      <p class="p-note">Averages skip roasts without that value. Tap a roast to see it and share its roast sheet.</p></div>`,wire:el=>phRpWireRoasts(el)}};
+/* one lot in the range: dated entries with the running balance */
+PHV.rlot=v=>{const R=phRpRange(),I=rpInv(R.from,R.end),o=I.lots.find(x=>x.l.id===v.id);
+  if(!o)return {nav:phNavSmall(phBackLabel(),'Reports'),body:'<div class="p-card"><div class="p-empty">This lot has no stock or movement in this range.</div></div>'};
+  let bal=o.open;const rows=o.ev.map(e=>{bal+=e.lb;const tag=e.r?`data-rr="${e.r.id}"`:'',el=e.r?'button':'div';
+    return `<${el} class="p-row" ${tag}><div class="m"><b style="font-weight:500">${esc(e.t)}</b><small>${rdShort(e.d)}${ok(e.price)&&e.kind==='in'?' · '+money(e.price)+' / lb':''}</small></div><span class="r"><span style="${e.lb>0?'color:var(--g-add,var(--good))':''}">${e.lb>0?'+':'−'}${rpNum(Math.abs(e.lb))}</span><small>${rpNum(bal)} lb</small></span>${e.r?'<span class="gt">›</span>':''}</${el}>`}).join('');
+  return {nav:phNavSmall('Reports',o.l.name),body:`<div><div style="font-size:20px;font-weight:700;line-height:1.25">${flagOf(o.l.origin)} ${esc(o.l.name)}${o.low?' <span class="p-pill w">Low</span>':''}</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:3px">${[esc(R.label),o.l.arrived?'arrived '+fmtDay(o.l.arrived):'',ok(num(o.l.price))?money(num(o.l.price))+' / lb':''].filter(Boolean).join(' · ')}</div></div>
+    <div class="p-card"><div class="p-kv"><span>On hand ${rdShort(R.from)}</span><b>${rpNum(o.open)} lb</b><span>Came in</span><b>${o.in>0.04?'+'+rpNum(o.in)+' lb':DASH}</b><span>Roasted</span><b>${o.used?'−'+rpNum(o.used)+' lb':DASH}</b>
+      <span>Adjusted</span><b>${Math.abs(o.adj)>0.04?(o.adj>0?'+':'−')+rpNum(Math.abs(o.adj))+' lb':DASH}</b><span>On hand ${rdShort(rdAdd(R.end,-1))}</span><b>${rpNum(o.close)} lb</b></div></div>
+    ${rpPace(o,R)?`<p class="p-note" style="margin-top:-4px">${esc(rpPace(o,R)[0].toUpperCase()+rpPace(o,R).slice(1))}.</p>`:''}
+    <div class="p-sec"><span class="p-h3">Entries</span><div class="p-card"><div class="p-row"><div class="m"><b style="font-weight:500">On hand at the start</b><small>${rdShort(R.from)}</small></div><span class="r">${DASH}<small>${rpNum(o.open)} lb</small></span></div>${rows}</div></div>`,
+    wire:el=>phRpWireRoasts(el)}};
+/* Share: the report as a PDF (same page as the Mac/iPad print) or as a CSV for a spreadsheet */
+function phRpShare(name,doc,csv){phSheet(`<div style="font-size:19px;font-weight:700">Share report</div>
+    <button class="p-btn full pri" id="phShPdf">PDF</button><button class="p-btn full" id="phShCsv">CSV for a spreadsheet</button>
+    <button class="p-btn full" id="phShX" style="border:0;background:transparent;color:var(--accent)">Cancel</button>`,sh=>{
+  $('#phShPdf',sh).onclick=()=>{phSheetClose();rpPrint(doc(),name)};$('#phShCsv',sh).onclick=()=>{phSheetClose();download(name+'.csv',csv())};$('#phShX',sh).onclick=phSheetClose})}
 
 /* ---------- cupping ---------- */
 PHV.cups=()=>{const list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
