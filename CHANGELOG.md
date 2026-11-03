@@ -2,6 +2,13 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.35 — Bean temp at 2, 4, 6 and 8 minutes (Nov 2, 2026; iMac, 13" iPad, iPhone)
+- Ty wanted the **exact** bean temp at 2:00, 4:00, 6:00 and 8:00 for every roast — no averages. `btAt(r,sec)`: the recorded reading nearest CHARGE+sec (within 1.5 s; `sampleAt`), none past Drop or with no Charge. `RP_MARKS=[120,240,360,480]`.
+- **Reports › Production**: new card "Bean temp at 2, 4, 6 and 8 minutes" listing every roast in the range (newest first: #, date, coffee, profile, batch, 2:00–8:00), click → roast sheet (`rpMarksTable`). Coffee drill-down roast list got the four columns; its on-screen Cost column was dropped to fit (still in print/CSV) and the "Roast sheet" button column removed (row click opens it). Printed production report includes the table; CSV per-roast rows get `bt_2min_F`…`bt_8min_F` (unit follows the setting).
+- **Events timeline** (`evTimeline(r,bg)`, `evDiff`): events + minute marks in time order. Roast sheet Events table shows them (marks in italics; "vs background" = time diff for events, ±° for marks). History detail has a new **Events** line (marks grey).
+- iPad: same through the merge. iPhone (ipad branch only): roast view boxes under the chart = events + marks in time order, 4 per row (`phEvents(r,null,true)`, `.p-ev4`, marks `.mk`); Live view unchanged.
+- Layout: `.rpCol>.rpTable:first-child{flex:none}`, `.rpMarksCard` fills the rest of the column and scrolls.
+
 ## 1.0.34 — Switch lights follow the P12 touchscreen (Nov 2, 2026; iMac)
 - Mac 1.0.34 from `main` (via `preview/switch-state-follow`). Not yet merged into `ipad`.
 - Found by listening to the real P12 (read-only: `getCurrentRoastingStep` + `getControlParams`) while Ty switched the burner on the touchscreen. The P12 reports switches as **numbers**, not true/false: `burnerState` −1 off (also before drives are on), 0 in between, 2 burning, 1 seen for ~1 s while shutting off; `drivesState`/`coolingFanState`/`stirrerState`/`standby` 0/1. The burner can only be switched on with the drives on.
