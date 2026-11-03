@@ -962,6 +962,7 @@ button.p-row:active{background:var(--soft)}
 .p-ev span{flex:1;min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:6px 8px;font-size:12px;color:var(--text2);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-ev span b{display:block;font-size:15px;color:var(--text)}
 .p-ev span.next{border-style:dashed}
+.p-ev4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.p-ev span.mk{background:var(--soft);border-color:transparent}
 .p-field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .p-field>label,.p-field>span{font-size:13.5px;color:var(--text2);font-weight:500}
 .p-inp{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--panel);border-radius:11px;padding:0 13px;min-height:52px}
@@ -3985,7 +3986,10 @@ function phChart(cv,r,bg,opt={}){if(!cv||!r)return;const b=cv.getBoundingClientR
   /* no roast yet: show the background's burner and air plan, faded */
   const src=!r.samples.length&&bg?bg:null;if(src)c.globalAlpha=.55;step('burner',COL.burner,y0,src);step('fan',COL.air,y0+lane+6,src);c.globalAlpha=1}
 const phLegend=bg=>`<div class="p-legend"><span><i style="border-color:var(--c-bt)"></i>Bean temp</span><span><i style="border-color:var(--c-ror)"></i>RoR</span>${bg?'<span><i style="border-color:var(--c-bkg);border-top-style:dashed"></i>Background</span>':''}<span><i style="border-color:var(--c-burner)"></i>Burner</span><span><i style="border-color:var(--c-air)"></i>Air</span></div>`;
-function phEvents(r,plan){const ev=r.events||{},o=ev.CHARGE??0,box=(k,l)=>{const t=ev[k];if(t==null)return '';const s=sampleAt(r.samples,t);return `<span>${l}<b>${mmss(t-o)}</b>${s&&ok(s.bt)?fT(s.bt)+'°':''}</span>`};
+function phEvents(r,plan,marks){const ev=r.events||{},o=ev.CHARGE??0,box=(k,l)=>{const t=ev[k];if(t==null)return '';const s=sampleAt(r.samples,t);return `<span>${l}<b>${mmss(t-o)}</b>${s&&ok(s.bt)?fT(s.bt)+'°':''}</span>`};
+  if(marks&&ev.CHARGE!=null){const it=[['TP','TP'],['DRY','Dry end'],['FCs','FC'],['DROP','Drop']].filter(([k])=>ev[k]!=null).map(([k,l])=>({t:ev[k]-o,h:box(k,l)}));
+    for(const m of RP_MARKS){const v=btAt(r,m);if(ok(v))it.push({t:m,h:`<span class="mk">Bean temp<b>${mmss(m)}</b>${fT(v)}°</span>`})}
+    it.sort((a,b)=>a.t-b.t);return it.length?`<div class="p-ev p-ev4">${it.map(x=>x.h).join('')}</div>`:''}
   let h=box('TP','TP')+box('DRY','Dry end')+box('FCs','FC')+box('DROP','Drop');
   if(plan&&ev.FCs==null&&plan.events&&plan.events.FCs!=null){const po=plan.events.CHARGE??0,s=sampleAt(plan.samples,plan.events.FCs);h+=`<span class="next">FC plan<b>~${mmss(plan.events.FCs-po)}</b>${s&&ok(s.bt)?fT(s.bt)+'°':''}</span>`}
   return h?`<div class="p-ev">${h}</div>`:''}
@@ -4034,7 +4038,7 @@ PHV.roast=v=>{const r=HIST.find(x=>x.id===v.id);if(!r)return {nav:phNavSmall(phB
   const notes=(r.tnotes||[]).map(n=>mmss(n.t-o)+'  '+n.text).join('\n');
   const body=`<div><div style="font-size:21px;font-weight:700;line-height:1.25">${esc(m.name||'Untitled')}${r.isProfile?' <span style="color:var(--warn)">★</span>':''}</div><div style="font-size:14px;color:var(--text2);margin-top:3px">${fmtLong(r.chargedAt||r.created)} · ${phLb(m.green)}${m.lot?' · Lot '+esc(m.lot):''}</div></div>
     <div class="p-chart"><canvas id="phCv"></canvas>${phLegend(bgOk)}</div>
-    ${phEvents(r)}
+    ${phEvents(r,null,true)}
     <div class="p-card"><div class="p-kv">
       <span>Development</span><b>${mmss(s.dev)}</b>
       <span>Drop</span><b>${mmss(s.drop)}${ok(s.dropBT)?`<small>${fT(s.dropBT)}°${cfg.unit}</small>`:''}</b>
