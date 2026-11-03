@@ -2,6 +2,13 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## iPhone build after 1.0.38 — Full Reports on the phone (Nov 3, 2026; iPhone only, `ipad` branch, TestFlight, no Mac release)
+- Ty: "I would like to be able to see more of the reporting on my iPhone." More › Reports (`PHV.rprod`) now has the same Production and Inventory reports as the Mac/iPad, read-only, phone layout.
+- Phone state `PH.rp/rv/rby/rfrom/rto` saved in `zr2.phReports`; `phRpWith(f)` runs the shared helpers (`rpRange`, `rpProd`, `rpBuckets`, `rpProdDoc`) with the phone's range/grouping in `RP` and restores it, so the Mac/iPad Reports settings on the device aren't touched.
+- Range chips (all `RP_PRE`, scrolls sideways) + Custom date inputs. Production: `rpTiles` (2 per row, previous-period line), `rpBarsSvg` chart, By coffee / Coffee + batch size, coffee rows → `PHV.rcof` (totals + roasts with weights, loss, colors, spread, 2·4·6·8 min bean temps) → the phone roast view; bean temp 2/4/6/8 min grid (`.p-marks`). Inventory: `rpInvTiles`, lots (`rpInv`) with Low/New, bar, `rpPace` → `PHV.rlot` (dated entries + running balance; roast entries open the roast).
+- Share (`phRpShare`): PDF via `rpPrint(rpProdDoc|rpInvDoc)` or CSV via `download(rpProdCSV|rpInvCSV)` → iOS share sheet.
+- MacBook 1728, iMac 2240, 13" iPad and the other iPhone screens unchanged (27 screens compared); only the More › Reports subtitle text changed.
+
 ## 1.0.38 — Blend pricing (Nov 3, 2026; Mac; iPad/iPhone get the Mac Pricing screen code but their phone Pricing view does not list blends yet)
 - **Pricing › + New blend**: a name and a recipe of green coffees by share (%). Total ≠ 100 % shows red. Blends get their own "Blends" group on the Price list (with "Single origins" above when both exist), recipe line under the name, same Wholesale/Retail rows and typed prices.
 - Data: `cfg.pricing.blends = [{id, name, parts:[{key, name, pct}]}]` (settings only — roast files and the data folder unchanged). `key` = `normName(coffee name)`, so a blend follows a coffee to its next lot like typed prices. Blend prices in `cfg.pricing.actual['blend:'+id]`. Selection id `'b:'+id`.
