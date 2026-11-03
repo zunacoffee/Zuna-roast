@@ -424,6 +424,12 @@ table.mini th{position:static;padding:7px 8px}table.mini td{padding:7px 8px;curs
 .ppill.w{background:color-mix(in srgb,var(--p-whole) 13%,var(--panel));color:var(--p-whole)}.ppill.r{background:color-mix(in srgb,var(--p-retail) 14%,var(--panel));color:var(--p-retail)}
 .wr .ptc{padding:3px 0}.plow{color:var(--p-low)!important}td.prc.wr span{font-weight:600}.notset{color:var(--text2);font-weight:400!important}
 .prbar select{width:auto;padding:4px 8px;font-size:var(--fs-sm)}
+tr.grp td{background:var(--soft)!important;cursor:default;font-size:var(--fs-cap);text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600;padding-top:7px;padding-bottom:7px;box-shadow:none!important}
+.recipe{border:1px solid var(--line2);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-2)}
+.rcrow{display:grid;grid-template-columns:1fr 96px 92px 28px;gap:var(--sp-2);align-items:center;font-size:var(--fs-body)}
+.rcrow.h{font-size:var(--fs-cap);text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600}
+.rcrow input{padding:5px 8px;text-align:right;min-width:0}.rcrow .rcpct{display:flex;gap:4px;align-items:center;flex-wrap:nowrap}.rcrow select{padding:5px 8px}.rcrow .n{text-align:right}
+.rcsum{display:flex;gap:var(--sp-2);align-items:center;font-size:var(--fs-sm);border-top:1px solid var(--line2);padding-top:var(--sp-2)}
 .prlegend{display:flex;gap:16px;align-items:center;padding:10px 14px;font-size:var(--fs-sm);color:var(--text2)}
 .info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text2);cursor:help;font-style:normal}
 .info .tip{display:none;position:absolute;bottom:calc(100% + 8px);right:-10px;width:320px;background:var(--text);color:var(--panel);font-weight:400;font-size:var(--fs-sm);line-height:1.5;padding:10px 12px;border-radius:8px;z-index:20;text-align:left;box-shadow:0 6px 20px rgba(0,0,0,.18)}
@@ -701,7 +707,7 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 <div class="screen" id="scr-pricing" hidden>
   <div class="page">
     <div class="ph"><h1>Pricing</h1><div class="seg" id="prView"><button data-v="prices" class="on">Price list</button><button data-v="overview">Overview</button><button data-v="costs">Costs &amp; settings</button></div><input type="search" id="prSearch" placeholder="Search coffee…">
-      <div class="sp"></div><span id="prWhatTag"></span><button id="btnPrSheet">Wholesale price sheet</button></div>
+      <div class="sp"></div><span id="prWhatTag"></span><button id="btnPrBlend">+ New blend</button><button id="btnPrSheet">Wholesale price sheet</button></div>
     <div id="prOverview" class="scroll" hidden></div>
     <div class="split" id="prSplit">
       <div class="card scroll"><div class="prbar" id="prBar"></div><table><thead><tr><th>Coffee</th><th style="width:110px"></th><th class="n" style="width:16%">12 oz</th><th class="n" style="width:16%">2 lb</th><th class="n" style="width:16%">5 lb</th></tr></thead><tbody id="prRows"></tbody></table><div id="prEmpty"></div></div>
@@ -3010,11 +3016,11 @@ const PR_DEF={
   rate:20,batchMin:25,batchLb:20,bagMin:{'12oz':1.5,'2lb':2,'5lb':3},
   pack:{'12oz':1.10,'2lb':1.60,'5lb':2.40},
   waste:3,lossDefault:15,wMargin:30,rMargin:50,gwMargin:45,grMargin:65,basis:'gross',round:0.25,
-  tiers:[{name:'Standard',minLb:0,off:0},{name:'10+ lb a week',minLb:10,off:5},{name:'25+ lb a week',minLb:25,off:10}],
+  blends:[],tiers:[{name:'Standard',minLb:0,off:0},{name:'10+ lb a week',minLb:10,off:5},{name:'25+ lb a week',minLb:25,off:10}],
   actual:{}};
 function PRC(){const p=cfg.pricing||{},d=JSON.parse(JSON.stringify(PR_DEF)),o={...d,...p};
   o.bagMin={...d.bagMin,...(p.bagMin||{})};o.pack={...d.pack,...(p.pack||{})};
-  if(!Array.isArray(o.overhead))o.overhead=d.overhead;if(!Array.isArray(o.tiers))o.tiers=d.tiers;
+  if(!Array.isArray(o.overhead))o.overhead=d.overhead;if(!Array.isArray(o.blends))o.blends=[];if(!Array.isArray(o.tiers))o.tiers=d.tiers;
   o.actual=p.actual&&typeof p.actual==='object'?p.actual:{};return o}
 function savePR(o){cfg.pricing=o;saveCfg()}
 let PRW={days:null,green:0},prSel=null,prView='prices',prSide='w';
@@ -3038,18 +3044,36 @@ function prT(o){return o.basis==='net'?{w:num(o.wMargin)||0,r:num(o.rMargin)||0,
 function prCalc(l,o,ctx){const hasPrice=ok(num(l.price)),landed=(num(l.price)||0)+(num(l.freight)||0)+(Number(PRW.green)||0);
   const ls=realRoasts().filter(r=>r.meta.invId===l.id||normName(r.meta.coffee)===prKey(l)).map(r=>{const g=num(r.meta.green),w=num(r.meta.roasted);return g&&w?(g-w)/g*100:null}).filter(v=>ok(v)&&v>0&&v<40).slice(0,6);
   const loss=ls.length?ls.reduce((a,v)=>a+v,0)/ls.length:(num(o.lossDefault)||15);
-  const coffee=landed/(1-loss/100)/(1-(num(o.waste)||0)/100),oh=ctx.ohPerLb||0,lab=ctx.labPerLb||0;
-  const act=o.actual[prKey(l)]||{};
+  const coffee=landed/(1-loss/100)/(1-(num(o.waste)||0)/100);
+  return {hasPrice,landed,loss,lossN:ls.length,...prBags(coffee,prKey(l),o,ctx)}}
+/* Bag costs, suggested prices and margins from a coffee cost per lb roasted. key = where Ty's typed prices are kept (cfg.pricing.actual). */
+function prBags(coffee,key,o,ctx){const oh=ctx.ohPerLb||0,lab=ctx.labPerLb||0;
+  const act=o.actual[key]||{};
   const bags=BAGS.map(b=>{const parts={coffee:coffee*b.lb,overhead:oh*b.lb,labor:lab*b.lb+(num(o.rate)||0)*(num(o.bagMin[b.k])||0)/60,pack:num(o.pack[b.k])||0};
     const cost=parts.coffee+parts.overhead+parts.labor+parts.pack,gcost=cost-parts.overhead,T=prT(o),base=o.basis==='net'?cost:gcost;
     const sw=prRound(base/(1-T.w/100),num(o.round)),sr=prRound(base/(1-T.r/100),num(o.round));
     const a=act[b.k]||{},aw=num(a.w),ar=num(a.r),w=ok(aw)?aw:sw,r=ok(ar)?ar:sr,mgN=p=>p>0?(p-cost)/p*100:null,mgG=p=>p>0?(p-gcost)/p*100:null,mg=o.basis==='net'?mgN:mgG;
     return {...b,parts,cost,gcost,sw,sr,aw,ar,w,r,mw:mg(w),mr:mg(r),gw:mgG(w),gr:mgG(r),nw:mgN(w),nr:mgN(r),lowW:ok(aw)&&mg(aw)<T.w-0.05,lowR:ok(ar)&&mg(ar)<T.r-0.05}});
-  return {hasPrice,landed,loss,lossN:ls.length,coffee,perLb:coffee+oh+lab,bags,low:bags.some(b=>b.lowW||b.lowR)}}
+  return {coffee,perLb:coffee+oh+lab,bags,low:bags.some(b=>b.lowW||b.lowR)}}
+/* ---- Blends: a recipe of green coffees by share. Kept in cfg.pricing.blends (settings), never in the roast files.
+   Each part points at a coffee by name, so the blend follows that coffee to its next lot (like typed prices).
+   Blended after roasting: each part costs what its own lot costs per lb roasted (its own price, freight and weight loss). */
+const prBlendKey=b=>'blend:'+b.id;
+const prBlendSel=b=>'b:'+b.id;
+function prLotFor(key){const c=INV.filter(l=>prKey(l)===key);if(!c.length)return null;
+  const inStock=c.filter(l=>invLeft(l)>0.001&&ok(num(l.price))),priced=c.filter(l=>ok(num(l.price))),pick=inStock.length?inStock:priced.length?priced:c;
+  return pick.slice().sort((a,b)=>String(b.arrived||b.created||'').localeCompare(String(a.arrived||a.created||'')))[0]}
+function prBlendCalc(bl,o,ctx){const parts=(bl.parts||[]).map(p=>{const l=prLotFor(p.key),c=l?prCalc(l,o,ctx):null;
+    return {...p,pct:num(p.pct)||0,l,c,ok:!!(c&&c.hasPrice),left:l?invLeft(l):0}});
+  const tot=parts.reduce((a,p)=>a+p.pct,0),okParts=parts.filter(p=>p.ok),okTot=okParts.reduce((a,p)=>a+p.pct,0);
+  const missing=parts.filter(p=>!p.ok&&p.pct>0),hasPrice=okParts.length>0&&!missing.length&&tot>0;
+  const coffee=okTot>0?okParts.reduce((a,p)=>a+p.pct*p.c.coffee,0)/okTot:0;
+  return {hasPrice,parts,tot,missing,...prBags(coffee,prBlendKey(bl),o,ctx)}}
+const prBlendLine=bl=>(bl.parts||[]).filter(p=>num(p.pct)>0).map(p=>`${num(p.pct)} % ${p.name||p.key}`).join(' · ');
 
 function renderPricing(){const o=PRC(),ctx=prContext(o);
   $$('#prView button').forEach(b=>b.classList.toggle('on',b.dataset.v===prView));
-  const L=prView==='prices';$('#prSplit').hidden=!L;$('#prSearch').hidden=!L||(INV.filter(l=>invLeft(l)>0.001).length<=8&&!$('#prSearch').value);$('#btnPrSheet').hidden=!L;
+  const L=prView==='prices';$('#prSplit').hidden=!L;$('#prSearch').hidden=!L||(INV.filter(l=>invLeft(l)>0.001).length<=8&&!$('#prSearch').value);$('#btnPrSheet').hidden=!L;$('#btnPrBlend').hidden=!L;
   $('#prOverview').hidden=prView!=='overview';$('#prCosts').hidden=prView!=='costs';
   const what=PRW.days!=null||Number(PRW.green);
   $('#prWhatTag').innerHTML=what&&prView!=='overview'?`<span class="badge" style="background:color-mix(in srgb,var(--warn) 14%,var(--panel));color:var(--warn);margin:0">What-if prices showing</span> <button class="sm" id="prWr2">Reset</button>`:'';
@@ -3060,12 +3084,13 @@ function renderPricing(){const o=PRC(),ctx=prContext(o);
 function prVolFor(price,b,m,ohMonth){const other=b.parts.coffee+b.parts.labor+b.parts.pack,room=price*(1-m/100)-other;return room>0?ohMonth/(room/b.lb):null}
 function renderPrOverview(o,ctx){const el=$('#prOverview'),what=PRW.days!=null||Number(PRW.green);
   const list=INV.filter(l=>invLeft(l)>0.001&&ok(num(l.price))),calc=list.map(l=>({l,c:prCalc(l,o,ctx)}));
+  const bcalc=o.blends.map(bl=>({l:{name:bl.name},c:prBlendCalc(bl,o,ctx)})).filter(x=>x.c.hasPrice);
   const avg=k=>calc.length?calc.reduce((a,x)=>a+x.c[k],0)/calc.length:null,avgCoffee=avg('coffee'),avgPer=avg('perLb');
   const ohShare=ok(avgPer)&&avgPer>0?ctx.ohPerLb/avgPer*100:null;
   // pounds/month & overhead/lb for 1–5 roast days
   const perDay=ctx.daysNow>0?ctx.base/ctx.daysNow:0,days=[1,2,3,4,5].map(d=>({d,lb:perDay*d,oh:perDay*d>0?ctx.ohMonth/(perDay*d):null})),maxOh=Math.max(...days.map(x=>x.oh||0));
   // break-even for every price Ty has typed in
-  const rows=[];calc.forEach(({l,c})=>c.bags.forEach(b=>[['w','Wholesale',o.wMargin],['r','Retail',o.rMargin]].forEach(([k,n,m])=>{const p=b['a'+k];if(!ok(p))return;
+  const rows=[];[...calc,...bcalc].forEach(({l,c})=>c.bags.forEach(b=>[['w','Wholesale',o.wMargin],['r','Retail',o.rMargin]].forEach(([k,n,m])=>{const p=b['a'+k];if(!ok(p))return;
     rows.push({l,b,n,p,m,zero:prVolFor(p,b,0,ctx.ohMonth),tgt:prVolFor(p,b,m,ctx.ohMonth)})})));
   rows.sort((x,y)=>(y.tgt??1e9)-(x.tgt??1e9));
   const vol=v=>v==null?'<span class="dangerTxt">never</span>':ok(v)?`${Math.round(v).toLocaleString()} lb`:'—';
@@ -3099,7 +3124,8 @@ let prOpen={cost:false,tiers:false};
 const infoTip=t=>`<i class="info">i<span class="tip">${t}</span></i>`;
 function renderPrPrices(o,ctx){const q=normName($('#prSearch').value);
   const list=INV.filter(l=>invLeft(l)>0.001&&(!q||normName([l.name,l.origin,l.lot].join(' ')).includes(q)));
-  if(!list.find(l=>l.id===prSel))prSel=list[0]?.id||null;
+  const blends=o.blends.filter(b=>!q||normName(b.name+' '+prBlendLine(b)).includes(q));
+  if(!list.find(l=>l.id===prSel)&&!blends.find(b=>prBlendSel(b)===prSel))prSel=list[0]?.id||(blends[0]?prBlendSel(blends[0]):null);
   const T=prT(o);
   $('#prBar').innerHTML=`<b>Your prices</b><span class="muted">per bag</span><span class="sp"></span><span class="muted">Margin</span>
     <select id="prBasisSel"><option value="gross" ${o.basis!=='net'?'selected':''}>Gross — before rent</option><option value="net" ${o.basis==='net'?'selected':''}>After overhead</option></select>
@@ -3108,25 +3134,35 @@ function renderPrPrices(o,ctx){const q=normName($('#prSearch').value);
   $('#prBasisSel').onchange=e=>{const p=PRC();p.basis=e.target.value;savePR(p);renderPricing()};
   const one=(b,k)=>{const a=b['a'+k];if(!ok(a))return '<span class="notset">—</span>';const m=b['m'+k],low=m<(k==='w'?T.w:T.r)-0.05;
     return `<span class="${low?'plow':''}" title="${b.lb!==1?money(a/b.lb)+' / lb · ':''}${ok(m)?m.toFixed(0)+' % margin':''}">${money(a)}</span>`};
-  $('#prRows').innerHTML=list.map(l=>{const c=prCalc(l,o,ctx);
+  const prices=c=>`<td class="wr"><span class="ptc"><b class="ppill w">Wholesale</b></span><span class="ptc"><b class="ppill r">Retail</b></span></td>${c.bags.map(b=>`<td class="n prc wr">${one(b,'w')}${one(b,'r')}</td>`).join('')}`;
+  $('#prRows').innerHTML=(blends.length&&list.length?'<tr class="grp"><td colspan="5">Single origins</td></tr>':'')+list.map(l=>{const c=prCalc(l,o,ctx);
     return `<tr class="${l.id===prSel?'sel':''}" data-id="${l.id}"><td><b>${esc(l.name)}</b><div class="muted" style="font-size:var(--fs-sm)">${esc([l.origin,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></td>
-      ${c.hasPrice?`<td class="wr"><span class="ptc"><b class="ppill w">Wholesale</b></span><span class="ptc"><b class="ppill r">Retail</b></span></td>${c.bags.map(b=>`<td class="n prc wr">${one(b,'w')}${one(b,'r')}</td>`).join('')}`:'<td colspan="4" class="muted">No green price yet — add it on the Green coffee screen</td>'}</tr>`}).join('');
-  $('#prEmpty').innerHTML=list.length?`<div class="prlegend"><span><b style="color:var(--text)">Black</b> = your price</span><span class="plow">Red = below target</span><span>— = not set yet</span><span class="sp"></span>
+      ${c.hasPrice?prices(c):'<td colspan="4" class="muted">No green price yet — add it on the Green coffee screen</td>'}</tr>`}).join('')
+    +(blends.length?'<tr class="grp"><td colspan="5">Blends</td></tr>':'')+blends.map(bl=>{const c=prBlendCalc(bl,o,ctx),id=prBlendSel(bl);
+    return `<tr class="${id===prSel?'sel':''}" data-id="${id}"><td><b>${esc(bl.name)}</b><div class="muted" style="font-size:var(--fs-sm)">${esc(prBlendLine(bl))||'No coffees yet'}</div></td>
+      ${c.hasPrice?prices(c):`<td colspan="4" class="muted">${c.missing.length?esc(c.missing.map(p=>p.name||p.key).join(', '))+' — no green price yet':'Recipe not finished'}</td>`}</tr>`}).join('');
+  $('#prEmpty').innerHTML=list.length||blends.length?`<div class="prlegend"><span><b style="color:var(--text)">Black</b> = your price</span><span class="plow">Red = below target</span><span>— = not set yet</span><span class="sp"></span>
     ${infoTip(`Only the prices you’ve set show here. Pick a coffee and type its prices in the card on the right — it also shows the suggested price, price per lb and both margins.<br><br><b>Margin is not markup.</b> Margin is the share of the price you keep. A $10 cost at ${num(T.w)} % margin sells for ${money(10/(1-T.w/100))}, not ${money(10*(1+T.w/100))}.`)}</div>`
     :`<div class="empty">No green coffee in stock.<br>Add coffee on the Green coffee screen, with its price per lb, to see prices here.</div>`;
   renderPrDetail(o,ctx)}
 
-function renderPrDetail(o,ctx){const el=$('#prDetail'),l=INV.find(x=>x.id===prSel);if(!l){el.innerHTML='<div class="empty">Pick a coffee to see its costs.</div>';return}
-  const c=prCalc(l,o,ctx),key=prKey(l);
-  if(!c.hasPrice){el.innerHTML=`<div class="dtitle">${esc(l.name)}</div><div class="empty">This lot has no green price yet.<br>Add its price per lb on the Green coffee screen.</div>`;return}
+function renderPrDetail(o,ctx){const el=$('#prDetail'),bl=String(prSel||'').startsWith('b:')?o.blends.find(b=>prBlendSel(b)===prSel):null,l=bl?{name:bl.name}:INV.find(x=>x.id===prSel);
+  if(!l){el.innerHTML='<div class="empty">Pick a coffee to see its costs.</div>';return}
+  const c=bl?prBlendCalc(bl,o,ctx):prCalc(l,o,ctx),key=bl?prBlendKey(bl):prKey(l);
+  const head=bl?prRecipeHtml(bl,c):`<div><div class="dtitle">${esc(l.name)}</div><div class="muted">${esc([l.origin,l.process,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></div>`;
+  if(!c.hasPrice){el.innerHTML=bl?head+`<div class="empty" style="padding:16px">${!c.parts.length?'Add the coffees in this blend and their share.':c.missing.length?`${esc(c.missing.map(p=>p.name||p.key).join(', '))} ${c.missing.length===1?'has':'have'} no green price yet.<br>Add it on the Green coffee screen.`:'Give each coffee its share of the blend.'}</div><div class="row"><span class="sp"></span><button class="sm dangerTxt" id="blDel">Delete blend</button></div>`:`<div class="dtitle">${esc(l.name)}</div><div class="empty">This lot has no green price yet.<br>Add its price per lb on the Green coffee screen.</div>`;bl&&prRecipeWire(el,bl);return}
   const COL={coffee:'var(--p-coffee)',overhead:'var(--p-over)',labor:'var(--p-labor)',pack:'var(--p-bag)'},NAME={coffee:'Coffee',overhead:'Overhead',labor:'Labor',pack:'Bag & label'};
   const tg=(m,t)=>ok(m)?`<span class="${m<t-0.05?'plow':''}">${m.toFixed(0)} %</span>`:'—';
   const lab=ctx.labPerLb||0,per=c.coffee+(ctx.ohPerLb||0)+lab;
-  el.innerHTML=`<div><div class="dtitle">${esc(l.name)}</div><div class="muted">${esc([l.origin,l.process,l.lot&&'lot '+l.lot].filter(Boolean).join(' · '))}</div></div>
+  el.innerHTML=`${head}
     <div><button class="costhead ${prOpen.cost?'open':''}" id="prCostTg"><span class="chev">▸</span><span>True cost per lb roasted</span><span class="sp"></span><b class="tnum" style="font-size:calc(17px*var(--ts,1))">${money(c.perLb)}</b></button>
       <div class="stack" style="margin-top:8px"><i style="width:${c.coffee/per*100}%;background:${COL.coffee}"></i><i style="width:${(ctx.ohPerLb||0)/per*100}%;background:${COL.overhead}"></i><i style="width:${lab/per*100}%;background:${COL.labor}"></i></div>
       <div class="row" style="gap:14px;font-size:var(--fs-sm);margin-top:6px">${['coffee','overhead','labor'].map(x=>`<span class="row" style="gap:5px"><i style="width:9px;height:9px;border-radius:2px;background:${COL[x]}"></i><span class="muted">${NAME[x]}</span> <b class="tnum">${money(x==='coffee'?c.coffee:x==='overhead'?ctx.ohPerLb:lab)}</b></span>`).join('')}</div>
-      ${prOpen.cost?`<div style="margin-top:8px"><div class="kv"><span>Green, landed</span><b class="tnum">${money(num(l.price))}${num(l.freight)?' + '+money(num(l.freight))+' freight':''}${Number(PRW.green)?' '+(PRW.green>0?'+':'−')+' '+money(Math.abs(PRW.green))+' what-if':''} = ${money(c.landed)} / lb</b></div>
+      ${prOpen.cost&&bl?`<div style="margin-top:8px">${c.parts.filter(p=>p.ok&&p.pct>0).map(p=>`<div class="kv"><span>${esc(p.name||p.key)} <span class="muted">· ${num(p.pct)} % · ${money(p.c.coffee)} / lb roasted, ${p.c.loss.toFixed(1)} % loss</span></span><b class="tnum">${money(p.pct/c.tot*p.c.coffee)}</b></div>`).join('')}
+        <div class="kv"><span>Coffee per lb of blend <span class="muted">(each coffee’s own weight loss, incl. ${num(o.waste)||0} % waste)</span></span><b class="tnum">${money(c.coffee)}</b></div>
+        <div class="kv"><span>Overhead per lb</span><b class="tnum">${money(ctx.ohPerLb)}</b></div>
+        <div class="kv" style="border:0"><span>Roasting labor per lb</span><b class="tnum">${money(lab)}</b></div></div>`:''}
+      ${prOpen.cost&&!bl?`<div style="margin-top:8px"><div class="kv"><span>Green, landed</span><b class="tnum">${money(num(l.price))}${num(l.freight)?' + '+money(num(l.freight))+' freight':''}${Number(PRW.green)?' '+(PRW.green>0?'+':'−')+' '+money(Math.abs(PRW.green))+' what-if':''} = ${money(c.landed)} / lb</b></div>
         <div class="kv"><span>Weight loss</span><b class="tnum">${c.loss.toFixed(1)} % ${c.lossN?`<span class="muted">· avg of last ${c.lossN} roast${c.lossN===1?'':'s'}</span>`:'<span class="muted">· default, no roasts yet</span>'}</b></div>
         <div class="kv"><span>Coffee per lb roasted <span class="muted">(incl. ${num(o.waste)||0} % waste)</span></span><b class="tnum">${money(c.coffee)}</b></div>
         <div class="kv"><span>Overhead per lb</span><b class="tnum">${money(ctx.ohPerLb)}</b></div>
@@ -3138,11 +3174,36 @@ function renderPrDetail(o,ctx){const el=$('#prDetail'),l=INV.find(x=>x.id===prSe
       </div>`).join('')}
     ${o.tiers.length>1?`<div><button class="fold" id="prTierTg">${prOpen.tiers?'▾':'▸'} Wholesale volume pricing</button>${prOpen.tiers?`<table class="mini" style="margin-top:6px"><thead><tr><th>Tier</th>${c.bags.map(b=>`<th class="n">${b.label}</th>`).join('')}<th class="n">${prT(o).name==='gross'?'Gross':'After OH'} (12 oz)</th></tr></thead><tbody>${o.tiers.map(t=>{const f=1-(num(t.off)||0)/100,p0=c.bags[0].w*f,c0=o.basis==='net'?c.bags[0].cost:c.bags[0].gcost,m=p0>0?(p0-c0)/p0*100:null;
       return `<tr><td>${esc(t.name)}${num(t.off)?` <span class="muted">−${num(t.off)} %</span>`:''}</td>${c.bags.map(b=>`<td class="n">${money(b.w*f)}</td>`).join('')}<td class="n">${tg(m,prT(o).w)}</td></tr>`}).join('')}</tbody></table>`:''}</div>`:''}
-    <div class="row muted" style="font-size:var(--fs-sm);gap:8px">${infoTip(`Your prices are kept for “${esc(l.name)}” and carry over to its next lot. Leave a box empty until you’ve decided — the list on the left shows only prices you’ve set.<br><br>Targets — gross: wholesale ${num(o.gwMargin)} %, retail ${num(o.grMargin)} % · after overhead: wholesale ${num(o.wMargin)} %, retail ${num(o.rMargin)} %.`)}<span>How these numbers work</span></div>`;
+    <div class="row muted" style="font-size:var(--fs-sm);gap:8px">${infoTip(`Your prices are kept for “${esc(l.name)}” and carry over to its next lot. Leave a box empty until you’ve decided — the list on the left shows only prices you’ve set.<br><br>Targets — gross: wholesale ${num(o.gwMargin)} %, retail ${num(o.grMargin)} % · after overhead: wholesale ${num(o.wMargin)} %, retail ${num(o.rMargin)} %.`)}<span>How these numbers work</span>${bl?'<span class="sp"></span><button class="sm dangerTxt" id="blDel">Delete blend</button>':''}</div>`;
   $('#prCostTg').onclick=()=>{prOpen.cost=!prOpen.cost;renderPrDetail(o,ctx)};
   if($('#prTierTg'))$('#prTierTg').onclick=()=>{prOpen.tiers=!prOpen.tiers;renderPrDetail(o,ctx)};
   $$('[data-act]',el).forEach(i=>i.onchange=()=>{const [bk,t]=i.dataset.act.split(':'),v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter the price as a number, e.g. 12.50');return}
-    const p=PRC(),a=p.actual[key]=p.actual[key]||{},b=a[bk]=a[bk]||{};if(ok(v))b[t]=v;else delete b[t];savePR(p);renderPricing()})}
+    const p=PRC(),a=p.actual[key]=p.actual[key]||{},b=a[bk]=a[bk]||{};if(ok(v))b[t]=v;else delete b[t];savePR(p);renderPricing()});
+  bl&&prRecipeWire(el,bl)}
+
+/* Blend recipe card (top of the blend detail): name, coffees and shares. */
+function prRecipeHtml(bl,c){const names=[...new Map(INV.filter(l=>ok(num(l.price))||invLeft(l)>0.001).map(l=>[prKey(l),l.name])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+  const opts=cur=>names.map(([k,n])=>`<option value="${esc(k)}" ${k===cur?'selected':''}>${esc(n)}</option>`).join('')+(cur&&!names.some(([k])=>k===cur)?`<option value="${esc(cur)}" selected>${esc(cur)} (not in stock)</option>`:'');
+  const off=Math.abs(c.tot-100)>0.05;
+  return `<div class="row" style="gap:var(--sp-2)"><input id="blName" value="${esc(bl.name)}" style="font-size:var(--fs-title);font-weight:600;padding:4px 8px;flex:1"><span class="badge">Blend</span></div>
+  <div class="recipe"><div class="rcrow h"><span>Coffee</span><span class="n">Share</span><span class="n">Cost / lb</span><span></span></div>
+    ${c.parts.map((p,i)=>`<div class="rcrow"><select data-bl="${i}:key">${opts(p.key)}</select><span class="rcpct"><input data-bl="${i}:pct" inputmode="decimal" value="${p.pct||''}" placeholder="0"><span class="muted">%</span></span>
+      <span class="n tnum">${p.ok?money(p.c.coffee):'<span class="muted">no price</span>'}</span><button class="sm" data-bldel="${i}" title="Remove">×</button></div>`).join('')}
+    <div class="rcsum"><button class="sm" id="blAdd">+ Add coffee</button><span class="sp"></span>${c.parts.length?`<span class="muted">Total</span><b class="tnum ${off?'dangerTxt':''}">${+c.tot.toFixed(1)} %</b>${off?'<span class="dangerTxt">should be 100 %</span>':''}`:''}</div>
+    <div class="muted" style="font-size:var(--fs-sm)">Blended after roasting: each coffee is costed with its own green price and weight loss. Cost / lb = per lb roasted.</div></div>`}
+function prRecipeWire(el,bl){const upd=f=>{const p=PRC(),b=p.blends.find(x=>x.id===bl.id);if(!b)return;f(b);savePR(p);renderPricing()};
+  $('#blName',el).onchange=e=>{const v=e.target.value.trim();if(!v){e.target.value=bl.name;return}upd(b=>b.name=v)};
+  $$('[data-bl]',el).forEach(i=>i.onchange=()=>{const [ix,f]=i.dataset.bl.split(':');
+    if(f==='key'){const l=prLotFor(i.value);upd(b=>{b.parts[ix].key=i.value;b.parts[ix].name=l?l.name:i.value})}
+    else{const v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter the share as a number, e.g. 60');return}upd(b=>b.parts[ix].pct=ok(v)?v:0)}});
+  $$('[data-bldel]',el).forEach(x=>x.onclick=()=>upd(b=>b.parts.splice(Number(x.dataset.bldel),1)));
+  $('#blAdd',el).onclick=()=>{const used=new Set(bl.parts.map(p=>p.key)),l=INV.find(x=>invLeft(x)>0.001&&ok(num(x.price))&&!used.has(prKey(x)));
+    if(!l){toast('No other coffee in stock with a green price');return}const rest=Math.max(0,100-bl.parts.reduce((a,p)=>a+(num(p.pct)||0),0));
+    upd(b=>b.parts.push({key:prKey(l),name:l.name,pct:rest}))};
+  const del=$('#blDel',el);if(del)del.onclick=async()=>{if(!await ask('Delete this blend?',`“${esc(bl.name)}” and the prices you set for it will be removed. Your green coffee and roasts are not changed.`,'Delete',true))return;
+    const p=PRC();p.blends=p.blends.filter(x=>x.id!==bl.id);delete p.actual[prBlendKey(bl)];prSel=null;savePR(p);renderPricing()}}
+function prNewBlend(){const p=PRC(),n=p.blends.length+1,b={id:Date.now().toString(36),name:n===1?'House Blend':'New blend '+n,parts:[]};
+  p.blends.push(b);savePR(p);prView='prices';prSel=prBlendSel(b);renderPricing();setTimeout(()=>{const i=$('#blName');i&&(i.focus(),i.select())},30)}
 
 function renderPrCosts(o,ctx){const el=$('#prCosts');
   const inp=(path,v,w='110px',ph='')=>`<input data-pr="${path}" inputmode="decimal" value="${ok(num(v))?v:''}" placeholder="${ph}" style="width:${w}">`;
@@ -3189,7 +3250,9 @@ function renderPrCosts(o,ctx){const el=$('#prCosts');
   $('#prTierAdd').onclick=()=>{const p=PRC(),last=p.tiers.at(-1)||{minLb:0,off:0};p.tiers.push({name:'New tier',minLb:(num(last.minLb)||0)+10,off:(num(last.off)||0)+5});savePR(p);renderPricing()}}
 
 function priceSheet(){const o=PRC(),saveW=PRW;PRW={days:null,green:0};const ctx0=prContext(o);
-  const rows=INV.filter(l=>invLeft(l)>0.001&&ok(num(l.price))).map(l=>({l,c:prCalc(l,o,ctx0)})).filter(x=>x.c.bags.some(b=>ok(b.aw)));PRW=saveW;
+  const rows=INV.filter(l=>invLeft(l)>0.001&&ok(num(l.price))).map(l=>({l,c:prCalc(l,o,ctx0)})).filter(x=>x.c.bags.some(b=>ok(b.aw)));
+  const brows=o.blends.map(bl=>({l:{name:bl.name,origin:'Blend',process:[...new Set((bl.parts||[]).filter(p=>num(p.pct)>0).map(p=>{const l=prLotFor(p.key);return (l&&l.origin||p.name||'').split(' · ')[0]}))].filter(Boolean).join(', ')},c:prBlendCalc(bl,o,ctx0)})).filter(x=>x.c.hasPrice&&x.c.bags.some(b=>ok(b.aw)));
+  rows.push(...brows);PRW=saveW;
   if(!rows.length){toast('Set your wholesale prices first — the sheet only lists prices you’ve set');return}
   const biz=cfg.bizName||'Wholesale',d=new Date().toLocaleDateString([], {month:'long',day:'numeric',year:'numeric'});
   const tiers=o.tiers.filter(t=>num(t.off)>0);
@@ -3565,7 +3628,7 @@ async function init(){
   $('#gView').onclick=e=>{const b=e.target.closest('button');if(b)setGView(b.dataset.v)};$('#gYearSel').onchange=e=>{gYear=Number(e.target.value);renderYear()};$('#btnYearCsv').onclick=()=>download(`green_use_${gYear}.csv`,yearCSV());
   $('#btnAddGreen').onclick=()=>{gMode='add';renderGreen()};$('#btnInvCsv').onclick=()=>download('green_inventory_'+new Date().toISOString().slice(0,10)+'.csv',invCSV());
   $('#prView').onclick=e=>{const b=e.target.closest('button');if(b){prView=b.dataset.v;renderPricing()}};$('#prSearch').oninput=renderPricing;
-  $('#prRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){prSel=tr.dataset.id;renderPricing()}};$('#btnPrSheet').onclick=priceSheet;
+  $('#prRows').onclick=e=>{const tr=e.target.closest('tr[data-id]');if(tr){prSel=tr.dataset.id;renderPricing()}};$('#btnPrSheet').onclick=priceSheet;$('#btnPrBlend').onclick=prNewBlend;
   $('#cRows').onclick=e=>{const tr=e.target.closest('tr');if(tr){selSession=tr.dataset.id;selSample=0;cupMode='view';renderCupping()}};
   $('#btnNewSession').onclick=()=>{cupMode='new';renderCupping()};$('#btnCupCsv').onclick=()=>download('cupping_'+new Date().toISOString().slice(0,10)+'.csv',cupCSV());
   window.addEventListener('beforeunload',e=>{if(S.recording||(S.dirty&&S.roast.samples.length&&!S.viewingId)){e.preventDefault();e.returnValue=''}});
