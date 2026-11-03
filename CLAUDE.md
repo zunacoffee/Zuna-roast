@@ -30,7 +30,7 @@ Release history with technical notes: `CHANGELOG.md`. Open questions and unteste
 6. Add the release to `CHANGELOG.md`, update the "Latest release" line in the project doc `claude/CURRENT-VERSION.md`, and update `claude/OPEN-ITEMS.md`.
 
 ## Screenshots for review
-Headless Chrome (Playwright) on `app/index.html` at iMac 2240×1260, 13" iPad 1366×1024 (`?ipad=1`), iPhone 393×852 (`?iphone=1`). Load demo data through History › Import (a full backup JSON) and run the built-in simulator at 10× for a live-roast shot. Compare before and after for every device the shared file affects. Don't check the 10.5"/11" compact iPad (`ipc`) — Ty stopped using it.
+Headless Chrome (Playwright) on `app/index.html` at iMac 2240×1260, MacBook 1728×1050 (16" Pro, maximized window; since 1.0.37 the MacBook is Ty's roasting Mac — no iMac for now), 13" iPad 1366×1024 (`?ipad=1`), iPhone 393×852 (`?iphone=1`). Load demo data through History › Import (a full backup JSON) and run the built-in simulator at 10× for a live-roast shot. Compare before and after for every device the shared file affects. Don't check the 10.5"/11" compact iPad (`ipc`) — Ty stopped using it.
 
 ## Rules Ty cares about
 - Never change the data folder layout or file names; new roast fields must be optional so old roasts still open.
