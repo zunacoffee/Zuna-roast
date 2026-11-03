@@ -144,6 +144,7 @@ canvas{display:block;width:100%;height:100%}
 .rpTable{display:flex;flex-direction:column;min-height:0;overflow:hidden;flex:0 1 auto}
 .rpTable>.scroll{min-height:0}
 .rpTh{padding:var(--sp-3) var(--sp-4)}
+.rpMarksCard{margin-top:var(--sp-4,16px)}
 .rpt td small{display:block;color:var(--text2);font-size:var(--fs-sm);margin-top:1px}
 .rpt tr.tot td{font-weight:600;border-top:1.5px solid var(--text);border-bottom:0;background:var(--soft)}
 .rpt tbody tr.tot,.rpt tbody tr.rpOpen{cursor:default}
@@ -4353,9 +4354,15 @@ function rpRange(){const now=new Date(),t=rd0(now);let from,to,unit=null;
 /* ---------- production ---------- */
 const rpRoasts=(a,b)=>HIST.filter(r=>r.meta&&r.samples&&r.samples.length&&(d=>d>=a&&d<b)(rDate(r))).sort((x,y)=>rDate(x)-rDate(y));
 const rpMean=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
-function rpGroup(name){return {name,key:'',batch:null,rs:[],n:0,g:0,gw:0,ww:0,wh:[],gr:[],sp:[],cost:0,cw:0,cww:0,noPrice:0,origin:'',process:'',lots:new Set()}}
+/* bean temp checkpoints: bean temp at 2, 4, 6 and 8 minutes after Charge (interpolated); none past Drop or the end of the data */
+const RP_MARKS=[120,240,360,480];
+function btAt(r,sec){const ev=r.events||{},c=ev.CHARGE,a=r.samples;if(c==null||!a||!a.length)return null;const t=c+sec;
+  if(ev.DROP!=null&&t>ev.DROP)return null;if(t>a.at(-1).t||t<a[0].t)return null;let lo=0,hi=a.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(a[m].t<t)lo=m;else hi=m}
+  const p=a[lo],q=a[hi];if(!ok(p.bt)||!ok(q.bt))return ok(p.bt)?p.bt:ok(q.bt)?q.bt:null;return q.t===p.t?p.bt:p.bt+(q.bt-p.bt)*(t-p.t)/(q.t-p.t)}
+const rpMarkHead=()=>RP_MARKS.map(m=>`<th class="n">${mmss(m)}</th>`).join('');
+function rpGroup(name){return {name,key:'',batch:null,rs:[],n:0,g:0,gw:0,ww:0,wh:[],gr:[],sp:[],bm:RP_MARKS.map(()=>[]),cost:0,cw:0,cww:0,noPrice:0,origin:'',process:'',lots:new Set()}}
 function rpAdd(o,r){const m=r.meta,g=num(m.green)||0,w=num(m.roasted),p=priceOf(m.invId),sp=spreadOf(m),wh=num(m.colorWhole),gr=num(m.colorGround);
-  o.rs.push(r);o.n++;o.g+=g;if(ok(w)&&g>0){o.gw+=g;o.ww+=w}if(ok(wh))o.wh.push(wh);if(ok(gr))o.gr.push(gr);if(ok(sp))o.sp.push(sp);
+  RP_MARKS.forEach((m,i)=>{const v=btAt(r,m);if(ok(v))o.bm[i].push(v)});o.rs.push(r);o.n++;o.g+=g;if(ok(w)&&g>0){o.gw+=g;o.ww+=w}if(ok(wh))o.wh.push(wh);if(ok(gr))o.gr.push(gr);if(ok(sp))o.sp.push(sp);
   if(ok(p)&&g){o.cost+=p*g;if(ok(w)&&w>0){o.cw+=p*g;o.cww+=w}}else o.noPrice++;if(m.invId)o.lots.add(m.invId)}
 /* batch sizes within 12 % are one size (13 lb vs 25 lb); a size is named by its most common batch */
 function rpBatches(rs){const v=[...new Set(rs.map(r=>num(r.meta.green)).filter(ok))].sort((a,b)=>a-b),cl=[];
@@ -4408,10 +4415,13 @@ function rpProdTable(P,opt={}){const sel=opt.sel,spC=v=>ok(v)?(opt.paper?rpNum(v
     <td class="n">${rpNum(rpMean(o.wh))}</td><td class="n">${rpNum(rpMean(o.gr))}</td><td class="n">${spC(rpMean(o.sp))}</td><td class="n">${o.cost?money(o.cost):DASH}</td><td class="n">${ok(rpPerLb(o))?money(rpPerLb(o)):DASH}</td></tr>`;
   return `<table class="rpt"><thead><tr><th>Coffee</th><th class="n">Roasts</th><th class="n">Green in</th><th class="n">Roasted out</th><th class="n">Avg loss</th><th class="n">Avg whole</th><th class="n">Avg ground</th><th class="n">Avg spread</th><th class="n">Green cost</th><th class="n">Per roasted lb</th></tr></thead><tbody>
     ${P.groups.map(o=>row(o,o.key===sel?'sel':'',opt.paper?'':`data-g="${esc(o.key)}"`)).join('')}${P.groups.length>1||opt.paper?row(P.tot,'tot'):''}</tbody></table>`}
-function rpRoastRows(rs,opt={}){return `<table class="rpt rpRoasts"><thead><tr><th>Roast</th><th>Date</th>${opt.name?'<th>Profile</th>':''}<th class="n">Green</th><th class="n">Roasted</th><th class="n">Loss</th><th class="n">Whole</th><th class="n">Ground</th><th class="n">Spread</th><th class="n">Cost</th>${opt.paper?'':'<th></th>'}</tr></thead><tbody>
+function rpMarksTable(P,opt={}){const cell=a=>{if(!a.length)return DASH;const mn=Math.min(...a),mx=Math.max(...a);return `${fT(rpMean(a))}${!opt.paper&&a.length>1&&toD(mx)-toD(mn)>=0.95?`<small>${fT(mn)} – ${fT(mx)}</small>`:''}`};
+  const row=(o,cls)=>`<tr class="${cls||''}"><td>${o===P.tot?'All coffees':`<b>${rpGName(o)}</b>`}</td>${o.bm.map(a=>`<td class="n">${cell(a)}</td>`).join('')}</tr>`;
+  return `<table class="rpt rpMarks"><thead><tr><th>Coffee</th>${rpMarkHead()}</tr></thead><tbody>${P.groups.map(o=>row(o)).join('')}${P.groups.length>1?row(P.tot,'tot'):''}</tbody></table>`}
+function rpRoastRows(rs,opt={}){return `<table class="rpt rpRoasts"><thead><tr><th>Roast</th><th>Date</th>${opt.name?'<th>Profile</th>':''}<th class="n">Green</th><th class="n">Roasted</th><th class="n">Loss</th><th class="n">Whole</th><th class="n">Ground</th><th class="n">Spread</th>${rpMarkHead()}${opt.paper?'<th class="n">Cost</th>':''}</tr></thead><tbody>
   ${rs.map(r=>{const m=r.meta,s=r.summary||summarize(r),sp=spreadOf(m),c=costOf(r);return `<tr ${opt.paper?'':`data-sheet="${r.id}"`}><td><b>#${r.num}</b>${r.isProfile?' ★':''}</td><td>${fmtDate(r.chargedAt||r.created,false)}</td>${opt.name?`<td>${esc(m.name||'')}</td>`:''}
     <td class="n">${fGreen(m.green)}</td><td class="n">${fRoasted(m.roasted)}</td><td class="n">${ok(s.loss)?rpNum(s.loss)+' %':DASH}</td><td class="n">${fAg(m.colorWhole)}</td><td class="n">${fAg(m.colorGround)}</td>
-    <td class="n">${ok(sp)?(opt.paper?rpNum(sp):rpSp(sp)):DASH}</td><td class="n">${c&&ok(c.batch)?money(c.batch):DASH}</td>${opt.paper?'':'<td class="n"><button class="q sm" tabindex="-1">Roast sheet</button></td>'}</tr>`}).join('')}</tbody></table>`}
+    <td class="n">${ok(sp)?(opt.paper?rpNum(sp):rpSp(sp)):DASH}</td>${RP_MARKS.map(mk=>`<td class="n">${(v=>ok(v)?fT(v):DASH)(btAt(r,mk))}</td>`).join('')}${opt.paper?`<td class="n">${c&&ok(c.batch)?money(c.batch):DASH}</td>`:''}</tr>`}).join('')}</tbody></table>`}
 
 /* ---------- inventory ---------- */
 function rpLotEvents(l){const ev=[],hasAdjPrice=(l.adj||[]).some(a=>ok(num(a.price)));
@@ -4487,7 +4497,10 @@ function roastSheetHtml(r){const m=r.meta,s=r.summary||summarize(r),ev=r.events|
   <div class="pdTitle"><h2>${esc(m.name||'Untitled')}${r.isProfile?' <span class="pdStar">★ Profile</span>':''}</h2><div class="pdMeta">${m.coffee?`<span>Coffee <b>${esc(m.coffee)}</b></span>`:''}${m.lot?`<span>Lot <b>${esc(m.lot)}</b></span>`:''}<span>Batch <b>${fGreen(m.green)} lb</b></span>${bg?`<span>Background <b>${esc(rTag(bg))} ${esc(bg.meta.name||'')}</b></span>`:''}</div></div>
   <div class="pdChart">${rsChart(r,bg,720,300,P)}<div class="pdLegend"><span><i style="background:${P.bt}"></i>Bean temp</span>${bg?`<span><i class="dash" style="border-color:${P.bkg}"></i>Background ${esc(rTag(bg))}</span>`:''}<span><i style="background:${P.ror}"></i>RoR</span><span><i style="background:${P.burner}"></i>Burner</span><span><i style="background:${P.air}"></i>Air</span></div></div>
   <div class="pd2"><div><div class="pdH">Events</div><table class="pdT2"><thead><tr><th>Event</th><th class="n">Time</th><th class="n">Bean °${cfg.unit}</th>${bg?`<th class="n">vs ${esc(rTag(bg))}</th>`:''}</tr></thead><tbody>${evRows||`<tr><td colspan="4">No events marked.</td></tr>`}</tbody></table>
-      ${kv('Development after FC',mmss(s.dev))}${kv('Total time',mmss(s.drop))}</div>
+      ${kv('Development after FC',mmss(s.dev))}${kv('Total time',mmss(s.drop))}
+      <div class="pdH" style="margin-top:10px">Bean temp at 2 · 4 · 6 · 8 min</div><table class="pdT2 pdMk"><thead><tr><th>Time</th>${RP_MARKS.map(m=>`<th class="n">${mmss(m)}</th>`).join('')}</tr></thead><tbody>
+        <tr><td>This roast</td>${RP_MARKS.map(m=>`<td class="n">${(v=>ok(v)?fT(v):'—')(btAt(r,m))}</td>`).join('')}</tr>
+        ${bg?`<tr><td>vs ${esc(rTag(bg))}</td>${RP_MARKS.map(m=>{const a=btAt(r,m),b=btAt(bg,m);if(!ok(a)||!ok(b))return '<td class="n">—</td>';const d=toD(a)-toD(b);return `<td class="n">${Math.abs(d)<0.05?'0.0':(d>0?'+':'−')+Math.abs(d).toFixed(1)}</td>`}).join('')}</tr>`:''}</tbody></table></div>
     <div><div class="pdH">Burner and air changes</div><table class="pdT2"><thead><tr><th>Time</th><th>Change</th></tr></thead><tbody>${adj.length?adj.map(a=>`<tr><td class="tnum">${mmss(a.t-o)}</td><td>${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}${a.key==='drum'?'':' %'}</td></tr>`).join(''):'<tr><td colspan="2">No changes during the roast.</td></tr>'}</tbody></table>
       ${bg&&bgAdj.length?`<div class="pdSmall">Background ${esc(rTag(bg))}: ${bgAdj.map(a=>`${mmss(a.t-bo)} ${a.label.toLowerCase()} ${Math.round(a.to)}`).join(' · ')}</div>`:''}</div></div>
   <div class="pd3"><div><div class="pdH">Weights</div>${kv('Green',fGreen(m.green)+' lb')}${kv('Roasted',fRoasted(m.roasted)+' lb')}${kv('Loss',ok(s.loss)?rpNum(s.loss)+' %':'—')}</div>
@@ -4502,6 +4515,7 @@ function rpProdDoc(R,P,Q){const C=rpPaperCols(),B=rpBuckets(R,P.rs),tl=rpTiles(P
   return `<div class="paperDoc">${rpBizHead({sub:'Production report',title:esc(R.label),line:`${P.tot.n} roast${P.tot.n===1?'':'s'}${RP.by==='batch'?' · by coffee and batch size':' · by coffee'}`})}
   <div class="pdTiles">${tl.map(t=>`<div><span>${t[0]}</span><b>${t[1]}${t[2]?` <small>${t[2]}</small>`:''}</b>${t[3].replace('class="delta"','class="pdD"')}</div>`).join('')}</div>
   ${rpProdTable(P,{paper:1})}
+  <div class="pdH" style="margin-top:14px">Bean temp at 2, 4, 6 and 8 minutes (°${cfg.unit} after Charge, average)</div>${rpMarksTable(P,{paper:1})}
   <div class="pdH" style="margin-top:14px">Green roasted by ${B.mode}</div>${rpBarsSvg(B.list,720,180,C)}
   ${P.groups.map(o=>`<div class="pdGroup"><div class="pdH">${rpGName(o)} · ${o.n} roast${o.n===1?'':'s'}</div>${rpRoastRows(o.rs,{paper:1,name:1})}</div>`).join('')}
   <div class="pdSmall">Weights in lb. Colors are Agtron averages of the roasts that have them. Green cost uses each lot’s green price. ★ = saved profile.</div>${rpFoot()}</div>`}
@@ -4519,10 +4533,11 @@ const rpFileDate=R=>rdIso(R.from)+'_to_'+rdIso(rdAdd(R.end,-1));
 
 /* ---------- CSV ---------- */
 function rpProdCSV(R,P){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,n=(v,d=2)=>ok(v)?v.toFixed(d):'',rows=[`# Production ${R.label} (${rdIso(R.from)} to ${rdIso(rdAdd(R.end,-1))})`];
-  rows.push(['coffee','batch_lb','roasts','green_lb','roasted_lb','avg_loss_pct','avg_whole','avg_ground','avg_spread','green_cost','cost_per_roasted_lb','roasts_without_price'].join(','));
-  for(const o of [...P.groups,P.tot])rows.push([q(o===P.tot?'All coffees':o.name),o.batch??'',o.n,n(o.g),n(o.ww),n(rpLoss(o)),n(rpMean(o.wh),1),n(rpMean(o.gr),1),n(rpMean(o.sp),1),n(o.cost),n(rpPerLb(o)),o.noPrice].join(','));
-  rows.push('');rows.push(['roast','date','coffee','profile','green_lb','roasted_lb','loss_pct','whole','ground','spread','green_cost','profile_mark'].join(','));
-  for(const r of P.rs){const m=r.meta,s=r.summary||summarize(r),c=costOf(r);rows.push([r.num,rdIso(rDate(r)),q(m.coffee||''),q(m.name||''),m.green||'',m.roasted||'',n(s.loss),m.colorWhole||'',m.colorGround||'',spreadOf(m)??'',c&&ok(c.batch)?c.batch.toFixed(2):'',r.isProfile?'yes':''].join(','))}
+  const mk=RP_MARKS.map(m=>'bt_'+m/60+'min_'+cfg.unit),dv=v=>ok(v)?toD(v).toFixed(1):'';
+  rows.push(['coffee','batch_lb','roasts','green_lb','roasted_lb','avg_loss_pct','avg_whole','avg_ground','avg_spread',...mk.map(k=>'avg_'+k),'green_cost','cost_per_roasted_lb','roasts_without_price'].join(','));
+  for(const o of [...P.groups,P.tot])rows.push([q(o===P.tot?'All coffees':o.name),o.batch??'',o.n,n(o.g),n(o.ww),n(rpLoss(o)),n(rpMean(o.wh),1),n(rpMean(o.gr),1),n(rpMean(o.sp),1),...o.bm.map(a=>dv(rpMean(a))),n(o.cost),n(rpPerLb(o)),o.noPrice].join(','));
+  rows.push('');rows.push(['roast','date','coffee','profile','green_lb','roasted_lb','loss_pct','whole','ground','spread',...mk,'green_cost','profile_mark'].join(','));
+  for(const r of P.rs){const m=r.meta,s=r.summary||summarize(r),c=costOf(r);rows.push([r.num,rdIso(rDate(r)),q(m.coffee||''),q(m.name||''),m.green||'',m.roasted||'',n(s.loss),m.colorWhole||'',m.colorGround||'',spreadOf(m)??'',...RP_MARKS.map(x=>dv(btAt(r,x))),c&&ok(c.batch)?c.batch.toFixed(2):'',r.isProfile?'yes':''].join(','))}
   return rows.join('\n')}
 function rpInvCSV(R,I){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,n=v=>ok(v)?v.toFixed(2):'',rows=[`# Green coffee inventory ${R.label} (${rdIso(R.from)} to ${rdIso(rdAdd(R.end,-1))})`];
   rows.push(['lot','origin','process','on_hand_start','came_in','roasted','adjusted','on_hand_end','cost_in'].join(','));
@@ -4557,7 +4572,8 @@ function renderRpProd(el,R){const P=rpProd(R.from,R.end),Q=rpProd(R.prev.from,R.
   const tiles=`<div class="tiles rpTiles">${rpTiles(P,Q,R).map(t=>`<div class="card tile"><div class="l">${t[0]}</div><div class="v">${t[1]}${t[2]?`<small>${t[2]}</small>`:''}</div>${t[3]}</div>`).join('')}</div>`;
   if(!P.tot.n){el.innerHTML=`${tiles}<div class="card empty">No roasts in ${esc(R.label)}. Pick another range above.</div>`;return}
   const B=rpBuckets(R,P.rs),chart=`<div class="card rpChart"><div class="row"><div class="h3">Green roasted by ${B.mode}</div><span class="sp"></span><div class="seg" id="rpBars">${[['auto','Auto'],['day','Day'],['week','Week'],['month','Month']].map(([k,l])=>`<button data-b="${k}" class="${RP.bars===k?'on':''}">${l}</button>`).join('')}</div></div><div id="rpBarsBox" class="rpBarsBox"></div></div>`;
-  const table=`<div class="card rpTable"><div class="row rpTh"><div class="h3">${esc(R.label)}</div><span class="sp"></span>${by}</div><div class="scroll">${rpProdTable(P,{sel:ipd?null:RP.sel})}</div></div>`;
+  const table=`<div class="card rpTable"><div class="row rpTh"><div class="h3">${esc(R.label)}</div><span class="sp"></span>${by}</div><div class="scroll">${rpProdTable(P,{sel:ipd?null:RP.sel})}</div></div>`
+    +`<div class="card rpTable rpMarksCard"><div class="row rpTh"><div class="h3">Bean temp at 2, 4, 6 and 8 minutes</div><span class="sp"></span><span class="muted">°${cfg.unit} after Charge · average, with lowest – highest</span></div><div class="scroll">${rpMarksTable(P)}</div></div>`;
   const detail=sel&&!ipd?`<div class="card detail rpDet"><div><div class="dtitle">${rpGName(sel)}</div><div class="muted" style="margin-top:3px">${sel.n} roast${sel.n===1?'':'s'} · ${esc(R.label)}${sel.origin?' · '+esc(sel.origin):''}</div></div><div class="scroll">${rpRoastRows(sel.rs)}</div>
       <div class="foot muted">Averages skip roasts without that value${sel.rs.some(r=>!ok(spreadOf(r.meta)))?` (${sel.rs.filter(r=>!ok(spreadOf(r.meta))).length} without colors)`:''}. Click a roast for its roast sheet.</div></div>`:'';
   el.innerHTML=ipd?`${tiles}${table}${chart}`:`${tiles}<div class="rpGrid"><div class="rpCol">${table}</div><div class="rpCol">${chart}${detail}</div></div>`;
