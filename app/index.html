@@ -177,8 +177,9 @@ canvas{display:block;width:100%;height:100%}
 .pdH{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:#6B7280;margin-bottom:5px}
 .pd2{display:grid;grid-template-columns:1fr 1fr;gap:22px}.pd3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .paperDoc table{width:100%;border-collapse:collapse}
-.paperDoc th{background:transparent;color:#6B7280;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-bottom:1px solid #15181B;position:static}
-.paperDoc td{padding:4px 6px;border-bottom:1px solid #E6E8EB;font-size:11px;color:#15181B;white-space:nowrap}
+/* paper tables: !important so screen rules (iPad touch rows .ipad td 14px, list row heights) never stretch a printed page */
+.paperDoc th{background:transparent;color:#6B7280;font-size:9.5px!important;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px!important;height:auto!important;border-bottom:1px solid #15181B;position:static}
+.paperDoc td{padding:3px 6px!important;height:auto!important;border-bottom:1px solid #E6E8EB;font-size:11px!important;line-height:1.35;color:#15181B;white-space:nowrap}
 .paperDoc tbody tr{cursor:default}.paperDoc tbody tr:hover td{background:none}
 .paperDoc tr.tot td{font-weight:700;border-top:1.5px solid #15181B;border-bottom:0;background:#F4F5F7}
 .paperDoc .muted,.paperDoc .miss{color:#6B7280}
@@ -193,6 +194,14 @@ canvas{display:block;width:100%;height:100%}
 .pdSmall{color:#6B7280;font-size:10px;margin-top:5px}
 .pdTiles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.pdTiles>div{border:1px solid #E6E8EB;border-radius:6px;padding:6px 8px}.pdTiles span{color:#6B7280;font-size:9.5px;display:block}.pdTiles b{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}.pdTiles small{font-size:9.5px;color:#6B7280;font-weight:500}.pdD{color:#6B7280;font-size:9px;margin-top:1px}
 .pdGroup{break-inside:avoid;page-break-inside:avoid}
+.pdSheet{gap:9px}
+.pdSheet .pdHead{padding-bottom:9px}.pdSheet .pdBiz img{height:38px}
+.pdSheet .pdTitle h2{font-size:16px}
+.pdSheet .pd2,.pdSheet .pd3{gap:18px}
+.pdSheet .pdH{margin-bottom:3px}
+.pdSheet .pdKv{padding:3px 0}
+.pdSheet .pdNote{padding:5px 8px;line-height:1.4}
+.pdSheet .pdLegend{margin-top:0}
 .pdFoot{margin-top:auto;display:flex;justify-content:space-between;gap:16px;color:#6B7280;font-size:9.5px;border-top:1px solid #E6E8EB;padding-top:7px}
 #printArea{display:none}
 @media print{
@@ -200,6 +209,7 @@ canvas{display:block;width:100%;height:100%}
   html,body{height:auto!important;overflow:visible!important;display:block!important;background:#fff!important}
   body>*:not(#printArea){display:none!important}
   #printArea{display:block!important}
+  :root{color-scheme:light!important}   /* white paper, margins too, even with the Dark theme */
   #printArea .paperDoc{width:auto;min-height:0;padding:0;box-shadow:none}
   #printArea .pdFoot{margin-top:10px}
 }
@@ -3372,7 +3382,7 @@ function roastSheetHtml(r){const m=r.meta,s=r.summary||summarize(r),ev=r.events|
   const notes=[m.notes?esc(m.notes):'',(r.tnotes||[]).map(n=>`<span class="pdT">${mmss(n.t-o)}</span> ${esc(n.text)}`).join('<br>')].filter(Boolean).join('<br><br>');
   return `<div class="paperDoc pdSheet">${rpBizHead({sub:'Roast sheet · Probat P12 III',title:`Roast #${r.num}`,line:esc(fmtLong(dt))})}
   <div class="pdTitle"><h2>${esc(m.name||'Untitled')}${r.isProfile?' <span class="pdStar">★ Profile</span>':''}</h2><div class="pdMeta">${m.coffee?`<span>Coffee <b>${esc(m.coffee)}</b></span>`:''}${m.lot?`<span>Lot <b>${esc(m.lot)}</b></span>`:''}<span>Batch <b>${fGreen(m.green)} lb</b></span>${bg?`<span>Background <b>${esc(rTag(bg))} ${esc(bg.meta.name||'')}</b></span>`:''}</div></div>
-  <div class="pdChart">${rsChart(r,bg,720,300,P)}<div class="pdLegend"><span><i style="background:${P.bt}"></i>Bean temp</span>${bg?`<span><i class="dash" style="border-color:${P.bkg}"></i>Background ${esc(rTag(bg))}</span>`:''}<span><i style="background:${P.ror}"></i>RoR</span><span><i style="background:${P.burner}"></i>Burner</span><span><i style="background:${P.air}"></i>Air</span></div></div>
+  <div class="pdChart">${rsChart(r,bg,720,270,P)}<div class="pdLegend"><span><i style="background:${P.bt}"></i>Bean temp</span>${bg?`<span><i class="dash" style="border-color:${P.bkg}"></i>Background ${esc(rTag(bg))}</span>`:''}<span><i style="background:${P.ror}"></i>RoR</span><span><i style="background:${P.burner}"></i>Burner</span><span><i style="background:${P.air}"></i>Air</span></div></div>
   <div class="pd2"><div><div class="pdH">Events</div><table class="pdT2"><thead><tr><th>Event</th><th class="n">Time</th><th class="n">Bean °${cfg.unit}</th>${bg?`<th class="n">vs ${esc(rTag(bg))}</th>`:''}</tr></thead><tbody>${evRows||`<tr><td colspan="4">No events marked.</td></tr>`}</tbody></table>
       ${kv('Development after FC',mmss(s.dev))}${kv('Total time',mmss(s.drop))}</div>
     <div><div class="pdH">Burner and air changes</div><table class="pdT2"><thead><tr><th>Time</th><th>Change</th></tr></thead><tbody>${adj.length?adj.map(a=>`<tr><td class="tnum">${mmss(a.t-o)}</td><td>${a.label} ${Math.round(a.from)} → ${Math.round(a.to)}${a.key==='drum'?'':' %'}</td></tr>`).join(''):'<tr><td colspan="2">No changes during the roast.</td></tr>'}</tbody></table>
@@ -3401,7 +3411,11 @@ function rpInvTiles(I,R){const t=I.tot;return [[`On hand ${rdShort(R.from)}`,rpN
   ['Came in',rpNum(t.in),`${t.inN} deliver${t.inN===1?'y':'ies'}${t.cost?' · '+money(t.cost):''}`],['Roasted',rpNum(t.used),`${t.roasts} roast${t.roasts===1?'':'s'}`],
   ['Other adjustments',(t.adj<-0.04?'−':t.adj>0.04?'+':'')+rpNum(Math.abs(t.adj)),`${t.adjN} entr${t.adjN===1?'y':'ies'}`],[`On hand ${rdShort(rdAdd(R.end,-1))}`,rpNum(t.close),(n=>n?`${n} lot${n===1?'':'s'} low`:'None low')(I.lots.filter(o=>o.low).length)]]}
 /* Print / PDF: Mac → print dialog (PDF ▾ › Save as PDF); iPad/iPhone → share sheet with a PDF; a browser → its print dialog */
-async function rpPrint(html,name){const el=$('#printArea');el.innerHTML=html;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+/* one Letter page = 7.6 × 10.1 in inside the margins (Mac @page .45in; the iPad/iPhone PDF uses the same) → 730 × 970 px */
+function rsFit(el){const d=el.querySelector('.pdSheet');if(!d)return;d.style.zoom='';
+  const box=document.createElement('div');box.style.cssText='position:fixed;left:-10000px;top:0;width:730px;visibility:hidden';const c=d.cloneNode(true);c.style.cssText='width:730px;min-height:0;padding:0';box.appendChild(c);document.body.appendChild(box);
+  const h=c.scrollHeight+12;box.remove();if(h>930)d.style.zoom=String(Math.max(.7,930/h).toFixed(3))}
+async function rpPrint(html,name){const el=$('#printArea');el.innerHTML=html;rsFit(el);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   try{if(window.ZR_NATIVE&&ZR_NATIVE.printPage)await ZR_NATIVE.printPage(name+'.pdf');else window.print()}catch(e){toast('Could not print: '+e)}}
 const rpFileDate=R=>rdIso(R.from)+'_to_'+rdIso(rdAdd(R.end,-1));
 
