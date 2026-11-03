@@ -2,6 +2,13 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## iPhone build after 1.0.38 — Full Pricing on the phone (Nov 3, 2026; iPhone only, `ipad` branch, TestFlight, no Mac release)
+- Ty: "I want more functionality on the iPhone with the pricing." More › Pricing (`PHV.price`) now has Price list · Overview · Costs (`PH.prv`), with the same numbers and saves as the Mac/iPad (`PRC`/`savePR`, `prCalc`, `prBlendCalc`, `prContext`, `prVolFor`).
+- Price list: blends grouped under single origins (closes the 1.0.38 open item), Wholesale/Retail, Gross/After OH (`basis`), + New blend. Detail (`PHV.priceEdit`, `{id}` or `{blend}`): blend name + recipe editing (`phRecipe`/`phRecipeWire`, same data as `prRecipeHtml`), cost table, cost of each bag (stacked bars), prices with gross and after-OH margins (red under target), "Use" suggested price, volume tier table, Delete blend.
+- Overview (`phPrOverview`): your roasting, average-pound split, What if (`PRW` days / green change, never saved), Do your prices work? Costs (`phPrCosts`): overhead list, volume mode, days, labor, bagging minutes, bag costs, margin targets, rounding, waste, default loss, tiers.
+- Share › wholesale price sheet as a PDF (`phPriceSheet` → `rpPrint`, report paper layout, blends and tiers included).
+- MacBook 1728, iMac 2240, 13" iPad and the other iPhone screens unchanged (28 screens compared).
+
 ## iPhone build after 1.0.38 — Full Reports on the phone (Nov 3, 2026; iPhone only, `ipad` branch, TestFlight, no Mac release)
 - Ty: "I would like to be able to see more of the reporting on my iPhone." More › Reports (`PHV.rprod`) now has the same Production and Inventory reports as the Mac/iPad, read-only, phone layout.
 - Phone state `PH.rp/rv/rby/rfrom/rto` saved in `zr2.phReports`; `phRpWith(f)` runs the shared helpers (`rpRange`, `rpProd`, `rpBuckets`, `rpProdDoc`) with the phone's range/grouping in `RP` and restores it, so the Mac/iPad Reports settings on the device aren't touched.
