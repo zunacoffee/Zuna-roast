@@ -1094,6 +1094,37 @@ html.iphone.kbOpen #phSheet .sh{bottom:var(--kb,0px);max-height:calc(100% - var(
 .p-welcome h2{margin:0;font-size:26px;font-weight:700}
 .p-welcome p{margin:0;font-size:16px;line-height:1.5;color:var(--text2)}
 .p-welcome code{font-family:inherit;font-weight:600;color:var(--text)}
+.p-pt>.grp{grid-column:1/-1;justify-content:flex-start;text-align:left;padding:14px 14px 6px;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:var(--soft)}
+.p-pt .c small.rc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.p-g3 .p-inp{padding:0 10px}.p-g3 .p-inp input{font-size:17px!important}
+.p-stack{display:flex;height:10px;border-radius:5px;overflow:hidden;margin-top:6px;background:var(--soft)}
+.p-stack i{display:block;height:100%}
+.p-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--text2);margin-top:8px}
+.p-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+.p-leg b{color:var(--text);font-weight:600;margin-left:3px}
+.p-pill.r{background:color-mix(in srgb,var(--danger) 12%,var(--panel));color:var(--danger)}
+.p-dayb{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;height:118px;margin-top:8px;align-items:end}
+.p-dayb>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;font-variant-numeric:tabular-nums}
+.p-dayb b{font-size:12px;font-weight:600}.p-dayb span{font-size:11.5px;color:var(--text2)}
+.p-dayb i{display:block;width:70%;max-height:70px;border-radius:4px 4px 0 0;background:var(--border)}
+.p-dayb .on i{background:var(--accent)}.p-dayb .on b,.p-dayb .on span{color:var(--accent)}
+.p-row.p-ed{gap:8px;padding:8px 10px 8px 14px}
+.p-ein{flex:1;min-width:0;border:0!important;background:transparent!important;padding:6px 0!important;font-size:16px!important}
+.p-ein:focus{outline:none;box-shadow:inset 0 -2px 0 var(--accent)}
+.p-amt{width:112px;min-height:42px;flex:none}.p-amt input{font-size:17px!important}
+.p-sm{width:96px;min-height:42px;flex:none;padding:0 8px!important}.p-sm input{font-size:16px!important;text-align:right}.p-sm em{font-size:12px!important;white-space:nowrap}
+.p-x{flex:none;width:34px;height:34px;border-radius:50%;border:0!important;background:transparent!important;color:var(--text2);font-size:22px;line-height:1;padding:0!important}
+.p-sel{width:100%;border:0!important;background:transparent!important;padding:2px 0!important;font-size:16px!important;font-weight:500;color:var(--text)}
+.p-chk{color:var(--accent);font-size:19px;font-weight:600}
+#phPb button{font-size:13.5px}
+.p-pg .mg .lo{color:var(--p-low,var(--warn))}
+.p-pg .mg .ns{color:var(--text2);font-weight:500}
+.p-row .m small.wr{white-space:normal}
+.p-row.p-tier{flex-wrap:wrap;row-gap:6px}
+.p-row.p-tier .p-ein{flex:1 1 100%;padding:2px 0!important}
+.p-row.p-tier .p-sm{flex:1 1 0;width:auto}
+.p-amt{width:100px}
 /* phone Reports */
 .p-chipRow{display:flex;gap:6px;overflow-x:auto;flex:none;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:2px max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
 .p-chipRow::-webkit-scrollbar{display:none}
@@ -4430,33 +4461,175 @@ PHV.cup=v=>{const s=CUP.find(x=>x.id===v.id);if(!s)return {nav:phNavSmall(phBack
       $('#phCD',nav).onclick=async()=>{await phCupSave(s,x,false);phBack()}}}};
 
 /* ---------- pricing ---------- */
-PHV.price=()=>{const o=PRC(),ctx=prContext(o),T=prT(o),list=INV.filter(l=>invLeft(l)>0.001),k=PH.side;
-  const cell=(b,e)=>{const a=b['a'+k];if(!ok(a))return `<span class="ns${e?' e':''}">—</span>`;const lo=b['m'+k]<(k==='w'?T.w:T.r)-0.05;return `<span class="${lo?'lo':''}${e?' e':''}">${a.toFixed(2)}</span>`};
-  const rows=list.map(l=>{const c=prCalc(l,o,ctx);if(!c.hasPrice)return `<button class="c" data-p="${l.id}" style="grid-column:1/-1;border:0;border-top:1px solid var(--line2);background:none;text-align:left;padding:11px 14px"><b>${esc(l.name)}</b><small>No green price yet — add it on the Green screen</small></button>`;
-    return `<button class="c" data-p="${l.id}" style="border:0;border-top:1px solid var(--line2);background:none;text-align:left;border-radius:0"><b>${esc(l.name)}</b><small>${money(c.perLb)}/lb cost</small></button>${c.bags.map((b,i)=>cell(b,i===2)).join('')}`}).join('');
-  return {nav:phNavSmall(phBackLabel(),'Pricing'),body:`<div class="p-seg" id="phPs"><button data-k="w" class="${k==='w'?'on':''}">Wholesale</button><button data-k="r" class="${k==='r'?'on':''}">Retail</button></div>
-    <p class="p-note">Targets ${num(T.w)}% wholesale · ${num(T.r)}% retail (${o.basis==='net'?'after overhead':'gross, before rent'}). Prices in color are under the target.</p>
-    ${list.length?`<div class="p-card"><div class="p-pt"><span class="c hd">Coffee</span><span class="hd">12 oz</span><span class="hd">2 lb</span><span class="hd e">5 lb</span>${rows}</div></div><p class="p-note" style="text-align:center">Tap a coffee to see costs and edit prices. — means not set yet.</p>`
-      :`<div class="p-card"><div class="p-empty">No green coffee in stock.<br>Add coffee on the Green screen with its price per lb.</div></div>`}`,
-    wire:el=>{$$('#phPs button').forEach(b=>b.onclick=()=>{PH.side=b.dataset.k;phRender(true)});$$('[data-p]',el).forEach(b=>b.onclick=()=>phGo({v:'priceEdit',id:b.dataset.p}))}}};
-PHV.priceEdit=v=>{const l=INV.find(x=>x.id===v.id);if(!l)return {nav:phNavSmall(phBackLabel(),'Pricing'),body:'<div class="p-empty">This coffee isn’t here anymore.</div>'};
-  const o=PRC(),ctx=prContext(o),c=prCalc(l,o,ctx),T=prT(o),key=prKey(l);
-  if(!c.hasPrice)return {nav:phNavSmall(phBackLabel(),l.name),body:'<div class="p-card"><div class="p-empty">This lot has no green price yet.<br>Add its price per lb on the iMac or iPad (Green coffee).</div></div>'};
-  const mg=(b,k)=>{const a=b['a'+k],m=b['m'+k],t=k==='w'?T.w:T.r;if(!ok(a))return `<span class="mg ns">Suggested ${money(b['s'+k])}</span>`;const lo=m<t-0.05;return `<span class="mg ${lo?'lo':''}">${ok(m)?m.toFixed(0)+'%':'—'}${lo?` · under ${num(t)}%`:''}</span>`};
+/* ---------- pricing on the phone (More › Pricing): Price list, Overview and Costs & settings, the same numbers as the Mac/iPad.
+   Prices, blends and cost settings save to cfg.pricing (Settings/settings.json) through savePR, so every device sees them. ---------- */
+PH.prv=PH.prv||'prices';
+const phPrSave=(f)=>{const p=PRC();f(p);savePR(p);phRender(true)};
+function phPrHead(o){const what=PRW.days!=null||Number(PRW.green);
+  return `<div class="p-seg" id="phPrv"><button data-v="prices" class="${PH.prv==='prices'?'on':''}">Price list</button><button data-v="overview" class="${PH.prv==='overview'?'on':''}">Overview</button><button data-v="costs" class="${PH.prv==='costs'?'on':''}">Costs</button></div>
+    ${what?`<div class="p-ban" style="padding:10px 14px"><div class="m" style="font-size:13.5px"><b style="font-size:14px">What-if prices showing</b>${PRW.days!=null?`${PRW.days} roast day${PRW.days===1?'':'s'} a week`:''}${PRW.days!=null&&Number(PRW.green)?' · ':''}${Number(PRW.green)?`green ${PRW.green>0?'+':'−'}${money(Math.abs(PRW.green))}/lb`:''}. Nothing is saved.</div><button class="p-btn sm" id="phWr">Reset</button></div>`:''}`}
+function phPrWireHead(el){$$('#phPrv button',el).forEach(b=>b.onclick=()=>{PH.prv=b.dataset.v;phRender()});const r=$('#phWr',el);if(r)r.onclick=()=>{PRW={days:null,green:0};phRender(true)}}
+
+PHV.price=()=>{const o=PRC(),ctx=prContext(o),T=prT(o);
+  let body,right='';
+  if(PH.prv==='overview')body=phPrOverview(o,ctx);
+  else if(PH.prv==='costs')body=phPrCosts(o,ctx);
+  else{const list=INV.filter(l=>invLeft(l)>0.001),k=PH.side;right='<button class="p-lnk" id="phPrMore">Share</button>';
+    const cell=(b,e)=>{const a=b['a'+k];if(!ok(a))return `<span class="ns${e?' e':''}">—</span>`;const lo=b['m'+k]<(k==='w'?T.w:T.r)-0.05;return `<span class="${lo?'lo':''}${e?' e':''}">${a.toFixed(2)}</span>`};
+    const rows=list.map(l=>{const c=prCalc(l,o,ctx);if(!c.hasPrice)return `<button class="c" data-p="${l.id}" style="grid-column:1/-1;border:0;border-top:1px solid var(--line2);background:none;text-align:left;padding:11px 14px"><b>${esc(l.name)}</b><small>No green price yet — add it on the Green screen</small></button>`;
+      return `<button class="c" data-p="${l.id}" style="border:0;border-top:1px solid var(--line2);background:none;text-align:left;border-radius:0"><b>${esc(l.name)}</b><small>${money(c.perLb)}/lb cost</small></button>${c.bags.map((b,i)=>cell(b,i===2)).join('')}`}).join('');
+    const grp=t=>`<span class="grp">${t}</span>`;
+    const brows=o.blends.map(bl=>{const c=prBlendCalc(bl,o,ctx),line=esc(prBlendLine(bl)||'No coffees yet');
+      if(!c.hasPrice)return `<button class="c" data-bl="${esc(bl.id)}" style="grid-column:1/-1;border:0;border-top:1px solid var(--line2);background:none;text-align:left;padding:11px 14px"><b>${esc(bl.name)}</b><small>${line} · not costed yet</small></button>`;
+      return `<button class="c" data-bl="${esc(bl.id)}" style="border:0;border-top:1px solid var(--line2);background:none;text-align:left;border-radius:0"><b>${esc(bl.name)}</b><small>${money(c.perLb)}/lb cost</small><small class="rc">${line}</small></button>${c.bags.map((b,i)=>cell(b,i===2)).join('')}`}).join('');
+    const allRows=(brows&&rows?grp('Single origins'):'')+rows+(brows?grp('Blends'):'')+brows;
+    body=`<div class="p-g2"><div class="p-seg" id="phPs"><button data-k="w" class="${k==='w'?'on':''}">Wholesale</button><button data-k="r" class="${k==='r'?'on':''}">Retail</button></div>
+      <div class="p-seg" id="phPb"><button data-b="gross" class="${o.basis!=='net'?'on':''}">Gross</button><button data-b="net" class="${o.basis==='net'?'on':''}">After OH</button></div></div>
+      <p class="p-note">Targets ${num(T.w)} % wholesale · ${num(T.r)} % retail (${o.basis==='net'?'after overhead':'gross, before rent'}). Prices in color are under the target.</p>
+      ${list.length||o.blends.length?`<div class="p-card"><div class="p-pt"><span class="c hd">Coffee</span><span class="hd">12 oz</span><span class="hd">2 lb</span><span class="hd e">5 lb</span>${allRows}</div></div>`
+        :`<div class="p-card"><div class="p-empty">No green coffee in stock.<br>Add coffee on the Green screen with its price per lb.</div></div>`}
+      <button class="p-btn full" id="phBlNew">+ New blend</button>
+      <p class="p-note" style="text-align:center">Tap a coffee or blend to see its costs and set prices. — means not set yet.</p>`}
+  return {nav:phNavSmall(phBackLabel(),'Pricing',right),body:phPrHead(o)+body,wire:(el,nav)=>{phPrWireHead(el);
+    $$('#phPs button',el).forEach(b=>b.onclick=()=>{PH.side=b.dataset.k;phRender(true)});
+    $$('#phPb button',el).forEach(b=>b.onclick=()=>phPrSave(p=>p.basis=b.dataset.b));
+    $$('[data-p]',el).forEach(b=>b.onclick=()=>phGo({v:'priceEdit',id:b.dataset.p}));$$('[data-bl]',el).forEach(b=>b.onclick=()=>phGo({v:'priceEdit',blend:b.dataset.bl}));
+    const nb=$('#phBlNew',el);if(nb)nb.onclick=()=>{const p=PRC(),n=p.blends.length+1,b={id:Date.now().toString(36),name:n===1?'House Blend':'New blend '+n,parts:[]};p.blends.push(b);savePR(p);phGo({v:'priceEdit',blend:b.id})};
+    const sh=$('#phPrMore',nav);if(sh)sh.onclick=phPriceSheet;
+    if(PH.prv==='overview')phPrOverviewWire(el,ctx);if(PH.prv==='costs')phPrCostsWire(el)}}};
+
+/* Overview: your roasting, what-if, and whether each price you've set works */
+function phPrOverview(o,ctx){const list=INV.filter(l=>invLeft(l)>0.001&&ok(num(l.price))),calc=list.map(l=>({l,c:prCalc(l,o,ctx)}));
+  const bcalc=o.blends.map(bl=>({l:{name:bl.name},c:prBlendCalc(bl,o,ctx)})).filter(x=>x.c.hasPrice);
+  const avg=k=>calc.length?calc.reduce((a,x)=>a+x.c[k],0)/calc.length:null,avgCoffee=avg('coffee'),avgPer=avg('perLb'),ohShare=ok(avgPer)&&avgPer>0?ctx.ohPerLb/avgPer*100:null;
+  const perDay=ctx.daysNow>0?ctx.base/ctx.daysNow:0,days=[1,2,3,4,5].map(d=>({d,oh:perDay*d>0?ctx.ohMonth/(perDay*d):null})),maxOh=Math.max(...days.map(x=>x.oh||0));
+  const rows=[];[...calc,...bcalc].forEach(({l,c})=>c.bags.forEach(b=>[['w','Wholesale',o.wMargin],['r','Retail',o.rMargin]].forEach(([k,n,m])=>{const p=b['a'+k];if(!ok(p))return;rows.push({l,b,n,p,m,zero:prVolFor(p,b,0,ctx.ohMonth),tgt:prVolFor(p,b,m,ctx.ohMonth)})})));
+  rows.sort((x,y)=>(y.tgt??1e9)-(x.tgt??1e9));
+  const vol=v=>v==null?'never':ok(v)?`${Math.round(v).toLocaleString()} lb`:'—',okNow=v=>v!=null&&v<=ctx.month+0.5;
+  const tag=r=>okNow(r.tgt)?'<span class="p-pill g">Works now</span>':r.tgt==null?'<span class="p-pill r">Raise price</span>':okNow(r.zero)?'<span class="p-pill w">Needs more volume</span>':'<span class="p-pill r">Losing money now</span>';
+  return `<div class="p-card" style="padding:14px"><div class="p-h3" style="margin-bottom:8px">Your roasting</div>
+      <div class="p-text" style="font-size:15px">You roast about <b>${ok(ctx.month)?Math.round(ctx.month).toLocaleString():'—'} lb</b> a month on <b>${ctx.days} day${ctx.days===1?'':'s'}</b> a week. Fixed costs are <b>${money0(ctx.ohMonth)}</b> a month, so every pound carries <b style="color:var(--warn)">${money(ctx.ohPerLb)}</b> of overhead${ok(ohShare)?`, about <b>${Math.round(ohShare)} %</b> of what a pound costs you`:''}.</div>
+      ${ok(avgPer)?`<div class="p-calc" style="margin-top:12px;padding:0"><span>Average pound</span><b>${money(avgPer)} / lb</b></div>
+        <div class="p-stack" style="height:12px;margin-top:6px"><i style="width:${avgCoffee/avgPer*100}%;background:var(--p-coffee)"></i><i style="width:${ctx.ohPerLb/avgPer*100}%;background:var(--p-over)"></i><i style="width:${ctx.labPerLb/avgPer*100}%;background:var(--p-labor)"></i></div>
+        <div class="p-leg"><span><i style="background:var(--p-coffee)"></i>Coffee <b>${money(avgCoffee)}</b></span><span><i style="background:var(--p-over)"></i>Overhead <b>${money(ctx.ohPerLb)}</b></span><span><i style="background:var(--p-labor)"></i>Labor <b>${money(ctx.labPerLb)}</b></span></div>`:''}</div>
+    <div class="p-card" style="padding:14px"><div class="p-h3" style="margin-bottom:10px">What if</div>
+      <div class="p-att" style="padding:0;border:0;min-height:44px"><span>Roast days a week</span><button id="phDm" aria-label="Fewer days">−</button><b>${ctx.days}</b><button id="phDp" aria-label="More days">+</button></div>
+      <div class="p-field" style="margin-top:8px"><label for="phGc">Green price change ($ / lb, e.g. 0.50 or −0.25)</label><div class="p-inp"><em>$</em><input id="phGc" class="t" inputmode="decimal" value="${Number(PRW.green)?PRW.green:''}" placeholder="0.00" autocomplete="off"></div></div>
+      <div class="p-note" style="margin-top:12px">Overhead per lb at each roast schedule (same rent and gas, more coffee):</div>
+      <div class="p-dayb">${days.map(x=>`<div class="${x.d===ctx.days?'on':''}"><b>${money(x.oh)}</b><i style="height:${x.oh&&maxOh?Math.max(4,x.oh/maxOh*100):0}%"></i><span>${x.d} day${x.d===1?'':'s'}</span></div>`).join('')}</div>
+      <p class="p-note" style="margin-top:8px">Every price on the Price list follows these while they’re on. Nothing is saved.</p></div>
+    <div class="p-sec"><span class="p-h3">Do your prices work?</span>
+      ${rows.length?`<p class="p-note" style="margin-top:-2px">Pounds a month each price needs to cover all costs, and to reach your after-overhead target. You roast about <b style="color:var(--text)">${Math.round(ctx.month).toLocaleString()} lb</b> now.</p>
+      <div class="p-card">${rows.map(r=>`<div class="p-row" style="align-items:flex-start"><div class="m"><b>${esc(r.l.name)}</b><small>${r.b.label} · ${r.n.toLowerCase()} · ${money(r.p)}</small>
+        <small class="wr">Covers costs at <b style="display:inline;font-size:inherit;color:${r.zero==null?'var(--danger)':'var(--text)'}">${vol(r.zero)}</b> · hits ${r.m} % at <b style="display:inline;font-size:inherit;color:${r.tgt==null?'var(--danger)':'var(--text)'}">${vol(r.tgt)}</b></small></div><span class="r">${tag(r)}</span></div>`).join('')}</div>
+      <p class="p-note">“Never” means the price doesn’t cover the coffee, labor and bag even with no rent at all.</p>`
+      :'<div class="p-card"><div class="p-empty">Set your prices on the Price list to see how many pounds a month each one needs.</div></div>'}</div>`}
+function phPrOverviewWire(el,ctx){$('#phDm',el).onclick=()=>{PRW.days=Math.max(1,ctx.days-1);if(PRW.days===ctx.daysNow)PRW.days=null;phRender(true)};
+  $('#phDp',el).onclick=()=>{PRW.days=Math.min(7,ctx.days+1);if(PRW.days===ctx.daysNow)PRW.days=null;phRender(true)};
+  $('#phGc',el).onchange=e=>{const v=num(e.target.value);if(e.target.value.trim()&&!ok(v)){toast('Enter the change as a number, e.g. 0.50');return}PRW.green=ok(v)?v:0;phRender(true)}}
+
+/* Costs & settings: the same settings as the Mac/iPad, saved to the shared settings file */
+function phPrCosts(o,ctx){const f=(path,label,v,unit,ph)=>`<div class="p-field"><label>${label}</label><div class="p-inp">${unit==='$'?'<em>$</em>':''}<input data-pr="${path}" class="t" inputmode="decimal" value="${ok(num(v))?v:''}" placeholder="${ph??''}" autocomplete="off">${unit&&unit!=='$'?`<em>${unit}</em>`:''}</div></div>`;
+  return `<div class="p-sec"><div class="p-calc"><span class="p-h3">Monthly overhead</span><b>${money(ctx.ohMonth)} / month</b></div><div class="p-card">
+      ${o.overhead.map((x,i)=>`<div class="p-row p-ed"><input data-oh="${i}:name" class="p-ein" value="${esc(x.name)}" aria-label="Cost name"><div class="p-inp p-amt"><em>$</em><input data-oh="${i}:amt" class="t" inputmode="decimal" value="${ok(num(x.amt))?x.amt:''}" placeholder="0" aria-label="${esc(x.name)} per month"></div><button class="p-x" data-ohdel="${i}" aria-label="Remove ${esc(x.name)}">×</button></div>`).join('')}
+      <button class="p-row" id="phOhAdd" style="color:var(--accent);font-weight:500;min-height:48px">+ Add cost</button></div>
+      <p class="p-note">Electric is $0 — the landowner pays it. For the P12, enter its cost ÷ the months you want it paid back in.</p></div>
+    <div class="p-sec"><span class="p-h3">Pounds roasted per month</span><div class="p-card">
+      <button class="p-row" data-vol="auto"><div class="m"><b style="font-weight:500">From my roasts — last 90 days</b><small>${ctx.rs.length} roast${ctx.rs.length===1?'':'s'} counted · ${ok(ctx.auto)?Math.round(ctx.auto)+' lb / month':'no roasts yet'}</small></div>${o.volMode!=='manual'?'<span class="p-chk">✓</span>':''}</button>
+      <button class="p-row" data-vol="manual"><div class="m"><b style="font-weight:500">My own number</b><small>${num(o.volManual)||0} lb / month</small></div>${o.volMode==='manual'?'<span class="p-chk">✓</span>':''}</button></div>
+      <div class="p-g2">${o.volMode==='manual'?f('volManual','Lb roasted / month',o.volManual,'lb','150'):''}${f('daysNow','Roast days a week now',o.daysNow,'','1')}</div></div>
+    <div class="p-sec"><span class="p-h3">Labor</span><div class="p-g2">${f('rate','Hourly rate',o.rate,'$','20')}${f('batchMin','Minutes per batch',o.batchMin,'min','25')}</div>
+      ${ctx.batchFromHist?`<p class="p-note">Batch size comes from your roasts: ${ctx.batchLb.toFixed(1)} lb roasted on average.</p>`:f('batchLb','Batch size, lb roasted',o.batchLb,'lb','20')}
+      <span class="p-h3" style="margin-top:6px">Bagging minutes per bag</span><div class="p-g3">${BAGS.map(b=>f('bagMin.'+b.k,b.label,o.bagMin[b.k],'min')).join('')}</div></div>
+    <div class="p-sec"><span class="p-h3">Bag, valve and label per bag</span><div class="p-g3">${BAGS.map(b=>f('pack.'+b.k,b.label,o.pack[b.k],'$')).join('')}</div></div>
+    <div class="p-sec"><span class="p-h3">Margin targets</span><p class="p-note" style="margin-top:-2px">Gross — before rent and overhead</p><div class="p-g2">${f('gwMargin','Wholesale',o.gwMargin,'%','45')}${f('grMargin','Retail',o.grMargin,'%','65')}</div>
+      <p class="p-note">After overhead — what’s left once rent, gas and other costs are paid</p><div class="p-g2">${f('wMargin','Wholesale',o.wMargin,'%','30')}${f('rMargin','Retail',o.rMargin,'%','50')}</div>
+      <div class="p-field"><label>Round prices up to</label><div class="p-seg" id="phRound">${[[0,'Exact'],[0.05,'5¢'],[0.25,'25¢'],[0.5,'50¢'],[1,'$1']].map(([v,t])=>`<button data-r="${v}" class="${Number(o.round)===v?'on':''}">${t}</button>`).join('')}</div></div>
+      <div class="p-g2">${f('waste','Waste — samples, rejects',o.waste,'%','3')}${f('lossDefault','Weight loss if no roasts',o.lossDefault,'%','15')}</div>
+      <p class="p-note">Margin is profit ÷ price. A 30 % margin means price = cost ÷ 0.70.</p></div>
+    <div class="p-sec"><span class="p-h3">Wholesale volume tiers</span><div class="p-card">
+      ${o.tiers.map((t,i)=>`<div class="p-row p-ed p-tier"><input data-tier="${i}:name" class="p-ein" value="${esc(t.name)}" aria-label="Tier name"><div class="p-inp p-sm"><input data-tier="${i}:minLb" class="t" inputmode="decimal" value="${ok(num(t.minLb))?t.minLb:''}" aria-label="Min lb a week"><em>lb/wk</em></div><div class="p-inp p-sm"><input data-tier="${i}:off" class="t" inputmode="decimal" value="${ok(num(t.off))?t.off:''}" aria-label="Percent off"><em>% off</em></div>${i?`<button class="p-x" data-tierdel="${i}" aria-label="Remove ${esc(t.name)}">×</button>`:'<span class="p-x" aria-hidden="true"></span>'}</div>`).join('')}
+      <button class="p-row" id="phTierAdd" style="color:var(--accent);font-weight:500;min-height:48px">+ Add tier</button></div></div>
+    <p class="p-note">Changes save to the shared folder, so the Mac and iPad use them too.</p>`}
+function phPrCostsWire(el){
+  $$('[data-pr]',el).forEach(i=>i.onchange=()=>{const v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter a number');return}phPrSave(p=>{const ks=i.dataset.pr.split('.');let t=p;for(let j=0;j<ks.length-1;j++)t=t[ks[j]];t[ks.at(-1)]=ok(v)?v:''})});
+  $$('[data-vol]',el).forEach(b=>b.onclick=()=>phPrSave(p=>p.volMode=b.dataset.vol));
+  $$('#phRound button',el).forEach(b=>b.onclick=()=>phPrSave(p=>p.round=Number(b.dataset.r)));
+  const listEdit=(attr,arr)=>$$(`[data-${attr}]`,el).forEach(i=>i.onchange=()=>{const [ix,fl]=i.dataset[attr].split(':');
+    if(fl!=='name'){const v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter a number');return}}phPrSave(p=>{const row=p[arr][ix];if(fl==='name')row.name=i.value.trim()||row.name;else{const v=num(i.value);row[fl]=ok(v)?v:0}})});
+  listEdit('oh','overhead');listEdit('tier','tiers');
+  $$('[data-ohdel]',el).forEach(b=>b.onclick=async()=>{const p=PRC(),x=p.overhead[Number(b.dataset.ohdel)];if(!x||!await ask('Remove this cost?',`“${esc(x.name)}” will be taken out of your monthly overhead.`,'Remove',true))return;phPrSave(q=>q.overhead.splice(Number(b.dataset.ohdel),1))});
+  $$('[data-tierdel]',el).forEach(b=>b.onclick=()=>phPrSave(p=>p.tiers.splice(Number(b.dataset.tierdel),1)));
+  $('#phOhAdd',el).onclick=()=>phPrSave(p=>p.overhead.push({name:'New cost',amt:0,est:true}));
+  $('#phTierAdd',el).onclick=()=>phPrSave(p=>{const last=p.tiers.at(-1)||{minLb:0,off:0};p.tiers.push({name:'New tier',minLb:(num(last.minLb)||0)+10,off:(num(last.off)||0)+5})})}
+
+/* One coffee or blend: costs, each bag's cost split, prices with both margins, volume tiers; a blend also has its recipe */
+PHV.priceEdit=v=>{const o=PRC(),bl=v.blend?o.blends.find(b=>b.id===v.blend):null,l=bl?{name:bl.name}:INV.find(x=>x.id===v.id);
+  if(!l)return {nav:phNavSmall(phBackLabel(),'Pricing'),body:`<div class="p-empty">This ${v.blend?'blend':'coffee'} isn’t here anymore.</div>`};
+  const ctx=prContext(o),c=bl?prBlendCalc(bl,o,ctx):prCalc(l,o,ctx),T=prT(o),key=bl?prBlendKey(bl):prKey(l);
+  const recipe=bl?phRecipe(bl,c):'';
+  const navR='<button class="p-lnk b" id="phPD">Done</button>';
+  if(!c.hasPrice)return {nav:phNavSmall(phBackLabel(),l.name,bl?navR:''),body:bl?recipe+`<div class="p-card"><div class="p-empty">${!c.parts.length?'Add the coffees in this blend and their share.':c.missing.length?esc(c.missing.map(p=>p.name||p.key).join(', '))+(c.missing.length===1?' has':' have')+' no green price yet. Add it on the Green screen.':'Give each coffee its share of the blend.'}</div></div>
+      <button class="p-btn full" id="phBlDel" style="color:var(--danger)">Delete blend</button>`:'<div class="p-card"><div class="p-empty">This lot has no green price yet.<br>Add its price per lb on the Mac or iPad (Green coffee).</div></div>',
+    wire:(el,nav)=>{if(bl)phRecipeWire(el,bl);const d=$('#phPD',nav);if(d)d.onclick=phBack}};
+  const mg=(b,k)=>{const a=b['a'+k],t=k==='w'?T.w:T.r;if(!ok(a))return `<span class="mg ns">Suggested ${money(b['s'+k])}</span>`;
+    const g=b['g'+k],n=b['n'+k],tg=k==='w'?num(o.gwMargin):num(o.grMargin),tn=k==='w'?num(o.wMargin):num(o.rMargin),cl=(m,t)=>ok(m)&&m<t-0.05?'lo':'';
+    return `<span class="mg"><span class="${cl(g,tg)}">${ok(g)?g.toFixed(0)+' %':'—'} gross</span> · <span class="${cl(n,tn)}">${ok(n)?n.toFixed(0)+' %':'—'} after OH</span>${b.lb!==1?`<br><span class="ns">${money(a/b.lb)} / lb</span>`:''}</span>`};
   let hint=null;for(const b of c.bags)for(const k of ['w','r'])if(!hint&&(k==='w'?b.lowW:b.lowR))hint={b,k};
-  const body=`<div style="font-size:14px;color:var(--text2)">${esc([l.origin,l.process,l.lot&&'Lot '+l.lot].filter(Boolean).join(' · '))}</div>
-    <div class="p-card"><div class="p-kv"><span>Green, landed</span><b>${money(c.landed)}/lb</b><span>Weight loss</span><b>${c.loss.toFixed(1)}%<small>${c.lossN?'avg of '+c.lossN:'default'}</small></b>
-      <span>Coffee per lb roasted</span><b>${money(c.coffee)}</b><span>Overhead per lb</span><b>${money(ctx.ohPerLb)}</b><span>Labor per lb</span><b>${money(ctx.labPerLb)}</b><span>True cost per lb</span><b>${money(c.perLb)}</b></div></div>
+  const COL={coffee:'var(--p-coffee)',overhead:'var(--p-over)',labor:'var(--p-labor)',pack:'var(--p-bag)'},NAME={coffee:'Coffee',overhead:'Overhead',labor:'Labor',pack:'Bag & label'};
+  const tiers=o.tiers.filter(t=>num(t.off)>0);
+  const body=`${bl?'':`<div style="font-size:14px;color:var(--text2)">${esc([l.origin,l.process,l.lot&&'Lot '+l.lot].filter(Boolean).join(' · '))}</div>`}
+    ${recipe}
+    <div class="p-card"><div class="p-kv">${bl?'':`<span>Green, landed</span><b>${money(c.landed)}/lb</b><span>Weight loss</span><b>${c.loss.toFixed(1)} %<small>${c.lossN?'avg of '+c.lossN:'default'}</small></b>`}
+      <span>Coffee per lb ${bl?'of blend':'roasted'}</span><b>${money(c.coffee)}</b><span>Overhead per lb</span><b>${money(ctx.ohPerLb)}</b><span>Labor per lb</span><b>${money(ctx.labPerLb)}</b><span>True cost per lb</span><b>${money(c.perLb)}</b></div></div>
+    <div class="p-sec"><span class="p-h3">Cost of each bag</span><div class="p-card" style="padding:12px 14px;display:flex;flex-direction:column;gap:12px">
+      ${c.bags.map(b=>`<div><div class="p-calc" style="padding:0"><b>${b.label}</b><b>${money(b.cost)}</b></div><div class="p-stack">${Object.keys(COL).map(x=>`<i style="width:${b.parts[x]/b.cost*100}%;background:${COL[x]}"></i>`).join('')}</div></div>`).join('')}
+      <div class="p-leg">${Object.keys(COL).map(x=>`<span><i style="background:${COL[x]}"></i>${NAME[x]}</span>`).join('')}</div></div></div>
     <div class="p-pg"><span class="hd">Bag</span><span class="hd">Wholesale</span><span class="hd">Retail</span>
       ${c.bags.map(b=>`<span class="sz">${b.label}<small>cost ${money(o.basis==='net'?b.cost:b.gcost)}</small></span>${['w','r'].map(k=>`<div><div class="p-inp"><em>$</em><input data-act="${b.k}:${k}" inputmode="decimal" enterkeyhint="next" value="${ok(b['a'+k])?b['a'+k].toFixed(2):''}" placeholder="${b['s'+k].toFixed(2)}" autocomplete="off"></div>${mg(b,k)}</div>`).join('')}`).join('')}</div>
-    ${hint?`<div class="p-ban p-info"><div class="m">Price for ${num(hint.k==='w'?T.w:T.r)}% ${hint.k==='w'?'wholesale':'retail'} at ${hint.b.label}: <b style="display:inline">${money(hint.b['s'+hint.k])}</b></div><button class="p-btn sm" id="phUse">Use</button></div>`:''}
-    <p class="p-note">Margins are ${o.basis==='net'?'after overhead':'gross (before rent and overhead)'}. Prices save to the shared folder, so the iMac’s price list and wholesale sheet show them too. Leave a box empty until you’ve decided.</p>`;
+    ${hint?`<div class="p-ban p-info"><div class="m">Price for ${num(hint.k==='w'?T.w:T.r)} % ${hint.k==='w'?'wholesale':'retail'} at ${hint.b.label}: <b style="display:inline">${money(hint.b['s'+hint.k])}</b></div><button class="p-btn sm" id="phUse">Use</button></div>`:''}
+    ${tiers.length&&c.bags.some(b=>ok(b.aw))?`<div class="p-sec"><span class="p-h3">Wholesale volume pricing</span><div class="p-card"><div class="p-pt"><span class="c hd">Tier</span>${c.bags.map((b,i)=>`<span class="hd${i===2?' e':''}">${b.label}</span>`).join('')}
+      ${o.tiers.map(t=>{const fct=1-(num(t.off)||0)/100;return `<div class="c"><b style="font-weight:500">${esc(t.name)}</b><small>${num(t.off)?'−'+num(t.off)+' %':'list price'}</small></div>${c.bags.map((b,i)=>`<span class="${i===2?'e':''}">${ok(b.aw)?(b.aw*fct).toFixed(2):'—'}</span>`).join('')}`}).join('')}</div></div></div>`:''}
+    <p class="p-note">Margins are shown both ways: gross (before rent and overhead) and after overhead. Prices save to the shared folder, so the Mac’s price list and wholesale sheet show them too. Leave a box empty until you’ve decided.</p>
+    ${bl?'<button class="p-btn full" id="phBlDel" style="color:var(--danger)">Delete blend</button>':''}`;
   const put=(bk,t,val)=>{const p=PRC(),a=p.actual[key]=p.actual[key]||{},b=a[bk]=a[bk]||{};if(ok(val))b[t]=val;else delete b[t];savePR(p)};
-  return {nav:phNavSmall(phBackLabel(),l.name,'<button class="p-lnk b" id="phPD">Done</button>'),body,
+  return {nav:phNavSmall(phBackLabel(),l.name,navR),body,
     wire:(el,nav)=>{$$('[data-act]',el).forEach(i=>i.onchange=()=>{const [bk,t]=i.dataset.act.split(':'),val=num(i.value);if(i.value.trim()&&!ok(val)){toast('Enter the price as a number, e.g. 12.50');return}
         put(bk,t,ok(val)?+val.toFixed(2):null);phRender(true)});
       const u=$('#phUse');if(u)u.onclick=()=>{put(hint.b.k,hint.k,+hint.b['s'+hint.k].toFixed(2));toast('Price set');phRender(true)};
-      $('#phPD',nav).onclick=()=>{if(document.activeElement&&document.activeElement.dataset.act)document.activeElement.blur();setTimeout(phBack,50)}}}};
+      if(bl)phRecipeWire(el,bl);
+      $('#phPD',nav).onclick=()=>{if(document.activeElement&&document.activeElement.matches('input'))document.activeElement.blur();setTimeout(phBack,50)}}}};
+/* blend recipe on the phone: name, coffees and shares (same data as the Mac/iPad recipe card) */
+function phRecipe(bl,c){const names=[...new Map(INV.filter(l=>ok(num(l.price))||invLeft(l)>0.001).map(l=>[prKey(l),l.name])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+  const opts=cur=>names.map(([k,n])=>`<option value="${esc(k)}" ${k===cur?'selected':''}>${esc(n)}</option>`).join('')+(cur&&!names.some(([k])=>k===cur)?`<option value="${esc(cur)}" selected>${esc(cur)} (not in stock)</option>`:'');
+  const off=c.parts.length&&Math.abs(c.tot-100)>0.05;
+  return `<div class="p-field"><label for="phBlName">Blend name</label><div class="p-inp"><input id="phBlName" class="t" value="${esc(bl.name)}" autocomplete="off" style="font-weight:600"></div></div>
+  <div class="p-sec"><div class="p-calc"><span class="p-h3">Recipe · blended after roasting</span>${c.parts.length?`<b style="${off?'color:var(--danger)':''}">${+c.tot.toFixed(1)} %${off?' · should be 100':''}</b>`:''}</div><div class="p-card">
+    ${c.parts.map((p,i)=>`<div class="p-row p-ed"><div style="flex:1;min-width:0"><select data-blp="${i}:key" class="p-sel" aria-label="Coffee">${opts(p.key)}</select><small style="display:block;font-size:12.5px;color:var(--text2);margin-top:2px">${p.ok?money(p.c.coffee)+' / lb roasted · '+p.c.loss.toFixed(1)+' % loss':'no green price yet'}</small></div>
+      <div class="p-inp p-sm"><input data-blp="${i}:pct" class="t" inputmode="decimal" value="${p.pct||''}" placeholder="0" aria-label="Share"><em>%</em></div><button class="p-x" data-blpdel="${i}" aria-label="Remove">×</button></div>`).join('')}
+    <button class="p-row" id="phBlAdd" style="color:var(--accent);font-weight:500;min-height:48px">+ Add coffee</button></div>
+    <p class="p-note">Each coffee is costed with its own green price and weight loss.</p></div>`}
+function phRecipeWire(el,bl){const upd=f=>{const p=PRC(),b=p.blends.find(x=>x.id===bl.id);if(!b)return;f(b);savePR(p);phRender(true)};
+  const nm=$('#phBlName',el);if(nm)nm.onchange=e=>{const v=e.target.value.trim();if(!v){e.target.value=bl.name;return}upd(b=>b.name=v)};
+  $$('[data-blp]',el).forEach(i=>i.onchange=()=>{const [ix,f]=i.dataset.blp.split(':');
+    if(f==='key'){const l=prLotFor(i.value);upd(b=>{b.parts[ix].key=i.value;b.parts[ix].name=l?l.name:i.value})}
+    else{const v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter the share as a number, e.g. 60');return}upd(b=>b.parts[ix].pct=ok(v)?v:0)}});
+  $$('[data-blpdel]',el).forEach(x=>x.onclick=()=>upd(b=>b.parts.splice(Number(x.dataset.blpdel),1)));
+  const add=$('#phBlAdd',el);if(add)add.onclick=()=>{const cur=PRC().blends.find(x=>x.id===bl.id)||bl,used=new Set(cur.parts.map(p=>p.key)),l=INV.find(x=>invLeft(x)>0.001&&ok(num(x.price))&&!used.has(prKey(x)));
+    if(!l){toast('No other coffee in stock with a green price');return}const rest=Math.max(0,100-cur.parts.reduce((a,p)=>a+(num(p.pct)||0),0));upd(b=>b.parts.push({key:prKey(l),name:l.name,pct:rest}))};
+  const del=$('#phBlDel',el);if(del)del.onclick=async()=>{if(!await ask('Delete this blend?',`“${esc(bl.name)}” and the prices you set for it will be removed. Your green coffee and roasts are not changed.`,'Delete',true))return;
+    const p=PRC();p.blends=p.blends.filter(x=>x.id!==bl.id);delete p.actual[prBlendKey(bl)];savePR(p);phBack()}}
+/* wholesale price sheet as a PDF on the phone: same rows as the Mac's sheet (only prices you've set), on the report paper layout */
+function phPriceSheet(){const o=PRC(),saveW=PRW;PRW={days:null,green:0};const ctx0=prContext(o);
+  const rows=INV.filter(l=>invLeft(l)>0.001&&ok(num(l.price))).map(l=>({l,c:prCalc(l,o,ctx0)})).filter(x=>x.c.bags.some(b=>ok(b.aw)));
+  rows.push(...o.blends.map(bl=>({l:{name:bl.name,origin:'Blend',process:[...new Set((bl.parts||[]).filter(p=>num(p.pct)>0).map(p=>{const l=prLotFor(p.key);return (l&&l.origin||p.name||'').split(' · ')[0]}))].filter(Boolean).join(', ')},c:prBlendCalc(bl,o,ctx0)})).filter(x=>x.c.hasPrice&&x.c.bags.some(b=>ok(b.aw))));
+  PRW=saveW;if(!rows.length){toast('Set your wholesale prices first — the sheet only lists prices you’ve set');return}
+  const tiers=o.tiers.filter(t=>num(t.off)>0),d=new Date().toLocaleDateString([], {month:'long',day:'numeric',year:'numeric'});
+  const html=`<div class="paperDoc">${rpBizHead({sub:'Wholesale price list',title:esc(d),line:`${rows.length} coffee${rows.length===1?'':'s'} · per bag, whole bean`})}
+    <table class="rpt"><thead><tr><th>Coffee</th>${BAGS.map(b=>`<th class="n">${b.label}</th>`).join('')}</tr></thead><tbody>
+    ${rows.map(({l,c})=>`<tr><td><b>${esc(l.name)}</b><div style="color:#6B7280;font-size:10px;margin-top:2px">${esc([l.origin,l.process].filter(Boolean).join(' · '))}</div></td>${c.bags.map(b=>`<td class="n">${ok(b.aw)?money(b.aw)+(b.lb!==1?`<div style="color:#6B7280;font-size:10px">${money(b.aw/b.lb)} / lb</div>`:''):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    <div style="margin-top:14px;color:#6B7280;font-size:11px;line-height:1.6">${tiers.length?'Volume pricing: '+tiers.map(t=>`${esc(t.name)} — ${num(t.off)} % off`).join(' · ')+'<br>':''}Prices per bag, whole bean. Subject to change with green coffee prices.</div>${rpFoot()}</div>`;
+  rpPrint(html,'wholesale_prices_'+new Date().toISOString().slice(0,10))}
 
 /* ---------- first launch on the phone: pick the shared iCloud folder ---------- */
 PHV.welcome=()=>({nav:phNavBig('Zuna Roast'),body:`<div class="p-welcome"><h2>Pick your roast folder</h2><p>The phone uses the same folder as the iMac and iPad: <code>iCloud Drive › Desktop › ZUNA COFFEE › Zuna Roast</code>. Pick it once and the phone remembers it.</p><button class="p-btn full pri" id="phPick">Choose folder</button></div>`,
