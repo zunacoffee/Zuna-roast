@@ -2,6 +2,12 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.44 — Cupping cards open as a landscape PDF in Preview (Nov 4, 2026; Mac)
+- 1.0.41–1.0.43 tried to fit a landscape card through the Mac app's print window. It always prints upright, ignores `@page size`, and its printable area changes with the printer (Ty's PDF and his print preview disagreed), so no fixed size fit.
+- Now, in the Mac app, Print / Print… on a cupping card builds a vector PDF in JS (`cupCardsPdf` / `cupCardPdfOps`: Letter landscape 792 × 612 pt, one card per page, Helvetica/Helvetica-Bold WinAnsi, ASCII-only file) and the new Rust command `open_pdf` (lib.rs) writes it to `$TMPDIR/Zuna Roast/<name>.pdf` and runs `open`, so it opens in Preview; ⌘P prints landscape on any printer. `ZR_NATIVE.openPdf` in native.js.
+- In a browser (no `ZR_NATIVE`) the old HTML print stays. Roast sheets and reports unchanged.
+- Checked: the PDF from demo data renders as 3 landscape pages (poppler); `open_pdf` compiled and ran with rustc on Linux (the `open` call is macOS-only).
+
 ## 1.0.43 — Cupping card fits the Mac page (Nov 4, 2026; Mac)
 - In 1.0.42 the sideways card was 10 in long; Ty's Mac PDF (Save as PDF from the print window) showed about 10.05 × 7.35 in inside the margins (≈0.45–0.65 in), so the card's edge and footer were cut and spilled onto a second page.
 - Card is now 9.6 × 7.1 in (`.cpRot`), page box 7.1 × 9.6 in (`.cpPage`). Checked as PDFs in Chromium with Ty's measured margins: 3 cards → 3 pages, nothing cut.
