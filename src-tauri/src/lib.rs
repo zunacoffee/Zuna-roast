@@ -47,6 +47,25 @@ fn device_name() -> String {
     name
 }
 
+/// Cupping cards: the Mac print window can't print landscape, so the app writes the cards as a
+/// landscape PDF (plain ASCII text) and this saves it to a temp folder and opens it in Preview.
+#[tauri::command]
+fn open_pdf(name: String, text: String) -> Result<(), String> {
+    let safe: String = name
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() || " -_.#".contains(c) { c } else { '_' })
+        .collect();
+    let dir = std::env::temp_dir().join("Zuna Roast");
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    let p = dir.join(format!("{}.pdf", safe.trim()));
+    std::fs::write(&p, text.as_bytes()).map_err(|e| e.to_string())?;
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("open").arg(&p).spawn().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
 /// Reports and roast sheets: opens the Mac print dialog for the page. The app fills a print-only
 /// area first, so only the report prints. PDF ▾ › Save as PDF is in that dialog.
 /// (The iPad and iPhone make the PDF in the zuna-ios plugin instead.)
@@ -92,6 +111,7 @@ pub fn run() {
             files::fs_stamp,
             device_name,
             print_page,
+            open_pdf,
             roaster::ws_open,
             roaster::ws_send,
             roaster::ws_close,

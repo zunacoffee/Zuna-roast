@@ -3376,7 +3376,70 @@ function askPrintCards(s){return new Promise(res=>{const root=$('#modalRoot');
   const bs=()=>$$('.cplist input',root),cnt=()=>{const n=bs().filter(b=>b.checked).length;$('#mYes').textContent=n?`Print ${n} card${n===1?'':'s'}`:'Print';$('#mYes').disabled=!n};
   bs().forEach(b=>b.onchange=cnt);cnt();$('#cpAll').onclick=()=>{bs().forEach(b=>b.checked=true);cnt()};$('#cpNone').onclick=()=>{bs().forEach(b=>b.checked=false);cnt()};
   const done=v=>{root.innerHTML='';res(v)};$('#mNo').onclick=()=>done(null);$('#mYes').onclick=()=>done(bs().filter(b=>b.checked).map(b=>+b.value))})}
+/* ---------- Cupping cards as a real landscape PDF (1.0.44) ----------
+   The Mac print window always prints upright and its printable area changes with the printer, so cards
+   printed from the page never fit reliably. Instead the app writes the cards as a vector PDF
+   (Letter landscape, one card per page, Helvetica, ASCII-only so it can go through save_export/open_pdf)
+   and opens it in Preview, which prints landscape the right way round on any printer. */
+function pdfStr(t){let o='';for(const ch of String(t??'')){const c=ch.codePointAt(0);
+  if(ch==='('||ch===')'||ch==='\\')o+='\\'+ch;else if(c>=32&&c<127)o+=ch;
+  else if(c===0xB7||ch==='•')o+='\\267';else if(c===0x2013||c===0x2014)o+='-';else if(c===0x2019||c===0x2018)o+="'";else if(c===0x201C||c===0x201D)o+='"';
+  else if(c>=0xA0&&c<=0xFF)o+='\\'+c.toString(8).padStart(3,'0');else if(c===10||c===9)o+=' ';else o+='?'}return o}
+// Helvetica widths (per 1000 em) for wrapping and centering; close enough for other characters
+const PDFW={' ':278,'!':278,'"':355,'#':556,'$':556,'%':889,'&':667,"'":191,'(':333,')':333,'*':389,'+':584,',':278,'-':333,'.':278,'/':278,':':278,';':278,'<':584,'=':584,'>':584,'?':556,'@':1015,'[':278,']':278,'_':556,'|':260,
+  i:222,j:222,l:222,f:278,t:278,r:333,I:278,J:500,m:833,w:722,M:833,W:944,f0:556};
+const pdfTW=(t,sz,bold)=>{let w=0;for(const ch of String(t)){let v=PDFW[ch];if(v==null)v=/[A-Z]/.test(ch)?667:/[0-9]/.test(ch)?556:/[a-z]/.test(ch)?530:556;w+=v}return w*sz/1000*(bold?1.06:1)};
+function pdfWrap(t,sz,width){const out=[];for(const para of String(t||'').split(/\n/)){let line='';for(const w of para.split(/\s+/).filter(Boolean)){const tryL=line?line+' '+w:w;if(pdfTW(tryL,sz)<=width||!line)line=tryL;else{out.push(line);line=w}}out.push(line)}return out.filter((l,i,a)=>l||i<a.length-1)}
+function cupCardPdfOps(s,x,stamp){const r=HIST.find(h=>h.id===x.roastId),c=cardOf(x),l=r&&INV.find(z=>z.id===r.meta.invId),sp=r?spreadOf(r.meta):null,t=r?tasteOf(r):{};
+  const W=792,H=612,M=30,ops=[],f=n=>Number(n).toFixed(2);
+  const text=(s2,xx,yy,sz,bold,grey)=>{ops.push(`${grey?'0.35 0.35 0.35 rg':'0 0 0 rg'} BT /${bold?'F2':'F1'} ${sz} Tf ${f(xx)} ${f(yy)} Td (${pdfStr(s2)}) Tj ET`)};
+  const ctext=(s2,cx,yy,sz,bold)=>text(s2,cx-pdfTW(s2,sz,bold)/2,yy,sz,bold);
+  const line=(x1,y1,x2,y2,w,grey)=>ops.push(`${grey?'0.6 0.6 0.6 RG':'0 0 0 RG'} ${w} w ${f(x1)} ${f(y1)} m ${f(x2)} ${f(y2)} l S`);
+  const rect=(xx,yy,w,h,lw)=>ops.push(`0 0 0 RG ${lw} w ${f(xx)} ${f(yy)} ${f(w)} ${f(h)} re S`);
+  const box=(xx,yy,on)=>{const z=15;if(on){ops.push(`0 0 0 rg ${f(xx)} ${f(yy)} ${z} ${z} re f`);ops.push(`1 1 1 RG 1.8 w 1 J 1 j ${f(xx+3.4)} ${f(yy+7.6)} m ${f(xx+6.4)} ${f(yy+4.4)} l ${f(xx+11.8)} ${f(yy+10.8)} l S 0 J 0 j`)}else rect(xx,yy,z,z,1.1)};
+  // outer card and footer
+  const offOn=TASTE.filter(([k])=>k!=='good'&&t[k]>0),bot=offOn.length?M+28:M;
+  rect(M,M,W-2*M,H-2*M,2);
+  text('Zuna Coffee - cupping card',M,16,7,0,1);const ft=`${s.name} - printed ${stamp}`;text(ft,W-M-pdfTW(ft,7),16,7,0,1);
+  // header
+  const top=H-M;text(`#${r?r.num:'?'} · ${cupCoffee(r)}`,M+14,top-22,15,1);
+  if(r){const t1=`#${r.num} · ${cupCoffee(r)}`;text([r.meta.name,lbTxt(batchOf(r))].filter(Boolean).join(' · '),M+22+pdfTW(t1,15,1),top-22,9,0,1)}
+  const roasted=r?r.chargedAt||r.created:null;
+  const cols=[M+14,M+214,M+404,M+564],ends=[M+196,M+386,M+546,W-M-14];
+  const rows=[[['DATE:',fmtDate(s.date,false)],['MOISTURE:',l?l.moisture:''],['WB:',r?r.meta.colorWhole:''],['CUPPER:',s.cuppers]],
+              [['ROAST DATE:',roasted?fmtDate(roasted,false)+' ('+ageOf(roasted)+')':''],['SCREEN SIZE:',l?l.screen:''],['GB:',r?r.meta.colorGround:''],null],
+              [['COFFEE:',r?r.meta.coffee:''],['WATER ACTIVITY:',l?l.wa:''],['SPREAD:',ok(sp)?String(sp):''],null]];
+  rows.forEach((row,ri)=>{const yy=top-42-ri*17;row.forEach((cell,ci)=>{if(!cell)return;const lx=cols[ci];text(cell[0],lx,yy,7.5,1,1);const vx=lx+pdfTW(cell[0],7.5,1)+4;
+    text(cell[1]==null||cell[1]===''?'-':String(cell[1]),vx,yy,10,0);line(vx,yy-3,ends[ci],yy-3,.6,1)})});
+  const hb=top-92;line(M,hb,W-M,hb,2);
+  // four panels
+  const pw=(W-2*M)/4,px=i=>M+i*pw;for(let i=1;i<4;i++)line(px(i),hb,px(i),bot,1.5);
+  const title=(i,a,b)=>{const cx=px(i)+pw/2;ctext(a,cx,hb-18,9.5,1);ctext(b,cx,hb-30,9.5,1);line(px(i)+14,hb-37,px(i)+pw-14,hb-37,1)};
+  const bxA=i=>px(i)+pw-58,bxB=i=>px(i)+pw-32;
+  const colHead=(i,a,b)=>{ctext(a,bxA(i)+7.5,hb-52,8.5,1);ctext(b,bxB(i)+7.5,hb-52,8.5,1)};
+  const fam=(i,a,b)=>{FAMS.forEach(([fk,fl],j)=>{const yy=hb-78-j*31;text(fl.toUpperCase(),px(i)+12,yy+4,8.5,0);box(bxA(i),yy,(c.fam[fk]||[]).includes(a));box(bxB(i),yy,(c.fam[fk]||[]).includes(b))})};
+  title(0,'FRAGRANCE','AROMA');colHead(0,'F','A');fam(0,'F','A');
+  title(1,'FLAVOR','AFTERTASTE');colHead(1,'FL','AT');fam(1,'FL','AT');
+  title(2,'BODY','ACIDITY');colHead(2,'B','A');CLV.forEach((v,j)=>{const yy=hb-78-j*31;text(v.toUpperCase(),px(2)+12,yy+4,8.5,0);box(bxA(2),yy,c.body===v);box(bxB(2),yy,c.acid===v)});
+  title(3,'BALANCE','OVERALL');colHead(3,'Y','N');[['BALANCE','bal'],['OVERALL','ov']].forEach(([lab,k],j)=>{const yy=hb-78-j*31;text(lab,px(3)+12,yy+4,8.5,0);box(bxA(3),yy,c[k]==='Y');box(bxB(3),yy,c[k]==='N')});
+  const notes=(i,ytop,val)=>{line(px(i),ytop,px(i)+pw,ytop,1);text('NOTES:',px(i)+12,ytop-13,8,1);const lines=pdfWrap(val,9.5,pw-24);let yy=ytop-27;
+    for(let n=0;yy>bot+8;n++,yy-=17){if(lines[n])text(lines[n],px(i)+12,yy+3,9.5,0);line(px(i)+12,yy,px(i)+pw-12,yy,.5,1)}};
+  notes(2,hb-78-5*31+14,c.noteBA);notes(3,hb-78-2*31+14,x.comments);
+  // anything off
+  if(offOn.length){line(M,bot,W-M,bot,1.5);let xx=M+14;text('ANYTHING OFF?',xx,M+10,8,1);xx+=pdfTW('ANYTHING OFF?',8,1)+12;
+    for(const [k,lab] of offOn){const s2=`${lab.split(' / ')[0]} · ${SEV[t[k]]}`,w=pdfTW(s2,8.5)+14;if(xx+w>W-M-10)break;ops.push(`0 0 0 RG 1 w ${f(xx)} ${M+5} ${f(w)} 16 re S`);text(s2,xx+7,M+10,8.5,0);xx+=w+6}}
+  return ops.join('\n')}
+function cupCardsPdf(s,idx){const stamp=fmtDate(new Date().toISOString(),false),pages=idx.map(i=>cupCardPdfOps(s,s.samples[i],stamp));
+  const objs=[];const add=o=>{objs.push(o);return objs.length};
+  const cat=add(''),pagesId=add(''),f1=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>'),f2=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+  const kids=pages.map(ops=>{const cs=add(`<< /Length ${ops.length} >>\nstream\n${ops}\nendstream`);return add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 ${f1} 0 R /F2 ${f2} 0 R >> >> /Contents ${cs} 0 R >>`)});
+  objs[cat-1]=`<< /Type /Catalog /Pages ${pagesId} 0 R >>`;objs[pagesId-1]=`<< /Type /Pages /Kids [${kids.map(k=>k+' 0 R').join(' ')}] /Count ${kids.length} >>`;
+  let out='%PDF-1.4\n';const off=[];objs.forEach((o,i)=>{off.push(out.length);out+=`${i+1} 0 obj\n${o}\nendobj\n`});
+  const xr=out.length;out+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`+off.map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length+1} /Root ${cat} 0 R >>\nstartxref\n${xr}\n%%EOF\n`;
+  return out}
 async function cupPrint(s,idx){clearTimeout(cupSaveT);await persistCup();
+  const r1=HIST.find(h=>h.id===s.samples[idx[0]].roastId),nm=idx.length===1&&r1?`Cupping card #${r1.num}`:`Cupping cards ${s.name}`;
+  if(window.ZR_NATIVE&&ZR_NATIVE.openPdf){try{await ZR_NATIVE.openPdf(nm,cupCardsPdf(s,idx));toast('Cards opened in Preview — print from there (⌘P). Landscape is set.')}catch(e){toast('Could not open the PDF: '+e)}return}
   const pages=idx.map(i=>`<div class="cpPage"><div class="cpRot">${cupCardHTML(s,s.samples[i],i,1)}<div class="cpFoot"><span>Zuna Coffee · cupping card</span><span>${esc(s.name)} · printed ${fmtDate(new Date().toISOString(),false)}</span></div></div></div>`).join('');
   const r0=HIST.find(h=>h.id===s.samples[idx[0]].roastId);
   await rpPrint(`<div class="cupPrint">${pages}</div>`,idx.length===1&&r0?`Cupping card #${r0.num}`:`Cupping cards ${s.name}`)}
