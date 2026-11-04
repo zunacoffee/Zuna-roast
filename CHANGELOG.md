@@ -2,6 +2,17 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.40 — Cupping cards like the paper card (Nov 4, 2026; Mac, 13" iPad, iPhone)
+- Ty: the F / A / FL / AT letters repeating everywhere were confusing, and he wanted the screen to look like the Brewed Behavior card he uses.
+- **Mac Cupping = one paper card per sample** (`renderCupMac`, `cupCardHTML`): header (date, roast date, coffee, moisture, screen size, water activity, WB, GB, spread, cupper), four panels Fragrance/Aroma (F A), Flavor/Aftertaste (FL AT), Body/Acidity (B A × Heavy / Medium+ / Medium / Light+ / Light), Balance/Overall (Y N), two notes areas, "Anything off?" chips (the roast's own taste tags, tap again for a little / some / a lot), To Analyze bar with Print, Compare with…, Analyze →. Plain boxes, no shaded columns; ticked = accent, carbon = danger, off chips = warn.
+- 2 or 4 cards per screen: `cfg.cupPerScreen` (default 2), Settings › Appearance › Cupping. 4 per screen fits a 15" MacBook Air (1710×1045); there "Anything off?" opens with Edit / + Pick what was off.
+- Session list replaced by a dropdown in the page row on the Mac (`#scr-cupping.cmMac`, `#cDetail.cmOn`); New session, 100-point form and the empty state still use the old split layout. "Jump to" strip (sticky) when there are more samples than fit; ⚠ on cards with something off. One sample: "Compare #N with…" panel (earlier cuppings of the same coffee first).
+- **Compare** (read-only): picks roasts from this session and from other sessions (grouped by coffee, "same coffee" marked); more than 6 → "Comparing N roasts ▾" with tick boxes and sideways scroll (names fixed on the left). Body/Acidity/Balance/Overall as words, Anything off? and Notes rows, sticky headings, Hide empty rows, Edit opens that card. Selection keys `sessionId|roastId` (`cupFind`).
+- **Print**: Print under a card, or Print… to tick which cards (`askPrintCards`). One card per Letter page, portrait (the iPad PDF is portrait-only), black and white; only the picked "Anything off?" items print. Uses `rpPrint`.
+- Body/acidity levels Light / Light+ / Medium / Medium+ / Heavy on Mac, iPad (`renderCupPad`, Body/Acidity now span two columns) and iPhone (L / L+ / M / M+ / H). New optional `card.noteBA` = notes under Body/Acidity on all three; `comments` stays the notes under Balance/Overall, so old cards open unchanged. CSV adds `card_notes_body_acidity`.
+- Analyze (`cardFaults`): Light body → thin 2 (was 1), Light+ → thin 1; Heavy acidity → sharp 2 (was 1), Medium+ → sharp 1. Cupping-cards-over-time table shows L / L+ / M / M+ / H.
+- Checked with demo data at MacBook 1728×1050, Air 1710×1045, iMac 2240×1260, iPad 1366×1024 and iPhone 393×852 (before/after on iPad/iPhone: only the Body/Acidity levels and the new notes box changed). Print checked as PDFs in Mac and `?ipad=1` modes (3 cards → 3 pages).
+
 ## 1.0.39 — Margin targets by bag size (Nov 3, 2026; Mac, 13" iPad, iPhone)
 - Ty: bigger bags should take a smaller margin. Targets were one number per channel (wholesale/retail) for every bag. Now each bag size has its own target, for both bases.
 - Data: `cfg.pricing.bagM = {gross:{'12oz':{w,r},'2lb':{w,r},'5lb':{w,r}}, net:{…}}` (settings only, optional). `PRC()` fills missing ones from the old single targets (`gwMargin`/`grMargin`, `wMargin`/`rMargin`) minus 0 / 5 / 10 points for 12 oz / 2 lb / 5 lb; the old fields stay.
