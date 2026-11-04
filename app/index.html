@@ -635,13 +635,14 @@ html:not(.ipad):not(.iphone) #scr-cupping.cmMac .cupsplit>.card.scroll,html:not(
 .cmk.on{background:var(--accent);border-color:var(--accent)}.cmk.on.carbon{background:var(--danger);border-color:var(--danger)}
 .cplist{display:flex;flex-direction:column;margin:var(--sp-2) 0 var(--sp-3);max-height:360px;overflow:auto}.cplist label{padding:7px 2px;border-top:1px solid var(--line2);margin:0}
 /* print: one card per Letter page, black and white */
-.cupPrint .cpPage{height:9.9in;display:flex;flex-direction:column;break-after:page;page-break-after:always}.cupPrint .cpPage:last-child{break-after:auto;page-break-after:auto}
-.cupPrint .cpc{--ink:#000;flex:1;border:2px solid #000;color:#000;border-radius:8px}.cupPrint .chd{grid-template-columns:1.35fr 1.1fr .7fr .9fr;gap:3px 12px;padding:12px 14px}
-.cupPrint .cttl b{font-size:17px}.cupPrint .cf{font-size:12.5px}.cupPrint .cf span{color:#444}.cupPrint .cf b{border-bottom-color:#999}.cupPrint .cf b *{color:#000!important}
-.cupPrint .cpn{padding:12px}.cupPrint .cpt{font-size:12px;margin-bottom:10px}.cupPrint .cgr{grid-template-columns:minmax(0,1fr) 28px 28px;row-gap:24px}.cupPrint .cgr.lv{row-gap:20px}.cupPrint .ol{color:#000}.cupPrint .cgr .n{font-size:12px}
-.cupPrint .cbx{width:22px;height:22px;border-color:#000;background:#fff}.cupPrint .cbx.on{background:#000;border-color:#000}
-.cupPrint .cnt{margin-top:14px}.cupPrint .cnt.big{flex:1}.cupPrint .ptx{flex:1;min-height:90px;font-size:12.5px;line-height:22px;white-space:pre-wrap;background:repeating-linear-gradient(#fff 0 21px,#999 21px 22px)}
-.cupPrint .coff{border-top-color:#000}.cupPrint .coc{display:inline-flex;align-items:center;height:24px;border:1.5px solid #000;background:#fff;color:#000;font-size:12px}
+.cupPrint .cpPage{height:7.55in;display:flex;flex-direction:column;break-after:page;page-break-after:always}.cupPrint .cpPage:last-child{break-after:auto;page-break-after:auto}
+.cupPrint .cpc{--ink:#000;flex:1;border:2px solid #000;color:#000;border-radius:8px}.cupPrint .chd{grid-template-columns:1.2fr 1.1fr .8fr .9fr;gap:4px 18px;padding:12px 18px}
+.cupPrint .cttl b{font-size:19px}.cupPrint .cttl .muted{font-size:13px}.cupPrint .cf{font-size:14px}.cupPrint .cf span{color:#444;font-size:12px}.cupPrint .cf b{border-bottom-color:#999}.cupPrint .cf b *{color:#000!important}
+.cupPrint .cpn{padding:12px 14px}.cupPrint .cpt{font-size:13px;margin-bottom:10px;padding-bottom:6px}
+.cupPrint .cgr{grid-template-columns:minmax(0,1fr) 32px 32px;row-gap:14px}.cupPrint .cgr.lv{row-gap:14px}.cupPrint .cgr .n{font-size:13px}.cupPrint .cgr .h{font-size:13px}.cupPrint .ol{color:#000;font-size:12px}
+.cupPrint .cbx{width:24px;height:24px;border-color:#000;background:#fff;font-size:15px}.cupPrint .cbx.on{background:#000;border-color:#000}
+.cupPrint .cnt{margin-top:12px;flex:1}.cupPrint .cnt .lab{font-size:12px}.cupPrint .ptx{flex:1;min-height:70px;font-size:13.5px;line-height:24px;white-space:pre-wrap;background:repeating-linear-gradient(#fff 0 23px,#999 23px 24px)}
+.cupPrint .coff{border-top-color:#000;padding:8px 18px}.cupPrint .coc{display:inline-flex;align-items:center;height:26px;border:1.5px solid #000;background:#fff;color:#000;font-size:13px}
 .cupPrint .muted{color:#444}.cpFoot{display:flex;justify-content:space-between;font-size:9.5px;color:#6B7280;margin-top:6px}
 @media print{.cupPrint *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .cot th.cur,.cot td.cur{background:var(--accentSoft)}
@@ -3373,6 +3374,7 @@ function askPrintCards(s){return new Promise(res=>{const root=$('#modalRoot');
   bs().forEach(b=>b.onchange=cnt);cnt();$('#cpAll').onclick=()=>{bs().forEach(b=>b.checked=true);cnt()};$('#cpNone').onclick=()=>{bs().forEach(b=>b.checked=false);cnt()};
   const done=v=>{root.innerHTML='';res(v)};$('#mNo').onclick=()=>done(null);$('#mYes').onclick=()=>done(bs().filter(b=>b.checked).map(b=>+b.value))})}
 async function cupPrint(s,idx){clearTimeout(cupSaveT);await persistCup();
+  if(!$('#cupPageCss')){const st=document.createElement('style');st.id='cupPageCss';st.textContent='@media print{@page{size:letter landscape;margin:.4in}}';document.head.appendChild(st)}
   const pages=idx.map(i=>`<div class="cpPage">${cupCardHTML(s,s.samples[i],i,1)}<div class="cpFoot"><span>Zuna Coffee · cupping card</span><span>${esc(s.name)} · printed ${fmtDate(new Date().toISOString(),false)}</span></div></div>`).join('');
   const r0=HIST.find(h=>h.id===s.samples[idx[0]].roastId);
   await rpPrint(`<div class="cupPrint">${pages}</div>`,idx.length===1&&r0?`Cupping card #${r0.num}`:`Cupping cards ${s.name}`)}
@@ -5066,7 +5068,8 @@ function rpInvTiles(I,R){const t=I.tot;return [[`On hand ${rdShort(R.from)}`,rpN
 function rsFit(el){const d=el.querySelector('.pdSheet');if(!d)return;d.style.zoom='';
   const box=document.createElement('div');box.style.cssText='position:fixed;left:-10000px;top:0;width:730px;visibility:hidden';const c=d.cloneNode(true);c.style.cssText='width:730px;min-height:0;padding:0';box.appendChild(c);document.body.appendChild(box);
   const h=c.scrollHeight+12;box.remove();if(h>930)d.style.zoom=String(Math.max(.7,930/h).toFixed(3))}
-async function rpPrint(html,name){const el=$('#printArea');el.innerHTML=html;rsFit(el);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+async function rpPrint(html,name){if(!String(html).includes('cupPrint')){const cp=$('#cupPageCss');if(cp)cp.remove()}   // cupping cards print landscape; everything else stays portrait
+  const el=$('#printArea');el.innerHTML=html;rsFit(el);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   try{if(window.ZR_NATIVE&&ZR_NATIVE.printPage)await ZR_NATIVE.printPage(name+'.pdf');else window.print()}catch(e){toast('Could not print: '+e)}}
 const rpFileDate=R=>rdIso(R.from)+'_to_'+rdIso(rdAdd(R.end,-1));
 
