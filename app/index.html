@@ -423,6 +423,11 @@ table.mini th{position:static;padding:7px 8px}table.mini td{padding:7px 8px;curs
 .ppill{display:inline-block!important;font-size:var(--fs-cap);font-weight:600;letter-spacing:.02em;border-radius:999px;padding:1px 9px!important;line-height:1.6!important;border:0!important}
 .ppill.w{background:color-mix(in srgb,var(--p-whole) 13%,var(--panel));color:var(--p-whole)}.ppill.r{background:color-mix(in srgb,var(--p-retail) 14%,var(--panel));color:var(--p-retail)}
 .wr .ptc{padding:3px 0}.plow{color:var(--p-low)!important}td.prc.wr span{font-weight:600}.notset{color:var(--text2);font-weight:400!important}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3)}
+.mtab{border:1px solid var(--line2);border-radius:var(--r-md);padding:var(--sp-3);display:flex;flex-direction:column;gap:var(--sp-2)}.mtab.on{border-color:color-mix(in srgb,var(--accent) 45%,var(--line2))}
+.mth{display:flex;flex-direction:column;gap:2px;font-size:var(--fs-sm)}
+.mrow{display:grid;grid-template-columns:52px 1fr 1fr;gap:var(--sp-2);align-items:center;font-size:var(--fs-body)}.mrow.h span{font-size:var(--fs-cap)}
+.pctin{position:relative;display:block}.pctin input{padding-right:24px;text-align:right}.pctin i{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--text2);font-size:var(--fs-sm)}
 .prbar select{width:auto;padding:4px 8px;font-size:var(--fs-sm)}
 tr.grp td{background:var(--soft)!important;cursor:default;font-size:var(--fs-cap);text-transform:uppercase;letter-spacing:.06em;color:var(--text2);font-weight:600;padding-top:7px;padding-bottom:7px;box-shadow:none!important}
 .recipe{border:1px solid var(--line2);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-2)}
@@ -3021,7 +3026,12 @@ const PR_DEF={
 function PRC(){const p=cfg.pricing||{},d=JSON.parse(JSON.stringify(PR_DEF)),o={...d,...p};
   o.bagMin={...d.bagMin,...(p.bagMin||{})};o.pack={...d.pack,...(p.pack||{})};
   if(!Array.isArray(o.overhead))o.overhead=d.overhead;if(!Array.isArray(o.blends))o.blends=[];if(!Array.isArray(o.tiers))o.tiers=d.tiers;
-  o.actual=p.actual&&typeof p.actual==='object'?p.actual:{};return o}
+  o.actual=p.actual&&typeof p.actual==='object'?p.actual:{};
+  // Margin targets per bag size (cfg.pricing.bagM, optional). Missing ones start from the old single targets, stepping down 5 points per size.
+  const step={'12oz':0,'2lb':5,'5lb':10},pb=p.bagM||{};o.bagM={};
+  [['gross','gwMargin','grMargin'],['net','wMargin','rMargin']].forEach(([bs,wk,rk])=>{o.bagM[bs]={};BAGS.forEach(b=>{const x=(pb[bs]||{})[b.k]||{},
+    w0=Math.max(0,(num(o[wk])||0)-step[b.k]),r0=Math.max(0,(num(o[rk])||0)-step[b.k]);o.bagM[bs][b.k]={w:ok(num(x.w))?num(x.w):w0,r:ok(num(x.r))?num(x.r):r0}})});
+  return o}
 function savePR(o){cfg.pricing=o;saveCfg()}
 let PRW={days:null,green:0},prSel=null,prView='prices',prSide='w';
 const prKey=l=>normName(l.name);
@@ -3040,7 +3050,8 @@ function prContext(o){const now=Date.now(),rs=realRoasts().filter(r=>now-rTime(r
   const labPerLb=(num(o.rate)||0)*(num(o.batchMin)||0)/60/batchLb;
   return {rs,auto,useAuto,base,days,daysNow,month,ohMonth,ohPerLb:month>0?ohMonth/month:null,batchLb,batchFromHist:bl.length>0,labPerLb}}
 /* Margin targets for the basis Ty picked: gross = before rent & overhead (how most roasters quote margin), net = after overhead. */
-function prT(o){return o.basis==='net'?{w:num(o.wMargin)||0,r:num(o.rMargin)||0,name:'after overhead'}:{w:num(o.gwMargin)||0,r:num(o.grMargin)||0,name:'gross'}}
+function prT(o,bk='12oz',basis=o.basis){const t=o.bagM[basis==='net'?'net':'gross'][bk];return {w:t.w,r:t.r,name:basis==='net'?'after overhead':'gross'}}
+const prTs=(o,k)=>BAGS.map(b=>num(prT(o,b.k)[k])).join(' / ');
 function prCalc(l,o,ctx){const hasPrice=ok(num(l.price)),landed=(num(l.price)||0)+(num(l.freight)||0)+(Number(PRW.green)||0);
   const ls=realRoasts().filter(r=>r.meta.invId===l.id||normName(r.meta.coffee)===prKey(l)).map(r=>{const g=num(r.meta.green),w=num(r.meta.roasted);return g&&w?(g-w)/g*100:null}).filter(v=>ok(v)&&v>0&&v<40).slice(0,6);
   const loss=ls.length?ls.reduce((a,v)=>a+v,0)/ls.length:(num(o.lossDefault)||15);
@@ -3050,10 +3061,10 @@ function prCalc(l,o,ctx){const hasPrice=ok(num(l.price)),landed=(num(l.price)||0
 function prBags(coffee,key,o,ctx){const oh=ctx.ohPerLb||0,lab=ctx.labPerLb||0;
   const act=o.actual[key]||{};
   const bags=BAGS.map(b=>{const parts={coffee:coffee*b.lb,overhead:oh*b.lb,labor:lab*b.lb+(num(o.rate)||0)*(num(o.bagMin[b.k])||0)/60,pack:num(o.pack[b.k])||0};
-    const cost=parts.coffee+parts.overhead+parts.labor+parts.pack,gcost=cost-parts.overhead,T=prT(o),base=o.basis==='net'?cost:gcost;
+    const cost=parts.coffee+parts.overhead+parts.labor+parts.pack,gcost=cost-parts.overhead,T=prT(o,b.k),base=o.basis==='net'?cost:gcost;
     const sw=prRound(base/(1-T.w/100),num(o.round)),sr=prRound(base/(1-T.r/100),num(o.round));
     const a=act[b.k]||{},aw=num(a.w),ar=num(a.r),w=ok(aw)?aw:sw,r=ok(ar)?ar:sr,mgN=p=>p>0?(p-cost)/p*100:null,mgG=p=>p>0?(p-gcost)/p*100:null,mg=o.basis==='net'?mgN:mgG;
-    return {...b,parts,cost,gcost,sw,sr,aw,ar,w,r,mw:mg(w),mr:mg(r),gw:mgG(w),gr:mgG(r),nw:mgN(w),nr:mgN(r),lowW:ok(aw)&&mg(aw)<T.w-0.05,lowR:ok(ar)&&mg(ar)<T.r-0.05}});
+    return {...b,parts,cost,gcost,sw,sr,aw,ar,w,r,tw:T.w,tr:T.r,mw:mg(w),mr:mg(r),gw:mgG(w),gr:mgG(r),nw:mgN(w),nr:mgN(r),lowW:ok(aw)&&mg(aw)<T.w-0.05,lowR:ok(ar)&&mg(ar)<T.r-0.05}});
   return {coffee,perLb:coffee+oh+lab,bags,low:bags.some(b=>b.lowW||b.lowR)}}
 /* ---- Blends: a recipe of green coffees by share. Kept in cfg.pricing.blends (settings), never in the roast files.
    Each part points at a coffee by name, so the blend follows that coffee to its next lot (like typed prices).
@@ -3090,7 +3101,7 @@ function renderPrOverview(o,ctx){const el=$('#prOverview'),what=PRW.days!=null||
   // pounds/month & overhead/lb for 1–5 roast days
   const perDay=ctx.daysNow>0?ctx.base/ctx.daysNow:0,days=[1,2,3,4,5].map(d=>({d,lb:perDay*d,oh:perDay*d>0?ctx.ohMonth/(perDay*d):null})),maxOh=Math.max(...days.map(x=>x.oh||0));
   // break-even for every price Ty has typed in
-  const rows=[];[...calc,...bcalc].forEach(({l,c})=>c.bags.forEach(b=>[['w','Wholesale',o.wMargin],['r','Retail',o.rMargin]].forEach(([k,n,m])=>{const p=b['a'+k];if(!ok(p))return;
+  const rows=[];[...calc,...bcalc].forEach(({l,c})=>c.bags.forEach(b=>[['w','Wholesale',prT(o,b.k,'net').w],['r','Retail',prT(o,b.k,'net').r]].forEach(([k,n,m])=>{const p=b['a'+k];if(!ok(p))return;
     rows.push({l,b,n,p,m,zero:prVolFor(p,b,0,ctx.ohMonth),tgt:prVolFor(p,b,m,ctx.ohMonth)})})));
   rows.sort((x,y)=>(y.tgt??1e9)-(x.tgt??1e9));
   const vol=v=>v==null?'<span class="dangerTxt">never</span>':ok(v)?`${Math.round(v).toLocaleString()} lb`:'—';
@@ -3129,10 +3140,10 @@ function renderPrPrices(o,ctx){const q=normName($('#prSearch').value);
   const T=prT(o);
   $('#prBar').innerHTML=`<b>Your prices</b><span class="muted">per bag</span><span class="sp"></span><span class="muted">Margin</span>
     <select id="prBasisSel"><option value="gross" ${o.basis!=='net'?'selected':''}>Gross — before rent</option><option value="net" ${o.basis==='net'?'selected':''}>After overhead</option></select>
-    <span class="muted">targets <b style="color:var(--text)">${num(T.w)} %</b> wholesale · <b style="color:var(--text)">${num(T.r)} %</b> retail</span>
+    <span class="muted" title="12 oz / 2 lb / 5 lb — set in Costs &amp; settings">targets <b style="color:var(--text)">${prTs(o,'w')} %</b> wholesale · <b style="color:var(--text)">${prTs(o,'r')} %</b> retail</span>
     ${infoTip(o.basis==='net'?'<b>After overhead</b> = what’s left once rent, gas and other monthly costs are paid. The strict view: does this price cover everything at your current volume?':'<b>Gross</b> = price minus coffee, labor and bag — before rent &amp; overhead. This is how most roasters quote margin. Rent is covered by volume; check that on the Overview.')}`;
   $('#prBasisSel').onchange=e=>{const p=PRC();p.basis=e.target.value;savePR(p);renderPricing()};
-  const one=(b,k)=>{const a=b['a'+k];if(!ok(a))return '<span class="notset">—</span>';const m=b['m'+k],low=m<(k==='w'?T.w:T.r)-0.05;
+  const one=(b,k)=>{const a=b['a'+k];if(!ok(a))return '<span class="notset">—</span>';const m=b['m'+k],low=m<b['t'+k]-0.05;
     return `<span class="${low?'plow':''}" title="${b.lb!==1?money(a/b.lb)+' / lb · ':''}${ok(m)?m.toFixed(0)+' % margin':''}">${money(a)}</span>`};
   const prices=c=>`<td class="wr"><span class="ptc"><b class="ppill w">Wholesale</b></span><span class="ptc"><b class="ppill r">Retail</b></span></td>${c.bags.map(b=>`<td class="n prc wr">${one(b,'w')}${one(b,'r')}</td>`).join('')}`;
   $('#prRows').innerHTML=(blends.length&&list.length?'<tr class="grp"><td colspan="5">Single origins</td></tr>':'')+list.map(l=>{const c=prCalc(l,o,ctx);
@@ -3142,7 +3153,7 @@ function renderPrPrices(o,ctx){const q=normName($('#prSearch').value);
     return `<tr class="${id===prSel?'sel':''}" data-id="${id}"><td><b>${esc(bl.name)}</b><div class="muted" style="font-size:var(--fs-sm)">${esc(prBlendLine(bl))||'No coffees yet'}</div></td>
       ${c.hasPrice?prices(c):`<td colspan="4" class="muted">${c.missing.length?esc(c.missing.map(p=>p.name||p.key).join(', '))+' — no green price yet':'Recipe not finished'}</td>`}</tr>`}).join('');
   $('#prEmpty').innerHTML=list.length||blends.length?`<div class="prlegend"><span><b style="color:var(--text)">Black</b> = your price</span><span class="plow">Red = below target</span><span>— = not set yet</span><span class="sp"></span>
-    ${infoTip(`Only the prices you’ve set show here. Pick a coffee and type its prices in the card on the right — it also shows the suggested price, price per lb and both margins.<br><br><b>Margin is not markup.</b> Margin is the share of the price you keep. A $10 cost at ${num(T.w)} % margin sells for ${money(10/(1-T.w/100))}, not ${money(10*(1+T.w/100))}.`)}</div>`
+    ${infoTip(`Only the prices you’ve set show here. Pick a coffee and type its prices in the card on the right — it also shows the suggested price, price per lb and both margins.<br><br><b>Margin is not markup.</b> Margin is the share of the price you keep. A $10 cost at ${num(T.w)} % margin sells for ${money(10/(1-T.w/100))}, not ${money(10*(1+T.w/100))}.<br><br>Each bag size has its own target (12 oz / 2 lb / 5 lb) — bigger bags take a smaller margin. Set them in Costs &amp; settings.`)}</div>`
     :`<div class="empty">No green coffee in stock.<br>Add coffee on the Green coffee screen, with its price per lb, to see prices here.</div>`;
   renderPrDetail(o,ctx)}
 
@@ -3167,14 +3178,14 @@ function renderPrDetail(o,ctx){const el=$('#prDetail'),bl=String(prSel||'').star
         <div class="kv"><span>Coffee per lb roasted <span class="muted">(incl. ${num(o.waste)||0} % waste)</span></span><b class="tnum">${money(c.coffee)}</b></div>
         <div class="kv"><span>Overhead per lb</span><b class="tnum">${money(ctx.ohPerLb)}</b></div>
         <div class="kv" style="border:0"><span>Roasting labor per lb</span><b class="tnum">${money(lab)}</b></div></div>`:''}</div>
-    ${c.bags.map(b=>`<div class="bagbox"><div class="row"><b style="font-size:calc(15px*var(--ts,1))">${b.label} bag</b><span class="sp"></span><span class="muted">Cost</span><b class="tnum">${money(b.cost)}</b></div>
+    ${c.bags.map(b=>`<div class="bagbox"><div class="row"><b style="font-size:calc(15px*var(--ts,1))">${b.label} bag</b><span class="muted" style="font-size:var(--fs-sm)">targets ${num(b.tw)} % · ${num(b.tr)} % ${prT(o).name==='gross'?'gross':'after OH'}</span><span class="sp"></span><span class="muted">Cost</span><b class="tnum">${money(b.cost)}</b></div>
       <div class="stack" title="${Object.keys(COL).map(x=>NAME[x]+' '+money(b.parts[x])).join(' · ')}">${Object.keys(COL).map(x=>`<i style="width:${b.parts[x]/b.cost*100}%;background:${COL[x]}"></i>`).join('')}</div>
       <div class="pin h"><span></span><span>Suggested</span><span></span><span>Your price</span><span class="n">Gross</span><span class="n" title="After rent, gas &amp; other overhead">After OH</span></div>
-      ${[['w','Wholesale','gwMargin','wMargin'],['r','Retail','grMargin','rMargin']].map(([k,n,g,nt])=>{const sg=b['s'+k],a=b['a'+k];return `<div class="pin"><span><b class="ppill ${k}">${n}</b></span><span class="tnum sug">${money(sg)}</span><span class="muted tnum" style="text-align:right;font-size:var(--fs-sm)">${b.lb!==1&&ok(a)?money(a/b.lb)+' / lb':''}</span><input data-act="${b.k}:${k}" inputmode="decimal" value="${ok(a)?a.toFixed(2):''}" placeholder="${sg.toFixed(2)}"><b class="n tnum">${ok(a)?tg(b['g'+k],num(o[g])):'<span class="muted">—</span>'}</b><b class="n tnum">${ok(a)?tg(b['n'+k],num(o[nt])):'<span class="muted">—</span>'}</b></div>`}).join('')}
+      ${[['w','Wholesale'],['r','Retail']].map(([k,n])=>{const sg=b['s'+k],a=b['a'+k];return `<div class="pin"><span><b class="ppill ${k}">${n}</b></span><span class="tnum sug">${money(sg)}</span><span class="muted tnum" style="text-align:right;font-size:var(--fs-sm)">${b.lb!==1&&ok(a)?money(a/b.lb)+' / lb':''}</span><input data-act="${b.k}:${k}" inputmode="decimal" value="${ok(a)?a.toFixed(2):''}" placeholder="${sg.toFixed(2)}"><b class="n tnum">${ok(a)?tg(b['g'+k],prT(o,b.k,'gross')[k]):'<span class="muted">—</span>'}</b><b class="n tnum">${ok(a)?tg(b['n'+k],prT(o,b.k,'net')[k]):'<span class="muted">—</span>'}</b></div>`}).join('')}
       </div>`).join('')}
     ${o.tiers.length>1?`<div><button class="fold" id="prTierTg">${prOpen.tiers?'▾':'▸'} Wholesale volume pricing</button>${prOpen.tiers?`<table class="mini" style="margin-top:6px"><thead><tr><th>Tier</th>${c.bags.map(b=>`<th class="n">${b.label}</th>`).join('')}<th class="n">${prT(o).name==='gross'?'Gross':'After OH'} (12 oz)</th></tr></thead><tbody>${o.tiers.map(t=>{const f=1-(num(t.off)||0)/100,p0=c.bags[0].w*f,c0=o.basis==='net'?c.bags[0].cost:c.bags[0].gcost,m=p0>0?(p0-c0)/p0*100:null;
-      return `<tr><td>${esc(t.name)}${num(t.off)?` <span class="muted">−${num(t.off)} %</span>`:''}</td>${c.bags.map(b=>`<td class="n">${money(b.w*f)}</td>`).join('')}<td class="n">${tg(m,prT(o).w)}</td></tr>`}).join('')}</tbody></table>`:''}</div>`:''}
-    <div class="row muted" style="font-size:var(--fs-sm);gap:8px">${infoTip(`Your prices are kept for “${esc(l.name)}” and carry over to its next lot. Leave a box empty until you’ve decided — the list on the left shows only prices you’ve set.<br><br>Targets — gross: wholesale ${num(o.gwMargin)} %, retail ${num(o.grMargin)} % · after overhead: wholesale ${num(o.wMargin)} %, retail ${num(o.rMargin)} %.`)}<span>How these numbers work</span>${bl?'<span class="sp"></span><button class="sm dangerTxt" id="blDel">Delete blend</button>':''}</div>`;
+      return `<tr><td>${esc(t.name)}${num(t.off)?` <span class="muted">−${num(t.off)} %</span>`:''}</td>${c.bags.map(b=>`<td class="n">${money(b.w*f)}</td>`).join('')}<td class="n">${tg(m,prT(o,'12oz').w)}</td></tr>`}).join('')}</tbody></table>`:''}</div>`:''}
+    <div class="row muted" style="font-size:var(--fs-sm);gap:8px">${infoTip(`Your prices are kept for “${esc(l.name)}” and carry over to its next lot. Leave a box empty until you’ve decided — the list on the left shows only prices you’ve set.<br><br>Targets (12 oz / 2 lb / 5 lb) — gross: wholesale ${prTs({...o,basis:'gross'},'w')} %, retail ${prTs({...o,basis:'gross'},'r')} % · after overhead: wholesale ${prTs({...o,basis:'net'},'w')} %, retail ${prTs({...o,basis:'net'},'r')} %.`)}<span>How these numbers work</span>${bl?'<span class="sp"></span><button class="sm dangerTxt" id="blDel">Delete blend</button>':''}</div>`;
   $('#prCostTg').onclick=()=>{prOpen.cost=!prOpen.cost;renderPrDetail(o,ctx)};
   if($('#prTierTg'))$('#prTierTg').onclick=()=>{prOpen.tiers=!prOpen.tiers;renderPrDetail(o,ctx)};
   $$('[data-act]',el).forEach(i=>i.onchange=()=>{const [bk,t]=i.dataset.act.split(':'),v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter the price as a number, e.g. 12.50');return}
@@ -3226,19 +3237,20 @@ function renderPrCosts(o,ctx){const el=$('#prCosts');
   <div class="card prcard"><div class="h3">Bag, valve &amp; label cost per bag ($)</div>
     <div class="grid3">${BAGS.map(b=>`<label class="field">${b.label}${inp('pack.'+b.k,o.pack[b.k],'100%')}</label>`).join('')}</div>
     <div class="h3" style="margin-top:6px">Margins</div>
-    <div class="muted" style="font-size:var(--fs-sm)">Gross — before rent &amp; overhead (how most roasters set prices)</div>
-    <div class="grid3"><label class="field">Wholesale gross (%)${inp('gwMargin',o.gwMargin,'100%','45')}</label><label class="field">Retail gross (%)${inp('grMargin',o.grMargin,'100%','65')}</label><span></span></div>
-    <div class="muted" style="font-size:var(--fs-sm)">After overhead — what’s left once rent, gas and other costs are paid</div>
-    <div class="grid3"><label class="field">Wholesale after overhead (%)${inp('wMargin',o.wMargin,'100%','30')}</label><label class="field">Retail after overhead (%)${inp('rMargin',o.rMargin,'100%','50')}</label>
-      <label class="field">Round prices up to<select data-pr="round">${[[0,'Exact'],[0.05,'$0.05'],[0.25,'$0.25'],[0.5,'$0.50'],[1,'$1.00']].map(([v,t])=>`<option value="${v}" ${Number(o.round)===v?'selected':''}>${t}</option>`).join('')}</select></label></div>
+    <div class="muted" style="font-size:var(--fs-sm)">Target margin for each bag size. Bigger bags sell more coffee at once, so they usually take a smaller margin.</div>
+    <div class="mgrid">${[['gross','Gross — before rent &amp; overhead','how most roasters set prices'],['net','After overhead','what’s left once rent, gas and other costs are paid']].map(([bs,t,sub])=>`<div class="mtab${o.basis===bs||(bs==='gross'&&o.basis!=='net')?' on':''}">
+      <div class="mth"><b>${t}</b><span class="muted">${sub}${o.basis===bs||(bs==='gross'&&o.basis!=='net')?' · <span style="color:var(--accent)">in use</span>':''}</span></div>
+      <div class="mrow h"><span></span><span><b class="ppill w">Wholesale</b></span><span><b class="ppill r">Retail</b></span></div>
+      ${BAGS.map(b=>`<div class="mrow"><span>${b.label}</span><span class="pctin">${inp('bagM.'+bs+'.'+b.k+'.w',o.bagM[bs][b.k].w,'100%')}<i>%</i></span><span class="pctin">${inp('bagM.'+bs+'.'+b.k+'.r',o.bagM[bs][b.k].r,'100%')}<i>%</i></span></div>`).join('')}</div>`).join('')}</div>
+    <div class="grid3"><label class="field">Round prices up to<select data-pr="round">${[[0,'Exact'],[0.05,'$0.05'],[0.25,'$0.25'],[0.5,'$0.50'],[1,'$1.00']].map(([v,t])=>`<option value="${v}" ${Number(o.round)===v?'selected':''}>${t}</option>`).join('')}</select></label></div>
     <div class="grid3"><label class="field">Waste — samples, rejects (%)${inp('waste',o.waste,'100%','3')}</label><label class="field">Weight loss if no roasts yet (%)${inp('lossDefault',o.lossDefault,'100%','15')}</label></div>
-    <div class="muted" style="font-size:var(--fs-sm)">Margin is profit ÷ price. A 30 % margin means price = cost ÷ 0.70. Suggested prices follow the Gross / After overhead switch on the Price list. The gross targets are common starting points — adjust them to what works for you.</div></div>
+    <div class="muted" style="font-size:var(--fs-sm)">Margin is profit ÷ price. A 30 % margin means price = cost ÷ 0.70. Suggested prices use the table that’s in use — switch it with the Margin menu on the Price list. The targets are starting points — adjust them to what works for you.</div></div>
   <div class="card prcard"><div class="h3">Wholesale volume tiers</div>
     <div class="prrow t h"><span>Tier</span><span>Min lb / week</span><span>% off</span><span></span></div>
     ${o.tiers.map((t,i)=>`<div class="prrow t"><input data-tier="${i}:name" value="${esc(t.name)}"><input data-tier="${i}:minLb" inputmode="decimal" value="${ok(num(t.minLb))?t.minLb:''}"><input data-tier="${i}:off" inputmode="decimal" value="${ok(num(t.off))?t.off:''}"><button class="sm" data-tierdel="${i}" ${i===0?'disabled':''} title="Remove">×</button></div>`).join('')}
     <div class="row"><button class="sm" id="prTierAdd">+ Add tier</button></div></div>
   </div>`;
-  const set=(path,val)=>{const p=PRC(),ks=path.split('.');let t=p;for(let i=0;i<ks.length-1;i++)t=t[ks[i]];t[ks.at(-1)]=val;savePR(p);renderPricing()};
+  const set=(path,val)=>{const p=PRC(),ks=path.split('.');let t=p;for(let i=0;i<ks.length-1;i++)t=t[ks[i]]=t[ks[i]]||{};t[ks.at(-1)]=val;savePR(p);renderPricing()};
   $$('[data-pr]',el).forEach(i=>i.onchange=()=>{const v=num(i.value);if(i.value.trim()&&!ok(v)){toast('Enter a number');return}set(i.dataset.pr,ok(v)?v:'')});
   $$('input[name=prVol]',el).forEach(i=>i.onchange=()=>set('volMode',i.value));
   const listEdit=(attr,arr)=>$$(`[data-${attr}]`,el).forEach(i=>i.onchange=()=>{const [ix,f]=i.dataset[attr].split(':'),p=PRC(),row=p[arr][ix];
