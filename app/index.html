@@ -2447,6 +2447,7 @@ function renderCupDetail(){const el=$('#cDetail');
 const FAMS=[['floral','Floral'],['fruity','Fruity'],['herbal','Herbal'],['nutty','Nutty'],['caramel','Caramel'],['chocolate','Chocolate'],['resin','Resin'],['spice','Spice'],['carbon','Carbon']];
 const CCOLS=['F','A','FL','AT'],CCOLN={F:'Fragrance (dry)',A:'Aroma (break)',FL:'Flavor',AT:'Aftertaste'};
 const CCSUB={F:'dry',A:'break',FL:'flavor',AT:'finish'};
+const CCLVL=[['Light','Light'],['Light+','Light+'],['Medium','Medium'],['Medium+','Medium+'],['Heavy','Heavy']]; // body + acidity; Light+/Medium+ added in the card, old cards keep their value
 const cardOf=x=>{x.card=x.card||{fam:{},body:'',acid:'',bal:'',ov:''};x.card.fam=x.card.fam||{};return x.card};
 const hasCard=x=>!!(x&&x.card&&(Object.values(x.card.fam||{}).some(a=>a&&a.length)||x.card.body||x.card.acid||x.card.bal||x.card.ov));
 const famIn=(c,f,cols)=>((c.fam||{})[f]||[]).some(k=>cols.includes(k));
@@ -2470,8 +2471,8 @@ function renderCupCard(el,s){const cols=s.samples.map(x=>({x,r:HIST.find(h=>h.id
     <tr class="sec ccletters"><td class="ccl">FLAVOR FAMILY</td>${cols.map(()=>`<td><div class="mini">${CCOLS.map(k=>`<span class="mc" title="${CCOLN[k]}"><b>${k}</b><i>${CCSUB[k]}</i></span>`).join('')}</div></td>`).join('')}</tr>
     ${FAMS.map(([f,l])=>`<tr class="ccfam"><td class="ccl">${l.toUpperCase()}</td>${td(({x})=>{const c=cardOf(x);return `<div class="mini">${CCOLS.map(k=>`<span class="mc"><button class="mt ${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-cf="${s.samples.indexOf(x)}:${f}:${k}" title="${l} — ${CCOLN[k]}" aria-label="${l} ${CCOLN[k]}">${(c.fam[f]||[]).includes(k)?'✓':''}</button></span>`).join('')}</div>`})}</tr>`).join('')}
     <tr class="sec"><td colspan="${cols.length+1}">Body · Acidity · Balance · Overall</td></tr>
-    <tr><td class="ccl">BODY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).body,`data-cb="${i}:body"`))}</tr>
-    <tr><td class="ccl">ACIDITY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).acid,`data-cb="${i}:acid"`))}</tr>
+    <tr><td class="ccl">BODY</td>${td(({x},i)=>seg('',CCLVL,cardOf(x).body,`data-cb="${i}:body"`))}</tr>
+    <tr><td class="ccl">ACIDITY</td>${td(({x},i)=>seg('',CCLVL,cardOf(x).acid,`data-cb="${i}:acid"`))}</tr>
     <tr><td class="ccl">BALANCE</td>${td(({x},i)=>seg('yn',[['Y','Yes','y'],['N','No','n']],cardOf(x).bal,`data-cb="${i}:bal"`))}</tr>
     <tr><td class="ccl">OVERALL</td>${td(({x},i)=>seg('yn',[['Y','Yes','y'],['N','No','n']],cardOf(x).ov,`data-cb="${i}:ov"`))}</tr>
     <tr><td class="ccl">ANYTHING OFF?</td>${td(({x,r},i)=>{if(!r)return '';const t=tasteOf(r),c=cardOf(x);return `${(c.bal==='N'||c.ov==='N')&&!TASTE.some(([k])=>k!=='good'&&t[k]>0)?'<div class="ccask">Balance or overall was No — what was off?</div>':''}<div class="chips ccoff">${TASTE.filter(([k])=>k!=='good').map(([k,l])=>`<button class="chip bad ${t[k]>0?'on':''}" data-co="${i}:${k}" title="Tap again for more">${esc(l.split(' / ')[0])}${t[k]>0?` <span class="sev">${'●'.repeat(t[k])}</span>`:''}</button>`).join('')}</div>`})}</tr>
