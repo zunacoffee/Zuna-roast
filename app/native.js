@@ -81,6 +81,9 @@
   /* Reports and roast sheets: opens the Mac print dialog (PDF ▾ › Save as PDF). */
   N.printPage = async () => { await invoke('print_page'); return true; };
 
+  /* Cupping cards: a landscape PDF the app wrote, saved to a temp folder and opened in Preview (prints landscape on any printer). */
+  N.openPdf = (name, text) => invoke('open_pdf', { name: String(name), text: String(text) });
+
   /* ---------------- roaster WebSocket ---------------- */
   let seq = 0; const socks = new Map();
   class NativeWebSocket {
