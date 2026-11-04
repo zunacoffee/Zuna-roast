@@ -2,6 +2,14 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.39 — Margin targets by bag size (Nov 3, 2026; Mac, 13" iPad, iPhone)
+- Ty: bigger bags should take a smaller margin. Targets were one number per channel (wholesale/retail) for every bag. Now each bag size has its own target, for both bases.
+- Data: `cfg.pricing.bagM = {gross:{'12oz':{w,r},'2lb':{w,r},'5lb':{w,r}}, net:{…}}` (settings only, optional). `PRC()` fills missing ones from the old single targets (`gwMargin`/`grMargin`, `wMargin`/`rMargin`) minus 0 / 5 / 10 points for 12 oz / 2 lb / 5 lb; the old fields stay.
+- `prT(o, bagKey='12oz', basis=o.basis)` returns that bag's targets; `prTs(o,'w'|'r')` = "45 / 40 / 35". `prBags` uses each bag's own target for suggested prices and red flags and returns `tw`/`tr` per bag. Overview "Do your prices work?" uses each bag's after-overhead target. Volume-tier table still checks the 12 oz target.
+- Costs & settings › Margins: two small tables (Gross, After overhead) — rows 12 oz / 2 lb / 5 lb, columns Wholesale / Retail; the one in use has an accent edge and "in use". Price list header shows "targets 45 / 40 / 35 % wholesale · 65 / 60 / 55 % retail"; each bag box on the card shows its own targets.
+- iPhone (`ipad` branch): Price list note, red flags, Costs (a box per bag for each basis), coffee detail margins and the "Price for N %" hint, Overview rows — all per bag.
+- iPad: `.ipad .pin` tighter columns so the After OH column fits inside the bag box (was cut off at 1366 wide since before 1.0.38).
+- Checked with demo data at MacBook 1728×1050, iMac 2240×1260, iPad 1366×1024 and iPhone 393×852, before/after: only the Pricing screens changed.
 ## iPhone build after 1.0.38 — Full Pricing on the phone (Nov 3, 2026; iPhone only, `ipad` branch, TestFlight, no Mac release)
 - Ty: "I want more functionality on the iPhone with the pricing." More › Pricing (`PHV.price`) now has Price list · Overview · Costs (`PH.prv`), with the same numbers and saves as the Mac/iPad (`PRC`/`savePR`, `prCalc`, `prBlendCalc`, `prContext`, `prVolFor`).
 - Price list: blends grouped under single origins (closes the 1.0.38 open item), Wholesale/Retail, Gross/After OH (`basis`), + New blend. Detail (`PHV.priceEdit`, `{id}` or `{blend}`): blend name + recipe editing (`phRecipe`/`phRecipeWire`, same data as `prRecipeHtml`), cost table, cost of each bag (stacked bars), prices with gross and after-OH margins (red under target), "Use" suggested price, volume tier table, Delete blend.
