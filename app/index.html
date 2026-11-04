@@ -540,6 +540,16 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .ccs{color:var(--text2);font-size:var(--fs-cap);margin-top:2px}
 .cctbl tr.sec td{background:var(--soft);font-size:var(--fs-cap);font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;padding:5px 12px}
 .mini{display:flex;gap:4px}.mt{width:36px;height:28px;border-radius:6px;padding:0;font-size:var(--fs-cap);font-weight:700;color:var(--text2)}
+/* card flavor grid: letters once per sample, four clear columns (alternate columns shaded so they read down the card) */
+.cctbl tbody td+td{border-left:2px solid var(--line2)}
+.cctbl tr.ccfam td:not(.ccl),.cctbl tr.ccletters td:not(.ccl){padding-top:0;padding-bottom:0;vertical-align:middle}
+.cctbl .mini{gap:0}.cctbl .mc{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;padding:var(--sp-2) 0}
+.cctbl .mc:nth-child(odd){background:var(--soft)}.cctbl .mc+.mc{border-left:1px solid var(--line2)}
+.cctbl tr.ccletters .mc{padding:var(--sp-2) 0 var(--sp-1)}.cctbl tr.ccletters .mc b{font-size:var(--fs-sm);color:var(--text);letter-spacing:.02em}
+.cctbl tr.ccletters .mc i{font-style:normal;font-weight:400;font-size:var(--fs-cap);letter-spacing:0;text-transform:none;color:var(--text2)}
+.cctbl tr.ccletters td{background:var(--panel);border-bottom:1px solid var(--line2)}
+.cctbl .mt{width:30px;height:26px;font-size:var(--fs-body);border-color:var(--line2);background:var(--panel)}
+.cctbl .mt.on{background:var(--accent);border-color:var(--accent);color:#fff}.cctbl .mt.carbon.on{background:var(--danger);border-color:var(--danger)}
 .mt.on{background:var(--accent);border-color:var(--accent);color:#fff}.mt.carbon.on{background:var(--danger);border-color:var(--danger);color:#fff}
 .cseg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}.cseg button{border:0;border-radius:0;padding:5px 11px;font-size:var(--fs-sm);border-right:1px solid var(--border)}.cseg button:last-child{border-right:0}
 .cseg button.on{background:var(--accent);color:#fff}.cseg.yn button.on.y{background:var(--good);color:#fff}.cseg.yn button.on.n{background:var(--danger);color:#fff}
@@ -2436,6 +2446,7 @@ function renderCupDetail(){const el=$('#cDetail');
    F = fragrance (dry), A = aroma (break), FL = flavor, AT = aftertaste. Notes stay in sample.comments. */
 const FAMS=[['floral','Floral'],['fruity','Fruity'],['herbal','Herbal'],['nutty','Nutty'],['caramel','Caramel'],['chocolate','Chocolate'],['resin','Resin'],['spice','Spice'],['carbon','Carbon']];
 const CCOLS=['F','A','FL','AT'],CCOLN={F:'Fragrance (dry)',A:'Aroma (break)',FL:'Flavor',AT:'Aftertaste'};
+const CCSUB={F:'dry',A:'break',FL:'flavor',AT:'finish'};
 const cardOf=x=>{x.card=x.card||{fam:{},body:'',acid:'',bal:'',ov:''};x.card.fam=x.card.fam||{};return x.card};
 const hasCard=x=>!!(x&&x.card&&(Object.values(x.card.fam||{}).some(a=>a&&a.length)||x.card.body||x.card.acid||x.card.bal||x.card.ov));
 const famIn=(c,f,cols)=>((c.fam||{})[f]||[]).some(k=>cols.includes(k));
@@ -2451,13 +2462,13 @@ let cupSaveT;function cupSaveSoon(){clearTimeout(cupSaveT);cupSaveT=setTimeout((
 function renderCupCard(el,s){const cols=s.samples.map(x=>({x,r:HIST.find(h=>h.id===x.roastId)})),old=$('.cctbl',el),keep=old&&old.dataset.sid===s.id?[old.scrollTop,old.scrollLeft,el.scrollTop]:null;
   const inv=r=>r&&INV.find(l=>l.id===r.meta.invId),seg=(cls,opts,cur,attr)=>`<div class="cseg ${cls}">${opts.map(([v,l,c])=>`<button class="${c||''} ${cur===v?'on':''}" ${attr} data-v="${v}">${l}</button>`).join('')}</div>`;
   const td=fn=>cols.map((c,i)=>`<td>${fn(c,i)}</td>`).join('');
-  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} sample${s.samples.length>1?'s':''}${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · tap F, A, FL or AT like the paper card — it saves as you go</div></div>
+  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} sample${s.samples.length>1?'s':''}${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · tick the boxes like the paper card — it saves as you go</div></div>
     ${cfg.cupScoring?`<div class="seg cvseg"><button class="on" data-cv="card">Card</button><button data-cv="score">100-point</button></div>`:''}<button class="sm" id="ccAdd">+ Add sample</button><button class="sm dangerTxt" id="csDel">Delete session</button></div>
   <div class="cctbl" data-sid="${s.id}"><table><thead><tr><th class="ccl"></th>${cols.map(({x,r},i)=>{const l=inv(r),sp=r?spreadOf(r.meta):null;return `<th><div class="cch"><b>#${r?r.num:'?'} · ${esc(r?(r.meta.coffee||r.meta.name||'Untitled'):'(roast removed)')}</b>${s.samples.length>1?`<button class="sm ccx" data-ccdel="${i}" title="Take this sample off the table">✕</button>`:''}</div>
       ${r?`<div class="ccs">${esc(r.meta.name||'')} · roasted ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · ${lbTxt(batchOf(r))}</div><div class="ccs">WB / GB ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(sp)?' · spread '+spTxt(sp):''}</div>`:''}
       ${l?`<div class="ccs">Moisture ${esc(l.moisture||'—')} · screen ${esc(l.screen||'—')} · aw ${esc(l.wa||'—')}</div>`:''}</th>`}).join('')}</tr></thead><tbody>
-    <tr class="sec"><td colspan="${cols.length+1}"><span title="${CCOLS.map(k=>k+' = '+CCOLN[k]).join(' · ')}">Fragrance (F) · Aroma (A) · Flavor (FL) · Aftertaste (AT)</span></td></tr>
-    ${FAMS.map(([f,l])=>`<tr><td class="ccl">${l.toUpperCase()}</td>${td(({x})=>{const c=cardOf(x);return `<div class="mini">${CCOLS.map(k=>`<button class="mt ${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-cf="${s.samples.indexOf(x)}:${f}:${k}" title="${l} — ${CCOLN[k]}">${k}</button>`).join('')}</div>`})}</tr>`).join('')}
+    <tr class="sec ccletters"><td class="ccl">FLAVOR FAMILY</td>${cols.map(()=>`<td><div class="mini">${CCOLS.map(k=>`<span class="mc" title="${CCOLN[k]}"><b>${k}</b><i>${CCSUB[k]}</i></span>`).join('')}</div></td>`).join('')}</tr>
+    ${FAMS.map(([f,l])=>`<tr class="ccfam"><td class="ccl">${l.toUpperCase()}</td>${td(({x})=>{const c=cardOf(x);return `<div class="mini">${CCOLS.map(k=>`<span class="mc"><button class="mt ${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-cf="${s.samples.indexOf(x)}:${f}:${k}" title="${l} — ${CCOLN[k]}" aria-label="${l} ${CCOLN[k]}">${(c.fam[f]||[]).includes(k)?'✓':''}</button></span>`).join('')}</div>`})}</tr>`).join('')}
     <tr class="sec"><td colspan="${cols.length+1}">Body · Acidity · Balance · Overall</td></tr>
     <tr><td class="ccl">BODY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).body,`data-cb="${i}:body"`))}</tr>
     <tr><td class="ccl">ACIDITY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).acid,`data-cb="${i}:acid"`))}</tr>
