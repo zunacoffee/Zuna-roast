@@ -635,9 +635,10 @@ html:not(.ipad):not(.iphone) #scr-cupping.cmMac .cupsplit>.card.scroll,html:not(
 .cmk.on{background:var(--accent);border-color:var(--accent)}.cmk.on.carbon{background:var(--danger);border-color:var(--danger)}
 .cplist{display:flex;flex-direction:column;margin:var(--sp-2) 0 var(--sp-3);max-height:360px;overflow:auto}.cplist label{padding:7px 2px;border-top:1px solid var(--line2);margin:0}
 /* print: one card per Letter page, black and white */
-/* the Mac print window has no orientation setting, so the card is laid out landscape (10 × 7.5 in) and turned on an upright Letter page */
-.cupPrint .cpPage{width:7.5in;height:10in;position:relative;overflow:hidden;break-after:page;page-break-after:always}
-.cupPrint .cpRot{position:absolute;left:0;top:0;width:10in;height:7.5in;display:flex;flex-direction:column;transform-origin:0 0;transform:translateY(10in) rotate(-90deg)}.cupPrint .cpPage:last-child{break-after:auto;page-break-after:auto}
+/* the Mac print window has no orientation setting and ignores @page size, so the card is laid out landscape and turned on an upright Letter page.
+   Ty's Mac PDF (Nov 4) showed about 10.05 × 7.35 in inside the margins, so the card is 9.6 × 7.1 in to leave room. */
+.cupPrint .cpPage{width:7.1in;height:9.6in;position:relative;overflow:hidden;break-after:page;page-break-after:always}
+.cupPrint .cpRot{position:absolute;left:0;top:0;width:9.6in;height:7.1in;display:flex;flex-direction:column;transform-origin:0 0;transform:translateY(9.6in) rotate(-90deg)}.cupPrint .cpPage:last-child{break-after:auto;page-break-after:auto}
 .cupPrint .cpc{--ink:#000;flex:1;border:2px solid #000;color:#000;border-radius:8px}.cupPrint .chd{grid-template-columns:1.2fr 1.1fr .8fr .9fr;gap:4px 18px;padding:12px 18px}
 .cupPrint .cttl b{font-size:19px}.cupPrint .cttl .muted{font-size:13px}.cupPrint .cf{font-size:14px}.cupPrint .cf span{color:#444;font-size:12px}.cupPrint .cf b{border-bottom-color:#999}.cupPrint .cf b *{color:#000!important}
 .cupPrint .cpn{padding:12px 14px}.cupPrint .cpt{font-size:13px;margin-bottom:10px;padding-bottom:6px}
