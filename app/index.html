@@ -551,6 +551,85 @@ table.be th{position:static}table.be td{cursor:default}table.be tbody tr:hover t
 .p.r{background:color-mix(in srgb,var(--danger) 12%,var(--panel));color:var(--danger)}.p.w{background:color-mix(in srgb,var(--warn) 15%,var(--panel));color:#a86f00}.p.g{background:color-mix(in srgb,var(--good) 12%,var(--panel));color:var(--good)}
 .cvseg{margin-right:6px}
 .cot{overflow:auto;border:1px solid var(--line2);border-radius:8px}.cot table td,.cot table th{padding:5px 10px;text-align:center}.cot td.ccl{text-align:left;position:static;width:auto;min-width:110px;font-size:var(--fs-cap)}
+/* ---------- Mac cupping cards (1.0.40): the paper card on screen ---------- */
+#scr-cupping button.q{border-color:transparent;background:transparent;color:var(--accent);padding:4px 6px;font-weight:500}#scr-cupping button.q:hover:not(:disabled){border-color:transparent;text-decoration:underline}
+html:not(.ipad):not(.iphone) #scr-cupping.cmMac .cupsplit{grid-template-columns:minmax(0,1fr)}
+html:not(.ipad):not(.iphone) #scr-cupping.cmMac .cupsplit>.card.scroll,html:not(.ipad):not(.iphone) #scr-cupping.cmMac .page>.ph{display:none}
+.cmTop h1{font-size:var(--fs-page);font-weight:600;margin:0 var(--sp-3) 0 0}
+#cDetail.cmOn{background:none;border:0;border-radius:0;padding:0 2px 2px;gap:var(--sp-3)}
+.cmTop{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}.cmTop select{max-width:260px}
+.cmT{display:flex;align-items:baseline;gap:var(--sp-3);min-width:0;margin-left:var(--sp-2)}.cmT b{font-size:var(--fs-title);font-weight:650;white-space:nowrap}.cmT .muted{font-size:var(--fs-cap)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);align-items:stretch}
+.cjump{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--bg);padding:4px 0}
+.cjump .chip.fl{border-color:color-mix(in srgb,var(--warn) 45%,var(--line2))}.wn{color:var(--warn)}
+.ol{font-size:var(--fs-cap);font-weight:700;letter-spacing:.06em;color:var(--text2);margin-right:4px;white-space:nowrap}
+.cpc{--ink:color-mix(in srgb,var(--text) 72%,var(--panel));background:var(--panel);border:1.5px solid var(--ink);border-radius:var(--r-md);overflow:hidden;display:flex;flex-direction:column;scroll-margin-top:48px}
+.cpc.hl{box-shadow:0 0 0 3px var(--accent)}
+.chd{display:grid;grid-template-columns:1fr 1fr .8fr .9fr;gap:2px var(--sp-4);padding:var(--sp-2) var(--sp-3);border-bottom:2px solid var(--ink);position:relative}
+.cttl{grid-column:1/-1;display:flex;align-items:baseline;gap:var(--sp-2);margin-bottom:2px;padding-right:28px}.cttl b{font-size:var(--fs-body);font-weight:650}.cttl .muted{font-size:var(--fs-cap)}
+.cx{position:absolute;right:6px;top:4px;height:24px;width:24px;padding:0;border:0;background:none;color:var(--text2)}.cx:hover{color:var(--danger)}
+.cf{display:flex;gap:6px;align-items:baseline;white-space:nowrap;overflow:hidden;font-size:var(--fs-cap)}.cf span{color:var(--text2);font-weight:600;font-size:11px;letter-spacing:.03em;text-transform:uppercase}
+.cf b{font-weight:500;flex:1;border-bottom:1px solid var(--line2);overflow:hidden;text-overflow:ellipsis;min-height:16px;font-variant-numeric:tabular-nums}
+.cbd{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));flex:1}
+.cpn{border-left:1.5px solid var(--ink);padding:var(--sp-2) var(--sp-3) var(--sp-2);display:flex;flex-direction:column;min-width:0}.cpn:first-child{border-left:0}
+.cpt{text-align:center;font-size:11px;font-weight:700;letter-spacing:.05em;line-height:1.25;color:var(--ink);padding-bottom:4px;border-bottom:1px solid var(--ink);margin:0 4px var(--sp-1)}
+.cgr{display:grid;grid-template-columns:minmax(0,1fr) 28px 28px;align-items:center;row-gap:2px;column-gap:4px}.cgr.lv{row-gap:5px}
+.cgr .h{font-size:11px;font-weight:700;color:var(--ink);text-align:center}.cgr .n{font-size:11px;letter-spacing:.03em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbx{width:22px;height:22px;min-height:0;padding:0;margin:auto;border:1.5px solid var(--ink);border-radius:3px;background:var(--panel);color:#fff;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center}
+.cbx:hover{border-color:var(--accent)}.cbx.on{background:var(--accent);border-color:var(--accent)}.cbx.on.carbon{background:var(--danger);border-color:var(--danger)}
+.cnt{border-top:1px solid var(--ink);margin:var(--sp-2) calc(-1*var(--sp-3)) 0;padding:6px var(--sp-3) 0;display:flex;flex-direction:column}.cnt .lab{font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.04em}
+.cnt textarea{border:0;border-radius:0;resize:none;padding:0;margin-top:2px;min-height:54px;font-size:var(--fs-sm);line-height:18px;background:repeating-linear-gradient(transparent 0 17px,var(--line2) 17px 18px);background-attachment:local}
+.cnt textarea:focus{outline:0;box-shadow:none}.cnt.big{flex:1;margin-top:auto}.cnt.big textarea{flex:1;min-height:110px}
+.coff{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:var(--sp-2) var(--sp-3);border-top:1px solid var(--ink)}
+.coc{height:28px;min-height:0;border-radius:var(--r-pill);padding:0 12px;font-size:var(--fs-sm)}.coc i{font-style:normal;opacity:.85}
+.coc.on{background:var(--warn);border-color:var(--warn);color:#fff}
+.can{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px var(--sp-3);border-top:1px solid var(--line2);background:var(--soft);min-height:40px}.can .q{height:28px}
+.cpill{display:inline-block;border-radius:var(--r-pill);padding:2px 9px;font-size:var(--fs-cap);font-weight:600}
+.cpill.r{background:color-mix(in srgb,var(--danger) 14%,var(--panel));color:color-mix(in srgb,var(--danger) 80%,var(--text))}
+.cpill.w{background:color-mix(in srgb,var(--warn) 16%,var(--panel));color:color-mix(in srgb,var(--warn) 60%,var(--text))}
+.cpill.g{background:color-mix(in srgb,var(--good) 14%,var(--panel));color:color-mix(in srgb,var(--good) 75%,var(--text))}
+/* 4 per screen: tighter, so all four fit on a 15" MacBook Air */
+.cgrid.per4 .cbx{width:20px;height:20px;font-size:12px}.cgrid.per4 .cgr{row-gap:1px}.cgrid.per4 .cgr.lv{row-gap:4px}.cgrid.per4 .cpn{padding:6px var(--sp-3)}
+.cgrid.per4 .chd{padding:6px var(--sp-3)}.cgrid.per4 .coff{padding:4px var(--sp-3)}.cgrid.per4 .can{min-height:34px;padding:2px var(--sp-3);flex-wrap:nowrap;overflow:hidden}.cgrid.per4 .can .cpill{white-space:nowrap}
+.cgrid.per4 .can .q{height:26px;padding:2px 4px}
+/* 2 per screen: bigger boxes and type */
+.cgrid.per2 .chd{padding:var(--sp-3) var(--sp-4);gap:4px var(--sp-5)}.cgrid.per2 .cttl b{font-size:var(--fs-title)}.cgrid.per2 .cf{font-size:var(--fs-sm)}
+.cgrid.per2 .cpn{padding:var(--sp-3) var(--sp-3) var(--sp-3)}.cgrid.per2 .cpt{font-size:12px;margin-bottom:var(--sp-2);padding-bottom:6px}
+.cgrid.per2 .cgr{grid-template-columns:minmax(0,1fr) 34px 34px;row-gap:6px;column-gap:6px}.cgrid.per2 .cgr .n{font-size:12.5px}.cgrid.per2 .cgr .h{font-size:12px}
+.cgrid.per2 .cbx{width:26px;height:26px;font-size:15px;border-radius:4px}
+.cgrid.per2 .cnt textarea{min-height:76px;font-size:var(--fs-body);line-height:19px;background:repeating-linear-gradient(transparent 0 18px,var(--line2) 18px 19px);background-attachment:local}.cgrid.per2 .cnt.big textarea{min-height:120px}
+.cgrid.per2 .coff{padding:var(--sp-2) var(--sp-4);gap:var(--sp-2)}.cgrid.per2 .coc{height:var(--h-btn-sm);font-size:var(--fs-sm)}.cgrid.per2 .can{padding:6px var(--sp-4)}
+/* one sample: side panel */
+.cside{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-4);align-self:start;display:flex;flex-direction:column;gap:6px}.cs1{font-size:var(--fs-cap);margin:2px 0 2px}
+.csr{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;width:100%;height:auto;min-height:40px;text-align:left;padding:6px 10px}.csr:hover{border-color:var(--accent)}.csr .go{color:var(--accent);font-size:var(--fs-sm)}.csr .muted{font-size:var(--fs-cap)}
+/* compare: read-only */
+.cmpick{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.cmpick .chip.ext{background:var(--text);border-color:var(--text);color:var(--panel)}
+.cmpick select{border-style:dashed;color:var(--accent);max-width:330px}.cmhe{font-size:var(--fs-sm);color:var(--text2);margin:0 var(--sp-2) 0 0}
+.cmdd{position:relative}.cmdd summary{list-style:none;cursor:pointer;height:30px;display:flex;align-items:center;padding:0 12px;border:1px solid var(--accent);border-radius:var(--r-pill);color:var(--accent);font-size:var(--fs-sm);background:var(--panel)}
+.cmdd summary::-webkit-details-marker{display:none}.cmddl{position:absolute;z-index:10;top:36px;left:0;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-md);box-shadow:0 8px 24px rgba(0,0,0,.15);padding:6px;min-width:300px;max-height:360px;overflow:auto}
+.cmddl label{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:6px;font-size:var(--fs-sm);cursor:pointer}.cmddl label:hover{background:var(--soft)}
+.cmp{--ink:color-mix(in srgb,var(--text) 72%,var(--panel));background:var(--panel);border:1.5px solid var(--ink);border-radius:var(--r-md);overflow:auto;max-height:calc(100vh - 240px);min-height:0}
+.cmp table{border-collapse:collapse;width:100%;min-width:900px;table-layout:fixed}.cmp table.wide{min-width:0}
+.cmp th,.cmp td{border-top:1px solid var(--line2);padding:5px 8px;text-align:center;font-size:var(--fs-cap);text-transform:none;letter-spacing:0}
+.cmp th{font-weight:650;color:var(--ink)}.cmp .n{width:130px;text-align:left;font-size:11px;letter-spacing:.03em;color:var(--ink);white-space:nowrap}.cmp .sg{border-left:1.5px solid var(--ink)}
+.cmp thead th{position:sticky;top:0;background:var(--panel);z-index:3}.cmp thead tr.sub th{top:54px;box-shadow:0 1px 0 var(--ink)}.cmp thead th.n{z-index:4}
+.cmp .sh{height:54px;vertical-align:top;text-align:left;padding:8px 10px}.cmp .sh b{font-size:var(--fs-sm)}.cmp .sh .muted{font-weight:400;margin-top:2px}.cmp .sh .q{height:20px;padding:0;font-size:var(--fs-cap)}
+.cmp tr.grp td{text-align:left;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--ink)}.cmp .gl{position:sticky;left:8px}
+.cmp tr.ln td{text-align:left;padding:6px 10px;font-size:var(--fs-sm);white-space:normal;overflow-wrap:anywhere}.cmp .cpill{white-space:nowrap}.cmp tr.ln td.n{font-size:11px}.cmp .cpill{margin:1px 4px 1px 0}
+.cmp table.wide .n{position:sticky;left:0;background:var(--panel);z-index:2;box-shadow:1px 0 0 var(--ink)}
+.cmk{display:inline-flex;width:18px;height:18px;border:1.5px solid var(--line2);border-radius:3px;align-items:center;justify-content:center;font-size:11px;color:#fff;vertical-align:middle}
+.cmk.on{background:var(--accent);border-color:var(--accent)}.cmk.on.carbon{background:var(--danger);border-color:var(--danger)}
+.cplist{display:flex;flex-direction:column;margin:var(--sp-2) 0 var(--sp-3);max-height:360px;overflow:auto}.cplist label{padding:7px 2px;border-top:1px solid var(--line2);margin:0}
+/* print: one card per Letter page, black and white */
+.cupPrint .cpPage{height:9.9in;display:flex;flex-direction:column;break-after:page;page-break-after:always}.cupPrint .cpPage:last-child{break-after:auto;page-break-after:auto}
+.cupPrint .cpc{--ink:#000;flex:1;border:2px solid #000;color:#000;border-radius:8px}.cupPrint .chd{grid-template-columns:1.35fr 1.1fr .7fr .9fr;gap:3px 12px;padding:12px 14px}
+.cupPrint .cttl b{font-size:17px}.cupPrint .cf{font-size:12.5px}.cupPrint .cf span{color:#444}.cupPrint .cf b{border-bottom-color:#999}.cupPrint .cf b *{color:#000!important}
+.cupPrint .cpn{padding:12px}.cupPrint .cpt{font-size:12px;margin-bottom:10px}.cupPrint .cgr{grid-template-columns:minmax(0,1fr) 28px 28px;row-gap:24px}.cupPrint .cgr.lv{row-gap:20px}.cupPrint .ol{color:#000}.cupPrint .cgr .n{font-size:12px}
+.cupPrint .cbx{width:22px;height:22px;border-color:#000;background:#fff}.cupPrint .cbx.on{background:#000;border-color:#000}
+.cupPrint .cnt{margin-top:14px}.cupPrint .cnt.big{flex:1}.cupPrint .ptx{flex:1;min-height:90px;font-size:12.5px;line-height:22px;white-space:pre-wrap;background:repeating-linear-gradient(#fff 0 21px,#999 21px 22px)}
+.cupPrint .coff{border-top-color:#000}.cupPrint .coc{display:inline-flex;align-items:center;height:24px;border:1.5px solid #000;background:#fff;color:#000;font-size:12px}
+.cupPrint .muted{color:#444}.cpFoot{display:flex;justify-content:space-between;font-size:9.5px;color:#6B7280;margin-top:6px}
+@media print{.cupPrint *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .cot th.cur,.cot td.cur{background:var(--accentSoft)}
 .cdot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)}.cdot.half{opacity:.35}.cdot.no{background:transparent;border:1.5px solid var(--border)}.cdot.carbon{background:var(--danger)}
 .ins{border-left:3px solid var(--warn);padding:3px 0 3px 11px;font-size:var(--fs-sm);margin-top:6px}.ins.g{border-color:var(--good)}.ins.r{border-color:var(--danger)}.ins small{display:block;color:var(--text2);font-size:var(--fs-cap);margin-top:1px}
@@ -862,6 +941,7 @@ const DEF={
   scales:{auto:false,tMin:150,tMax:450,tStep:50,rMin:0,rMax:40,rStep:10,minutes:13,showPressure:true,pMax:0,phaseBar:true,phaseBarBkg:true,fillBt:false,fillRor:false,fillEx:false,fillBkg:false,fillBurner:false,fillAir:false,fillPressure:false},
   theme:{name:'White',colors:{...WHITE}},customThemes:[],
   cupScoring:false,
+  cupPerScreen:2,       // Mac cupping cards per screen: 2 or 4
   spColorsOn:true,spBands:[{max:5,label:'On target',col:'#1E8E3E'},{max:8,label:'Watch',col:'#C99A06'},{max:10,label:'High',col:'#E8710A'},{max:null,label:'Too wide',col:'#D93025'}],
   cupColorsOn:true,cupBands:[{min:90,label:'Outstanding',col:'#B8860B'},{min:85,label:'Excellent',col:'#1E8E3E'},{min:80,label:'Very good · specialty',col:'#2A7F8F'},{min:0,label:'Below specialty',col:'#D93025'}],
   rorLineOn:true,rorLineC:12/1.8,rorZoneAlpha:10,rorLine2On:false,rorLine2C:20/1.8,rorZone2Alpha:6,
@@ -1352,8 +1432,8 @@ function csvText(r){const u=isF()?'F':'C',c=r.events.CHARGE??0,evAt={};for(const
 function invCSV(){const head=['coffee','origin','process','lot','supplier','arrived','price_per_lb','start_lb','adjust_lb','used_lb','left_lb','value_on_hand','notes'];
   const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;return [head.join(',')].concat(INV.map(l=>{const adj=(l.adj||[]).reduce((a,x)=>a+(num(x.lb)||0),0),left=invLeft(l),p=num(l.price);
     return [l.name,l.origin,l.process,l.lot,l.supplier,l.arrived,ok(p)?p.toFixed(2):'',num(l.startLb)||0,adj.toFixed(2),invUsed(l.id).toFixed(2),left.toFixed(2),ok(p)?(p*left).toFixed(2):'',l.notes].map(q).join(',')})).join('\n')}
-function cupCSV(){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;const head=['date','session','cuppers','roast','profile','fragrance','flavor','aftertaste','acidity','body','balance','overall','uniformity','clean_cup','sweetness','defects','final','notes','comments',...FAMS.map(f=>'card_'+f[0]),'card_body','card_acidity','card_balance','card_overall'];const rows=[];
-  for(const s of CUP)for(const x of s.samples){const r=HIST.find(h=>h.id===x.roastId),sc=x.scores;rows.push([s.date,s.name,s.cuppers,r?'#'+r.num:'',r?r.meta.name:'',...ATTRS.map(a=>sc[a[0]]),...CUPK.map(c=>x.cups[c[0]].filter(Boolean).length*2),x.defects,cupScore(x).toFixed(2),(x.tags||[]).join('; '),x.comments,...FAMS.map(f=>((x.card&&x.card.fam&&x.card.fam[f[0]])||[]).join(' ')),x.card?.body||'',x.card?.acid||'',x.card?.bal||'',x.card?.ov||''].map(q).join(','))}
+function cupCSV(){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;const head=['date','session','cuppers','roast','profile','fragrance','flavor','aftertaste','acidity','body','balance','overall','uniformity','clean_cup','sweetness','defects','final','notes','comments',...FAMS.map(f=>'card_'+f[0]),'card_body','card_acidity','card_balance','card_overall','card_notes_body_acidity'];const rows=[];
+  for(const s of CUP)for(const x of s.samples){const r=HIST.find(h=>h.id===x.roastId),sc=x.scores;rows.push([s.date,s.name,s.cuppers,r?'#'+r.num:'',r?r.meta.name:'',...ATTRS.map(a=>sc[a[0]]),...CUPK.map(c=>x.cups[c[0]].filter(Boolean).length*2),x.defects,cupScore(x).toFixed(2),(x.tags||[]).join('; '),x.comments,...FAMS.map(f=>((x.card&&x.card.fam&&x.card.fam[f[0]])||[]).join(' ')),x.card?.body||'',x.card?.acid||'',x.card?.bal||'',x.card?.ov||'',x.card?.noteBA||''].map(q).join(','))}
   return [head.join(',')].concat(rows).join('\n')}
 function download(name,text,type='text/csv'){if(window.ZR_NATIVE){ZR_NATIVE.saveExport(name,text).then(ok=>{if(ok)toast('Saved '+name)}).catch(e=>toast('Could not save: '+e));return}
   const b=new Blob([text],{type}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
@@ -2393,7 +2473,7 @@ function renderCupping(){const list=[...CUP].sort((a,b)=>String(b.date).localeCo
     const flags=s.samples.reduce((a,x)=>{const r=HIST.find(h=>h.id===x.roastId);return a+(r&&Object.keys(cupFaults(r).t).filter(k=>k!=='good').length?1:0)},0);
     return `<tr class="${s.id===selSession&&cupMode==='view'?'sel':''}" data-id="${s.id}"><td class="muted tnum">${fmtDate(s.date,false)}</td><td><b>${esc(s.name)}</b>${s.cuppers?`<div class="muted" style="font-size:var(--fs-cap)">${esc(s.cuppers)}</div>`:''}</td><td class="muted">${s.samples.map(x=>{const r=HIST.find(h=>h.id===x.roastId);return r?'#'+r.num:'?'}).join(' · ')}</td>${SC?`<td class="n"><span class="cup" style="${cupPillSt(best)}">${ok(best)?best.toFixed(2):'—'}</span></td>`:`<td>${flags?`<span class="btflat">⚠ ${flags}</span>`:'<span class="muted">—</span>'}</td>`}</tr>`}).join('');
   $('#cEmpty').innerHTML=list.length?'':'<div class="empty">No cupping sessions yet. Press <b>+ New session</b> and pick the roasts on the table.</div>';renderCupDetail()}
-function renderCupDetail(){const el=$('#cDetail');
+function renderCupDetail(){const el=$('#cDetail');el.classList.remove('cmOn');$('#scr-cupping').classList.remove('cmMac');
   if(cupMode==='new'){const recent=HIST.filter(r=>!r.archived).slice(0,40);
     el.innerHTML=`<div class="dtitle">New cupping session</div><div class="grid2"><label class="field">Session name<input id="csName" value="QC ${new Date().toLocaleDateString([], {month:'short',day:'numeric'})}"></label><label class="field">Cuppers<input id="csCuppers" placeholder="Ty, Sam"></label></div>
     <div class="h3">Roasts on the table</div><div class="picklist">${recent.map(r=>`<label><input type="checkbox" value="${r.id}"><b>#${r.num}</b> ${esc(r.meta.name||'Untitled')} <span class="muted">· ${fmtDate(r.chargedAt||r.created,false)} · ${ageOf(r.chargedAt||r.created)}</span></label>`).join('')||'<div class="empty">No roasts saved yet.</div>'}</div>
@@ -2444,42 +2524,131 @@ function cardFaults(c){const out=[];if(!c)return out;const cup=['FL','AT'];
   if(famIn(c,'carbon',CCOLS))out.push(['roasty',famIn(c,'carbon',cup)?2:1,'Carbon '+(famIn(c,'carbon',cup)?'in the cup':'on the dry/break')]);
   if(famIn(c,'resin',cup))out.push(['roasty',1,'Resin in the cup']);
   if(famIn(c,'herbal',cup))out.push(['underdev',1,'Herbal in the cup']);
-  if(c.body==='Light')out.push(['thin',1,'Body light']);
-  if(c.acid==='Heavy')out.push(['sharp',1,'Acidity heavy']);
+  if(c.body==='Light')out.push(['thin',2,'Body light']);else if(c.body==='Light+')out.push(['thin',1,'Body light+']);
+  if(c.acid==='Heavy')out.push(['sharp',2,'Acidity heavy']);else if(c.acid==='Medium+')out.push(['sharp',1,'Acidity medium+']);
   return out}
 let cupSaveT;function cupSaveSoon(){clearTimeout(cupSaveT);cupSaveT=setTimeout(()=>persistCup(),600)}
-function renderCupCard(el,s){const cols=s.samples.map(x=>({x,r:HIST.find(h=>h.id===x.roastId)})),old=$('.cctbl',el),keep=old&&old.dataset.sid===s.id?[old.scrollTop,old.scrollLeft,el.scrollTop]:null;
-  const inv=r=>r&&INV.find(l=>l.id===r.meta.invId),seg=(cls,opts,cur,attr)=>`<div class="cseg ${cls}">${opts.map(([v,l,c])=>`<button class="${c||''} ${cur===v?'on':''}" ${attr} data-v="${v}">${l}</button>`).join('')}</div>`;
-  const td=fn=>cols.map((c,i)=>`<td>${fn(c,i)}</td>`).join('');
-  el.innerHTML=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="dtitle">${fmtDate(s.date,false)} · ${esc(s.name)}</div><div class="muted" style="margin-top:3px">${s.samples.length} sample${s.samples.length>1?'s':''}${s.cuppers?' · cuppers: '+esc(s.cuppers):''} · tap F, A, FL or AT like the paper card — it saves as you go</div></div>
-    ${cfg.cupScoring?`<div class="seg cvseg"><button class="on" data-cv="card">Card</button><button data-cv="score">100-point</button></div>`:''}<button class="sm" id="ccAdd">+ Add sample</button><button class="sm dangerTxt" id="csDel">Delete session</button></div>
-  <div class="cctbl" data-sid="${s.id}"><table><thead><tr><th class="ccl"></th>${cols.map(({x,r},i)=>{const l=inv(r),sp=r?spreadOf(r.meta):null;return `<th><div class="cch"><b>#${r?r.num:'?'} · ${esc(r?(r.meta.coffee||r.meta.name||'Untitled'):'(roast removed)')}</b>${s.samples.length>1?`<button class="sm ccx" data-ccdel="${i}" title="Take this sample off the table">✕</button>`:''}</div>
-      ${r?`<div class="ccs">${esc(r.meta.name||'')} · roasted ${fmtDate(r.chargedAt||r.created,false)} (${ageOf(r.chargedAt||r.created)}) · ${lbTxt(batchOf(r))}</div><div class="ccs">WB / GB ${esc(r.meta.colorWhole||'—')} / ${esc(r.meta.colorGround||'—')}${ok(sp)?' · spread '+spTxt(sp):''}</div>`:''}
-      ${l?`<div class="ccs">Moisture ${esc(l.moisture||'—')} · screen ${esc(l.screen||'—')} · aw ${esc(l.wa||'—')}</div>`:''}</th>`}).join('')}</tr></thead><tbody>
-    <tr class="sec"><td colspan="${cols.length+1}"><span title="${CCOLS.map(k=>k+' = '+CCOLN[k]).join(' · ')}">Fragrance (F) · Aroma (A) · Flavor (FL) · Aftertaste (AT)</span></td></tr>
-    ${FAMS.map(([f,l])=>`<tr><td class="ccl">${l.toUpperCase()}</td>${td(({x})=>{const c=cardOf(x);return `<div class="mini">${CCOLS.map(k=>`<button class="mt ${f==='carbon'?'carbon':''} ${(c.fam[f]||[]).includes(k)?'on':''}" data-cf="${s.samples.indexOf(x)}:${f}:${k}" title="${l} — ${CCOLN[k]}">${k}</button>`).join('')}</div>`})}</tr>`).join('')}
-    <tr class="sec"><td colspan="${cols.length+1}">Body · Acidity · Balance · Overall</td></tr>
-    <tr><td class="ccl">BODY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).body,`data-cb="${i}:body"`))}</tr>
-    <tr><td class="ccl">ACIDITY</td>${td(({x},i)=>seg('',[['Light','Light'],['Medium','Medium'],['Heavy','Heavy']],cardOf(x).acid,`data-cb="${i}:acid"`))}</tr>
-    <tr><td class="ccl">BALANCE</td>${td(({x},i)=>seg('yn',[['Y','Yes','y'],['N','No','n']],cardOf(x).bal,`data-cb="${i}:bal"`))}</tr>
-    <tr><td class="ccl">OVERALL</td>${td(({x},i)=>seg('yn',[['Y','Yes','y'],['N','No','n']],cardOf(x).ov,`data-cb="${i}:ov"`))}</tr>
-    <tr><td class="ccl">ANYTHING OFF?</td>${td(({x,r},i)=>{if(!r)return '';const t=tasteOf(r),c=cardOf(x);return `${(c.bal==='N'||c.ov==='N')&&!TASTE.some(([k])=>k!=='good'&&t[k]>0)?'<div class="ccask">Balance or overall was No — what was off?</div>':''}<div class="chips ccoff">${TASTE.filter(([k])=>k!=='good').map(([k,l])=>`<button class="chip bad ${t[k]>0?'on':''}" data-co="${i}:${k}" title="Tap again for more">${esc(l.split(' / ')[0])}${t[k]>0?` <span class="sev">${'●'.repeat(t[k])}</span>`:''}</button>`).join('')}</div>`})}</tr>
-    <tr><td class="ccl">NOTES</td>${td(({x},i)=>`<textarea class="ccn" data-cn="${i}" placeholder="Notes">${esc(x.comments||'')}</textarea>`)}</tr>
-    <tr class="ccan"><td class="ccl">TO ANALYZE</td>${td(({x,r})=>{if(!r)return '';const t=tasteEff(r),cf=cupFaults(r).why,items=TASTE.filter(([k])=>t[k]>0);
-      return (items.length?items.map(([k,l])=>`<span class="p ${k==='good'?'g':t[k]>=2?'r':'w'}" title="${esc(cf[k]&&!(k in tasteOf(r))?'from the card: '+cf[k]:'you marked it')}">${esc(l.split(' / ')[0])}</span>`).join(''):'<span class="muted">nothing to fix yet</span>')+` <button class="sm" data-can="${r.id}">Analyze #${r.num} →</button>`})}</tr>
-  </tbody></table></div>`;
-  if(keep){const t=$('.cctbl',el);t.scrollTop=keep[0];t.scrollLeft=keep[1];el.scrollTop=keep[2]}
-  const save=()=>{cupSaveSoon()},rer=()=>renderCupping();   // re-draws the list too, so the ⚠ count stays right
-  $$('[data-cf]',el).forEach(b=>b.onclick=()=>{const [i,f,k]=b.dataset.cf.split(':'),c=cardOf(s.samples[+i]),a=c.fam[f]||[];c.fam[f]=a.includes(k)?a.filter(z=>z!==k):[...a,k];save();rer()});
-  $$('[data-cb]',el).forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.cb.split(':'),c=cardOf(s.samples[+i]),val=b.dataset.v;c[k]=c[k]===val?'':val;save();rer()});
-  $$('[data-co]',el).forEach(b=>b.onclick=async()=>{const [i,k]=b.dataset.co.split(':'),r=cols[+i].r;if(!r)return;const tags={...tasteOf(r)};tags[k]=((tags[k]||0)+1)%4;if(tags[k])tags.good=0;r.taste={...(r.taste||{}),tags,at:new Date().toISOString()};await commitRoast(r,true);rer()});
-  $$('[data-cn]',el).forEach(t=>t.oninput=()=>{s.samples[+t.dataset.cn].comments=t.value;save()});
-  $$('[data-can]',el).forEach(b=>b.onclick=async()=>{clearTimeout(cupSaveT);await persistCup();selAn=b.dataset.can;showScreen('analyze')});
-  $$('[data-ccdel]',el).forEach(b=>b.onclick=async()=>{const i=+b.dataset.ccdel,r=cols[i].r;if(!await ask('Take this sample off the table?',`${r?'Roast #'+r.num:'This sample'} is removed from this cupping session. The roast itself is not touched.`,'Remove',true))return;s.samples.splice(i,1);await persistCup();renderCupping()});
+function renderCupCard(el,s){return renderCupMac(el,s)}
+/* ---------- Mac cupping: one paper card per sample, laid out like the Brewed Behavior card (1.0.40) ----------
+   Saves into the same sample fields as before: card.fam/body/acid/bal/ov, comments (the notes under Balance/Overall),
+   plus the optional card.noteBA (the notes under Body/Acidity). "Anything off?" marks are the roast's own taste tags.
+   2 or 4 cards per screen (Settings › Appearance › Cupping). Compare is read-only. Print: one card per Letter page. */
+const CLV=['Heavy','Medium+','Medium','Light+','Light'];            // top to bottom, like the paper card
+const CLVA={Light:'L','Light+':'L+',Medium:'M','Medium+':'M+',Heavy:'H'};
+let cupMacView='cards',cupCmp=null,cupCmpHide=false,cupCmpDD=false,cupOffOpen=new Set(),cupHl=null;
+const cupKey=(s,x)=>s.id+'|'+x.roastId;
+function cupFind(k){const [sid,rid]=String(k).split('|'),s=CUP.find(z=>z.id===sid),x=s&&s.samples.find(y=>y.roastId===rid);return x?{s,x,r:HIST.find(h=>h.id===rid)}:null}
+const cupCoffee=r=>r?(r.meta.coffee||r.meta.name||'Untitled'):'(roast removed)';
+function cupAn(r){if(!r)return [];const te=tasteEff(r);return TASTE.filter(([k])=>te[k]>0).map(([k,l])=>[k,l.split(' / ')[0]+(k!=='good'?' · '+SEV[Math.min(3,te[k])]:''),k==='good'?'g':te[k]>=2?'r':'w'])}
+function cupFlag(x,r){const c=cardOf(x);return c.bal==='N'||c.ov==='N'||cupAn(r).some(([k])=>k!=='good')}
+const cupPills=r=>{const a=cupAn(r);return a.length?a.map(([,l,c])=>`<span class="cpill ${c}">${esc(l)}</span>`).join(''):'<span class="muted">nothing to fix yet</span>'};
+function cupCardHTML(s,x,i,pr){const r=HIST.find(h=>h.id===x.roastId),c=cardOf(x),l=r&&INV.find(z=>z.id===r.meta.invId),sp=r?spreadOf(r.meta):null,k=cupKey(s,x),t=r?tasteOf(r):{};
+  const bx=(on,attr,carbon)=>pr?`<span class="cbx ${on?'on':''}">${on?'✓':''}</span>`:`<button class="cbx ${on?'on':''} ${carbon?'carbon':''}" ${attr} aria-pressed="${on}">${on?'✓':''}</button>`;
+  const fv=(lab,v)=>`<div class="cf"><span>${lab}</span><b>${v===''||v==null?DASH:v}</b></div>`;
+  const fam=(a,b)=>`<div class="cgr"><span></span><span class="h">${a}</span><span class="h">${b}</span>${FAMS.map(([fk,fl])=>`<span class="n">${fl.toUpperCase()}</span>${[a,b].map(kk=>bx((c.fam[fk]||[]).includes(kk),`data-mf="${i}:${fk}:${kk}" title="${fl} — ${CCOLN[kk]}"`,fk==='carbon')).join('')}`).join('')}</div>`;
+  const note=(v,attr,big)=>`<div class="cnt ${big?'big':''}"><span class="lab">NOTES:</span>${pr?`<div class="ptx">${esc(v||'')}</div>`:`<textarea ${attr}>${esc(v||'')}</textarea>`}</div>`;
+  const roasted=r?r.chargedAt||r.created:null;
+  const offs=TASTE.filter(([kk])=>kk!=='good'),picked=offs.filter(([kk])=>t[kk]>0);
+  const chip=([kk,lab])=>`<button class="coc ${t[kk]>0?'on':''}" data-mo="${i}:${kk}" title="Tap again for more">${esc(lab.split(' / ')[0])}${t[kk]>0?` <i>· ${SEV[t[kk]]}</i>`:''}</button>`;
+  const per4=cfg.cupPerScreen===4,open=!per4||cupOffOpen.has(k);
+  const off=!r?'':pr?(picked.length?`<div class="coff"><span class="ol">ANYTHING OFF?</span>${picked.map(([kk,lab])=>`<span class="coc on">${esc(lab.split(' / ')[0])} · ${SEV[t[kk]]}</span>`).join('')}</div>`:'')
+    :open?`<div class="coff"><span class="ol">ANYTHING OFF?</span>${offs.map(chip).join('')}${per4?`<button class="q" data-moc="${k}">Done</button>`:''}</div>`
+    :(picked.length||c.bal==='N'||c.ov==='N')?`<div class="coff"><span class="ol">ANYTHING OFF?</span>${picked.map(chip).join('')}<button class="q" data-moo="${k}">${picked.length?'Edit':'+ Pick what was off'}</button></div>`:'';
+  return `<div class="cpc ${cupHl===k?'hl':''}" id="cpc${i}" data-k="${k}"><div class="chd">${!pr&&s.samples.length>1?`<button class="cx" data-mdel="${i}" title="Take this sample off the table">✕</button>`:''}
+    <div class="cttl"><b>#${r?r.num:'?'} · ${esc(cupCoffee(r))}</b><span class="muted">${r?esc(r.meta.name||'')+' · '+lbTxt(batchOf(r)):''}</span></div>
+    ${fv('Date:',fmtDate(s.date,false))}${fv('Moisture:',l?esc(l.moisture||''):'')}${fv('WB:',r?esc(r.meta.colorWhole||''):'')}${fv('Cupper:',esc(s.cuppers||''))}
+    ${fv('Roast date:',roasted?fmtDate(roasted,false)+' ('+ageOf(roasted)+')':'')}${fv('Screen size:',l?esc(l.screen||''):'')}${fv('GB:',r?esc(r.meta.colorGround||''):'')}<div></div>
+    ${fv('Coffee:',r?esc(r.meta.coffee||''):'')}${fv('Water activity:',l?esc(l.wa||''):'')}${fv('Spread:',ok(sp)?spTxt(sp):'')}<div></div></div>
+   <div class="cbd">
+    <div class="cpn"><div class="cpt">FRAGRANCE<br>AROMA</div>${fam('F','A')}</div>
+    <div class="cpn"><div class="cpt">FLAVOR<br>AFTERTASTE</div>${fam('FL','AT')}</div>
+    <div class="cpn"><div class="cpt">BODY<br>ACIDITY</div><div class="cgr lv"><span></span><span class="h">B</span><span class="h">A</span>${CLV.map(v=>`<span class="n">${v.toUpperCase()}</span>${bx(c.body===v,`data-mb="${i}:body:${v}"`)}${bx(c.acid===v,`data-mb="${i}:acid:${v}"`)}`).join('')}</div>${note(c.noteBA,`data-mn="${i}:ba"`)}</div>
+    <div class="cpn"><div class="cpt">BALANCE<br>OVERALL</div><div class="cgr lv"><span></span><span class="h">Y</span><span class="h">N</span>${[['BALANCE','bal'],['OVERALL','ov']].map(([lab,kk])=>`<span class="n">${lab}</span>${bx(c[kk]==='Y',`data-mb="${i}:${kk}:Y"`)}${bx(c[kk]==='N',`data-mb="${i}:${kk}:N"`)}`).join('')}</div>${note(x.comments,`data-mn="${i}:c"`,1)}</div>
+   </div>${off}
+   ${pr||!r?'':`<div class="can"><span class="ol">TO ANALYZE</span>${cupPills(r)}<span class="sp"></span><button class="q" data-mpr="${i}">Print</button><button class="q" data-mcw="${k}">Compare with…</button><button class="q" data-can="${r.id}">Analyze #${r.num} →</button></div>`}</div>`}
+function cupSide(s,x){const r=HIST.find(h=>h.id===x.roastId),me=cupCoffee(r),k0=cupKey(s,x);
+  const all=[...CUP].filter(z=>z.id!==s.id).sort((a,b)=>String(b.date).localeCompare(String(a.date))).flatMap(z=>z.samples.map(y=>({z,y,r:HIST.find(h=>h.id===y.roastId)}))).filter(o=>o.r&&hasCard(o.y));
+  const same=all.filter(o=>cupCoffee(o.r)===me),rest=all.filter(o=>cupCoffee(o.r)!==me).slice(0,4);
+  const row=o=>`<button class="csr" data-mpair="${k0}~${cupKey(o.z,o.y)}"><b>#${o.r.num} · ${esc(cupCoffee(o.r))}</b><span class="muted">${esc(o.r.meta.name||'')} · ${lbTxt(batchOf(o.r))} · cupped ${fmtDate(o.z.date,false)}</span><span class="sp"></span>${cupAn(o.r).map(([,l,c])=>`<span class="cpill ${c}">${esc(l)}</span>`).join('')}<span class="go">Compare →</span></button>`;
+  return `<div class="cside"><div class="dtitle" style="font-size:var(--fs-body)">Compare #${r?r.num:'?'} with…</div>
+    ${same.length?`<div class="muted cs1">Earlier cuppings of ${esc(me)}</div>${same.slice(0,6).map(row).join('')}`:`<div class="muted cs1">No earlier cuppings of ${esc(me)} yet.</div>`}
+    ${rest.length?`<div class="muted cs1" style="margin-top:var(--sp-4)">Other coffees</div>${rest.map(row).join('')}`:''}</div>`}
+function cupCompareHTML(s){
+  if(cupCmp==null)cupCmp=s.samples.map(x=>cupKey(s,x));
+  const keys=(Array.isArray(cupCmp)?cupCmp:[]).filter(k=>cupFind(k)),xs=keys.map(cupFind),here=s.samples.map(x=>cupKey(s,x));
+  const lbl=k=>{const o=cupFind(k);return `#${o.r?o.r.num:'?'} · ${esc(cupCoffee(o.r))}${o.s.id===s.id?'':' · '+fmtDate(o.s.date,false)}`};
+  const other=[...CUP].filter(z=>z.id!==s.id).sort((a,b)=>String(b.date).localeCompare(String(a.date))).flatMap(z=>z.samples.map(y=>cupKey(z,y))).filter(k=>!keys.includes(k)&&cupFind(k).r);
+  const sameC=new Set(xs.map(o=>cupCoffee(o.r))),groups=[...new Set(other.map(k=>cupCoffee(cupFind(k).r)))];
+  const extra=keys.filter(k=>!here.includes(k)),many=here.length+extra.length>6;
+  const pick=`<div class="cmpick"><span class="ol">COMPARE</span>${many?`<details class="cmdd" ${cupCmpDD?'open':''}><summary>Comparing ${keys.length} roast${keys.length===1?'':'s'} ▾</summary><div class="cmddl">${[...here,...extra].map(k=>`<label><input type="checkbox" data-mck="${k}" ${keys.includes(k)?'checked':''}> ${lbl(k)}</label>`).join('')}</div></details>`
+     :here.map(k=>`<button class="chip ${keys.includes(k)?'on':''}" data-mtg="${k}">${keys.includes(k)?'✓ ':''}${lbl(k)}</button>`).join('')+extra.map(k=>`<button class="chip on ext" data-mtg="${k}">✓ ${lbl(k)} ✕</button>`).join('')}
+    ${other.length?`<select id="cmAdd"><option value="">+ Roast from another session…</option>${groups.map(g=>`<optgroup label="${esc(g)}${sameC.has(g)?' — same coffee':''}">${other.filter(k=>cupCoffee(cupFind(k).r)===g).map(k=>`<option value="${k}">${lbl(k)} · ${esc(cupFind(k).s.name)}</option>`).join('')}</optgroup>`).join('')}</select>`:''}
+    <span class="sp"></span><label class="chk cmhe"><input type="checkbox" id="cmHide" ${cupCmpHide?'checked':''}> Hide empty rows</label><button class="q" data-mall="1">All in this session</button></div>`;
+  if(!xs.length)return pick+`<div class="card empty" style="padding:var(--sp-6)">Pick at least one roast to compare.</div>`;
+  const n=xs.length,wide=n>6,mk=(on,cb)=>`<span class="cmk ${on?'on':''} ${on&&cb?'carbon':''}">${on?'✓':''}</span>`,cs='colspan="4"',all=1+n*4;
+  const fams=FAMS.filter(([f])=>!cupCmpHide||xs.some(o=>(cardOf(o.x).fam[f]||[]).length));
+  const head=`<thead><tr><th class="n"></th>${xs.map((o,j)=>`<th class="sh sg" ${cs}><div class="row" style="gap:6px;flex-wrap:nowrap"><b>#${o.r?o.r.num:'?'} · ${esc(cupCoffee(o.r))}</b><span class="sp"></span><button class="q" data-medit="${keys[j]}">Edit</button></div><div class="muted">${o.r?esc(o.r.meta.name||'')+' · '+lbTxt(batchOf(o.r))+' · roasted '+fmtDate(o.r.chargedAt||o.r.created,false):''} · ${o.s.id===s.id?'this session':'cupped '+fmtDate(o.s.date,false)}</div></th>`).join('')}</tr>
+    <tr class="sub"><th class="n"></th>${xs.map(()=>CCOLS.map((k,j)=>`<th class="${j?'':'sg'}">${k}</th>`).join('')).join('')}</tr></thead>`;
+  const grp=t=>`<tr class="grp"><td colspan="${all}"><span class="gl">${t}</span></td></tr>`;
+  const famR=fams.map(([f,l])=>`<tr><td class="n">${l.toUpperCase()}</td>${xs.map(o=>CCOLS.map((k,j)=>`<td class="${j?'':'sg'}">${mk((cardOf(o.x).fam[f]||[]).includes(k),f==='carbon')}</td>`).join('')).join('')}</tr>`).join('')||`<tr><td class="n"></td><td colspan="${n*4}" class="muted">No flavors marked yet.</td></tr>`;
+  const word=v=>v?`<b>${esc(v)}</b>`:DASH,YN={Y:'Yes',N:'No'};
+  const line=(l,f)=>`<tr class="ln"><td class="n">${l}</td>${xs.map(o=>`<td class="sg" ${cs}>${f(o)}</td>`).join('')}</tr>`;
+  const offT=o=>{const t=o.r?tasteOf(o.r):{},on=TASTE.filter(([k])=>k!=='good'&&t[k]>0);return on.length?on.map(([k,l])=>`<span class="cpill w">${esc(l.split(' / ')[0])} · ${SEV[t[k]]}</span>`).join(''):DASH};
+  const notes=o=>{const v=[cardOf(o.x).noteBA,o.x.comments].filter(Boolean).join(' · ');return v?esc(v):DASH};
+  return pick+`<div class="cmp"><table class="${wide?'wide':''}" style="${wide?`width:${130+n*240}px`:''}">${head}<tbody>
+    ${grp('Flavor families')}${famR}${grp('Cup')}
+    ${line('BODY',o=>word(cardOf(o.x).body))}${line('ACIDITY',o=>word(cardOf(o.x).acid))}${line('BALANCE',o=>word(YN[cardOf(o.x).bal]))}${line('OVERALL',o=>word(YN[cardOf(o.x).ov]))}
+    ${line('ANYTHING OFF?',offT)}${line('NOTES',notes)}${grp('To Analyze')}${line('',o=>o.r?cupPills(o.r):'')}</tbody></table></div>`}
+function renderCupMac(el,s){const per=cfg.cupPerScreen===4?4:2,list=[...CUP].sort((a,b)=>String(b.date).localeCompare(String(a.date))),n=s.samples.length;
+  el.classList.add('cmOn');$('#scr-cupping').classList.add('cmMac');
+  const top=`<div class="cmTop"><h1>Cupping</h1><select id="cmSess" title="Cupping session">${list.map(z=>`<option value="${esc(z.id)}" ${z.id===s.id?'selected':''}>${fmtDate(z.date,false)} · ${esc(z.name)}</option>`).join('')}</select>
+    <div class="cmT"><b>${esc(s.name)}</b><span class="muted" title="Tick the boxes like the paper card — it saves as you go">${n} sample${n===1?'':'s'}${s.cuppers?' · '+esc(s.cuppers):''}</span></div><span class="sp"></span>
+    ${cfg.cupScoring?`<div class="seg"><button class="on" data-cv="card">Card</button><button data-cv="score">100-point</button></div>`:''}
+    <div class="seg"><button class="${cupMacView==='cards'?'on':''}" data-mv="cards">Cards</button><button class="${cupMacView==='cmp'?'on':''}" data-mv="cmp">Compare</button></div>
+    <button id="cmPrint" ${n?'':'disabled'}>Print…</button><button id="ccAdd">+ Add sample</button><button class="dangerTxt" id="csDel">Delete session</button><button data-mcsv="1">Export CSV</button><button class="pri" data-mnew="1">+ New session</button></div>`;
+  const cards=!n?`<div class="card empty" style="padding:var(--sp-6)">No samples yet — use <b>+ Add sample</b>.</div>`
+    :n===1?`<div class="cgrid per${per}">${cupCardHTML(s,s.samples[0],0)}${cupSide(s,s.samples[0])}</div>`
+    :`${n>per?`<div class="cjump"><span class="ol">JUMP TO</span>${s.samples.map((x,i)=>{const r=HIST.find(h=>h.id===x.roastId),f=cupFlag(x,r);return `<button class="chip ${f?'fl':''}" data-mj="${i}" title="${esc(cupCoffee(r))}">#${r?r.num:'?'}${f?' <span class="wn">⚠</span>':''}</button>`}).join('')}<span class="sp"></span><span class="muted">${s.samples.filter(x=>cupFlag(x,HIST.find(h=>h.id===x.roastId))).length} with something off</span></div>`:''}<div class="cgrid per${per}">${s.samples.map((x,i)=>cupCardHTML(s,x,i)).join('')}</div>`;
+  const keepY=el.dataset.sid===s.id&&el.dataset.mv===cupMacView?el.scrollTop:0,keepX=($('.cmp',el)||{}).scrollLeft||0;
+  el.innerHTML=top+(cupMacView==='cmp'?cupCompareHTML(s):cards);el.dataset.sid=s.id;el.dataset.mv=cupMacView;el.scrollTop=keepY;const cmpEl=$('.cmp',el);if(cmpEl)cmpEl.scrollLeft=keepX;
+  const rer=()=>renderCupping(),save=()=>cupSaveSoon(),X=i=>s.samples[+i];
+  $('#cmSess').onchange=async e=>{clearTimeout(cupSaveT);await persistCup();selSession=e.target.value;cupCmp=null;el.scrollTop=0;rer()};
+  $$('[data-mv]',el).forEach(b=>b.onclick=()=>{cupMacView=b.dataset.mv;rer()});
+  $$('[data-mcsv]',el).forEach(b=>b.onclick=()=>$('#btnCupCsv').click());$$('[data-mnew]',el).forEach(b=>b.onclick=()=>$('#btnNewSession').click());
   $$('[data-cv]',el).forEach(b=>b.onclick=()=>{cupView=b.dataset.cv;renderCupDetail()});
+  $$('[data-mf]',el).forEach(b=>b.onclick=()=>{const [i,f,k]=b.dataset.mf.split(':'),c=cardOf(X(i)),a=c.fam[f]||[];c.fam[f]=a.includes(k)?a.filter(z=>z!==k):[...a,k];save();rer()});
+  $$('[data-mb]',el).forEach(b=>b.onclick=()=>{const [i,k,v]=b.dataset.mb.split(':'),c=cardOf(X(i));c[k]=c[k]===v?'':v;save();rer()});
+  $$('[data-mn]',el).forEach(t=>t.oninput=()=>{const [i,k]=t.dataset.mn.split(':'),x=X(i);if(k==='c')x.comments=t.value;else{const c=cardOf(x);if(t.value)c.noteBA=t.value;else delete c.noteBA}save()});
+  $$('[data-mo]',el).forEach(b=>b.onclick=async()=>{const [i,k]=b.dataset.mo.split(':'),r=HIST.find(h=>h.id===X(i).roastId);if(!r)return;const tags={...tasteOf(r)};tags[k]=((tags[k]||0)+1)%4;if(tags[k])tags.good=0;r.taste={...(r.taste||{}),tags,at:new Date().toISOString()};await commitRoast(r,true);rer()});
+  $$('[data-moo]',el).forEach(b=>b.onclick=()=>{cupOffOpen.add(b.dataset.moo);rer()});$$('[data-moc]',el).forEach(b=>b.onclick=()=>{cupOffOpen.delete(b.dataset.moc);rer()});
+  $$('[data-mj]',el).forEach(b=>b.onclick=()=>{const c=$('#cpc'+b.dataset.mj,el);if(c)c.scrollIntoView({behavior:'smooth',block:'start'})});
+  $$('[data-mcw]',el).forEach(b=>b.onclick=()=>{cupCmp=[b.dataset.mcw];cupMacView='cmp';rer();setTimeout(()=>{const a=$('#cmAdd');if(a)a.focus()},50)});
+  $$('[data-mpair]',el).forEach(b=>b.onclick=()=>{cupCmp=b.dataset.mpair.split('~');cupMacView='cmp';rer()});
+  $$('[data-mtg]',el).forEach(b=>b.onclick=()=>{const k=b.dataset.mtg,cur=(Array.isArray(cupCmp)?cupCmp:[]).filter(q=>cupFind(q));cupCmp=cur.includes(k)?cur.filter(q=>q!==k):[...cur,k];if(!cupCmp.length)cupCmp='none';rer()});
+  $$('[data-mck]',el).forEach(b=>b.onchange=()=>{const k=b.dataset.mck,cur=(Array.isArray(cupCmp)?cupCmp:[]).filter(q=>cupFind(q));cupCmp=b.checked?[...cur,k]:cur.filter(q=>q!==k);if(!cupCmp.length)cupCmp='none';cupCmpDD=true;rer()});
+  const dd=$('.cmdd',el);if(dd)dd.ontoggle=()=>{cupCmpDD=dd.open};
+  const add=$('#cmAdd');if(add)add.onchange=()=>{if(!add.value)return;cupCmp=[...(Array.isArray(cupCmp)?cupCmp:[]),add.value];rer()};
+  const hide=$('#cmHide');if(hide)hide.onchange=()=>{cupCmpHide=hide.checked;rer()};
+  $$('[data-mall]',el).forEach(b=>b.onclick=()=>{cupCmp=null;rer()});
+  $$('[data-medit]',el).forEach(b=>b.onclick=()=>{const o=cupFind(b.dataset.medit);if(!o)return;selSession=o.s.id;cupMacView='cards';cupHl=b.dataset.medit;cupCmp=null;el.scrollTop=0;rer();
+    const i=o.s.samples.indexOf(o.x),c=$('#cpc'+i,el);if(c)c.scrollIntoView({block:'start'});setTimeout(()=>{cupHl=null;const h=$('.cpc.hl',el);if(h)h.classList.remove('hl')},1600)});
+  $$('[data-can]',el).forEach(b=>b.onclick=async()=>{clearTimeout(cupSaveT);await persistCup();selAn=b.dataset.can;showScreen('analyze')});
+  $$('[data-mpr]',el).forEach(b=>b.onclick=()=>cupPrint(s,[+b.dataset.mpr]));
+  $('#cmPrint').onclick=async()=>{const v=await askPrintCards(s);if(v&&v.length)cupPrint(s,v)};
+  $$('[data-mdel]',el).forEach(b=>b.onclick=async()=>{const i=+b.dataset.mdel,r=HIST.find(h=>h.id===X(i).roastId);if(!await ask('Take this sample off the table?',`${r?'Roast #'+r.num:'This sample'} is removed from this cupping session. The roast itself is not touched.`,'Remove',true))return;s.samples.splice(i,1);cupCmp=null;await persistCup();rer()});
   $('#ccAdd').onclick=async()=>{const have=new Set(s.samples.map(x=>x.roastId)),pick=HIST.filter(r=>!r.archived&&!have.has(r.id)).slice(0,30);if(!pick.length){toast('No other roasts to add');return}
-    const v=await askPick('Add a sample','Roast',pick.map(r=>[r.id,`#${r.num} ${r.meta.name||'Untitled'} · ${fmtDate(r.chargedAt||r.created,false)}`]));if(!v)return;s.samples.push(newSample(v));await persistCup();rer()};
-  $('#csDel').onclick=async()=>{if(!await ask('Delete this cupping session?','Taste marks already saved on the roasts stay on those roasts.','Delete',true))return;CUP=CUP.filter(z=>z.id!==s.id);await persistCup();renderCupping()}}
+    const v=await askPick('Add a sample','Roast',pick.map(r=>[r.id,`#${r.num} ${r.meta.name||'Untitled'} · ${fmtDate(r.chargedAt||r.created,false)}`]));if(!v)return;s.samples.push(newSample(v));cupCmp=null;await persistCup();rer()};
+  $('#csDel').onclick=async()=>{if(!await ask('Delete this cupping session?','Taste marks already saved on the roasts stay on those roasts.','Delete',true))return;CUP=CUP.filter(z=>z.id!==s.id);cupCmp=null;await persistCup();renderCupping()}}
+function askPrintCards(s){return new Promise(res=>{const root=$('#modalRoot');
+  root.innerHTML=`<div class="modalbg"><div class="modal"><h3>Print cards</h3><div class="muted" style="font-size:var(--fs-sm)">Each card prints on its own page.</div><div class="cplist">${s.samples.map((x,i)=>{const r=HIST.find(h=>h.id===x.roastId);return `<label class="chk"><input type="checkbox" value="${i}" checked> <b>#${r?r.num:'?'} · ${esc(cupCoffee(r))}</b> <span class="muted">${r?esc(r.meta.name||'')+' · '+lbTxt(batchOf(r)):''}</span></label>`}).join('')}</div>
+    <div class="row"><button class="q" id="cpAll">All</button><button class="q" id="cpNone">None</button><span class="sp"></span><button id="mNo">Cancel</button><button id="mYes" class="pri">Print</button></div></div></div>`;
+  const bs=()=>$$('.cplist input',root),cnt=()=>{const n=bs().filter(b=>b.checked).length;$('#mYes').textContent=n?`Print ${n} card${n===1?'':'s'}`:'Print';$('#mYes').disabled=!n};
+  bs().forEach(b=>b.onchange=cnt);cnt();$('#cpAll').onclick=()=>{bs().forEach(b=>b.checked=true);cnt()};$('#cpNone').onclick=()=>{bs().forEach(b=>b.checked=false);cnt()};
+  const done=v=>{root.innerHTML='';res(v)};$('#mNo').onclick=()=>done(null);$('#mYes').onclick=()=>done(bs().filter(b=>b.checked).map(b=>+b.value))})}
+async function cupPrint(s,idx){clearTimeout(cupSaveT);await persistCup();
+  const pages=idx.map(i=>`<div class="cpPage">${cupCardHTML(s,s.samples[i],i,1)}<div class="cpFoot"><span>Zuna Coffee · cupping card</span><span>${esc(s.name)} · printed ${fmtDate(new Date().toISOString(),false)}</span></div></div>`).join('');
+  const r0=HIST.find(h=>h.id===s.samples[idx[0]].roastId);
+  await rpPrint(`<div class="cupPrint">${pages}</div>`,idx.length===1&&r0?`Cupping card #${r0.num}`:`Cupping cards ${s.name}`)}
 function askPick(title,label,opts){return new Promise(res=>{const root=$('#modalRoot');root.innerHTML=`<div class="modalbg"><div class="modal"><h3>${esc(title)}</h3><label class="field">${esc(label)}<select id="mSel">${opts.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select></label><div class="row" style="justify-content:flex-end"><button id="mNo">Cancel</button><button id="mYes" class="pri">Add</button></div></div></div>`;
   const done=v=>{root.innerHTML='';res(v)};$('#mNo').onclick=()=>done(null);$('#mYes').onclick=()=>done($('#mSel').value)})}
 
@@ -2663,7 +2832,7 @@ function cardTimeHTML(r){const H=cardHistory(r);if(!H.length)return '';const C=H
   return `<div><div class="h3" style="margin-bottom:6px">Cupping cards over time — ${esc(r.meta.coffee||r.meta.name||'')} · ${lbTxt(batchOf(r))}</div>
    <div class="cot"><table><thead><tr><th></th>${C.map(({x})=>`<th class="${x.id===r.id?'cur':''}">#${x.num}<div class="muted" style="font-weight:400">${fmtDate(x.chargedAt||x.created,false)}</div></th>`).join('')}</tr></thead><tbody>
    ${FAMS.map(([f,l])=>`<tr><td class="ccl">${l}</td>${C.map(({x,c})=>`<td class="${x.id===r.id?'cur':''}">${dot(lvl(c,f),f)}</td>`).join('')}</tr>`).join('')}
-   <tr><td class="ccl">Body / acidity</td>${C.map(({x,c})=>`<td class="${x.id===r.id?'cur':''}">${(c.body||'—')[0]}/${(c.acid||'—')[0]}</td>`).join('')}</tr>
+   <tr><td class="ccl">Body / acidity</td>${C.map(({x,c})=>`<td class="${x.id===r.id?'cur':''}">${CLVA[c.body]||'—'}/${CLVA[c.acid]||'—'}</td>`).join('')}</tr>
    <tr><td class="ccl">Development</td>${C.map(({x,s})=>`<td class="${x.id===r.id?'cur':''}">${mmss(s.dev)}</td>`).join('')}</tr>
    <tr><td class="ccl">WB / GB</td>${C.map(({x})=>`<td class="${x.id===r.id?'cur':''}">${esc(x.meta.colorWhole||'—')}/${esc(x.meta.colorGround||'—')}</td>`).join('')}</tr></tbody></table></div>
    <div class="muted" style="font-size:var(--fs-cap);margin:4px 0 6px">Full dot = in the cup (flavor or aftertaste) · faint = only on the dry or break</div>${notes.slice(-3).reverse().join('')}</div>`}
@@ -2834,6 +3003,7 @@ function renderSettings(){const el=$('#scont');$$('#snav button').forEach(b=>b.c
     <div class="sech">Pricing</div>
     <div class="cols"><div>${COLOR_ROWS.pricing.slice(0,3).map(([k,l])=>crow(k,l)).join('')}</div><div>${COLOR_ROWS.pricing.slice(3).map(([k,l])=>crow(k,l)).join('')}</div></div>
     <div class="sech">Cupping</div>
+    <div class="row" style="gap:12px"><span>Cupping cards per screen on the Mac</span><div class="seg" id="cupPerSeg">${[2,4].map(n=>`<button class="${(cfg.cupPerScreen===4?4:2)===n?'on':''}" data-cps="${n}">${n}</button>`).join('')}</div><span class="muted" style="font-size:var(--fs-sm)">2 = bigger boxes · 4 = all four cards on one screen</span></div>
     <label class="chk"><input type="checkbox" id="cupScoreOn" ${cfg.cupScoring?'checked':''}> Also use the SCA 100-point score form (adds a Card / 100-point switch to each session; the card is always there)</label>
     <label class="chk"><input type="checkbox" id="cupOn" ${cfg.cupColorsOn?'checked':''}> Color cupping scores by grade (Cupping, History, Profiles and roast details)</label>
     <div class="cupbands">${cfg.cupBands.map((b,i)=>{const last=i===cfg.cupBands.length-1;return `<div class="crow" style="grid-template-columns:150px 1fr 44px 96px">${last?`<span class="muted">Below ${esc(String(cfg.cupBands[i-1].min))}</span>`:`<label class="row" style="gap:8px;flex-wrap:nowrap"><span class="muted">From</span><input type="number" step="0.25" data-cupm="${i}" value="${esc(String(b.min))}" style="width:80px"></label>`}<input type="text" data-cupl="${i}" value="${esc(b.label)}" placeholder="Grade name"><input type="color" data-cupc="${i}" value="${b.col}"><input type="text" data-cuph="${i}" value="${b.col.toUpperCase()}" maxlength="7"></div>`}).join('')}</div>
@@ -2948,7 +3118,7 @@ function wireSettings(){const el=$('#scont');
   $$('[data-hex]',el).forEach(i=>i.onchange=()=>{let v=i.value.trim();if(!v.startsWith('#'))v='#'+v;if(setCol(i.dataset.hex,v)){renderSettings()}else{toast('Use a 6-digit hex code like #1463FF');i.value=cfg.theme.colors[i.dataset.hex].toUpperCase()}});
   $$('[data-theme]',el).forEach(b=>b.onclick=e=>{if(e.target.dataset.deltheme!=null){cfg.customThemes.splice(Number(e.target.dataset.deltheme),1);saveCfg();renderSettings();return}const all=[{name:'White',colors:WHITE},{name:'Dark',colors:DARK},...cfg.customThemes],t=all[Number(b.dataset.theme)];cfg.theme={name:t.name,colors:{...WHITE,tTime:t.colors.text||WHITE.tTime,tBT:t.colors.text||WHITE.tBT,tRoR:t.colors.ror||WHITE.tRoR,tSpB:t.colors.text||WHITE.tSpB,tSpA:t.colors.text||WHITE.tSpA,tSpD:t.colors.text||WHITE.tSpD,...t.colors}};saveCfg();applyTheme();renderSettings();renderAll()});
   const ts=$('#thSave');if(ts)ts.onclick=async()=>{const n=await askText('Save this look','Name','My roasting room');if(!n||!n.trim())return;cfg.customThemes=cfg.customThemes.filter(t=>t.name!==n.trim());cfg.customThemes.push({name:n.trim(),colors:{...cfg.theme.colors}});cfg.theme.name=n.trim();saveCfg();renderSettings()};
-  const cso=$('#cupScoreOn');if(cso)cso.onchange=()=>{cfg.cupScoring=cso.checked;cupView='card';saveCfg();renderSettings()};
+  $$('[data-cps]').forEach(b=>b.onclick=()=>{cfg.cupPerScreen=+b.dataset.cps;saveCfg();renderSettings()});const cso=$('#cupScoreOn');if(cso)cso.onchange=()=>{cfg.cupScoring=cso.checked;cupView='card';saveCfg();renderSettings()};
   const co=$('#cupOn');if(co)co.onchange=()=>{cfg.cupColorsOn=co.checked;saveCfg();renderSettings();renderAll()};
   const cupSet=()=>{saveCfg();renderAll()};
   $$('[data-cupc]',el).forEach(i=>{i.oninput=()=>{cfg.cupBands[+i.dataset.cupc].col=i.value;$(`[data-cuph="${i.dataset.cupc}"]`,el).value=i.value.toUpperCase();cupSet()};i.onchange=()=>renderSettings()});
