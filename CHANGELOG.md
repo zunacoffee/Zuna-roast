@@ -2,6 +2,11 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.41 — Cupping cards print landscape (Nov 4, 2026; Mac)
+- Ty's print preview of 1.0.40 showed the portrait card squeezed and small. Cards now print landscape like the paper card: `cupPrint` adds `#cupPageCss` (`@page{size:letter landscape;margin:.4in}`); `rpPrint` removes it before any other printout, so roast sheets and reports stay portrait.
+- Bigger print sizes (text ~30 % larger, 24 px boxes, rows spread down the page); both notes areas fill their panels with ruled lines.
+- Checked as PDFs in Chromium: 3 cards → 3 landscape pages, a report printed afterwards is portrait. Not yet checked in the Mac app's print window (WebKit).
+
 ## 1.0.40 — Cupping cards like the paper card (Nov 4, 2026; Mac, 13" iPad, iPhone)
 - Ty: the F / A / FL / AT letters repeating everywhere were confusing, and he wanted the screen to look like the Brewed Behavior card he uses.
 - **Mac Cupping = one paper card per sample** (`renderCupMac`, `cupCardHTML`): header (date, roast date, coffee, moisture, screen size, water activity, WB, GB, spread, cupper), four panels Fragrance/Aroma (F A), Flavor/Aftertaste (FL AT), Body/Acidity (B A × Heavy / Medium+ / Medium / Light+ / Light), Balance/Overall (Y N), two notes areas, "Anything off?" chips (the roast's own taste tags, tap again for a little / some / a lot), To Analyze bar with Print, Compare with…, Analyze →. Plain boxes, no shaded columns; ticked = accent, carbon = danger, off chips = warn.
