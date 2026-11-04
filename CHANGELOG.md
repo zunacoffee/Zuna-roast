@@ -2,6 +2,11 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.42 — Cupping cards turned sideways on the page (Nov 4, 2026; Mac)
+- 1.0.41's `@page{size:letter landscape}` did nothing in the Mac app: its print window (WKWebView) has no orientation setting and ignores the CSS page size, so Ty still got the small upright card.
+- Now `cupPrint` lays each card out landscape (10 × 7.5 in, `.cpRot`) and turns it −90° inside an upright Letter page (`.cpPage` 7.5 × 10 in, `transform:translateY(10in) rotate(-90deg)`). No page-size CSS any more (`#cupPageCss` removed; `rpPrint` still clears it if present). Print upright as usual; turn the sheet to read it.
+- Checked as PDFs in Chromium (3 cards → 3 upright pages, card fills each). Not yet checked in the Mac app's print window.
+
 ## 1.0.41 — Cupping cards print landscape (Nov 4, 2026; Mac)
 - Ty's print preview of 1.0.40 showed the portrait card squeezed and small. Cards now print landscape like the paper card: `cupPrint` adds `#cupPageCss` (`@page{size:letter landscape;margin:.4in}`); `rpPrint` removes it before any other printout, so roast sheets and reports stay portrait.
 - Bigger print sizes (text ~30 % larger, 24 px boxes, rows spread down the page); both notes areas fill their panels with ruled lines.

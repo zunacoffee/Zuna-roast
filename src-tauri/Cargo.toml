@@ -1,6 +1,6 @@
 [package]
 name = "zuna-roast"
-version = "1.0.41"
+version = "1.0.42"
 description = "Zuna Roast — roasting software for the Probat P12 III"
 authors = ["Zuna Coffee"]
 edition = "2021"
