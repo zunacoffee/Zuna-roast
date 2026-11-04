@@ -621,6 +621,8 @@ html:not(.ipad) .ipOnly{display:none!important}
 .ipad body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .ipad input,.ipad textarea,.ipad select,.ipad .note{-webkit-user-select:text;user-select:text}
 .ipad header{gap:10px;padding:0 12px}
+/* iPad Pricing card: the bag rows are narrower here — tighter columns so After OH stays inside the bag box */
+.ipad .pin{grid-template-columns:82px 58px minmax(0,1fr) 84px 40px 50px;gap:6px}.ipad .pin .n{white-space:nowrap}.ipad .pin.h span{font-size:11px;letter-spacing:.03em}
 .ipad header button,.ipad nav button{min-height:44px}
 .ipad #btnDetails,.ipad #clock,.ipad .swk{display:none}
 .ipad .fk>small{display:none}
