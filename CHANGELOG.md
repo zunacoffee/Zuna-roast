@@ -2,6 +2,12 @@
 
 Newest first. One section per release (Mac version number) or iPad/iPhone-only TestFlight build. Technical notes are for whoever works on the code next; open questions and untested items live in the claude.ai project doc `claude/OPEN-ITEMS.md`.
 
+## 1.0.45 — Zuna logo on printed cupping cards (Nov 6, 2026; Mac)
+- Printed cupping cards (the Preview PDF) carry the Zuna logo, 36 pt, top-right of the header, in brand colors #002836 / #0C8493 (two greys on a black-and-white printer). The logo is drawn as vector paths from `assets/zuna-icon-reverse.svg` (`ZUNA_LOGO_PDF`, `pdfLogo`).
+- Cupper moved from the first header row to the bottom row, across from Spread, to free the corner.
+- A big faint background logo was tried and dropped: it tinted the empty boxes (same problem as the shaded columns).
+- Screen cards unchanged.
+
 ## 1.0.44 — Cupping cards open as a landscape PDF in Preview (Nov 4, 2026; Mac)
 - 1.0.41–1.0.43 tried to fit a landscape card through the Mac app's print window. It always prints upright, ignores `@page size`, and its printable area changes with the printer (Ty's PDF and his print preview disagreed), so no fixed size fit.
 - Now, in the Mac app, Print / Print… on a cupping card builds a vector PDF in JS (`cupCardsPdf` / `cupCardPdfOps`: Letter landscape 792 × 612 pt, one card per page, Helvetica/Helvetica-Bold WinAnsi, ASCII-only file) and the new Rust command `open_pdf` (lib.rs) writes it to `$TMPDIR/Zuna Roast/<name>.pdf` and runs `open`, so it opens in Preview; ⌘P prints landscape on any printer. `ZR_NATIVE.openPdf` in native.js.
